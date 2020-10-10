@@ -16,7 +16,7 @@
 # **********************************************************************/
 
 # Import MCSControl_PythonWrapper.py 
-from MCSControl_PythonWrapper import *
+from src.stages.MCSControl.MCSControl_PythonWrapper import *
 
 #check dll version (not really necessary)
 version = ct.c_ulong()
@@ -37,8 +37,8 @@ def ExitIfError(status):
 def main():
 
     #find all available MCS systems
-    outBuffer = ct.create_string_buffer(17) 
-    ioBufferSize = ct.c_ulong(18)
+    outBuffer = ct.create_string_buffer(4096)
+    ioBufferSize = ct.c_ulong(4096)
     ExitIfError( SA_FindSystems('', outBuffer, ioBufferSize) ) #will report a 'MCS error: query-buffer size' if outBuffer, ioBufferSize is to small
     print('MCS address: {}'.format(outBuffer[:18].decode("utf-8"))) #connect to first system of list
 
@@ -60,7 +60,7 @@ def main():
     #     mode. Please read the MCS Programmer's Guide for more information. */
 
     #/* Open the first MCS with USB interface in synchronous communication mode */
-    ExitIfError( SA_OpenSystem(mcsHandle,outBuffer, bytes('sync,reset',"utf-8")) )
+    ExitIfError( SA_OpenSystem(mcsHandle,bytes('usb:id:3948963323',"utf-8"), bytes('sync,reset',"utf-8")) )
 
     # /* Now the MCS is initialized and can be used.
     #    In this demo program all we do is reading the sensor power-mode. */
