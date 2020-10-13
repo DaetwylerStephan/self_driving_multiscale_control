@@ -60,7 +60,7 @@ def main():
     #     mode. Please read the MCS Programmer's Guide for more information. */
 
     #/* Open the first MCS with USB interface in synchronous communication mode */
-    ExitIfError( SA_OpenSystem(mcsHandle,"usb:id:3948963323", bytes('sync,reset',"utf-8")) )
+    #ExitIfError( SA_OpenSystem(mcsHandle,"usb:id:3948963323", bytes('sync,reset',"utf-8")) )
     ExitIfError(SA_OpenSystem(mcsHandle, outBuffer, bytes('sync,reset', "utf-8")))
 
     # /* Now the MCS is initialized and can be used.
