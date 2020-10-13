@@ -7,14 +7,14 @@ from MCSControl.MCSControl_PythonWrapper import *
 class SR2812_rotationstage:
 
     def __init__(self, locator):
+        # initialize some variables
+        self.sensorEnabled = ct.c_ulong(0)  # initialize sensorEnbaled variable
+        self.mcsHandle = ct.c_ulong()  # initialize MCS control handle
+
         # check dll version (not really necessary)
         version = ct.c_ulong()
         SA_GetDLLVersion(version)
         print('DLL-version: {}'.format(version.value))
-
-        # initialize some variables
-        self.sensorEnabled = ct.c_ulong(0)  # initialize sensorEnbaled variable
-        self.mcsHandle = ct.c_ulong()  # initialize MCS control handle
 
         # /* Open the first MCS with USB interface in synchronous communication mode */
         self.ExitIfError(SA_OpenSystem(self.mcsHandle, bytes(locator, "utf-8"), bytes('sync,reset', "utf-8")))
