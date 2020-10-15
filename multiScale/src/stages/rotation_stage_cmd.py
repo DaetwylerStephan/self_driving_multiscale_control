@@ -6,7 +6,8 @@ Script containing all functions to initialize and operate the rotation stage SR2
 '''
 
 # Import MCSControl_PythonWrapper.py
-from MCSControl.MCSControl_PythonWrapper import *
+from .MCSControl.MCSControl_PythonWrapper import *
+import time
 
 # ### implement getchar() function for single character user input
 class _GetchWindows:
@@ -33,6 +34,9 @@ class SR2812_rotationstage:
         self.numOfChannels = ct.c_ulong(0)
         self.channel = ct.c_ulong(0)
         self.sensorType = ct.c_ulong()
+        self.position = ct.c_int()
+        self.status = ct.c_ulong()
+
 
 
         # check dll version (not really necessary)
@@ -105,6 +109,26 @@ class SR2812_rotationstage:
 
             if (key == '+'):
                 self.ExitIfError(SA_GotoAngleRelative_S(self.mcsHandle, self.channel, step_angle, 0, 1000))
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # // wait until movement has finished
+        # // in synchronous communication mode, the current status of each channel
+        # // must be checked periodically ('polled') to know when a movement has
+         # // finished:
+        while True:
+            self.ExitIfError(SA_GetStatus_S(self.mcsHandle, self.channel, self.status))
+            time.sleep(0.05)
+            print(self.status.value)
+            if (self.status.value == SA_TARGET_STATUS) or (self.status.value == SA_STOPPED_STATUS):
+                break
+
+            # // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+            revolution = ct.c_ulong()
+            self.ExitIfError(SA_GetAngle_S(self.mcsHandle, self.channel, self.position, revolution))
+            print("Position: {} ugrad (Press \'s\' to change step size. Press \'q\' to exit.)".format(self.position.value))
+                # // - - - - - - - - - - -
 
     def closestage(self):
         # /* At the end of the program you should release all opened systems. */

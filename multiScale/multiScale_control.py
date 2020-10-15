@@ -9,6 +9,8 @@ import time
 import os
 import sys
 import importlib.util
+from src.stages.rotation_stage_cmd import *
+
 from PyQt5 import QtWidgets
 
 
@@ -59,6 +61,11 @@ def main():
     cfg = load_config(logger, configfilepath)
 
     print(cfg.stage_parameters)
+
+    stage_id = 'usb:id:3948963323'
+    rotationstage = SR2812_rotationstage(stage_id)
+    rotationstage.ManualMove()
+    rotationstage.closestage()
 
 
 if __name__ == '__main__':
