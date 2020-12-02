@@ -16,9 +16,11 @@ class slit_ximc_control:
         Output: an initialized and connected slit.
         '''
 
+        print("a")
+        print(sys.version_info)
 
         if sys.version_info >= (3, 0):
-        import urllib.parse
+            import urllib.parse
 
         # Dependences
 
@@ -44,7 +46,7 @@ class slit_ximc_control:
             os.environ["Path"] = self.libdir + ";" + os.environ["Path"]  # add dll path into an environment variable
 
         try:
-            from pyximc import *
+            import pyximc
         except ImportError as err:
             print(
                 "Can't import pyximc module. The most probable reason is that you changed the relative location of the testpython.py and pyximc.py files. See developers' documentation for details.")
@@ -74,6 +76,16 @@ class slit_ximc_control:
         # note that ximc uses stdcall on win
         print("Library loaded")
 
+        self.lib = pyximc.lib
+        self.x_device_information = pyximc.device_information_t()
+        self.Result = pyximc.Result
+        self.x_status = pyximc.status_t()
+        self.x_pos = pyximc.get_position_t()
+        self.eng = pyximc.engine_settings_t()
+        self.MicrostepMode = pyximc.MicrostepMode
+        self.mvst = pyximc.move_settings_t()
+
+
         self.sbuf = create_string_buffer(64)
         self.lib.ximc_version(self.sbuf)
         print("Library version: " + self.sbuf.raw.decode().rstrip("\0"))
@@ -85,7 +97,7 @@ class slit_ximc_control:
         self.lib.set_bindy_key(os.path.join(self.ximc_dir, "win32", "keyfile.sqlite").encode("utf-8"))
 
         # This is device search and enumeration with probing. It gives more information about devices.
-        probe_flags = self.EnumerateFlags.ENUMERATE_PROBE + self.EnumerateFlags.ENUMERATE_NETWORK
+        probe_flags = pyximc.EnumerateFlags.ENUMERATE_PROBE + pyximc.EnumerateFlags.ENUMERATE_NETWORK
         enum_hints = b"addr=192.168.0.1,172.16.2.3"
         # enum_hints = b"addr=" # Use this hint string for broadcast enumerate
         self.devenum = self.lib.enumerate_devices(probe_flags, enum_hints)
@@ -95,8 +107,8 @@ class slit_ximc_control:
         self.dev_count = self.lib.get_device_count(self.devenum)
         print("Device count: " + repr(self.dev_count))
 
-        self.controller_name = self.controller_name_t()
-        for dev_ind in range(0, dev_count):
+        self.controller_name = pyximc.controller_name_t()
+        for dev_ind in range(0, self.dev_count):
             enum_name = self.lib.get_device_name(self.devenum, dev_ind)
             result = self.lib.get_enumerate_device_controller_name(self.devenum, dev_ind, byref(self.controller_name))
             if result == self.Result.Ok:
@@ -107,7 +119,7 @@ class slit_ximc_control:
         self.open_name = None
         if len(sys.argv) > 1:
             self.open_name = sys.argv[1]
-        elif dev_count > 0:
+        elif self.dev_count > 0:
             self.open_name = self.lib.get_device_name(self.devenum, 0)
         elif sys.version_info >= (3, 0):
             # use URI for virtual device when there is new urllib python3 API
@@ -131,10 +143,11 @@ class slit_ximc_control:
         print("Device id: " + repr(self.device_id))
 
 
+
+
     def slit_info(self):
         print("\nGet device info")
-        x_device_information = self.device_information_t()
-        result = self.lib.get_device_information(self.device_id, byref(x_device_information))
+        result = self.lib.get_device_information(self.device_id, byref(self.x_device_information))
         print("Result: " + repr(result))
         if result == self.Result.Ok:
             print("Device information:")
@@ -151,24 +164,22 @@ class slit_ximc_control:
 
     def slit_status(self):
         print("\nGet status")
-        x_status = self.status_t()
-        result = self.lib.get_status(self.device_id, byref(x_status))
+        result = self.lib.get_status(self.device_id, byref(self.x_status))
         print("Result: " + repr(result))
         if result == self.Result.Ok:
-            print("Status.Ipwr: " + repr(x_status.Ipwr))
-            print("Status.Upwr: " + repr(x_status.Upwr))
-            print("Status.Iusb: " + repr(x_status.Iusb))
-            print("Status.Flags: " + repr(hex(x_status.Flags)))
+            print("Status.Ipwr: " + repr(self.x_status.Ipwr))
+            print("Status.Upwr: " + repr(self.x_status.Upwr))
+            print("Status.Iusb: " + repr(self.x_status.Iusb))
+            print("Status.Flags: " + repr(hex(self.x_status.Flags)))
 
 
     def slit_get_position(self):
         print("\nRead position")
-        x_pos = self.get_position_t()
-        result = self.lib.get_position(self.device_id, byref(x_pos))
+        result = self.lib.get_position(self.device_id, byref(self.x_pos))
         print("Result: " + repr(result))
         if result == self.Result.Ok:
-            print("Position: {0} steps, {1} microsteps".format(x_pos.Position, x_pos.uPosition))
-        return x_pos.Position, x_pos.uPosition
+            print("Position: {0} steps, {1} microsteps".format(self.x_pos.Position, self.x_pos.uPosition))
+        return self.x_pos.Position, self.x_pos.uPosition
 
 
     def slit_left(self):
@@ -199,28 +210,26 @@ class slit_ximc_control:
     def slit_get_speed(self):
         print("\nGet speed")
         # Create move settings structure
-        mvst = self.move_settings_t()
         # Get current move settings from controller
-        result = self.lib.get_move_settings(self.device_id, byref(mvst))
+        result = self.lib.get_move_settings(self.device_id, byref(self.mvst))
         # Print command return status. It will be 0 if all is OK
         print("Read command result: " + repr(result))
 
-        return mvst.Speed
+        return self.mvst.Speed
 
 
     def slit_set_speed(self, speed):
         print("\nSet speed")
         # Create move settings structure
-        mvst = self.move_settings_t()
         # Get current move settings from controller
-        result = self.lib.get_move_settings(self.device_id, byref(mvst))
+        result = self.lib.get_move_settings(self.device_id, byref(self.mvst))
         # Print command return status. It will be 0 if all is OK
         print("Read command result: " + repr(result))
-        print("The speed was equal to {0}. We will change it to {1}".format(mvst.Speed, speed))
+        print("The speed was equal to {0}. We will change it to {1}".format(self.mvst.Speed, speed))
         # Change current speed
-        mvst.Speed = int(speed)
+        self.mvst.Speed = int(speed)
         # Write new move settings to controller
-        result = self.lib.set_move_settings(self.device_id, byref(mvst))
+        result = self.lib.set_move_settings(self.device_id, byref(self.mvst))
         # Print command return status. It will be 0 if all is OK
         print("Write command result: " + repr(result))
 
@@ -228,16 +237,15 @@ class slit_ximc_control:
     def slit_set_microstep_mode_256(self):
         print("\nSet microstep mode to 256")
         # Create engine settings structure
-        eng = self.engine_settings_t()
         # Get current engine settings from controller
-        result = self.lib.get_engine_settings(self.device_id, byref(eng))
+        result = self.lib.get_engine_settings(self.device_id, byref(self.eng))
         # Print command return status. It will be 0 if all is OK
         print("Read command result: " + repr(result))
         # Change MicrostepMode parameter to MICROSTEP_MODE_FRAC_256
         # (use MICROSTEP_MODE_FRAC_128, MICROSTEP_MODE_FRAC_64 ... for other microstep modes)
-        eng.MicrostepMode = self.MicrostepMode.MICROSTEP_MODE_FRAC_256
+        self.eng.MicrostepMode = self.MicrostepMode.MICROSTEP_MODE_FRAC_256
         # Write new engine settings to controller
-        result = self.lib.set_engine_settings(self.device_id, byref(eng))
+        result = self.lib.set_engine_settings(self.device_id, byref(self.eng))
         # Print command return status. It will be 0 if all is OK
         print("Write command result: " + repr(result))
 
@@ -248,9 +256,7 @@ class slit_ximc_control:
 
 if __name__ == '__main__':
     ##test here code of this class
-
-    stage_id = 'usb:sn:MCS2-00001795'
-
+    print("aaa")
     test_slit = slit_ximc_control()
     test_slit.slit_info()
     test_slit.slit_status()
