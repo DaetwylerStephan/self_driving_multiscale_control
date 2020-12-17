@@ -11,7 +11,7 @@ import napari
 from qtpy.QtCore import QTimer
 # Our stuff
 from proxy_objects import (
-    ProxyManager, _dummy_function, _reconnect_shared_arrays, _SharedNumpyArray)
+ProxyManager, _dummy_function, _reconnect_shared_arrays, _SharedNumpyArray)
 
 def display(proxy_manager=None):
     if proxy_manager is None:
@@ -22,8 +22,17 @@ def display(proxy_manager=None):
     return display
 
 class _NapariDisplay:
+
+    #modify to solve my problems
     def __init__(self):
         self.viewer = napari.Viewer()
+
+    def show_lowresimage(self, lowresim):
+        if not hasattr(self, 'lowresim'):
+            self.lowresim = self.viewer.add_image(lowresim, name="lowres")
+        else:
+            self.lowresim.data = lowresim
+
 
     def show_image(self, im):
         if not hasattr(self, 'image'):
@@ -97,18 +106,32 @@ class _Microscope:
     def __init__(self):
         import queue
         import time
-        self.pm = ProxyManager(shared_memory_sizes=(1*2048*2060*2,))
+        self.pm = ProxyManager(shared_memory_sizes=(1*2048*2060*2,1*2048*2060*2,))
+
         self.data_buffers = [
             self.pm.shared_numpy_array(which_mp_array=0,
                                        shape=(1, 2048, 2060),
                                        dtype='uint16')
             for i in range(2)]
+        self.lowresdata_buffers = [
+            self.pm.shared_numpy_array(which_mp_array=1,
+                                       shape=(1, 2048, 2060),
+                                       dtype='uint16')
+            for i in range(2)]
+
         self.data_buffer_queue = queue.Queue()
+        self.lowres_data_buffer_queue = queue.Queue()
+
         for i in range(len(self.data_buffers)):
             self.data_buffer_queue.put(i)
-        print("Displaying", self.data_buffers[0].shape,
+            self.lowres_data_buffer_queue.put(i)
+
+        print("Displaying", self.data_buffers[1].shape,
               self.data_buffers[0].dtype, 'images.')
+
         self.camera = self.pm.proxy_object(_Camera)
+        self.lowrescamera = self.pm.proxy_object(_lowresCamera)
+
         self.display = display(proxy_manager=self.pm)
         self.num_frames = 0
         self.initial_time = time.perf_counter()
@@ -118,13 +141,25 @@ class _Microscope:
         from proxy_objects import launch_custody_thread
         def snap_task(custody):
             custody.switch_from(None, to=self.camera)
+
             which_buffer = self.data_buffer_queue.get()
+            lowres_which_buffer = self.lowres_data_buffer_queue.get()
+
             data_buffer = self.data_buffers[which_buffer]
+            lowres_data_buffer = self.lowresdata_buffers[lowres_which_buffer]
+
             self.camera.record(out=data_buffer)
+            self.lowrescamera.record(out=lowres_data_buffer)
+
             custody.switch_from(self.camera, to=self.display)
-            self.display.show_image(data_buffer)
+            if(self.num_frames>50):
+                self.display.show_image(data_buffer)
+            self.display.show_lowresimage(lowres_data_buffer)
+
             custody.switch_from(self.display, to=None)
             self.data_buffer_queue.put(which_buffer)
+            self.lowres_data_buffer_queue.put(lowres_which_buffer)
+
             self.num_frames += 1
             if self.num_frames == 100:
                 time_elapsed =  time.perf_counter() - self.initial_time
@@ -140,11 +175,18 @@ class _Camera:
         out[:] = np.random.randint(
             0, 2**16, size=out.shape, dtype='uint16')
 
+
+class _lowresCamera:
+    def record(self, out):
+        import numpy as np
+        out[:] = np.random.randint(
+            0, 2**16, size=out.shape, dtype='uint16')
+
 if __name__ == '__main__':
     scope = _Microscope()
     snap_threads = []
     print("Launching a ton of 'snap' threads...")
-    for i in range(1000):
+    for i in range(100):
         th = scope.snap()
         snap_threads.append(th)
     print(len(snap_threads), "'snap' threads launched.")
