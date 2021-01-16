@@ -5,7 +5,10 @@ Script containing all functions to initialize and operate the translation stages
 '''
 
 import sys
-import smaract.ctl as ctl
+try:
+    from .smaract import ctl as ctl
+except ImportError:
+    import smaract.ctl as ctl
 
 
 
@@ -105,7 +108,7 @@ class SLC_translationstage:
             # The "ChannelState.REFERENCING" flag in the channel state can be monitored to determine
             # the end of the referencing sequence.
 
-    def closestage(self):
+    def close(self):
         if self.d_handle != None:
             ctl.Close(self.d_handle)
             print("MCS2 close.")
@@ -117,4 +120,4 @@ if __name__ == '__main__':
 
     translationstage = SLC_translationstage(stage_id)
     translationstage.findReference()
-    translationstage.closestage()
+    translationstage.close()

@@ -62,7 +62,7 @@ class Photo_Camera:
         print('Total frames: {}\nAverage fps: {}\n'.format(tot, (tot / (time.time() - start))))
 
 if __name__ == '__main__':
-    camera = Photometrics_Camera()
+    camera = Photo_Camera()
     camera.take_snapshot(20)
     camera.preview_live()
     camera.take_snapshot(20)

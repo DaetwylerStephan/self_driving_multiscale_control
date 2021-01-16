@@ -130,7 +130,7 @@ class SR2812_rotationstage:
             print("Position: {} ugrad (Press \'s\' to change step size. Press \'q\' to exit.)".format(self.position.value))
                 # // - - - - - - - - - - -
 
-    def closestage(self):
+    def close(self):
         # /* At the end of the program you should release all opened systems. */
         self.ExitIfError(SA_CloseSystem(self.mcsHandle))
         print('stage closed')
@@ -142,4 +142,4 @@ if __name__ == '__main__':
 
     rotationstage = SR2812_rotationstage(stage_id)
     rotationstage.ManualMove()
-    rotationstage.closestage()
+    rotationstage.close()

@@ -6,15 +6,9 @@ import threading
 import auxiliary_code.proxy_objects as proxy_objects
 from auxiliary_code.proxied_napari import display
 import src.camera.Photometrics_camera as Photometricscamera
-
-
-
-class _Camera:
-    def record(self, out):
-        import numpy as np
-        out[:] = np.random.randint(
-            0, 2**16, size=out.shape, dtype='uint16')
-
+import src.ni_board.ni as ni
+import src.stages.rotation_stage_cmd as RotStage
+import src.stages.translation_stage_cmd as TransStage
 
 class multiScope:
     def __init__(
@@ -33,11 +27,21 @@ class multiScope:
 
         #start initializing all hardware component here by calling the initialization from a thread
         lowres_camera_init = threading.Thread(target=self._init_lowres_camera) #~3.6s
-
         lowres_camera_init.start()
-        #self._init_display() #~1.3s
 
+        #trans_stage_init = threading.Thread(target=self._init_XYZ_stage) #~0.4s
+        #trans_stage_init.start()
+        #rot_stage_init = threading.Thread(target=self._init_rotation_stage)
+        #rot_stage_init.start()
+
+
+        self.display = display(proxy_manager=self.pm)
+        self._init_ao()  # ~0.2s
+
+        #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.join()
+        #trans_stage_init.join()
+        #rot_stage_init.join()
 
         print('Finished initializing multiScope')
 
@@ -68,29 +72,67 @@ class multiScope:
             self.preview_buffer_queue.put(i + num_data_buffers) # pointer math!
 
     def _init_lowres_camera(self):
+        """
+        Initialize low resolution camera
+        """
         print("Initializing camera..")
+        #place the Photometrics class as object into a proxy object
         self.camera = self.pm.proxy_object(Photometricscamera.Photo_Camera)
-        #self.camera = self.pm.proxy_object(_Camera)
-
         self.camera.take_snapshot(20)
-        #self.camera.apply_settings(trigger='external_trigger')
         print("done with camera.")
 
-    def _init_display(self):
-        print("Initializing display...")
-        self.display = display(proxy_manager=self.pm)
-        print("done with display.")
+    def _init_ao(self):
+        """
+        Initialize National Instruments card 6378 as device 1, Dev1
+        """
+        self.names_to_voltage_channels = {
+            'camera_lowres':0,
+            'LED_power':12,
+            '488_TTL':20,
+            '488_power':21,
+            }
+        print("Initializing ao card...", end=' ')
+        self.ao = ni.Analog_Out(num_channels=30,
+                                rate=1e5,
+                                daq_type='6738',
+                                board_name='Dev1',
+                                verbose=True)
+        print("done with ao.")
+        atexit.register(self.ao.close)
 
+    def _init_XYZ_stage(self):
+        """
+        Initialize translation stage
+        """
+        print("Initializing XYZ stage usb:sn:MCS2-00001795...")
+        stage_id = 'usb:sn:MCS2-00001795'
+        self.XYZ_stage = TransStage.SLC_translationstage(stage_id)
+        self.XYZ_stage.findReference()
+        print("done with XYZ stage.")
+        atexit.register(self.XYZ_stage.close)
 
-    def quit(self):
-        self.camera.close()
-        self.display.close() # more work needed here
-        print('Quit Snoutscope')
+    def _init_rotation_stage(self):
+        """
+        Initialize rotation stage
+        """
+        print("Initializing rotation stage...")
+        stage_id = 'usb:id:3948963323'
+        self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
+        self.rotationstage.ManualMove()
+        print("done with XY stage.")
+        atexit.register(self.rotationstage.close)
 
     def close(self):
+        """
+        Close all opened channels, camera etc
+                """
         self.finish_all_tasks()
-        self.quit()
-        print('Closed Snoutscope')
+        self.camera.close()
+        self.ao.close()
+        #self.rotationstage.close()
+        #self.XYZ_stage.close()
+        self.display.close()  # more work needed here
+        print('Closed multiScope')
 
     def finish_all_tasks(self):
         collected_tasks = []
