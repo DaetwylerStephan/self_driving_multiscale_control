@@ -1,5 +1,5 @@
 '''
-multiScale_control.py
+old_multiScale_control.py
 ========================================
 Core python script to start the multiScale control
 '''

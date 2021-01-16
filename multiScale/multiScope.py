@@ -9,6 +9,8 @@ import src.camera.Photometrics_camera as Photometricscamera
 import src.ni_board.ni as ni
 import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
+import src.filter_wheel.ludlcontrol as FilterWheel
+
 
 class multiScope:
     def __init__(
@@ -29,6 +31,7 @@ class multiScope:
         lowres_camera_init = threading.Thread(target=self._init_lowres_camera) #~3.6s
         lowres_camera_init.start()
 
+        #initialize stages in threads
         #trans_stage_init = threading.Thread(target=self._init_XYZ_stage) #~0.4s
         #trans_stage_init.start()
         #rot_stage_init = threading.Thread(target=self._init_rotation_stage)
@@ -37,6 +40,7 @@ class multiScope:
 
         self.display = display(proxy_manager=self.pm)
         self._init_ao()  # ~0.2s
+        self._init_filterwheel()  # ~0.2s
 
         #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.join()
@@ -99,6 +103,24 @@ class multiScope:
                                 verbose=True)
         print("done with ao.")
         atexit.register(self.ao.close)
+
+    def _init_filterwheel(self):
+        """
+        Initialize filterwheel
+        """
+        ComPort = 'COM6'
+        self.filters = {'515-30-25': 0,
+               '572/20-25': 1,
+               '615/20-25': 2,
+               '676/37-25': 3,
+               }
+        print("Initializing filter wheel...", end=' ')
+        self.filterwheel = FilterWheel.LudlFilterwheel(ComPort, self.filters)
+        self.filterwheel.set_filter('515-30-25', wait_until_done=False)
+        self.filterwheel.set_filter('572/20-25', wait_until_done=False)
+        self.filterwheel.set_filter('615/20-25', wait_until_done=False)
+        self.filterwheel.set_filter('676/37-25', wait_until_done=False)
+        print("done with filterwheel.")
 
     def _init_XYZ_stage(self):
         """
