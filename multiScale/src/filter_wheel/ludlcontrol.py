@@ -1,10 +1,3 @@
-"""
-mesoSPIM Module for controlling Ludl filterwheels
-
-Author: Fabian Voigt
-
-#TODO
-"""
 
 import serial as Serial
 import io as Io
@@ -32,6 +25,8 @@ class LudlFilterwheel:
     filterwheel is assumed to be a double wheel.
 
     I.e.: '508 520-35': (2,3)
+
+    adapted from ludl filter wheel control by Fabian Voigt
     """
 
     def __init__(self, COMport, filterdict, baudrate=9600):
