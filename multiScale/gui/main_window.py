@@ -5,6 +5,7 @@ from tkinter import ttk
 
 from Tkinter_test import HelloView
 from Welcome_window import Welcome_Tab
+from run_window import Run_Tab
 
 
 class MultiScope_MainGui(tk.Tk):
@@ -26,9 +27,11 @@ class MultiScope_MainGui(tk.Tk):
         WelcomeTab =    Welcome_Tab(all_tabs_mainGUI)
         tab2 = HelloView(all_tabs_mainGUI)
         AdvancedSettingsTab = ttk.Frame(all_tabs_mainGUI)
+        RunTab = Run_Tab(all_tabs_mainGUI)
 
         all_tabs_mainGUI.add(WelcomeTab, text = "Welcome")
-        all_tabs_mainGUI.add(tab2, text="Run")
+        all_tabs_mainGUI.add(tab2, text="Test")
+        all_tabs_mainGUI.add(RunTab, text="Run")
         all_tabs_mainGUI.add(AdvancedSettingsTab, text="Advanced Settings")
 
         # Define the UI
