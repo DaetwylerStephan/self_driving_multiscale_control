@@ -6,7 +6,9 @@ from tkinter import ttk
 from Tkinter_test import HelloView
 from Welcome_window import Welcome_Tab
 from run_window import Run_Tab
-
+from stages_window import Stages_Tab
+from advancedsettings_window import AdvancedSettings_Tab
+from settings_window import Settings_Tab
 
 class MultiScope_MainGui(tk.Tk):
     """
@@ -24,13 +26,15 @@ class MultiScope_MainGui(tk.Tk):
         # set notebook
         all_tabs_mainGUI = ttk.Notebook(self)
 
-        WelcomeTab =    Welcome_Tab(all_tabs_mainGUI)
-        tab2 = HelloView(all_tabs_mainGUI)
-        AdvancedSettingsTab = ttk.Frame(all_tabs_mainGUI)
+        WelcomeTab = Welcome_Tab(all_tabs_mainGUI)
+        SettingsTab = Settings_Tab(all_tabs_mainGUI)
+        StagesSettingsTab = Stages_Tab(all_tabs_mainGUI)
+        AdvancedSettingsTab = AdvancedSettings_Tab(all_tabs_mainGUI)
         RunTab = Run_Tab(all_tabs_mainGUI)
 
         all_tabs_mainGUI.add(WelcomeTab, text = "Welcome")
-        all_tabs_mainGUI.add(tab2, text="Test")
+        all_tabs_mainGUI.add(SettingsTab, text="Settings")
+        all_tabs_mainGUI.add(StagesSettingsTab, text="Stages")
         all_tabs_mainGUI.add(RunTab, text="Run")
         all_tabs_mainGUI.add(AdvancedSettingsTab, text="Advanced Settings")
 

@@ -143,6 +143,8 @@ if __name__ == '__main__':
                '572/20-25': 1,
                '615/20-25': 2,
                '676/37-25': 3,
+               'transmission': 4,
+               'block': 5,
                }
     filterwheel_test = LudlFilterwheel(ComPort, filters)
     filterwheel_test.set_filter('515-30-25', wait_until_done=False)
