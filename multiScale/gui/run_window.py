@@ -14,7 +14,16 @@ class Run_Tab(tk.Frame):
     """
 
     def __init__(self, parent, *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
+        super().__init__(parent, **kwargs)
+
+        self.testmode = 0
+
+        if (len(args) > 0):
+            print(args)
+            self.scope = args[0][1]
+            print('initialized zet......................')
+            self.testmode =1
+
 
         self.acquisition_progress = tk.DoubleVar()
 
@@ -81,7 +90,10 @@ class Run_Tab(tk.Frame):
             self.bt_preview.config(relief="raised")
         else:
             self.bt_preview.config(relief="sunken")
-        pass
+
+        if self.testmode == 1:
+            self.scope.lowres_camera.take_snapshot(20)
+
 
     def preview_changeTo488(self):
         self.changeFilter('515-30-25')

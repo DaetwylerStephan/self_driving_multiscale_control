@@ -3,6 +3,10 @@ import time
 import os
 import atexit
 import threading
+
+import tkinter as tk
+from tkinter import ttk
+
 import auxiliary_code.proxy_objects as proxy_objects
 from auxiliary_code.proxied_napari import display
 import src.camera.Photometrics_camera as Photometricscamera
@@ -10,7 +14,7 @@ import src.ni_board.ni as ni
 import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
-
+from gui.main_window import MultiScope_MainGui
 
 class multiScope:
     def __init__(
@@ -38,9 +42,9 @@ class multiScope:
         #rot_stage_init.start()
 
 
-        self.display = display(proxy_manager=self.pm)
-        self._init_ao()  # ~0.2s
-        self._init_filterwheel()  # ~0.2s
+        #self.display = display(proxy_manager=self.pm)
+        #self._init_ao()  # ~0.2s
+        #self._init_filterwheel()  # ~0.2s
 
         #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.join()
@@ -81,8 +85,8 @@ class multiScope:
         """
         print("Initializing camera..")
         #place the Photometrics class as object into a proxy object
-        self.camera = self.pm.proxy_object(Photometricscamera.Photo_Camera)
-        self.camera.take_snapshot(20)
+        self.lowres_camera = self.pm.proxy_object(Photometricscamera.Photo_Camera)
+        self.lowres_camera.take_snapshot(20)
         print("done with camera.")
 
     def _init_ao(self):
@@ -113,7 +117,9 @@ class multiScope:
                '572/20-25': 1,
                '615/20-25': 2,
                '676/37-25': 3,
-               }
+               'transmission': 4,
+               'block': 5,
+                }
         print("Initializing filter wheel...", end=' ')
         self.filterwheel = FilterWheel.LudlFilterwheel(ComPort, self.filters)
         self.filterwheel.set_filter('515-30-25', wait_until_done=False)
@@ -149,7 +155,7 @@ class multiScope:
         Close all opened channels, camera etc
                 """
         self.finish_all_tasks()
-        self.camera.close()
+        self.lowres_camera.close()
         self.ao.close()
         #self.rotationstage.close()
         #self.XYZ_stage.close()
@@ -185,4 +191,17 @@ if __name__ == '__main__':
 
     # Create scope object:
     scope = multiScope(bytes_per_data_buffer, num_data_buffers, bytes_per_preview_buffer)
+
+    scope.lowres_camera.take_snapshot(20)
+
+    #Create GUI
+    root = tk.Tk()
+    root.title("Multi-scale microscope V1")
+    root.geometry("800x600")
+    all_tabs_mainGUI = ttk.Notebook(root)
+    Gui_mainwindow = MultiScope_MainGui(all_tabs_mainGUI, scope)
+
+    root.mainloop()
+
+    #close
     scope.close()
