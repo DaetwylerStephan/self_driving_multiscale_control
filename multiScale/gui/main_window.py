@@ -33,8 +33,8 @@ class MultiScope_MainGui(ttk.Notebook):
         #self.resizable(width=False, height=False)
 
         # set notebook
-        if(len(args)>0):
-            RunTab = Run_Tab(self, args)
+        if(len(args)>1):
+            RunTab = Run_Tab(self, args[1])
         else:
             RunTab = Run_Tab(self)
 

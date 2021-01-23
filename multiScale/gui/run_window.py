@@ -20,7 +20,7 @@ class Run_Tab(tk.Frame):
 
         if (len(args) > 0):
             print(args)
-            self.scope = args[0][1]
+            self.scope = args[0]
             print('initialized zet......................')
             self.testmode =1
 
