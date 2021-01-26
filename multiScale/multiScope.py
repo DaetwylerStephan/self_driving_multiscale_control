@@ -32,7 +32,7 @@ class multiScopeModel:
 
         #start initializing all hardware component here by calling the initialization from a thread
         lowres_camera_init = threading.Thread(target=self._init_lowres_camera) #~3.6s
-        #lowres_camera_init.start()
+        lowres_camera_init.start()
 
         #initialize stages in threads
         #trans_stage_init = threading.Thread(target=self._init_XYZ_stage) #~0.4s
@@ -46,7 +46,7 @@ class multiScopeModel:
         self._init_filterwheel()  # ~0.2s
 
         #wait for all started initialization threads before continuing (by calling thread join)
-        #lowres_camera_init.join()
+        lowres_camera_init.join()
         #trans_stage_init.join()
         #rot_stage_init.join()
 

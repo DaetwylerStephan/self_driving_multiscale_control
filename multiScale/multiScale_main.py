@@ -10,15 +10,17 @@ class MultiScale_Microscope_Controller():
     """
     def __init__(self):
         self.root = tk.Tk()
-        # Create scope object:
 
+        # Create scope object as model
         self.model = multiScopeModel()
 
+        #create the gui as view
         all_tabs_mainGUI = ttk.Notebook(self.root)
         self.view = MultiScope_MainGui(all_tabs_mainGUI, self.model)
 
-        #self.view.sidepanel.plotBut.bind("<Button>", self.my_plot)
-        #self.view.sidepanel.clearButton.bind("<Button>", self.clear)
+        #define here which buttons run which function in the multiScope model
+        self.view.runtab.bt_preview.bind("<Button>", self.run_preview)
+
 
 
     def run(self):
@@ -28,6 +30,10 @@ class MultiScale_Microscope_Controller():
 
     def close(self):
         self.model.close()
+
+    def run_preview(self, event):
+        print("running preview")
+        self.model.lowres_camera.take_snapshot(20)
 
 if __name__ == '__main__':
     c = MultiScale_Microscope_Controller()

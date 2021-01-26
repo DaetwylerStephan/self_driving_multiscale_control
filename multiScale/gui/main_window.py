@@ -4,14 +4,12 @@ import tkinter as tk
 from tkinter import ttk
 
 try:
-    from .Tkinter_test import HelloView
     from .Welcome_window import Welcome_Tab
     from .run_window import Run_Tab
     from .stages_window import Stages_Tab
     from .advancedsettings_window import AdvancedSettings_Tab
     from .settings_window import Settings_Tab
 except ImportError:
-    from Tkinter_test import HelloView
     from Welcome_window import Welcome_Tab
     from run_window import Run_Tab
     from stages_window import Stages_Tab
@@ -34,21 +32,21 @@ class MultiScope_MainGui(ttk.Notebook):
 
         # set notebook
         if(len(args)>1):
-            RunTab = Run_Tab(self, args[1])
+            self.runtab = Run_Tab(self, args[1])
         else:
-            RunTab = Run_Tab(self)
+            self.runtab = Run_Tab(self)
 
         #all_tabs_mainGUI = ttk.Notebook(self)
 
-        self.WelcomeTab = Welcome_Tab(self)
-        SettingsTab = Settings_Tab(self)
+        self.welcometab = Welcome_Tab(self)
+        self.settingstab = Settings_Tab(self)
         StagesSettingsTab = Stages_Tab(self)
         AdvancedSettingsTab = AdvancedSettings_Tab(self)
 
-        self.add(self.WelcomeTab, text = "Welcome")
-        self.add(SettingsTab, text="Settings")
+        self.add(self.welcometab, text = "Welcome")
+        self.add(self.settingstab, text="Settings")
         self.add(StagesSettingsTab, text="Stages")
-        self.add(RunTab, text="Run")
+        self.add(self.runtab, text="Run")
         self.add(AdvancedSettingsTab, text="Advanced Settings")
 
         # Define the UI

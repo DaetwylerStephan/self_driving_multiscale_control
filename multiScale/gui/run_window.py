@@ -92,7 +92,8 @@ class Run_Tab(tk.Frame):
             self.bt_preview.config(relief="sunken")
 
         if self.testmode == 1:
-            self.scope.lowres_camera.take_snapshot(20)
+            #self.scope.lowres_camera.take_snapshot(20)
+            print("test here")
 
 
     def preview_changeTo488(self):
