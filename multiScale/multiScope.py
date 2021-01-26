@@ -15,6 +15,9 @@ import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
 from gui.main_window import MultiScope_MainGui
+from constants import FilterWheel_parameters
+from constants import Stage_parameters
+from constants import NI_board_parameters
 
 class multiScope:
     def __init__(
@@ -33,7 +36,7 @@ class multiScope:
 
         #start initializing all hardware component here by calling the initialization from a thread
         lowres_camera_init = threading.Thread(target=self._init_lowres_camera) #~3.6s
-        lowres_camera_init.start()
+        #lowres_camera_init.start()
 
         #initialize stages in threads
         #trans_stage_init = threading.Thread(target=self._init_XYZ_stage) #~0.4s
@@ -44,10 +47,10 @@ class multiScope:
 
         #self.display = display(proxy_manager=self.pm)
         #self._init_ao()  # ~0.2s
-        #self._init_filterwheel()  # ~0.2s
+        self._init_filterwheel()  # ~0.2s
 
         #wait for all started initialization threads before continuing (by calling thread join)
-        lowres_camera_init.join()
+        #lowres_camera_init.join()
         #trans_stage_init.join()
         #rot_stage_init.join()
 
@@ -93,12 +96,7 @@ class multiScope:
         """
         Initialize National Instruments card 6378 as device 1, Dev1
         """
-        self.names_to_voltage_channels = {
-            'camera_lowres':0,
-            'LED_power':12,
-            '488_TTL':20,
-            '488_power':21,
-            }
+        self.names_to_voltage_channels = NI_board_parameters.names_to_voltage_channels
         print("Initializing ao card...", end=' ')
         self.ao = ni.Analog_Out(num_channels=30,
                                 rate=1e5,
@@ -112,14 +110,9 @@ class multiScope:
         """
         Initialize filterwheel
         """
-        ComPort = 'COM6'
-        self.filters = {'515-30-25': 0,
-               '572/20-25': 1,
-               '615/20-25': 2,
-               '676/37-25': 3,
-               'transmission': 4,
-               'block': 5,
-                }
+        ComPort = FilterWheel_parameters.comport
+        self.filters = FilterWheel_parameters.avail_filters
+
         print("Initializing filter wheel...", end=' ')
         self.filterwheel = FilterWheel.LudlFilterwheel(ComPort, self.filters)
         self.filterwheel.set_filter('515-30-25', wait_until_done=False)
@@ -133,7 +126,7 @@ class multiScope:
         Initialize translation stage
         """
         print("Initializing XYZ stage usb:sn:MCS2-00001795...")
-        stage_id = 'usb:sn:MCS2-00001795'
+        stage_id = Stage_parameters.stage_id_XYZ
         self.XYZ_stage = TransStage.SLC_translationstage(stage_id)
         self.XYZ_stage.findReference()
         print("done with XYZ stage.")
@@ -144,7 +137,7 @@ class multiScope:
         Initialize rotation stage
         """
         print("Initializing rotation stage...")
-        stage_id = 'usb:id:3948963323'
+        stage_id = Stage_parameters.stage_id_rot
         self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
         self.rotationstage.ManualMove()
         print("done with XY stage.")
@@ -191,8 +184,6 @@ if __name__ == '__main__':
 
     # Create scope object:
     scope = multiScope(bytes_per_data_buffer, num_data_buffers, bytes_per_preview_buffer)
-
-    scope.lowres_camera.take_snapshot(20)
 
     #Create GUI
     root = tk.Tk()

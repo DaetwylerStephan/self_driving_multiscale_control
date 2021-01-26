@@ -40,12 +40,12 @@ class MultiScope_MainGui(ttk.Notebook):
 
         #all_tabs_mainGUI = ttk.Notebook(self)
 
-        WelcomeTab = Welcome_Tab(self)
+        self.WelcomeTab = Welcome_Tab(self)
         SettingsTab = Settings_Tab(self)
         StagesSettingsTab = Stages_Tab(self)
         AdvancedSettingsTab = AdvancedSettings_Tab(self)
 
-        self.add(WelcomeTab, text = "Welcome")
+        self.add(self.WelcomeTab, text = "Welcome")
         self.add(SettingsTab, text="Settings")
         self.add(StagesSettingsTab, text="Stages")
         self.add(RunTab, text="Run")

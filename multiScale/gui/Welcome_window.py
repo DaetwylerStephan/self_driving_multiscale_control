@@ -31,7 +31,7 @@ class Welcome_Tab(tk.Frame):
         #widgets
         username_box = ttk.Combobox(self, textvariable=self.username, values=["Stephan Daetwyler", "Reto Fiolka", "Bo-Jui Chang"])
         modelOrganism_box = ttk.Combobox(self, textvariable=self.modelorganism_name,
-                                    values=["Cell", "Xenograft", "Colon"])
+                                    values=["Cell", "Xenograft", "Colon", "Beads"])
         fluorescent_marker_box = ttk.Combobox(self, textvariable=self.maker_name,
                                          values=["kdrl:mCherry", "kdrl:GFP", "UAS:GFP"])
         quit_button = tk.Button(self, text="Quit", command =self.deleteme)
@@ -56,6 +56,12 @@ class Welcome_Tab(tk.Frame):
 
         self.columnconfigure(1, weight=1)
 
+    def getwelcome_parameters(self):
+        """
+        get parameters of Welcome Window
+        :return: list of parameters: {username, modelOrganism, fluorescent maker}
+        """
+        return {self.username, self.modelorganism_name, self.maker_name}
 
     def deleteme(self):
         """

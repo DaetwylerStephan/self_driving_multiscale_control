@@ -32,6 +32,10 @@ class AdvancedSettings_Tab(tk.Frame):
         # Layout form
         intro_text.grid(row=0, column=0, columnspan=3, sticky=(tk.E + tk.W))
 
+        ch_button = ttk.Button(self, text="Change", command=self.print_values)
+        ch_button.grid(row=1, column=1, sticky=tk.E)
+
         self.columnconfigure(1, weight=1)
 
-
+    def print_values(self):
+        print(self.WelcomeTab.getwelcome_parameters())
