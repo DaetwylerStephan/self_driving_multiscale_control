@@ -4,8 +4,7 @@ import os
 import atexit
 import threading
 
-import tkinter as tk
-from tkinter import ttk
+
 
 import auxiliary_code.proxy_objects as proxy_objects
 from auxiliary_code.proxied_napari import display
@@ -14,24 +13,21 @@ import src.ni_board.ni as ni
 import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
-from gui.main_window import MultiScope_MainGui
 from constants import FilterWheel_parameters
 from constants import Stage_parameters
 from constants import NI_board_parameters
+from constants import SharedMemory_allocation
 
-class multiScope:
+class multiScopeModel:
     def __init__(
-        self,
-        bytes_per_data_buffer,
-        num_data_buffers,
-        bytes_per_preview_buffer,
+        self
         ):
         """
         We use bytes_per_buffer to specify the shared_memory_sizes for the
         child processes.
         """
         self._init_shared_memory(
-            bytes_per_data_buffer, num_data_buffers, bytes_per_preview_buffer)
+            SharedMemory_allocation.bytes_per_data_buffer, SharedMemory_allocation.num_data_buffers, SharedMemory_allocation.bytes_per_preview_buffer)
         self.unfinished_tasks = queue.Queue()
 
         #start initializing all hardware component here by calling the initialization from a thread
@@ -171,28 +167,8 @@ class multiScope:
 if __name__ == '__main__':
     # first code to run in the multiscope
 
-    # Acquisition:
-    vol_per_buffer = 1
-    num_data_buffers = 2  # increase for multiprocessing
-    num_snap = 1  # interbuffer time limited by ao play
-
-    images_per_buffer = 1
-    bytes_per_data_buffer = images_per_buffer * 6000 * 4000 * 2
-
-
-    bytes_per_preview_buffer = bytes_per_data_buffer *3
-
     # Create scope object:
-    scope = multiScope(bytes_per_data_buffer, num_data_buffers, bytes_per_preview_buffer)
-
-    #Create GUI
-    root = tk.Tk()
-    root.title("Multi-scale microscope V1")
-    root.geometry("800x600")
-    all_tabs_mainGUI = ttk.Notebook(root)
-    Gui_mainwindow = MultiScope_MainGui(all_tabs_mainGUI, scope)
-
-    root.mainloop()
+    scope = multiScope()
 
     #close
     scope.close()

@@ -19,3 +19,13 @@ class NI_board_parameters:
         '488_TTL': 20,
         '488_power': 21,
         }
+
+
+class SharedMemory_allocation:
+    # Acquisition:
+    vol_per_buffer = 1
+    num_data_buffers = 2  # increase for multiprocessing
+    num_snap = 1  # interbuffer time limited by ao play
+    images_per_buffer = 1
+    bytes_per_data_buffer = images_per_buffer * 6000 * 4000 * 2
+    bytes_per_preview_buffer = bytes_per_data_buffer * 3
