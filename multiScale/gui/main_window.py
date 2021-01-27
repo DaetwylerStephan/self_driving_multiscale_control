@@ -20,7 +20,8 @@ except ImportError:
 
 class MultiScope_MainGui(ttk.Notebook):
     """
-    This is the main GUI class for the multi-scale microscope.
+    This is the main GUI class for the multi-scale microscope. It arranges the microscope GUI into different tabs:
+    a welcome tab, a settings tab, a stage settings tab, a run tab and the advanced settings
     """
 
     def __init__(self, *args, **kwargs):
@@ -28,31 +29,21 @@ class MultiScope_MainGui(ttk.Notebook):
 
         # set the window properties
 
-        #self.resizable(width=False, height=False)
-
-        # set notebook
-        if(len(args)>1):
-            self.runtab = Run_Tab(self, args[1])
-        else:
-            self.runtab = Run_Tab(self)
-
-        #all_tabs_mainGUI = ttk.Notebook(self)
-
+        #define the individual sheets: a welcome tab, a settings tab, a stage settings tab, a run tab and the advanced settings
+        self.runtab = Run_Tab(self)
         self.welcometab = Welcome_Tab(self)
         self.settingstab = Settings_Tab(self)
-        StagesSettingsTab = Stages_Tab(self)
-        AdvancedSettingsTab = AdvancedSettings_Tab(self)
+        self.stagessettingstab = Stages_Tab(self)
+        self.advancedSettingstab = AdvancedSettings_Tab(self)
 
+        #add the individual sheets to the Notebook
         self.add(self.welcometab, text = "Welcome")
         self.add(self.settingstab, text="Settings")
-        self.add(StagesSettingsTab, text="Stages")
+        self.add(self.stagessettingstab, text="Stages")
         self.add(self.runtab, text="Run")
-        self.add(AdvancedSettingsTab, text="Advanced Settings")
+        self.add(self.advancedSettingstab, text="Advanced Settings")
 
-        # Define the UI
-        #HelloView(self).grid(sticky=(tk.E + tk.W + tk.N + tk.S))
-
-        #self.columnconfigure(0, weight=1)
+        #pack tge sheets
         self.pack(expand=1, fill='both')
 
 if __name__ == '__main__':

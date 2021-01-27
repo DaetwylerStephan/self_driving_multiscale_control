@@ -7,6 +7,7 @@ from multiScope import multiScopeModel
 class MultiScale_Microscope_Controller():
     """
     This is the controller in an MVC-scheme for mediating the interaction between the View (GUI) and the model (multiScope.py).
+    Use: https://www.python-course.eu/tkinter_events_binds.php
     """
     def __init__(self):
         self.root = tk.Tk()
@@ -26,6 +27,7 @@ class MultiScale_Microscope_Controller():
     def run(self):
         self.root.title("Multi-scale microscope V1")
         self.root.geometry("800x600")
+        self.resizable(width=False, height=False)
         self.root.mainloop()
 
     def close(self):
