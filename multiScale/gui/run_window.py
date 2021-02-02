@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import time
+import datetime as dt
 
 class Run_Tab(tk.Frame):
     """
@@ -16,11 +17,24 @@ class Run_Tab(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, **kwargs)
 
-
-        self.acquisition_progress = tk.DoubleVar()
-        self.numberOfTimepoints = tk.IntVar()
+        #params
         self.excitation_lowres = tk.IntVar()
-        self.numberOfTimepoints = 50
+
+        #stack acquisition parameters
+        self.stack_aq_progress = tk.DoubleVar()
+        self.stack_aq_488on = tk.IntVar()
+        self.stack_aq_552on = tk.IntVar()
+        self.stack_aq_594on = tk.IntVar()
+        self.stack_aq_640on = tk.IntVar()
+        self.stack_acq_laserCycleMode = tk.StringVar()
+        self.stack_aq_numberOfPlanes = tk.IntVar()
+        self.stack_aq_plane_spacing = tk.DoubleVar()
+
+        #time-lapse setting parameters
+        self.timelapse_aq_progress = tk.DoubleVar()
+        self.timelapse_aq_nbTimepoints = tk.IntVar()
+        self.timelapse_aq_timeinterval = tk.DoubleVar()
+        self.timelapse_aq_nbTimepoints.set(50)
 
 
         #set the different label frames
@@ -57,40 +71,66 @@ class Run_Tab(tk.Frame):
         ### ----------------------------stack acquisition buttons ------------------------------------------------------
         #stack aquisition labels (positioned)
         laseron_label = ttk.Label(stack_aquisition_settings, text="Laser On:").grid(row=2, column=0)
-        numberOfPlanes_label= ttk.Label(stack_aquisition_settings, text="Number of planes:").grid(row = 3, column = 0)
-        plane_spacing_label= ttk.Label(stack_aquisition_settings, text="Spacing of planes:").grid(row = 4, column = 0)
+        numberOfPlanes_label= ttk.Label(stack_aquisition_settings, text="Number of planes:").grid(row = 6, column = 0)
+        plane_spacing_label= ttk.Label(stack_aquisition_settings, text="Spacing of planes:").grid(row = 10, column = 0)
+        laser_cyclemode_label= ttk.Label(stack_aquisition_settings, text="Laser Cycle Mode:").grid(row = 3, column = 0)
 
         #stack aquisition settings
-        self.numberOfPlanes = tk.IntVar()
-        self.Entry_numberOfPlanes = tk.Entry(stack_aquisition_settings, textvariable = self.numberOfPlanes)
-        self.Entry_numberOfPlanes.insert(0,"20")
+        self.ckb_laserOn488 = tk.Checkbutton(stack_aquisition_settings, text ='488', variable=self.stack_aq_488on, onvalue=1, offvalue=0)
+        self.ckb_laserOn552 = tk.Checkbutton(stack_aquisition_settings, text ='552', variable=self.stack_aq_552on, onvalue=1, offvalue=0)
+        self.ckb_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594on, onvalue=1, offvalue=0)
+        self.ckb_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640on, onvalue=1, offvalue=0)
 
-        self.plane_spacing = tk.DoubleVar()
-        self.Entry_plane_spacing = tk.Entry(stack_aquisition_settings, textvariable=self.plane_spacing)
+        laserCycles = ('Change filter/stack', 'Change filter/plane')
+        self.option_laserCycle = tk.OptionMenu(stack_aquisition_settings, self.stack_acq_laserCycleMode, *laserCycles)
+        self.stack_acq_laserCycleMode.set(laserCycles[0])
+
+        self.Entry_numberOfPlanes = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes)
+        self.Entry_numberOfPlanes.insert(0, "20")
+
+        self.Entry_plane_spacing = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing)
         self.Entry_plane_spacing.insert(0, "1")
 
         self.bt_run_lowresstack = tk.Button(stack_aquisition_settings, text="Acquire Low Res Stack(s)")
         self.bt_run_highresstack = tk.Button(stack_aquisition_settings, text="Acquire High Res Stack(s)")
 
-        self.bt_laserOn488 = tk.Checkbutton(stack_aquisition_settings, text ='488')
-        self.bt_laserOn552 = tk.Checkbutton(stack_aquisition_settings, text ='552')
-        self.bt_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594')
-        self.bt_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640')
-
         #stack aquisition layout (labels positioned above)
-        self.bt_laserOn488.grid(row =2, column=1)
-        self.bt_laserOn552.grid(row=2, column=2)
-        self.bt_laserOn594.grid(row=2, column=3)
-        self.bt_laserOn640.grid(row=2, column=4)
-        self.Entry_numberOfPlanes.grid(row =3, column=1, columnspan=3, sticky = tk.W + tk.E)
-        self.Entry_plane_spacing.grid(row =4, column=1, columnspan=3, sticky = tk.W + tk.E)
-        self.bt_run_lowresstack.grid(row = 5, column =0, columnspan=3, sticky = tk.W + tk.E)
-        self.bt_run_highresstack.grid(row=5, column=3, columnspan=3, sticky=tk.W + tk.E)
+        self.ckb_laserOn488.grid(row =2, column=1)
+        self.ckb_laserOn552.grid(row=2, column=2)
+        self.ckb_laserOn594.grid(row=2, column=3)
+        self.ckb_laserOn640.grid(row=2, column=4)
+        self.option_laserCycle.grid(row=3,column =1, columnspan=3,sticky = tk.W + tk.E)
+
+        self.Entry_numberOfPlanes.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.Entry_plane_spacing.grid(row =10, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.bt_run_lowresstack.grid(row = 15, column =0, columnspan=3, sticky = tk.W + tk.E)
+        self.bt_run_highresstack.grid(row=15, column=3, columnspan=3, sticky=tk.W + tk.E)
+
+        ### ----------------------------time-lapse acquisition buttons ------------------------------------------------------
+        # time-lapse aquisition labels (positioned)
+        timeinterval_label = ttk.Label(timelapse_acquisition_settings, text="Time interval:").grid(row=2, column=0)
+        timepointsnb_label = ttk.Label(timelapse_acquisition_settings, text="Number of timepoints:").grid(row=5, column=0)
+        start_time = ttk.Label(timelapse_acquisition_settings, text="Start time:").grid(row=12, column=0)
+        # time-lapse aquisition settings
+        self.Entry_Timeinterval = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_timeinterval)
+        self.Entry_Timeinterval.insert(0, "6")
+        self.Entry_NbTimepoints = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_nbTimepoints)
+        self.Entry_NbTimepoints.insert(0, "6")
+
+        self.bt_run_timelapse = tk.Button(timelapse_acquisition_settings, text="Run Timelapse")
+
+        self.starttime= tk.Label(timelapse_acquisition_settings, text=f"{dt.datetime.now():%a, %b %d %Y}")
+
+        # time-lapse aquisition layout (labels positioned above)
+        self.Entry_Timeinterval.grid(row=2, column=1,columnspan=3, sticky = tk.W + tk.E)
+        self.Entry_NbTimepoints.grid(row=5, column=2, columnspan=3, sticky = tk.W + tk.E)
+        self.bt_run_timelapse.grid(row=15, column=0, columnspan=3, sticky=tk.W + tk.E)
+        self.starttime.grid(row=12, column=2)
 
         ch_button = ttk.Button(self, text="Change", command=self.loop_function)
         ch_button.grid(row=0, column=3, sticky=tk.E)
 
-        progressbar = ttk.Progressbar(self, variable=self.acquisition_progress, maximum=self.numberOfTimepoints)
+        progressbar = ttk.Progressbar(self, variable=self.timelapse_aq_progress, maximum=self.timelapse_aq_nbTimepoints.get())
         progressbar.grid(row=0, column=2, sticky=tk.E)
 
 
@@ -104,9 +144,10 @@ class Run_Tab(tk.Frame):
 
     def loop_function(self):
         k = 0
-        while k <= self.numberOfTimepoints:
+        print(self.timelapse_aq_nbTimepoints.get())
+        while k <= self.timelapse_aq_nbTimepoints.get():
             ### some work to be done
-            self.acquisition_progress.set(k)
+            self.timelapse_aq_progress.set(k)
             k += 1
             time.sleep(0.02)
             self.update_idletasks()
@@ -131,6 +172,15 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo_block.config(relief="raised")
         self.bt_changeTo_trans.config(relief="raised")
         button.config(relief="sunken")
+
+    def preview_change(self, button):
+        if (button.cget('relief') == "sunken"):
+            button.config(relief="raised")
+        else:
+            button.config(relief="sunken")
+
+    def updateEndTime(self):
+        print('test')
 
 #---------------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
