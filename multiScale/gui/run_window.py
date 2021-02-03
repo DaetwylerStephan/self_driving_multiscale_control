@@ -111,21 +111,31 @@ class Run_Tab(tk.Frame):
         timeinterval_label = ttk.Label(timelapse_acquisition_settings, text="Time interval:").grid(row=2, column=0)
         timepointsnb_label = ttk.Label(timelapse_acquisition_settings, text="Number of timepoints:").grid(row=5, column=0)
         start_time = ttk.Label(timelapse_acquisition_settings, text="Start time:").grid(row=12, column=0)
+        end_time = ttk.Label(timelapse_acquisition_settings, text="End time:").grid(row=14, column=0)
+        self.timelapse_lb_starttime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        self.timelapse_lb_endtime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
         # time-lapse aquisition settings
         self.Entry_Timeinterval = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_timeinterval)
+        self.timelapse_aq_timeinterval.trace("w", lambda name, index, mode, var = self.timelapse_aq_timeinterval: self.updateTimesTimelapse())
         self.Entry_Timeinterval.insert(0, "6")
-        self.Entry_NbTimepoints = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_nbTimepoints)
+        self.Entry_NbTimepoints = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_nbTimepoints, validate="all", validatecommand=self.updateTimesTimelapse)
+        self.timelapse_aq_nbTimepoints.trace("w", lambda name, index, mode,
+                                                         var=self.timelapse_aq_nbTimepoints: self.updateTimesTimelapse())
+
         self.Entry_NbTimepoints.insert(0, "6")
 
         self.bt_run_timelapse = tk.Button(timelapse_acquisition_settings, text="Run Timelapse")
+        self.bt_abort_timelapse = tk.Button(timelapse_acquisition_settings, text="Abort Timelapse")
 
-        self.starttime= tk.Label(timelapse_acquisition_settings, text=f"{dt.datetime.now():%a, %b %d %Y}")
 
         # time-lapse aquisition layout (labels positioned above)
         self.Entry_Timeinterval.grid(row=2, column=1,columnspan=3, sticky = tk.W + tk.E)
         self.Entry_NbTimepoints.grid(row=5, column=2, columnspan=3, sticky = tk.W + tk.E)
-        self.bt_run_timelapse.grid(row=15, column=0, columnspan=3, sticky=tk.W + tk.E)
-        self.starttime.grid(row=12, column=2)
+        self.bt_run_timelapse.grid(row=15, column=0, columnspan=2, sticky=tk.W + tk.E)
+        self.bt_abort_timelapse.grid(row=15, column=3, columnspan=2, sticky=tk.W + tk.E)
+        self.timelapse_lb_starttime.grid(row=12, column=2)
+        self.timelapse_lb_endtime.grid(row=14, column=2)
 
         ch_button = ttk.Button(self, text="Change", command=self.loop_function)
         ch_button.grid(row=0, column=3, sticky=tk.E)
@@ -179,8 +189,19 @@ class Run_Tab(tk.Frame):
         else:
             button.config(relief="sunken")
 
-    def updateEndTime(self):
-        print('test')
+    def updateTimesTimelapse(self):
+        now = dt.datetime.now()
+        nowtime = now.strftime("%Y-%m-%d %H:%M:%S")
+        self.timelapse_lb_starttime.config(text=nowtime)
+
+        #calculate end time
+        try:
+            endtime = now + dt.timedelta(0, self.timelapse_aq_timeinterval.get() * self.timelapse_aq_nbTimepoints.get())
+        except:
+            endtime = now #catch exception if all entries are deleted
+
+        end = endtime.strftime("%Y-%m-%d %H:%M:%S")
+        self.timelapse_lb_endtime.config(text=end)
 
 #---------------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
