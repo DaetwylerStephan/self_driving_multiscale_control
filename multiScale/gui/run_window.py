@@ -41,11 +41,17 @@ class Run_Tab(tk.Frame):
         preview_settings = tk.LabelFrame(self, text="Preview")
         stack_aquisition_settings = tk.LabelFrame(self, text="Stack acquisition")
         timelapse_acquisition_settings = tk.LabelFrame(self, text="Time-lapse acquisition")
+        statusprogress_settings = tk.LabelFrame(self, text="Progress")
 
         # overall positioning of label frames
         preview_settings.grid(row=0, column=1, sticky = tk.W + tk.E)
         stack_aquisition_settings.grid(row=1, column=1, sticky = tk.W + tk.E)
         timelapse_acquisition_settings.grid(row=2, column=1, sticky=tk.W + tk.E)
+        statusprogress_settings.grid(row=4, column=1, sticky=tk.W + tk.E)
+
+        #define some labels here to ensure existance for code
+        self.timelapse_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
+        self.stack_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
 
         ### ----------------------------preview buttons ---------------------------------------------------------------
         #preview settings-----------------------------------------------------------------------------------
@@ -55,8 +61,10 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo640 = tk.Button(preview_settings, text="640 nm", command=lambda : self.preview_filter_select(self.bt_changeTo640), bg="#ff2100")
         self.bt_changeTo_block = tk.Button(preview_settings, text="no filter", command=lambda : self.preview_filter_select(self.bt_changeTo_block))
         self.bt_changeTo_trans = tk.Button(preview_settings, text="block", command=lambda : self.preview_filter_select(self.bt_changeTo_trans))
-        self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview", command= lambda : self.preview_change(self.bt_preview_lowres))
-        self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview", command=lambda : self.preview_change(self.bt_preview_highres))
+        #self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview", command= lambda : self.preview_change(self.bt_preview_lowres))
+        #self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview", command=lambda : self.preview_change(self.bt_preview_highres))
+        self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview")
+        self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview")
 
         #preview layout
         self.bt_changeTo488.grid(row=3, column=2)
@@ -140,16 +148,20 @@ class Run_Tab(tk.Frame):
         ch_button = ttk.Button(self, text="Change", command=self.loop_function)
         ch_button.grid(row=0, column=3, sticky=tk.E)
 
-        progressbar = ttk.Progressbar(self, variable=self.timelapse_aq_progress, maximum=self.timelapse_aq_nbTimepoints.get())
-        progressbar.grid(row=0, column=2, sticky=tk.E)
+        ### ----------------------------progress display settings ------------------------------------------------------
+        stackprogress_label = ttk.Label(statusprogress_settings, text="Stack progress:").grid(row=1, column=0)
+        self.stack_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.stack_aq_progress,
+                                                        maximum=self.stack_aq_numberOfPlanes.get())
+        self.stack_aq_progressbar.grid(row=1, column=2, sticky=tk.E)
+        self.stack_aq_progressindicator.config(text="0 of " + str(self.stack_aq_numberOfPlanes.get()))
+        self.stack_aq_progressindicator.grid(row=1, column=4, sticky=tk.E)
 
+        timelapseprogress_label = ttk.Label(statusprogress_settings, text="Timelapse progress:").grid(row=2, column=0)
+        self.timelapse_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.timelapse_aq_progress, maximum=self.timelapse_aq_nbTimepoints.get())
+        self.timelapse_aq_progressbar.grid(row=2, column=2, sticky=tk.E)
+        self.timelapse_aq_progressindicator.config(text="0 of " + str(self.timelapse_aq_nbTimepoints.get()))
+        self.timelapse_aq_progressindicator.grid(row=2, column=4, sticky=tk.E)
 
-    def timelapse_started(self):
-        """
-        Set all the buttons to disable by using config - config can change the properties of a widget
-        my_button.config(state=DISABLED)
-        :return:
-        """
 
 
     def loop_function(self):
@@ -189,6 +201,11 @@ class Run_Tab(tk.Frame):
         else:
             button.config(relief="sunken")
 
+    def sunk_timelapseButton(self, event):
+        print("sink timelapse button")
+        self.bt_run_timelapse.config(relief="sunken")
+        self.update()
+
     def updateTimesTimelapse(self):
         now = dt.datetime.now()
         nowtime = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -202,6 +219,14 @@ class Run_Tab(tk.Frame):
 
         end = endtime.strftime("%Y-%m-%d %H:%M:%S")
         self.timelapse_lb_endtime.config(text=end)
+
+        try:
+            outOftext = "0 of " + str(self.timelapse_aq_nbTimepoints.get())
+        except:
+            outOftext = "0 of 0"
+
+        self.timelapse_aq_progressindicator.config(text=outOftext)
+
 
 #---------------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------

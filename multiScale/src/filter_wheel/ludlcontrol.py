@@ -137,7 +137,6 @@ class LudlFilterwheel:
 
 if __name__ == '__main__':
     ##test here code of this class
-
     ComPort = 'COM6'
     filters = {'515-30-25': 0,
                '572/20-25': 1,

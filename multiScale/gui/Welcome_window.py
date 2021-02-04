@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import psutil
 
 class Welcome_Tab(tk.Frame):
     """
@@ -10,6 +11,7 @@ class Welcome_Tab(tk.Frame):
     - user
     - fluorescent marker
     - quit application
+    - free disk space
     """
 
     def __init__(self, parent, *args, **kwargs):
@@ -22,11 +24,20 @@ class Welcome_Tab(tk.Frame):
         #intro-text
         intro_text = tk.Text(self, height = 2, wrap = "none", bg="grey")
         intro_text.insert('1.0', 'Welcome to using the multi-scale python programming interface. \nPlease set here some experiment specific parameters')
+        intro_text.grid(row=0, column=0, columnspan=3, sticky=(tk.E + tk.W))
+
+        #calculate free disk space
+        obj_Disk = psutil.disk_usage('D:\\')
+        totaldisksize = obj_Disk.total/(1024.0 ** 3)
+        useddisksize = obj_Disk.used/(1024.0 ** 3)
+        freedisksize = round(obj_Disk.free/(1024.0 ** 3))
 
         #labels
-        username_label = ttk.Label(self, text="Username:")
-        modelorganism_label = ttk.Label(self, text="Model organism:")
-        fluorescent_marker_label = ttk.Label(self, text="Fluorescent marker:")
+        username_label = ttk.Label(self, text="Username:").grid(row=2, column=0, sticky=tk.W)
+        modelorganism_label = ttk.Label(self, text="Model organism:").grid(row=5, column=0, sticky=tk.W)
+        fluorescent_marker_label = ttk.Label(self, text="Fluorescent marker:").grid(row=10, column=0, sticky=tk.W)
+        freediskspace_label = ttk.Label(self, text="Free disk space (D:\\):").grid(row=15, column=0, sticky=tk.W)
+        freedisksize_label = ttk.Label(self, text=str(freedisksize) + "GB").grid(row=16, column=1, sticky=tk.W)
 
         #widgets
         username_box = ttk.Combobox(self, textvariable=self.username, values=["Stephan Daetwyler", "Reto Fiolka", "Bo-Jui Chang"])
@@ -35,25 +46,19 @@ class Welcome_Tab(tk.Frame):
         fluorescent_marker_box = ttk.Combobox(self, textvariable=self.maker_name,
                                          values=["kdrl:mCherry", "kdrl:GFP", "UAS:GFP"])
         quit_button = tk.Button(self, text="Quit", command =self.deleteme)
+        free_diskspace_bar = ttk.Progressbar(self, variable=useddisksize, maximum=totaldisksize)
 
         #Set default values
         username_box.set("Stephan Daetwyler")
         modelOrganism_box.set("Xenograft")
         fluorescent_marker_box.set("kdrl:mCherry")
 
-
-        # Layout form
-        intro_text.grid(row=0, column=0, columnspan=3, sticky=(tk.E + tk.W))
-        #label placement
-        username_label.grid(row=2, column=0, sticky=tk.W)
-        modelorganism_label.grid(row=5, column=0, sticky=tk.W)
-        fluorescent_marker_label.grid(row=10, column=0, sticky=tk.W)
         #widget placement
         username_box.grid(row=2, column=1, sticky=(tk.W))
         modelOrganism_box.grid(row=5, column=1, sticky=(tk.W))
         fluorescent_marker_box.grid(row=10, column=1, sticky=(tk.W))
         quit_button.grid(row=100, column=0, sticky = (tk.W + tk.E))
-
+        free_diskspace_bar.grid(row=15, column=1, columnspan=3, sticky=(tk.W))
         self.columnconfigure(1, weight=1)
 
     def getwelcome_parameters(self):
