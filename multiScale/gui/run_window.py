@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import time
 import datetime as dt
+import math
 
 class Run_Tab(tk.Frame):
     """
@@ -17,6 +18,11 @@ class Run_Tab(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, **kwargs)
 
+        # intro-text
+        intro_text = tk.Text(self, height=2, width= 600, wrap="none", bg="grey")
+        intro_text.insert('1.0', 'In this tab, select parameters to run preview, stack and time-lapse acquisitions \n')
+        intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E + tk.W))
+
         #params
         self.excitation_lowres = tk.IntVar()
 
@@ -26,16 +32,25 @@ class Run_Tab(tk.Frame):
         self.stack_aq_552on = tk.IntVar()
         self.stack_aq_594on = tk.IntVar()
         self.stack_aq_640on = tk.IntVar()
+        self.stack_aq_lowResCameraOn = tk.IntVar()
+        self.stack_aq_highResCameraOn = tk.IntVar()
         self.stack_acq_laserCycleMode = tk.StringVar()
         self.stack_aq_numberOfPlanes = tk.IntVar()
         self.stack_aq_plane_spacing = tk.DoubleVar()
 
         #time-lapse setting parameters
         self.timelapse_aq_progress = tk.DoubleVar()
-        self.timelapse_aq_nbTimepoints = tk.IntVar()
-        self.timelapse_aq_timeinterval = tk.DoubleVar()
-        self.timelapse_aq_nbTimepoints.set(50)
-
+        self.timelapse_aq_nbTimepoints = 22
+        self.timelapse_aq_timeinterval_min = tk.DoubleVar()
+        self.timelapse_aq_timeinterval_min.set(15)
+        self.timelapse_aq_timeinterval_seconds = tk.DoubleVar()
+        self.timelapse_aq_timeinterval_seconds.set(0)
+        self.timelapse_aq_length_hours = tk.DoubleVar()
+        self.timelapse_aq_length_hours.set(5)
+        self.timelapse_aq_length_min = tk.DoubleVar()
+        self.timelapse_aq_length_min.set(30)
+        self.timelapse_aq_length_seconds = tk.DoubleVar()
+        self.timelapse_aq_length_seconds.set(00)
 
         #set the different label frames
         preview_settings = tk.LabelFrame(self, text="Preview")
@@ -44,9 +59,9 @@ class Run_Tab(tk.Frame):
         statusprogress_settings = tk.LabelFrame(self, text="Progress")
 
         # overall positioning of label frames
-        preview_settings.grid(row=0, column=1, sticky = tk.W + tk.E)
-        stack_aquisition_settings.grid(row=1, column=1, sticky = tk.W + tk.E)
-        timelapse_acquisition_settings.grid(row=2, column=1, sticky=tk.W + tk.E)
+        preview_settings.grid(row=1, column=1, sticky = tk.W + tk.E)
+        stack_aquisition_settings.grid(row=2, column=1, sticky = tk.W + tk.E)
+        timelapse_acquisition_settings.grid(row=3, column=1, sticky=tk.W + tk.E)
         statusprogress_settings.grid(row=4, column=1, sticky=tk.W + tk.E)
 
         #define some labels here to ensure existance for code
@@ -61,8 +76,6 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo640 = tk.Button(preview_settings, text="640 nm", command=lambda : self.preview_filter_select(self.bt_changeTo640), bg="#ff2100")
         self.bt_changeTo_block = tk.Button(preview_settings, text="no filter", command=lambda : self.preview_filter_select(self.bt_changeTo_block))
         self.bt_changeTo_trans = tk.Button(preview_settings, text="block", command=lambda : self.preview_filter_select(self.bt_changeTo_trans))
-        #self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview", command= lambda : self.preview_change(self.bt_preview_lowres))
-        #self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview", command=lambda : self.preview_change(self.bt_preview_highres))
         self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview")
         self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview")
 
@@ -82,73 +95,101 @@ class Run_Tab(tk.Frame):
         numberOfPlanes_label= ttk.Label(stack_aquisition_settings, text="Number of planes:").grid(row = 6, column = 0)
         plane_spacing_label= ttk.Label(stack_aquisition_settings, text="Spacing of planes:").grid(row = 10, column = 0)
         laser_cyclemode_label= ttk.Label(stack_aquisition_settings, text="Laser Cycle Mode:").grid(row = 3, column = 0)
+        cameraOn_label= ttk.Label(stack_aquisition_settings, text="Camera On:").grid(row = 4, column = 0)
 
-        #stack aquisition settings
-        self.ckb_laserOn488 = tk.Checkbutton(stack_aquisition_settings, text ='488', variable=self.stack_aq_488on, onvalue=1, offvalue=0)
-        self.ckb_laserOn552 = tk.Checkbutton(stack_aquisition_settings, text ='552', variable=self.stack_aq_552on, onvalue=1, offvalue=0)
-        self.ckb_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594on, onvalue=1, offvalue=0)
-        self.ckb_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640on, onvalue=1, offvalue=0)
 
+        #stack aquisition settings......................................................................................
+        #choice of laser
+        self.stack_aq_laserOn488 = tk.Checkbutton(stack_aquisition_settings, text ='488', variable=self.stack_aq_488on, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn552 = tk.Checkbutton(stack_aquisition_settings, text ='552', variable=self.stack_aq_552on, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594on, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640on, onvalue=1, offvalue=0)
+
+        #choice of camera
+        self.stack_aq_ckb_lowresCamera  = tk.Checkbutton(stack_aquisition_settings, text ='Low Res Camera', variable=self.stack_aq_lowResCameraOn, onvalue=1, offvalue=0)
+        self.stack_aq_ckb_highresCamera = tk.Checkbutton(stack_aquisition_settings, text ='High Res Camera', variable=self.stack_aq_highResCameraOn, onvalue=1, offvalue=0)
+
+        #laser cycle
         laserCycles = ('Change filter/stack', 'Change filter/plane')
-        self.option_laserCycle = tk.OptionMenu(stack_aquisition_settings, self.stack_acq_laserCycleMode, *laserCycles)
+        self.stack_aq_option_laserCycle = tk.OptionMenu(stack_aquisition_settings, self.stack_acq_laserCycleMode, *laserCycles)
         self.stack_acq_laserCycleMode.set(laserCycles[0])
 
-        self.Entry_numberOfPlanes = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes)
-        self.Entry_numberOfPlanes.insert(0, "20")
+        #number of planes
+        self.stack_aq_entry_numberOfPlanes = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes)
+        self.stack_aq_entry_numberOfPlanes.insert(0, "20")
 
-        self.Entry_plane_spacing = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing)
-        self.Entry_plane_spacing.insert(0, "1")
+        #plane spacing
+        self.stack_aq_entry_plane_spacing = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing)
+        self.stack_aq_entry_plane_spacing.insert(0, "1")
 
-        self.bt_run_lowresstack = tk.Button(stack_aquisition_settings, text="Acquire Low Res Stack(s)")
-        self.bt_run_highresstack = tk.Button(stack_aquisition_settings, text="Acquire High Res Stack(s)")
+        #run buttons
+        self.stack_aq_bt_run_stack = tk.Button(stack_aquisition_settings, text="Acquire Stack")
+        self.stack_aq_bt_abort_stack = tk.Button(stack_aquisition_settings, text="Abort Stack")
 
-        #stack aquisition layout (labels positioned above)
-        self.ckb_laserOn488.grid(row =2, column=1)
-        self.ckb_laserOn552.grid(row=2, column=2)
-        self.ckb_laserOn594.grid(row=2, column=3)
-        self.ckb_laserOn640.grid(row=2, column=4)
-        self.option_laserCycle.grid(row=3,column =1, columnspan=3,sticky = tk.W + tk.E)
+        #stack aquisition layout (labels positioned above)..............................................................
+        self.stack_aq_laserOn488.grid(row =2, column=1)
+        self.stack_aq_laserOn552.grid(row=2, column=2)
+        self.stack_aq_laserOn594.grid(row=2, column=3)
+        self.stack_aq_laserOn640.grid(row=2, column=4)
+        self.stack_aq_option_laserCycle.grid(row=3,column =1, columnspan=3,sticky = tk.W + tk.E)
 
-        self.Entry_numberOfPlanes.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
-        self.Entry_plane_spacing.grid(row =10, column=1, columnspan=3, sticky = tk.W + tk.E)
-        self.bt_run_lowresstack.grid(row = 15, column =0, columnspan=3, sticky = tk.W + tk.E)
-        self.bt_run_highresstack.grid(row=15, column=3, columnspan=3, sticky=tk.W + tk.E)
+        self.stack_aq_ckb_lowresCamera.grid(row=4, column=1, columnspan=2)
+        self.stack_aq_ckb_highresCamera.grid(row=4, column=3, columnspan=2)
+
+        self.stack_aq_entry_numberOfPlanes.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_entry_plane_spacing.grid(row =10, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_bt_run_stack.grid(row = 15, column =0, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_bt_abort_stack.grid(row=15, column=3, columnspan=4, sticky=tk.W + tk.E)
 
         ### ----------------------------time-lapse acquisition buttons ------------------------------------------------------
-        # time-lapse aquisition labels (positioned)
+        # passive time-lapse aquisition labels (positioned)
         timeinterval_label = ttk.Label(timelapse_acquisition_settings, text="Time interval:").grid(row=2, column=0)
-        timepointsnb_label = ttk.Label(timelapse_acquisition_settings, text="Number of timepoints:").grid(row=5, column=0)
+        timepointsnb_label = ttk.Label(timelapse_acquisition_settings, text="Number of timepoints:").grid(row=6, column=0)
+        overall_length_label = ttk.Label(timelapse_acquisition_settings, text="Total length:").grid(row=5, column=0)
         start_time = ttk.Label(timelapse_acquisition_settings, text="Start time:").grid(row=12, column=0)
         end_time = ttk.Label(timelapse_acquisition_settings, text="End time:").grid(row=14, column=0)
+        interval_min_time = ttk.Label(timelapse_acquisition_settings, text="min").grid(row=2, column=2)
+        interval_seconds_time = ttk.Label(timelapse_acquisition_settings, text="seconds").grid(row=2, column=4)
+        length_hours_time = ttk.Label(timelapse_acquisition_settings, text="hours").grid(row=5, column=2)
+        length_min_time = ttk.Label(timelapse_acquisition_settings, text="min").grid(row=5, column=4)
+        length_seconds_time = ttk.Label(timelapse_acquisition_settings, text="seconds").grid(row=5, column=6)
+
+        #active labels
+        self.timelapse_aq_lb_NbTimepoints = tk.Label(timelapse_acquisition_settings, text=str(self.timelapse_aq_nbTimepoints))
         self.timelapse_lb_starttime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         self.timelapse_lb_endtime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         # time-lapse aquisition settings
-        self.Entry_Timeinterval = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_timeinterval)
-        self.timelapse_aq_timeinterval.trace("w", lambda name, index, mode, var = self.timelapse_aq_timeinterval: self.updateTimesTimelapse())
-        self.Entry_Timeinterval.insert(0, "6")
-        self.Entry_NbTimepoints = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_nbTimepoints, validate="all", validatecommand=self.updateTimesTimelapse)
-        self.timelapse_aq_nbTimepoints.trace("w", lambda name, index, mode,
-                                                         var=self.timelapse_aq_nbTimepoints: self.updateTimesTimelapse())
+        self.timelapse_delta_entry_minute = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_timeinterval_min, width=5)
+        self.timelapse_delta_entry_seconds = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_timeinterval_seconds, width=5)
+        self.timelapse_length_entry_hours = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_length_hours, width=5)
+        self.timelapse_length_entry_minutes = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_length_min, width=5)
+        self.timelapse_length_entry_seconds = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_length_seconds, width=5)
 
-        self.Entry_NbTimepoints.insert(0, "6")
+        self.timelapse_aq_timeinterval_min.trace("w", lambda name, index, mode, var = self.timelapse_aq_timeinterval_min: self.updateTimesTimelapse())
+        self.timelapse_aq_timeinterval_seconds.trace("w", lambda name, index, mode, var = self.timelapse_aq_timeinterval_seconds: self.updateTimesTimelapse())
+        self.timelapse_aq_length_hours.trace("w", lambda name, index, mode, var = self.timelapse_aq_length_hours: self.updateTimesTimelapse())
+        self.timelapse_aq_length_min.trace("w", lambda name, index, mode, var = self.timelapse_aq_length_min: self.updateTimesTimelapse())
+        self.timelapse_aq_length_seconds.trace("w", lambda name, index, mode, var = self.timelapse_aq_length_seconds: self.updateTimesTimelapse())
 
-        self.bt_run_timelapse = tk.Button(timelapse_acquisition_settings, text="Run Timelapse")
-        self.bt_abort_timelapse = tk.Button(timelapse_acquisition_settings, text="Abort Timelapse")
+
+        self.timelapse_aq_bt_run_timelapse = tk.Button(timelapse_acquisition_settings, text="Run Timelapse")
+        self.timelapse_aq_bt_abort_timelapse = tk.Button(timelapse_acquisition_settings, text="Abort Timelapse")
 
 
         # time-lapse aquisition layout (labels positioned above)
-        self.Entry_Timeinterval.grid(row=2, column=1,columnspan=3, sticky = tk.W + tk.E)
-        self.Entry_NbTimepoints.grid(row=5, column=2, columnspan=3, sticky = tk.W + tk.E)
-        self.bt_run_timelapse.grid(row=15, column=0, columnspan=2, sticky=tk.W + tk.E)
-        self.bt_abort_timelapse.grid(row=15, column=3, columnspan=2, sticky=tk.W + tk.E)
-        self.timelapse_lb_starttime.grid(row=12, column=2)
-        self.timelapse_lb_endtime.grid(row=14, column=2)
+        self.timelapse_delta_entry_minute.grid(row=2, column=1,columnspan=1,sticky = tk.W + tk.E)
+        self.timelapse_delta_entry_seconds.grid(row=2, column=3,columnspan=1, ipadx=5,sticky = tk.W + tk.E)
+        self.timelapse_length_entry_hours.grid(row=5, column=1,columnspan=1, ipadx=5,sticky = tk.W + tk.E)
+        self.timelapse_length_entry_minutes.grid(row=5, column=3,columnspan=1, ipadx=5,sticky = tk.W + tk.E)
+        self.timelapse_length_entry_seconds.grid(row=5, column=5,columnspan=1, ipadx=5,sticky = tk.W + tk.E)
+        self.timelapse_aq_lb_NbTimepoints.grid(row=6,column=1)
+        self.timelapse_lb_starttime.grid(row=12, column=1,columnspan=3,sticky = tk.W)
+        self.timelapse_lb_endtime.grid(row=14, column=1,columnspan=3,sticky = tk.W)
+        self.timelapse_aq_bt_run_timelapse.grid(row=15, column=0, columnspan=2, sticky=tk.W + tk.E)
+        self.timelapse_aq_bt_abort_timelapse.grid(row=15, column=2, columnspan=3, sticky=tk.W + tk.E)
 
-        ch_button = ttk.Button(self, text="Change", command=self.loop_function)
-        ch_button.grid(row=0, column=3, sticky=tk.E)
-
-        ### ----------------------------progress display settings ------------------------------------------------------
+### ----------------------------progress display settings ------------------------------------------------------
         stackprogress_label = ttk.Label(statusprogress_settings, text="Stack progress:").grid(row=1, column=0)
         self.stack_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.stack_aq_progress,
                                                         maximum=self.stack_aq_numberOfPlanes.get())
@@ -157,24 +198,10 @@ class Run_Tab(tk.Frame):
         self.stack_aq_progressindicator.grid(row=1, column=4, sticky=tk.E)
 
         timelapseprogress_label = ttk.Label(statusprogress_settings, text="Timelapse progress:").grid(row=2, column=0)
-        self.timelapse_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.timelapse_aq_progress, maximum=self.timelapse_aq_nbTimepoints.get())
+        self.timelapse_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.timelapse_aq_progress, maximum=self.timelapse_aq_nbTimepoints)
         self.timelapse_aq_progressbar.grid(row=2, column=2, sticky=tk.E)
-        self.timelapse_aq_progressindicator.config(text="0 of " + str(self.timelapse_aq_nbTimepoints.get()))
+        self.timelapse_aq_progressindicator.config(text="0 of " + str(self.timelapse_aq_nbTimepoints))
         self.timelapse_aq_progressindicator.grid(row=2, column=4, sticky=tk.E)
-
-
-
-    def loop_function(self):
-        k = 0
-        print(self.timelapse_aq_nbTimepoints.get())
-        while k <= self.timelapse_aq_nbTimepoints.get():
-            ### some work to be done
-            self.timelapse_aq_progress.set(k)
-            k += 1
-            time.sleep(0.02)
-            self.update_idletasks()
-        #self.after(100, loop_function())
-
 
 
 #-------button press functions---------------------------------------------------------------------------------------------
@@ -206,14 +233,44 @@ class Run_Tab(tk.Frame):
         self.bt_run_timelapse.config(relief="sunken")
         self.update()
 
+    def checkentry_notempty(self, entryfield):
+        try:
+            entryfield.get()
+        except:
+            entryfield.set(0)
+
     def updateTimesTimelapse(self):
         now = dt.datetime.now()
         nowtime = now.strftime("%Y-%m-%d %H:%M:%S")
         self.timelapse_lb_starttime.config(text=nowtime)
 
+        #capture some exceptions - like entering no valid number (maybe not best way)
+        #self.checkentry_notempty(self.timelapse_aq_timeinterval_min)
+        #self.checkentry_notempty(self.timelapse_aq_timeinterval_seconds)
+        #self.checkentry_notempty(self.timelapse_aq_length_hours)
+        #self.checkentry_notempty(self.timelapse_aq_length_min)
+        #self.checkentry_notempty(self.timelapse_aq_length_seconds)
+
+
+        try:
+            timeinterval_in_seconds = (60*self.timelapse_aq_timeinterval_min.get() + self.timelapse_aq_timeinterval_seconds.get())
+            totallength_in_seconds =  (60*60*self.timelapse_aq_length_hours.get() + 60*self.timelapse_aq_length_min.get() + self.timelapse_aq_length_seconds.get())
+        except:
+            timeinterval_in_seconds = 900
+            totallength_in_seconds = 19800
+
+        #print(str(timeinterval_in_seconds) + " " + str(totallength_in_seconds))
+        if timeinterval_in_seconds==0:
+            timeinterval_in_seconds=900
+
+        self.timelapse_aq_nbTimepoints = math.floor(totallength_in_seconds/timeinterval_in_seconds)
+
+        #set right number of timepoints
+        self.timelapse_aq_lb_NbTimepoints.config(text=str(self.timelapse_aq_nbTimepoints))
+
         #calculate end time
         try:
-            endtime = now + dt.timedelta(0, self.timelapse_aq_timeinterval.get() * self.timelapse_aq_nbTimepoints.get())
+            endtime = now + dt.timedelta(0, totallength_in_seconds)
         except:
             endtime = now #catch exception if all entries are deleted
 
@@ -221,7 +278,7 @@ class Run_Tab(tk.Frame):
         self.timelapse_lb_endtime.config(text=end)
 
         try:
-            outOftext = "0 of " + str(self.timelapse_aq_nbTimepoints.get())
+            outOftext = "0 of " + str(self.timelapse_aq_nbTimepoints)
         except:
             outOftext = "0 of 0"
 

@@ -35,13 +35,15 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.bt_changeTo640.bind("<Button>", lambda event: self.changefilter(event, '640', '640_filter'))
         self.view.runtab.bt_changeTo_block.bind("<Button>", lambda event: self.changefilter(event, 'None', 'Block'))
         self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED', 'No_filter'))
-        self.view.runtab.bt_run_lowresstack.bind("<Button>", self.acquire_lowresstack)
-        self.view.runtab.bt_run_highresstack.bind("<Button>", self.acquire_highresstack)
-        self.view.runtab.bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
-        self.view.runtab.bt_run_timelapse.bind('<ButtonRelease-1>', self.view.runtab.sunk_timelapseButton)
-        self.view.runtab.bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
+        self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
+        self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
+        self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
 
     def run(self):
+        """
+        Run the Tkinter Gui in the main loop
+        :return:
+        """
         self.root.title("Multi-scale microscope V1")
         self.root.geometry("800x600")
         self.root.resizable(width=False, height=False)
@@ -49,6 +51,8 @@ class MultiScale_Microscope_Controller():
 
     def close(self):
         self.model.close()
+
+    ##here follow the call to the functions of the model (microscope) that were bound above:
 
     def run_lowrespreview(self, event):
         self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
@@ -64,33 +68,22 @@ class MultiScale_Microscope_Controller():
         print("filter " + filter)
         print("laser " + laser)
 
-    def acquire_lowresstack(self, event):
-        self.view.runtab.bt_run_lowresstack.config(relief="sunken")
+    def acquire_stack(self, event):
+        self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
         self.view.update()
 
         print("acquiring low res stack")
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))
-        self.view.runtab.bt_run_lowresstack.config(relief="raised")
-
-    def acquire_highresstack(self, event):
-
-        self.view.runtab.bt_run_highresstack.config(relief="sunken")
-        self.view.update()
-
-        time.sleep(2)
-        print("acquiring high res stack")
-        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))
-
-        self.view.runtab.bt_run_highresstack.config(relief="raised")
+        self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
 
     def acquire_timelapse(self, event):
 
         self.view.runtab.updateTimesTimelapse()
-        self.view.runtab.bt_run_timelapse.config(relief="sunken")
+        self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
         self.view.update_idletasks()
         self.view.update()
 
-        self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints.get()-1)
+        self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints-1)
         self.continuetimelapse = 0
         print("acquiring timelapse")
 
@@ -103,15 +96,21 @@ class MultiScale_Microscope_Controller():
 
     def run_timelapse(self):
         varb = str(np.random.randint(0, 100))
-        for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints.get()):
-            self.view.runtab.bt_run_timelapse.config(relief="sunken") #keep the button pressed while executing the timelapse
+        self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
+        self.view.update()
+
+        for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints):
+            self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken") #keep the button pressed while executing the timelapse
             self.view.runtab.timelapse_aq_progress.set(timeiter)
+            self.view.runtab.timelapse_aq_progressindicator.config(text=str(timeiter+1) +" of " + str(self.view.runtab.timelapse_aq_nbTimepoints))
+
+
             print("hello " + varb)
             time.sleep(2)
             if self.continuetimelapse == 1:
                 break  # Break while loop when stop = 1
 
-        self.view.runtab.bt_run_timelapse.config(relief="raised")
+        self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="raised")
         self.view.update()
 
 
