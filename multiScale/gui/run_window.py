@@ -26,6 +26,12 @@ class Run_Tab(tk.Frame):
         #params
         self.excitation_lowres = tk.IntVar()
 
+        #laser settings
+        self.laser488_percentage = tk.IntVar()
+        self.laser552_percentage = tk.IntVar()
+        self.laser594_percentage = tk.IntVar()
+        self.laser640_percentage = tk.IntVar()
+
         #stack acquisition parameters
         self.stack_aq_progress = tk.DoubleVar()
         self.stack_aq_488on = tk.IntVar()
@@ -53,20 +59,56 @@ class Run_Tab(tk.Frame):
         self.timelapse_aq_length_seconds.set(00)
 
         #set the different label frames
+        laser_settings = tk.LabelFrame(self, text="Laser Settings")
         preview_settings = tk.LabelFrame(self, text="Preview")
         stack_aquisition_settings = tk.LabelFrame(self, text="Stack acquisition")
         timelapse_acquisition_settings = tk.LabelFrame(self, text="Time-lapse acquisition")
         statusprogress_settings = tk.LabelFrame(self, text="Progress")
 
         # overall positioning of label frames
-        preview_settings.grid(row=1, column=1, sticky = tk.W + tk.E)
-        stack_aquisition_settings.grid(row=2, column=1, sticky = tk.W + tk.E)
-        timelapse_acquisition_settings.grid(row=3, column=1, sticky=tk.W + tk.E)
-        statusprogress_settings.grid(row=4, column=1, sticky=tk.W + tk.E)
+        laser_settings.grid(row=1, column=1, rowspan=3, sticky = tk.W + tk.E+tk.S+tk.N)
+        preview_settings.grid(row=1, column=2, sticky = tk.W + tk.E+tk.S+tk.N)
+        stack_aquisition_settings.grid(row=3, column=2, sticky = tk.W + tk.E+tk.S+tk.N)
+        timelapse_acquisition_settings.grid(row=4, column=2, sticky=tk.W + tk.E+tk.S+tk.N)
+        statusprogress_settings.grid(row=5, column=2, sticky=tk.W + tk.E+tk.S+tk.N)
 
         #define some labels here to ensure existance for code
         self.timelapse_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
         self.stack_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
+
+        ### ----------------------------laser settings -----------------------------------------------------------------
+        # laser labels (positioned)
+        laser488_label = ttk.Label(laser_settings, text="488 nm:").grid(row=2, column=0)
+        laser552_label = ttk.Label(laser_settings, text="552 nm:").grid(row=3, column=0)
+        laser594_label = ttk.Label(laser_settings, text="594 nm:").grid(row=4, column=0)
+        laser640_label = ttk.Label(laser_settings, text="640 nm:").grid(row=5, column=0)
+
+        self.laser488_entry = tk.Entry(laser_settings, textvariable=self.laser488_percentage, width=3)
+        self.laser552_entry = tk.Entry(laser_settings, textvariable=self.laser552_percentage, width=3)
+        self.laser594_entry = tk.Entry(laser_settings, textvariable=self.laser594_percentage, width=3)
+        self.laser640_entry = tk.Entry(laser_settings, textvariable=self.laser640_percentage, width=3)
+
+        #default values
+        self.laser488_percentage.set(20)
+        self.laser552_percentage.set(20)
+        self.laser594_percentage.set(20)
+        self.laser640_percentage.set(20)
+
+        laser488_scale = tk.Scale(laser_settings, variable=self.laser488_percentage,from_=0, to=100, orient="horizontal")
+        laser552_scale = tk.Scale(laser_settings, variable=self.laser552_percentage,from_=0, to=100, orient="horizontal")
+        laser594_scale = tk.Scale(laser_settings, variable=self.laser594_percentage,from_=0, to=100, orient="horizontal")
+        laser640_scale = tk.Scale(laser_settings, variable=self.laser640_percentage,from_=0, to=100, orient="horizontal")
+
+        #laser widgets layout
+        self.laser488_entry.grid(row=2, column=3, sticky=tk.W + tk.E)
+        self.laser552_entry.grid(row=3, column=3, sticky=tk.W + tk.E)
+        self.laser594_entry.grid(row=4, column=3, sticky=tk.W + tk.E)
+        self.laser640_entry.grid(row=5, column=3, sticky=tk.W + tk.E)
+        laser488_scale.grid(row=2, column=2, sticky=tk.W + tk.E)
+        laser552_scale.grid(row=3, column=2, sticky=tk.W + tk.E)
+        laser594_scale.grid(row=4, column=2, sticky=tk.W + tk.E)
+        laser640_scale.grid(row=5, column=2, sticky=tk.W + tk.E)
+
 
         ### ----------------------------preview buttons ---------------------------------------------------------------
         #preview settings-----------------------------------------------------------------------------------
@@ -156,8 +198,8 @@ class Run_Tab(tk.Frame):
 
         #active labels
         self.timelapse_aq_lb_NbTimepoints = tk.Label(timelapse_acquisition_settings, text=str(self.timelapse_aq_nbTimepoints))
-        self.timelapse_lb_starttime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        self.timelapse_lb_endtime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        self.timelapse_lb_starttime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%A-%Y-%m-%d %H:%M:%S"))
+        self.timelapse_lb_endtime = tk.Label(timelapse_acquisition_settings, text=dt.datetime.now().strftime("%A-%Y-%m-%d %H:%M:%S"))
 
         # time-lapse aquisition settings
         self.timelapse_delta_entry_minute = tk.Entry(timelapse_acquisition_settings, textvariable=self.timelapse_aq_timeinterval_min, width=5)
@@ -233,35 +275,40 @@ class Run_Tab(tk.Frame):
         self.bt_run_timelapse.config(relief="sunken")
         self.update()
 
-    def checkentry_notempty(self, entryfield):
-        try:
-            entryfield.get()
-        except:
-            entryfield.set(0)
 
     def updateTimesTimelapse(self):
         now = dt.datetime.now()
-        nowtime = now.strftime("%Y-%m-%d %H:%M:%S")
+        nowtime = now.strftime("%A-%Y-%m-%d %H:%M:%S")
         self.timelapse_lb_starttime.config(text=nowtime)
 
         #capture some exceptions - like entering no valid number (maybe not best way)
-        #self.checkentry_notempty(self.timelapse_aq_timeinterval_min)
-        #self.checkentry_notempty(self.timelapse_aq_timeinterval_seconds)
-        #self.checkentry_notempty(self.timelapse_aq_length_hours)
-        #self.checkentry_notempty(self.timelapse_aq_length_min)
-        #self.checkentry_notempty(self.timelapse_aq_length_seconds)
-
-
         try:
-            timeinterval_in_seconds = (60*self.timelapse_aq_timeinterval_min.get() + self.timelapse_aq_timeinterval_seconds.get())
-            totallength_in_seconds =  (60*60*self.timelapse_aq_length_hours.get() + 60*self.timelapse_aq_length_min.get() + self.timelapse_aq_length_seconds.get())
+            timeinterval_min = self.timelapse_aq_timeinterval_min.get()
         except:
-            timeinterval_in_seconds = 900
-            totallength_in_seconds = 19800
+            timeinterval_min = 0
+        try:
+            timeinterval_seconds = self.timelapse_aq_timeinterval_seconds.get()
+        except:
+            timeinterval_seconds = 0
+        try:
+            timelapse_hours = self.timelapse_aq_length_hours.get()
+        except:
+            timelapse_hours = 0
+        try:
+            timelapse_min = self.timelapse_aq_length_min.get()
+        except:
+            timelapse_min = 0
+        try:
+            timelapse_sec = self.timelapse_aq_length_seconds.get()
+        except:
+            timelapse_sec = 0
 
-        #print(str(timeinterval_in_seconds) + " " + str(totallength_in_seconds))
+        timeinterval_in_seconds = (60*timeinterval_min + timeinterval_seconds)
+        totallength_in_seconds =  (60*60*timelapse_hours + 60*timelapse_min + timelapse_sec)
+
         if timeinterval_in_seconds==0:
-            timeinterval_in_seconds=900
+            self.timelapse_lb_endtime.config(text="invalid time interval zero")
+            return
 
         self.timelapse_aq_nbTimepoints = math.floor(totallength_in_seconds/timeinterval_in_seconds)
 
@@ -274,7 +321,7 @@ class Run_Tab(tk.Frame):
         except:
             endtime = now #catch exception if all entries are deleted
 
-        end = endtime.strftime("%Y-%m-%d %H:%M:%S")
+        end = endtime.strftime("%A-%Y-%m-%d %H:%M:%S")
         self.timelapse_lb_endtime.config(text=end)
 
         try:
