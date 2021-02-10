@@ -23,14 +23,16 @@ class Run_Tab(tk.Frame):
         intro_text.insert('1.0', 'In this tab, select parameters to run preview, stack and time-lapse acquisitions \n')
         intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E + tk.W))
 
-        #params
-        self.excitation_lowres = tk.IntVar()
-
         #laser settings
         self.laser488_percentage = tk.IntVar()
         self.laser552_percentage = tk.IntVar()
         self.laser594_percentage = tk.IntVar()
         self.laser640_percentage = tk.IntVar()
+
+        #Camera settings
+        self.cam_lowresExposure = tk.IntVar()
+        self.cam_highresExposure = tk.IntVar()
+        self.cam_highresMode = tk.StringVar()
 
         #stack acquisition parameters
         self.stack_aq_progress = tk.DoubleVar()
@@ -60,33 +62,47 @@ class Run_Tab(tk.Frame):
 
         #set the different label frames
         laser_settings = tk.LabelFrame(self, text="Laser Settings")
+        camera_settings = tk.LabelFrame(self, text="Camera Settings")
         preview_settings = tk.LabelFrame(self, text="Preview")
         stack_aquisition_settings = tk.LabelFrame(self, text="Stack acquisition")
         timelapse_acquisition_settings = tk.LabelFrame(self, text="Time-lapse acquisition")
         statusprogress_settings = tk.LabelFrame(self, text="Progress")
 
         # overall positioning of label frames
-        laser_settings.grid(row=1, column=1, rowspan=3, sticky = tk.W + tk.E+tk.S+tk.N)
-        preview_settings.grid(row=1, column=2, sticky = tk.W + tk.E+tk.S+tk.N)
+        laser_settings.grid(row=1, column=3, rowspan=3, sticky = tk.W + tk.E+tk.S+tk.N)
+        camera_settings.grid(row=4, column=3, sticky = tk.W + tk.E+tk.S+tk.N)
+        preview_settings.grid(row=1, column=2, rowspan=2, sticky = tk.W + tk.E+tk.S+tk.N)
         stack_aquisition_settings.grid(row=3, column=2, sticky = tk.W + tk.E+tk.S+tk.N)
-        timelapse_acquisition_settings.grid(row=4, column=2, sticky=tk.W + tk.E+tk.S+tk.N)
-        statusprogress_settings.grid(row=5, column=2, sticky=tk.W + tk.E+tk.S+tk.N)
+        timelapse_acquisition_settings.grid(row=4, column=2, rowspan=2,sticky=tk.W + tk.E+tk.S+tk.N)
+        statusprogress_settings.grid(row=7, column=2, sticky=tk.W + tk.E+tk.S+tk.N)
 
         #define some labels here to ensure existance for code
-        self.timelapse_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
         self.stack_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
+        self.timelapse_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
 
         ### ----------------------------laser settings -----------------------------------------------------------------
         # laser labels (positioned)
         laser488_label = ttk.Label(laser_settings, text="488 nm:").grid(row=2, column=0)
-        laser552_label = ttk.Label(laser_settings, text="552 nm:").grid(row=3, column=0)
-        laser594_label = ttk.Label(laser_settings, text="594 nm:").grid(row=4, column=0)
-        laser640_label = ttk.Label(laser_settings, text="640 nm:").grid(row=5, column=0)
+        laser552_label = ttk.Label(laser_settings, text="552 nm:").grid(row=4, column=0)
+        laser594_label = ttk.Label(laser_settings, text="594 nm:").grid(row=6, column=0)
+        laser640_label = ttk.Label(laser_settings, text="640 nm:").grid(row=8, column=0)
 
+        #laser output indication
+        self.laser488_output = tk.Label(laser_settings, text="0 mW")
+        self.laser552_output = tk.Label(laser_settings, text="0 mW")
+        self.laser594_output = tk.Label(laser_settings, text="0 mW")
+        self.laser640_output = tk.Label(laser_settings, text="0 mW")
+
+        #laser percentage input
         self.laser488_entry = tk.Entry(laser_settings, textvariable=self.laser488_percentage, width=3)
         self.laser552_entry = tk.Entry(laser_settings, textvariable=self.laser552_percentage, width=3)
         self.laser594_entry = tk.Entry(laser_settings, textvariable=self.laser594_percentage, width=3)
         self.laser640_entry = tk.Entry(laser_settings, textvariable=self.laser640_percentage, width=3)
+
+        laser488_scale = tk.Scale(laser_settings, variable=self.laser488_percentage, from_=0, to=100, orient="horizontal")
+        laser552_scale = tk.Scale(laser_settings, variable=self.laser552_percentage, from_=0, to=100, orient="horizontal")
+        laser594_scale = tk.Scale(laser_settings, variable=self.laser594_percentage, from_=0, to=100, orient="horizontal")
+        laser640_scale = tk.Scale(laser_settings, variable=self.laser640_percentage, from_=0, to=100, orient="horizontal")
 
         #default values
         self.laser488_percentage.set(20)
@@ -94,22 +110,50 @@ class Run_Tab(tk.Frame):
         self.laser594_percentage.set(20)
         self.laser640_percentage.set(20)
 
-        laser488_scale = tk.Scale(laser_settings, variable=self.laser488_percentage,from_=0, to=100, orient="horizontal")
-        laser552_scale = tk.Scale(laser_settings, variable=self.laser552_percentage,from_=0, to=100, orient="horizontal")
-        laser594_scale = tk.Scale(laser_settings, variable=self.laser594_percentage,from_=0, to=100, orient="horizontal")
-        laser640_scale = tk.Scale(laser_settings, variable=self.laser640_percentage,from_=0, to=100, orient="horizontal")
-
         #laser widgets layout
-        self.laser488_entry.grid(row=2, column=3, sticky=tk.W + tk.E)
-        self.laser552_entry.grid(row=3, column=3, sticky=tk.W + tk.E)
-        self.laser594_entry.grid(row=4, column=3, sticky=tk.W + tk.E)
-        self.laser640_entry.grid(row=5, column=3, sticky=tk.W + tk.E)
-        laser488_scale.grid(row=2, column=2, sticky=tk.W + tk.E)
-        laser552_scale.grid(row=3, column=2, sticky=tk.W + tk.E)
-        laser594_scale.grid(row=4, column=2, sticky=tk.W + tk.E)
-        laser640_scale.grid(row=5, column=2, sticky=tk.W + tk.E)
+        self.laser488_entry.grid(row=3, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser552_entry.grid(row=5, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser594_entry.grid(row=7, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser640_entry.grid(row=9, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser488_output.grid(row=3, column=0, sticky=tk.W + tk.E)
+        self.laser552_output.grid(row=5, column=0, sticky=tk.W + tk.E)
+        self.laser594_output.grid(row=7, column=0, sticky=tk.W + tk.E)
+        self.laser640_output.grid(row=9, column=0, sticky=tk.W + tk.E)
+        laser488_scale.grid(row=2, column=2, rowspan =2, sticky=tk.W + tk.E)
+        laser552_scale.grid(row=4, column=2, rowspan =2, sticky=tk.W + tk.E)
+        laser594_scale.grid(row=6, column=2, rowspan =2, sticky=tk.W + tk.E)
+        laser640_scale.grid(row=8, column=2, rowspan =2, sticky=tk.W + tk.E)
 
 
+        ### ----------------------------camera settings -----------------------------------------------------------------
+        # camera labels (positioned)
+        exposure_lowrescameralabel = ttk.Label(camera_settings, text="Exposure Low Res (ms)").grid(row=2, column=0)
+        exposure_highrescameralabel = ttk.Label(camera_settings, text="Exposure High Res (ms)").grid(row=4, column=0)
+        framerate_highrescameralabel = ttk.Label(camera_settings, text="Frame rate Low Res (Hz)").grid(row=6, column=0)
+        framerate_lowrescameralabel = ttk.Label(camera_settings, text="Frame rate Low Res (Hz)").grid(row=8, column=0)
+        highresmode_label = ttk.Label(camera_settings, text="High Res Acquisition Mode").grid(row=10, column=0)
+
+        self.cam_lowresExposure_entry = tk.Entry(camera_settings, textvariable=self.cam_lowresExposure, width=5)
+        self.cam_highresExposure_entry = tk.Entry(camera_settings, textvariable=self.cam_highresExposure, width=5)
+        self.cam_lowresFrameRate = tk.Label(camera_settings, text="0")
+        self.cam_highresFrameRate = tk.Label(camera_settings, text="0")
+
+        # choice of high res camera mode
+        highresModeOptions = ('SPIM Mode', 'ASLM Mode')
+        self.cam_highresModeOption = tk.OptionMenu(camera_settings, self.cam_highresMode,
+                                                        *highresModeOptions)
+        self.cam_highresMode.set(highresModeOptions[0])
+
+        #set defaults
+        self.cam_lowresExposure.set(20)
+        self.cam_highresExposure.set(20)
+
+        #Layout Camera settings
+        self.cam_lowresExposure_entry.grid(row=2, column=3, sticky=tk.W + tk.E + tk.S)
+        self.cam_highresExposure_entry.grid(row=4, column=3, sticky=tk.W + tk.E + tk.S)
+        self.cam_lowresFrameRate.grid(row=6, column=3, sticky=tk.W + tk.E + tk.S)
+        self.cam_highresFrameRate.grid(row=8, column=3, sticky=tk.W + tk.E + tk.S)
+        self.cam_highresModeOption.grid(row=10, column=3, sticky=tk.W + tk.E + tk.S)
         ### ----------------------------preview buttons ---------------------------------------------------------------
         #preview settings-----------------------------------------------------------------------------------
         self.bt_changeTo488 = tk.Button(preview_settings, text="488 nm", command= lambda : self.preview_filter_select(self.bt_changeTo488), bg="#00f7ff")

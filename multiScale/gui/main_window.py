@@ -32,13 +32,13 @@ class MultiScope_MainGui(ttk.Notebook):
         #define the individual sheets: a welcome tab, a settings tab, a stage settings tab, a run tab and the advanced settings
         self.runtab = Run_Tab(self)
         self.welcometab = Welcome_Tab(self)
-        self.settingstab = Settings_Tab(self)
+        #self.settingstab = Settings_Tab(self)
         self.stagessettingstab = Stages_Tab(self)
         self.advancedSettingstab = AdvancedSettings_Tab(self)
 
         #add the individual sheets to the Notebook
         self.add(self.welcometab, text = "Welcome")
-        self.add(self.settingstab, text="Settings")
+        #self.add(self.settingstab, text="Settings")
         self.add(self.stagessettingstab, text="Stages")
         self.add(self.runtab, text="Run")
         self.add(self.advancedSettingstab, text="Advanced Settings")
