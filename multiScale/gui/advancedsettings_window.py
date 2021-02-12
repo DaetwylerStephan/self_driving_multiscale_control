@@ -22,6 +22,9 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_lowres = tk. DoubleVar()
         self.slit_highres = tk. DoubleVar()
 
+        #stage settings
+
+
         #set the different label frames
         slit_settings = tk.LabelFrame(self, text="Slit Settings")
 
@@ -50,6 +53,8 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_opening_entry.grid(row=3, column=5, sticky=tk.W + tk.E + tk.S)
         self.slit_lowres_entry.grid(row=4, column=1, columnspan=2, sticky=tk.W + tk.E + tk.S)
         self.slit_highres_entry.grid(row=4, column=4, columnspan=2, sticky=tk.W + tk.E + tk.S)
+
+
 
     def print_values(self):
         print("test")

@@ -13,6 +13,13 @@ class Run_Tab(tk.Frame):
     - preview button
     - number of planes
     - plane spacing
+
+
+
+    Todo: pixel width light sheet mode
+    field of view
+    range of remote voice coil
+    offset
     """
 
     def __init__(self, parent, *args, **kwargs):
