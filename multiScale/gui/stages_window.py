@@ -32,13 +32,13 @@ class Stages_Tab(tk.Frame):
 
         # set the different label frames
         generalstage_settings = tk.LabelFrame(self, text="Stage Movement Settings")
-        stagepositions = tk.LabelFrame(self, text="Stage Positions")
         movetoposition = tk.LabelFrame(self, text="Move to ...")
+        savedpositions = tk.LabelFrame(self, text="Positions")
 
         # overall positioning of label frames
         generalstage_settings.grid(row=1, column=0, rowspan=2, sticky=tk.W + tk.E + tk.S + tk.N)
-        stagepositions.grid(row=6, column=0, sticky=tk.W + tk.E + tk.S + tk.N)
         movetoposition.grid(row=5, column=0, sticky=tk.W + tk.E + tk.S + tk.N)
+        savedpositions.grid(row=1, column=1, sticky=tk.W + tk.E + tk.S + tk.N)
 
         ### ----------------------------general stage settings -----------------------------------------------------------------
         # stage labels (positioned)
@@ -88,8 +88,8 @@ class Stages_Tab(tk.Frame):
         self.stage_moveto_angle_entry = tk.Entry(movetoposition, textvariable=self.stage_moveto_angle, width=7)
 
         self.keyboardinput = tk.StringVar(value="off")
-        self.keyboard_input_on_bt = tk.Radiobutton(movetoposition, text="Enable Keyboard", value="on", variable =self.keyboardinput, indicatoron=False, command=lambda : self.bind_keys())
-        self.keyboard_input_off_bt = tk.Radiobutton(movetoposition, text="Disable Keyboard", value="off", variable =self.keyboardinput, indicatoron=False, command=lambda : self.unbind())
+        self.keyboard_input_on_bt = tk.Radiobutton(movetoposition, text="Enable Keyboard", value="on", variable =self.keyboardinput, indicatoron=False)
+        self.keyboard_input_off_bt = tk.Radiobutton(movetoposition, text="Disable Keyboard", value="off", variable =self.keyboardinput, indicatoron=False)
 
         # move to widgets layout
         self.stage_moveto_lateral_entry.grid(row=2, column=1,columnspan=1,sticky = tk.W + tk.E)
@@ -108,6 +108,38 @@ class Stages_Tab(tk.Frame):
         self.keyboard_input_on_bt.grid(row=12, column=0,columnspan=2,sticky = tk.W + tk.E)
         self.keyboard_input_off_bt.grid(row=12, column=2,columnspan=4,sticky = tk.W + tk.E)
 
+        ### ----------------------------saved positions -----------------------------------------------------------------
+        # labels (positioned)
+
+        self.stage_addPos_bt = tk.Button(savedpositions, text="Add current position", command=lambda : self.addPos())
+        self.stage_addPos_index_entry = tk.Entry(savedpositions, textvariable=self.stage_currentPosindex, width=4)
+        self.stage_savedPos_tree = ttk.Treeview(savedpositions, columns=("Position", "X", "Y", "Z", "Phi"), show="headings")
+
+        self.stage_savedPos_tree.heading("Position", text="Position")
+        self.stage_savedPos_tree.heading("X", text="X")
+        self.stage_savedPos_tree.heading("Y", text="Y")
+        self.stage_savedPos_tree.heading("Z", text="Z")
+        self.stage_savedPos_tree.heading("Phi", text="Angle")
+        self.stage_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO")
+        self.stage_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO")
+        self.stage_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO")
+        self.stage_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO")
+        self.stage_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO")
+
+        # Add content using (where index is the position/row of the treeview)
+        # iid is the item index (used to access a specific element in the treeview)
+        # you can set iid to be equal to the index
+        tuples = [(1, 0,0,0,0)]
+        index = iid = 0
+        for row in tuples:
+            self.stage_savedPos_tree.insert("", index, iid, values=row)
+            index = iid = index + 1
+
+
+        # saved position layout
+        self.stage_addPos_bt.grid(row=0,column=0)
+
+        self.stage_savedPos_tree.grid(row=2, column=0)
     #-------functions---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -125,8 +157,4 @@ class Stages_Tab(tk.Frame):
 
         direction.set(new_position)
 
-    def bind_keys(self):
-        self.bind('e', lambda : self.change_angle(self.stage_moveto_angle, 1))
-
-    def unbind_keys(self):
-        self.unbind('e')
+    def addPos(self):
