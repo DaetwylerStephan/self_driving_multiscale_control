@@ -24,11 +24,14 @@ class Stages_Tab(tk.Frame):
         self.stage_trans_stepsize = tk.DoubleVar()
         self.stage_rot_stepsize = tk.DoubleVar()
 
-        # move to parameters
+        # parameters move to
         self.stage_moveto_lateral = tk.DoubleVar()
         self.stage_moveto_axial   = tk.DoubleVar()
         self.stage_moveto_updown  = tk.DoubleVar()
         self.stage_moveto_angle   = tk.DoubleVar()
+
+        # parameters save to position
+        self.stage_currentPosindex = tk.IntVar()
 
         # set the different label frames
         generalstage_settings = tk.LabelFrame(self, text="Stage Movement Settings")
@@ -115,31 +118,34 @@ class Stages_Tab(tk.Frame):
         self.stage_addPos_index_entry = tk.Entry(savedpositions, textvariable=self.stage_currentPosindex, width=4)
         self.stage_savedPos_tree = ttk.Treeview(savedpositions, columns=("Position", "X", "Y", "Z", "Phi"), show="headings")
 
+        ybarSrolling = tk.Scrollbar(savedpositions, orient =tk.VERTICAL, command=self.stage_savedPos_tree.yview())
+        self.stage_savedPos_tree.configure(yscroll=ybarSrolling.set)
+
         self.stage_savedPos_tree.heading("Position", text="Position")
         self.stage_savedPos_tree.heading("X", text="X")
         self.stage_savedPos_tree.heading("Y", text="Y")
         self.stage_savedPos_tree.heading("Z", text="Z")
         self.stage_savedPos_tree.heading("Phi", text="Angle")
-        self.stage_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO")
-        self.stage_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO")
-        self.stage_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO")
-        self.stage_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO")
-        self.stage_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO")
+        self.stage_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
+        self.stage_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
 
         # Add content using (where index is the position/row of the treeview)
         # iid is the item index (used to access a specific element in the treeview)
         # you can set iid to be equal to the index
         tuples = [(1, 0,0,0,0)]
-        index = iid = 0
+        index = iid = 1
         for row in tuples:
-            self.stage_savedPos_tree.insert("", index, iid, values=row)
+            self.stage_savedPos_tree.insert("", 1, iid='item1', values=row)
             index = iid = index + 1
 
 
         # saved position layout
-        self.stage_addPos_bt.grid(row=0,column=0)
-
-        self.stage_savedPos_tree.grid(row=2, column=0)
+        self.stage_addPos_bt.grid(row=0,column=0,sticky = tk.W)
+        self.stage_addPos_index_entry.grid(row=0,column=2,sticky = tk.W)
+        self.stage_savedPos_tree.grid(row=2, column=0, columnspan=400)
     #-------functions---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -158,3 +164,14 @@ class Stages_Tab(tk.Frame):
         direction.set(new_position)
 
     def addPos(self):
+        print("add")
+        print(self.stage_savedPos_tree.get_children())
+
+        newitem = 'item%i' % self.stage_currentPosindex.get()
+
+        if newitem in self.stage_savedPos_tree.get_children():
+            print("contained")
+            self.stage_savedPos_tree.delete(newitem)
+
+        newentry = (self.stage_currentPosindex.get(), self.stage_moveto_lateral.get(), self.stage_moveto_updown.get(), self.stage_moveto_axial.get(), self.stage_moveto_angle.get())
+        self.stage_savedPos_tree.insert("", index=self.stage_currentPosindex.get(), iid=newitem, values=newentry)
