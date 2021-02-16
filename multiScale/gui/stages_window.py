@@ -32,16 +32,30 @@ class Stages_Tab(tk.Frame):
 
         # parameters save to position
         self.stage_currentPosindex = tk.IntVar()
+        self.stage_currentPosindex.set(1)
+        self.stage_currenthighresPosindex = tk.IntVar()
+        self.stage_currenthighresPosindex.set(1)
+        self.stage_PositionList = [(1,0,0,0,0)]
+        self.stage_savePositionList = [(1,0,0,0,0)]
+        self.stage_oldPositionList = [(1,0,0,0,0)]
+        self.stage_highres_PositionList = [(1, 0, 0, 0, 0)]
+        self.stage_highres_savePositionList = [(1, 0, 0, 0, 0)]
+        self.stage_highres_oldPositionList = [(1, 0, 0, 0, 0)]
+        self.stage_mosaic_upDown = 2
+        self.stage_mosaic_lateral = 2
+
 
         # set the different label frames
         generalstage_settings = tk.LabelFrame(self, text="Stage Movement Settings")
         movetoposition = tk.LabelFrame(self, text="Move to ...")
-        savedpositions = tk.LabelFrame(self, text="Positions")
+        saved_lowRes_positions = tk.LabelFrame(self, text="Low Resolution Positions")
+        saved_highres_positions = tk.LabelFrame(self, text="High Resolution Positions")
 
         # overall positioning of label frames
         generalstage_settings.grid(row=1, column=0, rowspan=2, sticky=tk.W + tk.E + tk.S + tk.N)
         movetoposition.grid(row=5, column=0, sticky=tk.W + tk.E + tk.S + tk.N)
-        savedpositions.grid(row=1, column=1, sticky=tk.W + tk.E + tk.S + tk.N)
+        saved_lowRes_positions.grid(row=1, column=1, sticky=tk.W + tk.E + tk.S + tk.N)
+        saved_highres_positions.grid(row=5, column=1, sticky=tk.W + tk.E + tk.S + tk.N)
 
         ### ----------------------------general stage settings -----------------------------------------------------------------
         # stage labels (positioned)
@@ -111,14 +125,16 @@ class Stages_Tab(tk.Frame):
         self.keyboard_input_on_bt.grid(row=12, column=0,columnspan=2,sticky = tk.W + tk.E)
         self.keyboard_input_off_bt.grid(row=12, column=2,columnspan=4,sticky = tk.W + tk.E)
 
-        ### ----------------------------saved positions -----------------------------------------------------------------
+        ### ----------------------------low resolution saved positions -----------------------------------------------------------------
         # labels (positioned)
+        self.stage_addPos_bt = tk.Button(saved_lowRes_positions, text="Add current position", command=lambda : self.addPos())
+        self.stage_savePos_bt = tk.Button(saved_lowRes_positions, text="Save list", command=lambda : self.savePosList())
+        self.stage_loadPos_bt = tk.Button(saved_lowRes_positions, text="Load saved list", command=lambda : self.loadPosList())
+        self.stage_Revert_bt = tk.Button(saved_lowRes_positions, text="Revert", command=lambda : self.revertList())
+        self.stage_addPos_index_entry = tk.Entry(saved_lowRes_positions, textvariable=self.stage_currentPosindex, width=4)
+        self.stage_savedPos_tree = ttk.Treeview(saved_lowRes_positions, columns=("Position", "X", "Y", "Z", "Phi"), show="headings", height=9)
 
-        self.stage_addPos_bt = tk.Button(savedpositions, text="Add current position", command=lambda : self.addPos())
-        self.stage_addPos_index_entry = tk.Entry(savedpositions, textvariable=self.stage_currentPosindex, width=4)
-        self.stage_savedPos_tree = ttk.Treeview(savedpositions, columns=("Position", "X", "Y", "Z", "Phi"), show="headings")
-
-        ybarSrolling = tk.Scrollbar(savedpositions, orient =tk.VERTICAL, command=self.stage_savedPos_tree.yview())
+        ybarSrolling = tk.Scrollbar(saved_lowRes_positions, orient =tk.VERTICAL, command=self.stage_savedPos_tree.yview())
         self.stage_savedPos_tree.configure(yscroll=ybarSrolling.set)
 
         self.stage_savedPos_tree.heading("Position", text="Position")
@@ -145,16 +161,64 @@ class Stages_Tab(tk.Frame):
         # saved position layout
         self.stage_addPos_bt.grid(row=0,column=0,sticky = tk.W)
         self.stage_addPos_index_entry.grid(row=0,column=2,sticky = tk.W)
+        self.stage_savePos_bt.grid(row=0,column=3,sticky = tk.W)
+        self.stage_loadPos_bt.grid(row=0,column=4,sticky = tk.W)
+        self.stage_Revert_bt.grid(row=0,column=5,sticky = tk.W)
         self.stage_savedPos_tree.grid(row=2, column=0, columnspan=400)
+
+        ### ----------------------------high resolution saved positions -----------------------------------------------------------------
+        # labels (positioned)
+        self.stage_highres_addPos_bt = tk.Button(saved_highres_positions, text="Add current position",
+                                         command=lambda: self.addhighresPos())
+        self.stage_highres_savePos_bt = tk.Button(saved_highres_positions, text="Save list", command=lambda: self.savehighresPosList())
+        self.stage_highres_loadPos_bt = tk.Button(saved_highres_positions, text="Load saved list",
+                                          command=lambda: self.loadhighresPosList())
+        self.stage_highres_Revert_bt = tk.Button(saved_highres_positions, text="Revert", command=lambda: self.reverthighresList())
+        self.stage_highres_addPos_index_entry = tk.Entry(saved_highres_positions, textvariable=self.stage_currenthighresPosindex,
+                                                 width=4)
+        self.stage_highres_savedPos_tree = ttk.Treeview(saved_highres_positions, columns=("Position", "X", "Y", "Z", "Phi"),
+                                                show="headings", height=9)
+
+        ybarSrolling = tk.Scrollbar(saved_highres_positions, orient=tk.VERTICAL,
+                                    command=self.stage_highres_savedPos_tree.yview())
+        self.stage_highres_savedPos_tree.configure(yscroll=ybarSrolling.set)
+
+        self.stage_highres_savedPos_tree.heading("Position", text="Position")
+        self.stage_highres_savedPos_tree.heading("X", text="X")
+        self.stage_highres_savedPos_tree.heading("Y", text="Y")
+        self.stage_highres_savedPos_tree.heading("Z", text="Z")
+        self.stage_highres_savedPos_tree.heading("Phi", text="Angle")
+        self.stage_highres_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
+        self.stage_highres_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_highres_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_highres_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_highres_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
+
+        # Add content using (where index is the position/row of the treeview)
+        # iid is the item index (used to access a specific element in the treeview)
+        # you can set iid to be equal to the index
+        tuples = [(1, 0, 0, 0, 0)]
+        index = iid = 1
+        for row in tuples:
+            self.stage_highres_savedPos_tree.insert("", 1, iid='item1', values=row)
+            index = iid = index + 1
+
+        # saved position layout
+        self.stage_highres_addPos_bt.grid(row=0, column=0, sticky=tk.W)
+        self.stage_highres_addPos_index_entry.grid(row=0, column=2, sticky=tk.W)
+        self.stage_highres_savePos_bt.grid(row=0, column=3, sticky=tk.W)
+        self.stage_highres_loadPos_bt.grid(row=0, column=4, sticky=tk.W)
+        self.stage_highres_Revert_bt.grid(row=0, column=5, sticky=tk.W)
+        self.stage_highres_savedPos_tree.grid(row=2, column=0, columnspan=400)
     #-------functions---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
 
     def change_currentposition(self, direction, factor):
-        new_position = direction.get() + self.stage_trans_stepsize.get() * factor
+        new_position = round(direction.get() + self.stage_trans_stepsize.get() * factor,7)
         direction.set(new_position)
 
     def change_angle(self, direction, factor):
-        new_position = direction.get() + self.stage_rot_stepsize.get() * factor
+        new_position = round(direction.get() + self.stage_rot_stepsize.get() * factor, 5)
 
         if new_position < 0:
             new_position = 360 + new_position
@@ -163,15 +227,99 @@ class Stages_Tab(tk.Frame):
 
         direction.set(new_position)
 
+    def savePosList(self):
+        self.stage_savePositionList = self.stage_PositionList.copy()
+
+    def savehighresPosList(self):
+        self.stage_highres_savePositionList = self.stage_highres_PositionList.copy()
+
+    def loadPosList(self):
+        # save previous state
+        self.stage_oldPositionList = self.stage_PositionList.copy()
+        #load list
+        self.stage_PositionList = self.stage_savePositionList.copy()
+        # display tree
+        self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
+
+    def loadhighresPosList(self):
+        # save previous state
+        self.stage_highres_oldPositionList = self.stage_highres_PositionList.copy()
+        #load list
+        self.stage_highres_PositionList = self.stage_highres_savePositionList.copy()
+        # display tree
+        self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
+
+    def revertList(self):
+        self.stage_PositionList = self.stage_oldPositionList.copy()
+        # display tree
+        self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
+
+    def reverthighresList(self):
+        self.stage_highres_PositionList = self.stage_highres_oldPositionList.copy()
+        # display tree
+        self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
+
     def addPos(self):
-        print("add")
-        print(self.stage_savedPos_tree.get_children())
+        #save previous state
+        self.stage_oldPositionList = self.stage_PositionList.copy()
 
-        newitem = 'item%i' % self.stage_currentPosindex.get()
-
-        if newitem in self.stage_savedPos_tree.get_children():
-            print("contained")
-            self.stage_savedPos_tree.delete(newitem)
-
+        #new position to add or update
         newentry = (self.stage_currentPosindex.get(), self.stage_moveto_lateral.get(), self.stage_moveto_updown.get(), self.stage_moveto_axial.get(), self.stage_moveto_angle.get())
-        self.stage_savedPos_tree.insert("", index=self.stage_currentPosindex.get(), iid=newitem, values=newentry)
+
+        #check if element is already there
+        modified =0
+        for listiter in range(len(self.stage_PositionList)):
+            if self.stage_PositionList[listiter][0] == self.stage_currentPosindex.get():
+                print(self.stage_PositionList[listiter])
+                modified=1
+                self.stage_PositionList[listiter] = newentry
+
+        if modified==0:
+            self.stage_PositionList.append(newentry)
+
+        #sort list
+        self.stage_PositionList.sort()
+
+        #display tree
+        self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
+
+    def addhighresPos(self):
+        #save previous state
+        self.stage_highres_oldPositionList = self.stage_highres_PositionList.copy()
+
+        #new position to add or update
+        newentry = (self.stage_currenthighresPosindex.get(), self.stage_moveto_lateral.get(), self.stage_moveto_updown.get(), self.stage_moveto_axial.get(), self.stage_moveto_angle.get())
+
+        #check if element is already there
+        modified =0
+        for listiter in range(len(self.stage_highres_PositionList)):
+            if self.stage_highres_PositionList[listiter][0] == self.stage_currenthighresPosindex.get():
+                print(self.stage_highres_PositionList[listiter])
+                modified=1
+                self.stage_highres_PositionList[listiter] = newentry
+
+        if modified==0:
+            self.stage_highres_PositionList.append(newentry)
+
+        #sort list
+        self.stage_highres_PositionList.sort()
+
+        #display tree
+        self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
+
+    def display_tree(self, tree, positionlist):
+        #delete current tree
+        tree.delete(*tree.get_children())
+
+        #generate new tree for display
+        iter =0
+        for listelement in positionlist:
+            iter=iter+1
+            newitem = 'item%i' % iter
+            tree.insert("", index=iter, iid=newitem, values=listelement)
+
+    def generate_mosaic(self):
+        # self.stage_PositionList =
+
+        # display tree
+        self.display_tree()
