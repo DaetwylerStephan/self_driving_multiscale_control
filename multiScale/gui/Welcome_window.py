@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 import psutil
 
 class Welcome_Tab(tk.Frame):
@@ -12,61 +13,95 @@ class Welcome_Tab(tk.Frame):
     - fluorescent marker
     - quit application
     - free disk space
+    - path to save
     """
 
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
-        self.username = tk.StringVar()
-        self.modelorganism_name = tk.StringVar()
-        self.maker_name = tk.StringVar
 
         #intro-text
-        intro_text = tk.Text(self, height = 2, wrap = "none", bg="grey")
-        intro_text.insert('1.0', 'Welcome to using the multi-scale python programming interface. \nPlease set here some experiment specific parameters')
-        intro_text.grid(row=0, column=0, columnspan=3, sticky=(tk.E + tk.W))
+        welcometext = 'Welcome to using the multi-scale python programming interface. \nPlease set here some experiment specific parameters'
+        intro_text = tk.Label(self, text=welcometext, height=2, width=115, fg="black", bg="grey")
+        intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E))
 
-        #calculate free disk space
-        obj_Disk = psutil.disk_usage('D:\\')
-        totaldisksize = obj_Disk.total/(1024.0 ** 3)
-        useddisksize = obj_Disk.used/(1024.0 ** 3)
-        freedisksize = round(obj_Disk.free/(1024.0 ** 3))
+        #welcome settings
+        self.welcome_username = tk.StringVar()
+        self.welcome_modelorganism = tk.StringVar()
+        self.welcome_marker = tk.StringVar
 
-        #labels
-        username_label = ttk.Label(self, text="Username:").grid(row=2, column=0, sticky=tk.W)
-        modelorganism_label = ttk.Label(self, text="Model organism:").grid(row=5, column=0, sticky=tk.W)
-        fluorescent_marker_label = ttk.Label(self, text="Fluorescent marker:").grid(row=10, column=0, sticky=tk.W)
-        freediskspace_label = ttk.Label(self, text="Free disk space (D:\\):").grid(row=15, column=0, sticky=tk.W)
-        freedisksize_label = ttk.Label(self, text=str(freedisksize) + "GB").grid(row=16, column=1, sticky=tk.W)
+        #file path settings
+        self.filepath_string = tk.StringVar()
+
+        # set the different label frames
+        experiment_settings = tk.LabelFrame(self, text="Experiment Settings")
+        filepath_settings = tk.LabelFrame(self, text="Filepath")
+
+        # overall positioning of label frames
+        experiment_settings.grid(row=1, column=0, rowspan=1, sticky=tk.W + tk.E + tk.S + tk.N)
+        filepath_settings.grid(row=4, column=0, sticky=tk.W + tk.E + tk.S + tk.N)
+
+
+
+        ###----------------------------quit button -------- -----------------------------------------------------------------
+        quit_button = tk.Button(self, text="Quit", width=10, command=self.deleteme)
+        quit_button.place(relx =0, rely=1,anchor=tk.SW)
+
+        ### ----------------------------experiment settings -----------------------------------------------------------------
+        # laser labels (positioned)
+        username_label = ttk.Label(experiment_settings, text="Username:").grid(row=2, column=0, sticky=tk.W)
+        modelorganism_label = ttk.Label(experiment_settings, text="Model organism:").grid(row=5, column=0, sticky=tk.W)
+        fluorescent_marker_label = ttk.Label(experiment_settings, text="Fluorescent marker:").grid(row=10, column=0, sticky=tk.W)
 
         #widgets
-        username_box = ttk.Combobox(self, textvariable=self.username, values=["Stephan Daetwyler", "Reto Fiolka", "Bo-Jui Chang"])
-        modelOrganism_box = ttk.Combobox(self, textvariable=self.modelorganism_name,
+        username_box = ttk.Combobox(experiment_settings, textvariable=self.welcome_username, values=["Stephan Daetwyler", "Reto Fiolka", "Bo-Jui Chang"])
+        modelOrganism_box = ttk.Combobox(experiment_settings, textvariable=self.welcome_modelorganism,
                                     values=["Cell", "Xenograft", "Colon", "Beads"])
-        fluorescent_marker_box = ttk.Combobox(self, textvariable=self.maker_name,
+        fluorescent_marker_box = ttk.Combobox(experiment_settings, textvariable=self.welcome_marker,
                                          values=["kdrl:mCherry", "kdrl:GFP", "UAS:GFP"])
-        quit_button = tk.Button(self, text="Quit", command =self.deleteme)
-        free_diskspace_bar = ttk.Progressbar(self, variable=useddisksize, maximum=totaldisksize)
 
         #Set default values
         username_box.set("Stephan Daetwyler")
         modelOrganism_box.set("Xenograft")
         fluorescent_marker_box.set("kdrl:mCherry")
 
-        #widget placement
+        #experiment settings widgets layout
         username_box.grid(row=2, column=1, sticky=(tk.W))
         modelOrganism_box.grid(row=5, column=1, sticky=(tk.W))
         fluorescent_marker_box.grid(row=10, column=1, sticky=(tk.W))
-        quit_button.grid(row=100, column=0, sticky = (tk.W + tk.E))
-        free_diskspace_bar.grid(row=15, column=1, columnspan=3, sticky=(tk.W))
-        self.columnconfigure(1, weight=1)
+
+        ### ----------------------------filepath settings -----------------------------------------------------------------
+        # calculations
+        # calculate free disk space
+        obj_Disk = psutil.disk_usage('D:\\')
+        totaldisksize = obj_Disk.total / (1024.0 ** 3)
+        useddisksize = obj_Disk.used / (1024.0 ** 3)
+        freedisksize = round(obj_Disk.free / (1024.0 ** 3))
+
+        # filepath labels (positioned)
+        freediskspace_label = ttk.Label(filepath_settings, text="Free disk space (D:\\):").grid(row=1, column=0, sticky=tk.W)
+        freedisksize_label = ttk.Label(filepath_settings, text=str(freedisksize) + "GB").grid(row=1, column=4, sticky=tk.W)
+        filepath_label = ttk.Label(filepath_settings, text="Filepath: ").grid(row=4, column=0, sticky=tk.W)
+
+        #widgets
+        free_diskspace_bar = ttk.Progressbar(filepath_settings, variable=useddisksize, maximum=totaldisksize)
+        self.filepath_entry = tk.Entry(filepath_settings, textvariable=self.filepath_string, width=50)
+        self.filepath_choosefolder = tk.Button(filepath_settings, text="Choose folder", command=self.choose_directory)
+
+        #filepath widgets layout
+        free_diskspace_bar.grid(row=1, column=1, columnspan=3, sticky=(tk.W))
+        self.filepath_entry.grid(row=4, column=1, columnspan=100, sticky=(tk.W))
+        self.filepath_choosefolder.grid(row=5, column=0, sticky=(tk.W+tk.E))
 
     def getwelcome_parameters(self):
         """
         get parameters of Welcome Window
         :return: list of parameters: {username, modelOrganism, fluorescent maker}
         """
-        return {self.username, self.modelorganism_name, self.maker_name}
+        return {self.welcome_username, self.welcome_modelorganism, self.welcome_marker}
+
+    def choose_directory(self):
+        self.filepath_string.set(filedialog.askdirectory())
 
     def deleteme(self):
         """

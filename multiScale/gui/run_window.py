@@ -26,9 +26,10 @@ class Run_Tab(tk.Frame):
         super().__init__(parent, **kwargs)
 
         # intro-text
-        intro_text = tk.Text(self, height=2, width= 600, wrap="none", bg="grey")
-        intro_text.insert('1.0', 'In this tab, select parameters to run preview, stack and time-lapse acquisitions \n')
-        intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E + tk.W))
+        welcometext = 'In this tab, select parameters to run preview, stack and time-lapse acquisitions \n'
+        intro_text = tk.Label(self, text=welcometext, height=2, width=115, fg="black", bg="grey")
+        intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E))
+
 
         #laser settings
         self.laser488_percentage = tk.IntVar()

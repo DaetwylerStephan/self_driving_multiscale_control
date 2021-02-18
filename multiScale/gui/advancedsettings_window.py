@@ -13,9 +13,10 @@ class AdvancedSettings_Tab(tk.Frame):
         super().__init__(parent, *args, **kwargs)
 
         # intro-text
-        intro_text = tk.Text(self, height=2, width= 600, wrap="none", bg="grey")
-        intro_text.insert('1.0', 'In this tab, you have some advanced settings available \n')
-        intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E + tk.W))
+        # intro-text
+        intro_text = tk.Label(self, text='In this tab, you have some advanced settings available \n', height=2, width=115,
+                              fg="black", bg="grey")
+        intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E))
 
         #slit settings
         self.slit_currentsetting = tk.DoubleVar()
