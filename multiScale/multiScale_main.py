@@ -39,6 +39,10 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
 
+        #buttons stage tab
+        self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
+        self.view.stagessettingstab.keyboard_input_off_bt.bind("<Button>", self.disable_keyboard_movement)
+
     def run(self):
         """
         Run the Tkinter Gui in the main loop
@@ -116,6 +120,43 @@ class MultiScale_Microscope_Controller():
 
     def abort_timelapse(self,event):
         self.continuetimelapse = 1
+
+
+#enable keyboard movements ---------------------------------------------------------------------------------------------
+    def enable_keyboard_movement(self, event):
+        self.root.bind("<Key>", self.key_pressed)
+        self.root.update()
+
+    def disable_keyboard_movement(self, event):
+        self.root.unbind("<Key>")
+        self.root.update()
+
+    def key_pressed(self, event):
+        print(event.keysym)
+        if event.char == "w" or event.keysym =="Up":
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_updown, 1)
+            self.view.stagessettingstab.stage_last_key.set("w")
+
+        if event.char == "s" or event.keysym =="Down":
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_updown, -1)
+            self.view.stagessettingstab.stage_last_key.set("s")
+
+        if event.char =="a" or event.keysym =="Left":
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_lateral, -1)
+            self.view.stagessettingstab.stage_last_key.set("a")
+
+        if event.char == "d" or event.keysym =="Right":
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_lateral, 1)
+            self.view.stagessettingstab.stage_last_key.set("d")
+
+        if event.char == "q":
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_axial, 1)
+            self.view.stagessettingstab.stage_last_key.set("q")
+
+        if event.char == "e":
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_axial, -1)
+            self.view.stagessettingstab.stage_last_key.set("e")
+
 
 if __name__ == '__main__':
     c = MultiScale_Microscope_Controller()

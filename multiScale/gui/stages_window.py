@@ -43,6 +43,7 @@ class Stages_Tab(tk.Frame):
         self.stage_highres_oldPositionList = [(1, 0, 0, 0, 0)]
         self.stage_mosaic_upDown = 2
         self.stage_mosaic_lateral = 2
+        self.stage_last_key = tk.StringVar()
 
         #mosaic parameters
         self.stage_mosaic_upDown_Nb = tk.IntVar()
@@ -114,6 +115,7 @@ class Stages_Tab(tk.Frame):
         self.keyboardinput = tk.StringVar(value="off")
         self.keyboard_input_on_bt = tk.Radiobutton(movetoposition, text="Enable Keyboard", value="on", variable =self.keyboardinput, indicatoron=False)
         self.keyboard_input_off_bt = tk.Radiobutton(movetoposition, text="Disable Keyboard", value="off", variable =self.keyboardinput, indicatoron=False)
+        self.keyboard_entry = tk.Entry(movetoposition, textvariable=self.stage_last_key, width=7)
 
         # move to widgets layout
         self.stage_moveto_lateral_entry.grid(row=2, column=1,columnspan=1,sticky = tk.W + tk.E)
@@ -131,6 +133,7 @@ class Stages_Tab(tk.Frame):
         self.stage_move_angleright_bt.grid(row=8, column=5,columnspan=1,sticky = tk.W + tk.E)
         self.keyboard_input_on_bt.grid(row=12, column=0,columnspan=2,sticky = tk.W + tk.E)
         self.keyboard_input_off_bt.grid(row=12, column=2,columnspan=4,sticky = tk.W + tk.E)
+        self.keyboard_entry.grid(row=12, column=6,columnspan=2,sticky = tk.W + tk.E)
 
         ### ----------------------------mosaic settings -----------------------------------------------------------------
         # stage labels (positioned)
@@ -417,6 +420,3 @@ class Stages_Tab(tk.Frame):
             self.stage_PositionList = newlist
             self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
             self.update_idletasks()
-
-
-

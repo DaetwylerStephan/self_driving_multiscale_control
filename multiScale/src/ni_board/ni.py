@@ -300,7 +300,7 @@ api.get_error_info.argtypes = [C.c_char_p, C.c_uint32]
 
 def check_error(error_code):
     if error_code != 0:
-        num_bytes = api.get_error_info(None, 0)
+        num_bytes = api.get_error_info(None, 0) #if passed in 0 in buffersize, the value returned is the number of bytes
         print("Error message from NI DAQ: (", num_bytes, "bytes )")
         error_buffer = (C.c_char * num_bytes)()
         api.get_error_info(error_buffer, num_bytes)
