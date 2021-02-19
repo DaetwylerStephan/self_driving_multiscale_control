@@ -342,6 +342,9 @@ api.clock_timing.argtypes = [
     C.c_uint64]
 api.clock_timing.restype = check_error
 
+#int32 DAQmxWriteAnalogF64 (TaskHandle taskHandle, int32 numSampsPerChan,
+# bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[],
+# int32 *sampsPerChanWritten, bool32 *reserved);
 api.write_voltages = api.DAQmxWriteAnalogF64
 api.write_voltages.argtypes = [
     C.c_void_p,
@@ -353,6 +356,17 @@ api.write_voltages.argtypes = [
     C.POINTER(C.c_int32),
     C.POINTER(C.c_uint32)]
 api.write_voltages.restype = check_error
+
+#int32 DAQmxWriteAnalogScalarF64 (TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 value, bool32 *reserved);
+api.write_scalarvoltages = api.DAQmxWriteAnalogScalarF64
+api.write_scalarvoltages.argtypes = [
+    C.c_void_p,
+    C.c_uint32,
+    C.c_double,
+    C.c_double,
+    C.POINTER(C.c_uint32)]
+api.write_scalarvoltages.restype = check_error
+
 
 api.write_digits = api.DAQmxWriteDigitalLines
 api.write_digits.argtypes = [
@@ -381,6 +395,7 @@ api.stop_task.restype = check_error
 api.clear_task = api.DAQmxClearTask
 api.clear_task.argtypes = [C.c_void_p]
 api.clear_task.restype = check_error
+
 
 if __name__ == '__main__':
     ## Test basic functionality of the Analog_Out object
