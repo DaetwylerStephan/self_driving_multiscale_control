@@ -10,6 +10,12 @@ If you get an error, google for NIDAQmx.h to decypher it.
 """
 api = C.cdll.LoadLibrary("nicaiu")
 
+
+#todo- rewrite this so that you can specify in constants
+#digital/analog, channel number, minVol, maxVol, name of channel, constant voltage or play
+
+#todo - include a tool to make a single voltage output and not only the play voltage functionality
+
 class Analog_Out:
     def __init__(
         self,
@@ -29,36 +35,8 @@ class Analog_Out:
                          '9263', '9401', '6001']
         assert daq_type in allowed_cards, "We don't support this card (%s) yet" % daq_type
         self.daq_type = daq_type
-        if self.daq_type == '6733':
-            self.max_channels = 8
-            self.max_rate = 1e6
-            self.channel_type = 'analog'
-            self.has_clock = True
-        elif self.daq_type =='6733_digital':
-            # WARNING: Init is weird for 6733 digital lines, because
-            # they don't have their own clock. You probably want to use
-            # the analog clock of the 6733 as the clock for the digital
-            # lines. Since the init method relies on this clock playing,
-            # in order to zero the output voltages, this can get
-            # confusing. Here's a recipe to follow:
-            #
-            # do = Analog_Out(num_channels=8, rate=2e4, daq_type='6733_digital',
-            #     board_name='Dev1', clock_name='/Dev1/ao/SampleClock')
-            #     # This leaves the digital lines stalled, waiting for a clock.
-            # ao = Analog_Out(num_channels=8, rate=2e4, daq_type='6733',
-            #     board_name='Dev1', clock_name=None)
-            #     # This has the side effect of finishing the digital init.
-            #
-            # Then, later, when you want to play digital voltages, you
-            # have to use non-blocking calls and play analog voltages too:
-            #
-            # do.play_voltages(block=False) # Stalls
-            # ao.play_voltages(block=True)  # Plays both types, synchronized
-            self.max_channels = 8
-            self.max_rate = 1e6
-            self.channel_type = 'digital'
-            self.has_clock = False
-        elif self.daq_type == '6738':
+
+        if self.daq_type == '6738':
             self.max_channels = 32
             self.max_rate = 1e6 #TODO is this the correct max rate?
             self.channel_type = 'analog'
@@ -71,37 +49,7 @@ class Analog_Out:
             self.max_rate = 1e6 #TODO is this the correct max rate?
             self.channel_type = 'digital'
             self.has_clock = False
-        elif self.daq_type == '6739':
-            self.max_channels = 64 #TODO is this correct?
-            self.max_rate = 1e6 #TODO is this the correct max rate?
-            self.channel_type = 'analog'
-            self.has_clock = True
-        elif self.daq_type == '6739_digital':
-            self.max_channels = 2 #TODO is this correct?
-            self.max_rate = 1e6 #TODO is this the correct max rate?
-            self.channel_type = 'digital'
-            self.has_clock = False
-        elif self.daq_type == '9263':
-            self.max_channels = 4
-            self.max_rate = 1e5
-            self.channel_type = 'analog'
-            self.has_clock = True
-        elif self.daq_type == '9401':
-            self.max_channels = 8
-            self.max_rate = 8e7
-            self.channel_type = 'digital'
-            self.has_clock = True
-        elif self.daq_type == '6001':
-            ## NOTE: This only controls the two AO channels on the
-            ## USB-6001. There are a number of other features of this
-            ## device (AI, DI/O, Counters) that are not exposed by this
-            ## class. It will take more effort and likely a large
-            ## reorganization of this code to expose these
-            ## functionalities.
-            self.max_channels = 2
-            self.max_rate = 5e3
-            self.channel_type = 'analog'
-            self.has_clock = True
+
         if num_channels == 'all':
             num_channels = self.max_channels
         assert 1 <= num_channels <= self.max_channels
@@ -170,7 +118,7 @@ class Analog_Out:
             self.clock_name, #NULL, to specify onboard clock for timing
             self.rate,
             10280, #DAQmx_Val_Rising (doesn't matter)
-            10178, #DAQmx_Val_FiniteSamps (run once)
+            10178, #DAQmx_Val_FiniteSamps (run once / Acquire or generate a finite number of samples.)
             self.voltages.shape[0])
         return None
 
@@ -250,7 +198,7 @@ class Analog_Out:
             self._task_running = False
         if self._task_running:
             if self.verbose: print("Waiting for board to finish playing...")
-            api.finish_task(self.task_handle, -1)
+            api.finish_task(self.task_handle, -1) #A value of -1 (DAQmx_Val_WaitInfinitely) means to wait indefinitely.
             if self.verbose: print(" NI%s is finished playing."%self.daq_type)
             api.stop_task(self.task_handle)
             self._task_running = False
@@ -289,12 +237,11 @@ class Analog_Out:
         return None
 
 
-PCI_6733 = Analog_Out # Backwards compatible
+# DLL api management----------------------------------------------------------------------------------------------------
 
-# DLL api management
-#
-# Mostly just sets a bunch of argtypes and renames the DLL functions to
-# a pythonier style.
+#int32 DAQmxGetExtendedErrorInfo (char errorString[], uInt32 bufferSize);
+#Returns dynamic, specific error information. This function is valid only for the last function that failed;
+# additional NI-DAQmx calls may invalidate this information.
 api.get_error_info = api.DAQmxGetExtendedErrorInfo
 api.get_error_info.argtypes = [C.c_char_p, C.c_uint32]
 
@@ -309,10 +256,15 @@ def check_error(error_code):
             "NI DAQ error code: %i; see above for details."%(error_code))
     return error_code
 
+#int32 DAQmxCreateTask (const char taskName[], TaskHandle *taskHandle);
+#Creates a task . If you use this function to create a task, you must use DAQmxClearTask to destroy it.
 api.create_task = api.DAQmxCreateTask
 api.create_task.argtypes = [C.c_char_p, C.POINTER(C.c_void_p)]
 api.create_task.restype = check_error
 
+#int32 DAQmxCreateAOVoltageChan (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[],
+# float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+# Creates channel(s) to generate voltage and adds the channel(s) to the task you specify with taskHandle.
 api.create_ao_voltage_channel = api.DAQmxCreateAOVoltageChan
 api.create_ao_voltage_channel.argtypes = [
     C.c_void_p,
@@ -324,6 +276,11 @@ api.create_ao_voltage_channel.argtypes = [
     C.c_char_p]
 api.create_ao_voltage_channel.restype = check_error
 
+#int32 DAQmxCreateDOChan (TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+#Creates channel(s) to generate digital signals and adds the channel(s) to the task you specify with taskHandle. You can group
+# digital lines into one digital channel or separate them into multiple digital channels. If you specify one or more entire ports
+# in lines by using port physical channel names, you cannot separate the ports into multiple channels. To separate ports into multiple
+# channels, use this function multiple times with a different port each time.
 api.create_do_channel = api.DAQmxCreateDOChan
 api.create_do_channel.argtypes = [
     C.c_void_p,
@@ -332,6 +289,8 @@ api.create_do_channel.argtypes = [
     C.c_int32]
 api.create_do_channel.restype = check_error
 
+#int32 DAQmxCfgSampClkTiming (TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChanToAcquire);
+#Sets the source of the Sample Clock, the rate of the Sample Clock, and the number of samples to acquire or generate.
 api.clock_timing = api.DAQmxCfgSampClkTiming
 api.clock_timing.argtypes = [
     C.c_void_p,
@@ -345,6 +304,7 @@ api.clock_timing.restype = check_error
 #int32 DAQmxWriteAnalogF64 (TaskHandle taskHandle, int32 numSampsPerChan,
 # bool32 autoStart, float64 timeout, bool32 dataLayout, float64 writeArray[],
 # int32 *sampsPerChanWritten, bool32 *reserved);
+#Writes multiple floating-point samples to a task that contains one or more analog output channels.
 api.write_voltages = api.DAQmxWriteAnalogF64
 api.write_voltages.argtypes = [
     C.c_void_p,
@@ -358,6 +318,7 @@ api.write_voltages.argtypes = [
 api.write_voltages.restype = check_error
 
 #int32 DAQmxWriteAnalogScalarF64 (TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 value, bool32 *reserved);
+#Writes a floating-point sample to a task that contains a single analog output channel.
 api.write_scalarvoltages = api.DAQmxWriteAnalogScalarF64
 api.write_scalarvoltages.argtypes = [
     C.c_void_p,
@@ -367,7 +328,10 @@ api.write_scalarvoltages.argtypes = [
     C.POINTER(C.c_uint32)]
 api.write_scalarvoltages.restype = check_error
 
-
+#int32 DAQmxWriteDigitalLines (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout,
+# bool32 dataLayout, uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+#Writes multiple samples to each digital line in a task. When you create your write array, each sample per channel
+# must contain the number of bytes returned by the DAQmx_Write_DigitalLines_BytesPerChan property.
 api.write_digits = api.DAQmxWriteDigitalLines
 api.write_digits.argtypes = [
     C.c_void_p,
@@ -380,69 +344,38 @@ api.write_digits.argtypes = [
     C.POINTER(C.c_uint32)]
 api.write_digits.restype = check_error
 
+
+#Transitions the task from the committed state to the running state, which begins measurement or generation. Using this
+# function is required for some applications and optional for others. If you do not use this function, a measurement task starts
+# automatically when a read operation begins. The autoStart parameter of the NI-DAQmx Write functions determines if a generation
+# task starts automatically when you use an NI-DAQmx Write function. If you do not call DAQmxStartTask and DAQmxStopTask when you
+# call NI-DAQmx Read functions or NI-DAQmx Write functions multiple times, such as in a loop, the task starts and stops repeatedly.
+# Starting and stopping a task repeatedly reduces the performance of the application.
 api.start_task = api.DAQmxStartTask
 api.start_task.argtypes = [C.c_void_p]
 api.start_task.restype = check_error
 
+#int32 DAQmxWaitUntilTaskDone (TaskHandle taskHandle, float64 timeToWait);
+#Waits for the measurement or generation to complete. Use this function to ensure that the specified operation is complete before you stop the task.
 api.finish_task = api.DAQmxWaitUntilTaskDone
 api.finish_task.argtypes = [C.c_void_p, C.c_double]
 api.finish_task.restype = check_error
 
+#int32 DAQmxStopTask (TaskHandle taskHandle);
+#Stops the task and returns it to the state it was in before you called DAQmxStartTask or called an NI-DAQmx Write function with autoStart set to TRUE.
 api.stop_task = api.DAQmxStopTask
 api.stop_task.argtypes = [C.c_void_p]
 api.stop_task.restype = check_error
 
+#int32 DAQmxClearTask (TaskHandle taskHandle);
+#Clears the task. Before clearing, this function aborts the task, if necessary, and releases any resources reserved by the task.
+# You cannot use a task once you clear the task without recreating or reloading the task.
 api.clear_task = api.DAQmxClearTask
 api.clear_task.argtypes = [C.c_void_p]
 api.clear_task.restype = check_error
 
 
 if __name__ == '__main__':
-    ## Test basic functionality of the Analog_Out object
-    # daq = Analog_Out(
-    #     rate=1e3,
-    #     num_channels=2,
-    #     verbose=True,
-    #     daq_type='6001', # Change this if you want to test another card
-    #     board_name='Dev1')
-    # try:
-    #     daq.play_voltages()
-    #     v = np.ones((1000, daq.num_channels), dtype=np.float64)
-    #     v[:, :] = np.sin(np.linspace(0, np.pi, v.shape[0]
-    #                                  )).reshape(v.shape[0], 1)
-    #     daq.play_voltages(v)
-    #     daq.verbose=False
-    #     for i in range(10):
-    #         daq.play_voltages()
-    # finally:
-    #     daq.verbose = True
-    #     daq.close()
-
-## This block tests an AO/DO play of 9401/9263 cards in a cDAQ-9174 chassis.
-
-    ## 6733 test block
-    # rate = 2e4
-    # do_type = '6733_digital'
-    # do_name = 'Dev1'
-    # do_nchannels = 8
-    # do_clock = '/Dev1/ao/SampleClock'
-    # do = Analog_Out(
-    #     num_channels=do_nchannels,
-    #     rate=rate,
-    #     daq_type=do_type,
-    #     board_name=do_name,
-    #     clock_name=do_clock,
-    #     verbose=False)
-    # ao_type = '6733'
-    # ao_name = 'Dev1'
-    # ao_nchannels = 8
-    # ao = Analog_Out(
-    #     num_channels=ao_nchannels,
-    #     rate=rate,
-    #     daq_type=ao_type,
-    #     board_name=ao_name,
-    #     verbose=False)
-
 ##    6738 test block
     rate = 2e4
     do_type = '6738_digital'
