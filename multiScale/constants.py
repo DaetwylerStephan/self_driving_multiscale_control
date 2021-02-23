@@ -9,7 +9,8 @@ class FilterWheel_parameters:
     comport= 'COM6'
 
 class Stage_parameters:
-    stage_id_XYZ = 'usb:sn:MCS2-00001795'
+    #stage_id_XYZ = 'usb:sn:MCS2-00001795'
+    stage_id_XYZ = 'network:sn:MCS2-00000382'
     stage_id_rot = 'usb:id:3948963323'
 
 class NI_board_parameters:

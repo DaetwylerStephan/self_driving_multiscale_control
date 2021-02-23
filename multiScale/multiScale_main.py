@@ -70,6 +70,7 @@ class MultiScale_Microscope_Controller():
 
     def changefilter(self, event, laser, filter):
         print("filter " + filter)
+        self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
         print("laser " + laser)
 
     def acquire_stack(self, event):
