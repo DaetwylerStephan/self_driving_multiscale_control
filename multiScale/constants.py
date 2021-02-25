@@ -21,6 +21,19 @@ class NI_board_parameters:
         '488_power': 21,
         }
 
+    #hardware; control type (analog, digital, constant); minvoltage; maxvoltage; devicename;
+    NI_board_allocation ={
+        ('laser488power', 'constant', 0, 5, "Dev1", 0),
+        ('laser488onoff', 'digital', "Dev1", 1),
+        ('laser552power', 'constant', 0, 5, "Dev1", 3),
+        ('laser552onoff', 'digital', "Dev1", 3),
+        ('laser594power', 'constant', 0, 5, "Dev1", 5),
+        ('laser594onoff', 'digital', "Dev1", 5),
+        ('laser640power', 'constant', 0, 5, "Dev1", 12),
+        ('laser640onoff', 'digital', "Dev1"),
+        ('voicecoil', 'analog', 0,10,"Dev1", 18)
+    }
+
 
 class SharedMemory_allocation:
     # Acquisition:

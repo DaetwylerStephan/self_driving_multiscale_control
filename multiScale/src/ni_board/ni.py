@@ -27,18 +27,13 @@ class Analog_Out:
         clock_name=None,
         ):
         """Play analog voltages via a National Instruments analog-out DAQ board.
-        So far, I've only tested this for the PCI 6733 and the NI 9263.
         """
-        allowed_cards = ['6733', '6733_digital',
-                         '6738', '6738_digital',
-                         '6739', '6739_digital',
-                         '9263', '9401', '6001']
-        assert daq_type in allowed_cards, "We don't support this card (%s) yet" % daq_type
+
         self.daq_type = daq_type
 
         if self.daq_type == '6738':
             self.max_channels = 32
-            self.max_rate = 1e6 #TODO is this the correct max rate?
+            self.max_rate = 1e6 #This is for 8 channels, otherwise 350 kS/s
             self.channel_type = 'analog'
             self.has_clock = True
         elif self.daq_type == '6738_digital':
@@ -46,9 +41,14 @@ class Analog_Out:
             # are 8 digital lines on `port1`, but these are not "buffered". We
             # have not yet included any functionality for these lines.
             self.max_channels = 2
-            self.max_rate = 1e6 #TODO is this the correct max rate?
+            self.max_rate = 10e6 #TODO is this the correct max rate?
             self.channel_type = 'digital'
             self.has_clock = False
+        elif self.daq_type == '6738_constant':
+            self.max_channels = 32
+            self.max_rate = 1e6  # This is for 8 channels, otherwise 350 kS/s
+            self.channel_type = 'analog'
+            self.has_clock = True
 
         if num_channels == 'all':
             num_channels = self.max_channels
