@@ -21,17 +21,21 @@ class NI_board_parameters:
         '488_power': 21,
         }
 
+    #available: 0,1, 3,5,6,8,11,12,14,17,18, 22
     #hardware; control type (analog, digital, constant); minvoltage; maxvoltage; devicename;
     NI_board_allocation ={
-        ('laser488power', 'constant', 0, 5, "Dev1", 0),
-        ('laser488onoff', 'digital', "Dev1", 1),
-        ('laser552power', 'constant', 0, 5, "Dev1", 3),
-        ('laser552onoff', 'digital', "Dev1", 3),
-        ('laser594power', 'constant', 0, 5, "Dev1", 5),
-        ('laser594onoff', 'digital', "Dev1", 5),
-        ('laser640power', 'constant', 0, 5, "Dev1", 12),
-        ('laser640onoff', 'digital', "Dev1"),
-        ('voicecoil', 'analog', 0,10,"Dev1", 18)
+        ('laser488_power', 'constant', 0, 5, "Dev1", 0),
+        ('laser488_TTL', 'analog',  0, 5, "Dev1", 1),
+        ('laser552_power', 'constant', 0, 5, "Dev1", 3),
+        ('laser552_TTL', 'analog', 0, 5, "Dev1", 5),
+        ('laser594_power', 'constant', 0, 5, "Dev1", 6),
+        ('laser594_TTL', 'analog',  0, 5, "Dev1", 8),
+        ('laser640_power', 'constant', 0, 5, "Dev1", 11),
+        ('laser640_TTL', 'analog',  0, 5, "Dev1", 12),
+        ('voicecoil', 'analog', 0,10,"Dev1", 14),
+        ('stagetrigger', 'analog',0,5,"Dev1",17),
+        ('lowres_cameratrigger', 'analog', 0, 5, "Dev1", 18),
+        ('highres_cameratrigger', 'analog', 0, 5, "Dev1", 22),
     }
 
 

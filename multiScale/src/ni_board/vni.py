@@ -23,8 +23,10 @@ class Analog_Out:
         rate=1e4,
         verbose=True,
         daq_type='6733',
-        board_name='Dev1', # Also popular: 'cDAQ1Mod1'
+        line='Dev1/ao0',
         clock_name=None,
+        minVol=0,
+        maxVol=10,
         ):
         """Play analog voltages via a National Instruments analog-out DAQ board.
         """
@@ -47,7 +49,7 @@ class Analog_Out:
         elif self.daq_type == '6738_constant':
             self.max_channels = 32
             self.max_rate = 1e6  # This is for 8 channels, otherwise 350 kS/s
-            self.channel_type = 'analog'
+            self.channel_type = 'constant'
             self.has_clock = True
 
         if num_channels == 'all':
@@ -65,32 +67,41 @@ class Analog_Out:
         # If I were a real man, I would automatically detect the proper
         # board name somehow
     # (http://digital.ni.com/public.nsf/allkb/86256F0E001DA9FF492572A5006FD7D3)
-        # instead of demanding user input via the 'init' argument. If
+    # instead of demanding user input via the 'init' argument. If
         # this next api call crashes for you, check the name of your
         # analog-out card using NI Measurement and Automation Explorer
         # (NI MAX):
-        device_name = bytes(
-            board_name +
-            {'digital':'/port0/line', 'analog':'/ao'}[self.channel_type] +
-            '0:%i'%(self.num_channels - 1),
-            'ascii')
+
         if self.channel_type == 'analog':
+            device_name2 = bytes(line, 'ascii')
             api.create_ao_voltage_channel(
                 self.task_handle,
-                device_name,
+                device_name2,
                 b"",
                 -10, #Minimum voltage
                 +10.0, #Maximum voltage
                 10348, #DAQmx_Val_Volts; don't question it!
                 None) #NULL
         elif self.channel_type == 'digital':
+            device_name2 = bytes(line, 'ascii')
             api.create_do_channel(
                 self.task_handle,
-                device_name,
+                device_name2,
                 b"",
                 1) #DAQmx_Val_ChanForAllLines; don't question it!
+        elif self.channel_type == 'constant':
+            device_name2 = bytes(line, 'ascii')
+            api.create_ao_voltage_channel(
+                self.task_handle,
+                device_name2,
+                b"",
+                minVol,  # Minimum voltage
+                maxVol,  # Maximum voltage
+                10348,  # DAQmx_Val_Volts; don't question it!
+                None)  # NULL
+            return None
+
         if self.verbose: print(" Board open.")
-        self.board_name = board_name
         dtype = {'digital': np.uint8, 'analog': np.float64}[self.channel_type]
         self.voltages = np.zeros((2, self.num_channels), dtype=dtype)
         # Play initial voltages with the internal clock
@@ -155,11 +166,21 @@ class Analog_Out:
         return None
 
     def close(self):
-        self._ensure_task_is_stopped()
-        if self.verbose: print("Closing %s board..."%self.daq_type)
-        api.clear_task(self.task_handle)
-        if self.verbose: print(" %s board is closed."%self.daq_type)
-        return None
+        if self.daq_type == '6738_constant':
+            if self.verbose: print("Setting voltages to zero")
+            api.write_scalarvoltages(self.task_handle, 1, 10, 0, None)
+            api.clear_task(self.task_handle)
+            return None
+        else:
+            self._ensure_task_is_stopped()
+            if self.verbose: print("Closing %s board..."%self.daq_type)
+            api.clear_task(self.task_handle)
+            if self.verbose: print(" %s board is closed."%self.daq_type)
+            return None
+
+    def setconstantvoltage(self, voltage):
+        # Writes a floating-point sample to a task that contains a single analog output channel.
+        api.write_scalarvoltages(self.task_handle, 1, 10, voltage, None)
 
     def s2p(self, seconds):
         '''Convert a duration in seconds to a number of AO "pixels."
@@ -386,30 +407,39 @@ if __name__ == '__main__':
         num_channels=do_nchannels,
         rate=rate,
         daq_type=do_type,
-        board_name=do_name,
+        line= 'Dev1/port0/line0',
         clock_name=do_clock,
         verbose=True)
+
     ao_type = '6738'
-    ao_name = 'Dev1'
-    ao_nchannels = 10
+    ao_nchannels = 3
     ao = Analog_Out(
         num_channels=ao_nchannels,
         rate=rate,
         daq_type=ao_type,
-        board_name=ao_name,
+        line= "Dev1/ao0, Dev1/ao1, Dev1/ao5",
         verbose=True)
     digits = np.zeros((do.s2p(1), do_nchannels), np.dtype(np.uint8))
     volts = np.zeros((ao.s2p(1), ao_nchannels), np.dtype(np.float64))
     digits[do.s2p(.25):do.s2p(.75), :] = 1
     volts[ao.s2p(.25):ao.s2p(1), :] = 5
-    do.play_voltages(digits, block=False)
-    ao.play_voltages(volts, block=True)
+    do.play_voltages(digits, force_final_zeros=True, block=False)
+    ao.play_voltages(volts, force_final_zeros=True, block=True)
 
-    volts2 = np.ones((2,10), np.dtype(np.float64))
-    ao.play_voltages(volts2, block=True)
+
+
+    ao_constant = Analog_Out(
+        daq_type='6738_constant',
+        line="Dev1/ao18",
+        minVol=0,
+        maxVol=5,
+        verbose=True)
+
+    ao_constant.setconstantvoltage(4.5)
 
     import time
     time.sleep(4)
 
     do.close()
     ao.close()
+    ao_constant.close()
