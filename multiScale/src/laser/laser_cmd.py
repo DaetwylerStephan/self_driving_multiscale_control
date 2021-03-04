@@ -150,7 +150,7 @@ class Obis(RS232.RS232):
 #
 
 if __name__ == "__main__":
-    obis = Obis("COM9")
+    obis = Obis("COM15")
     if obis.getStatus():
         print obis.getPowerRange()
         print obis.getLaserOnOff()

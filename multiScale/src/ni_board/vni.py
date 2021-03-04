@@ -419,10 +419,12 @@ if __name__ == '__main__':
         daq_type=ao_type,
         line= "Dev1/ao0, Dev1/ao1, Dev1/ao5",
         verbose=True)
-    digits = np.zeros((do.s2p(1), do_nchannels), np.dtype(np.uint8))
-    volts = np.zeros((ao.s2p(1), ao_nchannels), np.dtype(np.float64))
+    digits = np.zeros((do.s2p(10), do_nchannels), np.dtype(np.uint8))
+    volts = np.zeros((ao.s2p(10), ao_nchannels), np.dtype(np.float64))
     digits[do.s2p(.25):do.s2p(.75), :] = 1
     volts[ao.s2p(.25):ao.s2p(1), :] = 5
+    volts[ao.s2p(2.5):ao.s2p(4), :] = 5
+    volts[ao.s2p(8):ao.s2p(10), :] = 5
     do.play_voltages(digits, force_final_zeros=True, block=False)
     ao.play_voltages(volts, force_final_zeros=True, block=True)
 
@@ -435,7 +437,7 @@ if __name__ == '__main__':
         maxVol=5,
         verbose=True)
 
-    ao_constant.setconstantvoltage(4.5)
+    ao_constant.setconstantvoltage(2)
 
     import time
     time.sleep(4)
