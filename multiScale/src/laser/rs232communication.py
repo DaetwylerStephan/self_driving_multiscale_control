@@ -34,7 +34,7 @@ class RS232():
             self.live = True
             time.sleep(self.wait_time)
         except Exception as e:
-            print "RS232 Error:", type(e), str(e)
+            print("RS232 Error:", type(e), str(e))
             self.live = False
 
     ## commWithResp

@@ -43,11 +43,11 @@ class Obis(RS232.RS232):
             if (not self.getLaserOnOff()):
                 self.setLaserOnOff(True)
         except:
-            print traceback.format_exc()
+            print(traceback.format_exc())
             self.live = False
-            print "Failed to connect to Obis Laser at port", port
-            print "Perhaps it is turned off or the COM ports have"
-            print "been scrambled?"
+            print("Failed to connect to Obis Laser at port", port)
+            print("Perhaps it is turned off or the COM ports have")
+            print("been scrambled?")
 
     #def respToFloat(self, resp, start):
     #    return float(resp[start:-1])
@@ -152,9 +152,9 @@ class Obis(RS232.RS232):
 if __name__ == "__main__":
     obis = Obis("COM15")
     if obis.getStatus():
-        print obis.getPowerRange()
-        print obis.getLaserOnOff()
-        obis.setPower(200.0)
+        print(obis.getPowerRange())
+        print(obis.getLaserOnOff())
+        obis.setPower(50.0)
         time.sleep(10)
         obis.shutDown()
 

@@ -132,7 +132,7 @@ else:
 d_handle = None
 try:
     # Open the first USB MCS2 found.
-    locator = "usb:ix:0"
+    locator = "network:sn:MCS2-00000382"
     d_handle = ctl.Open(locator)
     print("MCS2 opened {}.".format(locator))
     print("*******************************************************")
