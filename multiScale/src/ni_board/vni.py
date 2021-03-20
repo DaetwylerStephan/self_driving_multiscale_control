@@ -1,5 +1,7 @@
 import ctypes as C
 import numpy as np
+import matplotlib.pyplot as plt
+
 """
 TODO: One way or another, make it harder to forget the daq.close()
 method, which can cause crazy voltages to persist. _del_? _enter_ and
@@ -257,6 +259,16 @@ class Analog_Out:
                   "points written to each %s channel."%self.daq_type)
         return None
 
+    def plot_voltages(self, volts, names):
+        # Reverse lookup table; channel numbers to names:
+        for c in range(volts.shape[1]):
+            plt.plot(volts[:, c], label=names[c])
+        plt.legend(loc='upper right')
+        xlocs, xlabels = plt.xticks()
+        plt.xticks(xlocs, [self.p2s(l) for l in xlocs])
+        plt.ylabel('Volts')
+        plt.xlabel('Seconds')
+        plt.show()
 
 # DLL api management----------------------------------------------------------------------------------------------------
 
@@ -413,11 +425,12 @@ if __name__ == '__main__':
 
     ao_type = '6738'
     ao_nchannels = 3
+    line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao5"
     ao = Analog_Out(
         num_channels=ao_nchannels,
         rate=rate,
         daq_type=ao_type,
-        line= "Dev1/ao0, Dev1/ao1, Dev1/ao5",
+        line= line_selection,
         verbose=True)
     digits = np.zeros((do.s2p(10), do_nchannels), np.dtype(np.uint8))
     volts = np.zeros((ao.s2p(10), ao_nchannels), np.dtype(np.float64))
@@ -425,6 +438,11 @@ if __name__ == '__main__':
     volts[ao.s2p(.25):ao.s2p(1), :] = 5
     volts[ao.s2p(2.5):ao.s2p(4), :] = 5
     volts[ao.s2p(8):ao.s2p(10), :] = 5
+
+    
+    ao.plot_voltages(volts,("Dev1/ao0", "Dev1/ao1", "Dev1/ao5"))
+
+    #volts[ao.s2p(0.001):ao.s2p]
     do.play_voltages(digits, force_final_zeros=True, block=False)
     ao.play_voltages(volts, force_final_zeros=True, block=True)
 
@@ -440,7 +458,7 @@ if __name__ == '__main__':
     ao_constant.setconstantvoltage(2)
 
     import time
-    time.sleep(4)
+    #time.sleep(4)
 
     do.close()
     ao.close()
