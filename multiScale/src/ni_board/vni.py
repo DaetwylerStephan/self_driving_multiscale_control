@@ -439,7 +439,7 @@ if __name__ == '__main__':
     volts[ao.s2p(2.5):ao.s2p(4), :] = 5
     volts[ao.s2p(8):ao.s2p(10), :] = 5
 
-    
+
     ao.plot_voltages(volts,("Dev1/ao0", "Dev1/ao1", "Dev1/ao5"))
 
     #volts[ao.s2p(0.001):ao.s2p]
