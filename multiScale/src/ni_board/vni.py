@@ -425,7 +425,7 @@ if __name__ == '__main__':
 
     ao_type = '6738'
     ao_nchannels = 3
-    line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao5"
+    line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14"
     ao = Analog_Out(
         num_channels=ao_nchannels,
         rate=rate,
@@ -440,7 +440,18 @@ if __name__ == '__main__':
     volts[ao.s2p(8):ao.s2p(10), :] = 5
 
 
-    ao.plot_voltages(volts,("Dev1/ao0", "Dev1/ao1", "Dev1/ao5"))
+    #channels: stage trigger, remote mirror, TTL laser (4), camera trigger
+    exposure_time = 0.04 # 40 ms
+    basic_unit = np.zeros((ao.s2p(0.05), 7), np.dtype(np.float64))
+    basic_unit[0:ao.s2p(0.002), 0] = 4 #stage trigger
+    basic_unit[ao.s2p(0.004): ao.s2p(0.006),1] =4 # camera trigger
+    basic_unit[ao.s2p(0.004): ao.s2p(0.006 + exposure_time),2] =4 # laser trigger
+
+
+    nb_frames = 5
+    control_array = np.tile(basic_unit, nb_frames)
+    print(control_array)
+    ao.plot_voltages(basic_unit, ("Dev1/ao0", "Dev1/ao1", "Dev1/ao5", "Dev1/ao6", "Dev1/ao8", "Dev1/ao11", "Dev1/ao14"))
 
     #volts[ao.s2p(0.001):ao.s2p]
     do.play_voltages(digits, force_final_zeros=True, block=False)
