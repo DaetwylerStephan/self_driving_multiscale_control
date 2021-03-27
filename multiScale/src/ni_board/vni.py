@@ -263,11 +263,12 @@ class Analog_Out:
         # Reverse lookup table; channel numbers to names:
         for c in range(volts.shape[1]):
             plt.plot(volts[:, c], label=names[c])
-        plt.legend(loc='upper right')
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         xlocs, xlabels = plt.xticks()
         plt.xticks(xlocs, [self.p2s(l) for l in xlocs])
         plt.ylabel('Volts')
         plt.xlabel('Seconds')
+        plt.tight_layout()
         plt.show()
 
 # DLL api management----------------------------------------------------------------------------------------------------
@@ -424,8 +425,8 @@ if __name__ == '__main__':
         verbose=True)
 
     ao_type = '6738'
-    ao_nchannels = 3
-    line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14"
+    ao_nchannels = 7
+    line_selection = "Dev1/ao0, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14, , Dev1/ao18"
     ao = Analog_Out(
         num_channels=ao_nchannels,
         rate=rate,
@@ -441,27 +442,39 @@ if __name__ == '__main__':
 
 
     #channels: stage trigger, remote mirror, TTL laser (4), camera trigger
-    exposure_time = 0.04 # 40 ms
-    basic_unit = np.zeros((ao.s2p(0.05), 7), np.dtype(np.float64))
-    basic_unit[0:ao.s2p(0.002), 0] = 4 #stage trigger
-    basic_unit[ao.s2p(0.004): ao.s2p(0.006),1] =4 # camera trigger
-    basic_unit[ao.s2p(0.004): ao.s2p(0.006 + exposure_time),2] =4 # laser trigger
+    exposure_time = 0.2 # 40 ms
+    remote_low_vol = -2
+    remote_high_vol =+2
+    stage_triggertime = 0.002
+    delay_camera_trigger = 0.002 #how long does stage needs to move
+    camera_triggertime = 0.002
+    returnpoint = ao.s2p(stage_triggertime + delay_camera_trigger)
+    endpoint = ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
 
+    #np.linspace(remote_low_vol, remote_low_vol, num = ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
+    basic_unit = np.zeros((endpoint, 7), np.dtype(np.float64))
+    basic_unit[0:ao.s2p(stage_triggertime), 0] = 4 #stage trigger
+    basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger): ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime),1] =4 # camera trigger
+    basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time),2] =4 # laser trigger
+    print(ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
+
+    basic_unit[0 : returnpoint,3] = np.linspace(remote_high_vol, remote_low_vol, num = returnpoint-ao.s2p(0.000))
+    basic_unit[returnpoint: endpoint,3] = np.linspace(remote_low_vol, remote_high_vol, num = endpoint-returnpoint)
 
     nb_frames = 5
-    control_array = np.tile(basic_unit, nb_frames)
+    control_array = np.tile(basic_unit, (nb_frames, 1))
     print(control_array)
-    ao.plot_voltages(basic_unit, ("Dev1/ao0", "Dev1/ao1", "Dev1/ao5", "Dev1/ao6", "Dev1/ao8", "Dev1/ao11", "Dev1/ao14"))
+    ao.plot_voltages(control_array, ("ao0/stage", "ao5/camera", "ao6/laser", "ao8/remote mirror", "ao11", "ao14", "ao18"))
 
     #volts[ao.s2p(0.001):ao.s2p]
-    do.play_voltages(digits, force_final_zeros=True, block=False)
-    ao.play_voltages(volts, force_final_zeros=True, block=True)
+    #do.play_voltages(digits, force_final_zeros=True, block=False)
+    #ao.play_voltages(volts, force_final_zeros=True, block=True)
 
-
+    ao.play_voltages(control_array, force_final_zeros=True, block=True)
 
     ao_constant = Analog_Out(
         daq_type='6738_constant',
-        line="Dev1/ao18",
+        line="Dev1/ao22",
         minVol=0,
         maxVol=5,
         verbose=True)
@@ -470,7 +483,7 @@ if __name__ == '__main__':
 
     import time
     #time.sleep(4)
-
+    print("closing")
     do.close()
     ao.close()
     ao_constant.close()
