@@ -21,10 +21,44 @@ class Photo_Camera:
         pvc.uninit_pvcam()
         print("camera closed")
 
+    def getinfo(self):
+        print(self.cam.trigger_table)
+
     def take_snapshot(self, exposure):
         frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
         plt.imshow(frame, cmap="gray")
         plt.show()
+
+    def apply_stack_aq_settings_Iris(self):
+        """Changes the settings of the Iris camera for stack acquisition."""
+        self.cam.clear_mode = "Pre-Sequence"
+        self.cam.exp_mode = "Strobed"
+        self.cam.exp_out_mode = "Any Rows"
+        self.cam.readout_port = 0
+        self.cam.speed_table_index = 0
+        self.cam.gain = 1
+
+    def apply_preview_settings_Iris(self):
+        """Changes the settings of the Iris camera to preview acquisitions."""
+        self.cam.clear_mode = "Pre-Sequence"
+        self.cam.exp_mode = "Timed"
+        self.cam.readout_port = 0
+        self.cam.speed_table_index = 0
+        self.cam.gain = 1
+
+    def apply_stack_aq_settings_PrimeExpress(self):
+        """Changes the settings of the Iris camera to preview acquisitions."""
+        self.cam.exp_mode = "Strobed"
+        self.cam.exp_out_mode = "Any Rows"
+        self.cam.speed_table_index = 0
+        self.cam.gain = 1
+
+    def apply_preview_settings_PrimeExpress(self):
+        """Changes the settings of the Iris camera to preview acquisitions."""
+        self.cam.exp_mode = "Timed"
+        self.cam.readout_port = 0
+        self.cam.speed_table_index = 0
+        self.cam.gain = 1
 
     def preview_live(self):
         self.cam.start_live(exp_time=20)
@@ -64,6 +98,7 @@ class Photo_Camera:
 if __name__ == '__main__':
     camera = Photo_Camera()
     camera.take_snapshot(20)
-    camera.preview_live()
+    camera.getinfo()
+    #camera.preview_live()
     camera.take_snapshot(20)
     camera.close()
