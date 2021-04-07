@@ -99,6 +99,6 @@ if __name__ == '__main__':
     camera = Photo_Camera()
     camera.take_snapshot(20)
     camera.getinfo()
-    #camera.preview_live()
+    camera.preview_live()
     camera.take_snapshot(20)
     camera.close()
