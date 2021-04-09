@@ -7,10 +7,15 @@ import numpy as np
 
 
 class Photo_Camera:
-    def __init__(self):
+    def __init__(self, camera_name):
         pvc.init_pvcam()
         print("pvcam initialized")
-        self.cam = next(Camera.detect_camera())
+
+        camera_names = Camera.get_available_camera_names()
+        print('Available cameras: ' + str(camera_names))
+
+        self.cam = Camera.select_camera(camera_name)
+        print('start camera: ' + camera_name)
         print("camera detected")
         self.cam.open()
         print("camera open")
@@ -62,6 +67,7 @@ class Photo_Camera:
 
     def preview_live(self):
         self.cam.start_live(exp_time=20)
+
         cnt = 0
         tot = 0
         t1 = time.time()
@@ -72,31 +78,30 @@ class Photo_Camera:
         fps = 0
 
         while True:
-            frame = self.cam.get_live_frame().reshape(self.cam.sensor_size[::-1])
-            frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
-            cv2.imshow('Live Mode', frame)
+            frame, fps, frame_count = self.cam.poll_frame()
+            frame['pixel_data'] = cv2.resize(frame['pixel_data'], dim, interpolation=cv2.INTER_AREA)
+            cv2.imshow('Live Mode', frame['pixel_data'])
 
-            low = np.amin(frame)
-            high = np.amax(frame)
-            average = np.average(frame)
+            low = np.amin(frame['pixel_data'])
+            high = np.amax(frame['pixel_data'])
+            average = np.average(frame['pixel_data'])
 
             if cnt == 10:
                 t1 = time.time() - t1
                 fps = 10 / t1
                 t1 = time.time()
                 cnt = 0
-            # esc-key
             if cv2.waitKey(10) == 27:
                 break
             print('Min:{}\tMax:{}\tAverage:{:.0f}\tFrame Rate: {:.1f}\n'.format(low, high, average, fps))
             cnt += 1
             tot += 1
 
-        self.cam.stop_live()
-        print('Total frames: {}\nAverage fps: {}\n'.format(tot, (tot / (time.time() - start))))
+        self.cam.finish()
+
 
 if __name__ == '__main__':
-    camera = Photo_Camera()
+    camera = Photo_Camera('PMPCIECam00')
     camera.take_snapshot(20)
     camera.getinfo()
     camera.preview_live()
