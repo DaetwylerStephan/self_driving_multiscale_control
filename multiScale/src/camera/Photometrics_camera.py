@@ -34,14 +34,7 @@ class Photo_Camera:
         plt.imshow(frame, cmap="gray")
         plt.show()
 
-    def apply_stack_aq_settings_Iris(self):
-        """Changes the settings of the Iris camera for stack acquisition."""
-        self.cam.clear_mode = "Pre-Sequence"
-        self.cam.exp_mode = "Strobed"
-        self.cam.exp_out_mode = "Any Rows"
-        self.cam.readout_port = 0
-        self.cam.speed_table_index = 0
-        self.cam.gain = 1
+
 
     def apply_preview_settings_Iris(self):
         """Changes the settings of the Iris camera to preview acquisitions."""
@@ -51,12 +44,28 @@ class Photo_Camera:
         self.cam.speed_table_index = 0
         self.cam.gain = 1
 
-    def apply_stack_aq_settings_PrimeExpress(self):
+    def run_stack_aquisition(self, nb_planes):
         """Changes the settings of the Iris camera to preview acquisitions."""
-        self.cam.exp_mode = "Strobed"
+        self.exp_mode = 'Edge Trigger'
         self.cam.exp_out_mode = "Any Rows"
-        self.cam.speed_table_index = 0
-        self.cam.gain = 1
+
+        # Collect frames in live mode
+        self.cam.start_live()
+
+        framesReceived = 0
+
+        while framesReceived < nb_planes:
+            time.sleep(0.005)
+
+            try:
+                frame, fps, frame_count = self.cam.poll_frame()
+                print('Count: {} FPS: {} First five pixels of frame: {}'.format(frame_count, round(fps, 2),
+                                                                                frame['pixel_data'][0, 0:5]))
+                framesReceived += 1
+            except Exception as e:
+                print(str(e))
+
+        self.cam.finish()
 
     def apply_preview_settings_PrimeExpress(self):
         """Changes the settings of the Iris camera to preview acquisitions."""
