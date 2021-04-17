@@ -4,10 +4,9 @@ import os
 import atexit
 import threading
 
+import auxiliary_code.concurrency_tools as ct
+import auxiliary_code.napari_in_subprocess as napari
 
-
-import auxiliary_code.proxy_objects as proxy_objects
-from auxiliary_code.proxied_napari import display
 import src.camera.Photometrics_camera as Photometricscamera
 import src.ni_board.ni as ni
 import src.stages.rotation_stage_cmd as RotStage
@@ -26,67 +25,68 @@ class multiScopeModel:
         We use bytes_per_buffer to specify the shared_memory_sizes for the
         child processes.
         """
-        self._init_shared_memory(
-            SharedMemory_allocation.bytes_per_data_buffer, SharedMemory_allocation.num_data_buffers, SharedMemory_allocation.bytes_per_preview_buffer)
         self.unfinished_tasks = queue.Queue()
 
-        #start initializing all hardware component here by calling the initialization from a thread
-        lowres_camera_init = threading.Thread(target=self._init_lowres_camera) #~3.6s
-        lowres_camera_init.start()
+        self.data_buffers = [
+            ct.SharedNDArray(shape=(1, 2048, 2048), dtype='uint16')
+            for i in range(2)]
+        self.data_buffer_queue = queue.Queue()
+        for i in range(len(self.data_buffers)):
+            self.data_buffer_queue.put(i)
+        print("Displaying", self.data_buffers[0].shape,
+              self.data_buffers[0].dtype, 'images.')
+        self.num_frames = 0
+        self.initial_time = time.perf_counter()
 
-        #initialize stages in threads
-        #trans_stage_init = threading.Thread(target=self._init_XYZ_stage) #~0.4s
-        #trans_stage_init.start()
-        #rot_stage_init = threading.Thread(target=self._init_rotation_stage)
-        #rot_stage_init.start()
+        #start initializing all hardware component here by calling the initialization from a ResultThread
+        lowres_camera_init = ct.ResultThread(target=self._init_lowres_camera).start() #~3.6s
+        highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
+        self._init_display() #~1.3s
 
 
-        #self.display = display(proxy_manager=self.pm)
+        #initialize stages and stages in ResultThreads
+        #trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start() #~0.4s
+        #rot_stage_init = ct.ResultThread(target=self._init_rotation_stage).start()
+        #filterwheel_init = ct.ResultThread(target=self._init_filterwheel).start()  # ~5.3s
+
+
         #self._init_ao()  # ~0.2s
-        self._init_filterwheel()  # ~0.2s
+
 
         #wait for all started initialization threads before continuing (by calling thread join)
-        lowres_camera_init.join()
-        #trans_stage_init.join()
-        #rot_stage_init.join()
+        lowres_camera_init.get_result()
+        highres_camera_init.get_result()
+        # filterwheel_init.get_result()
+        # trans_stage_init.get_result()
+        # rot_stage_init.get_result()
 
         print('Finished initializing multiScope')
-
-
-    def _init_shared_memory(
-        self,
-        bytes_per_data_buffer,
-        num_data_buffers,
-        bytes_per_preview_buffer,
-        ):
-        """
-        Each buffer is acquired in deterministic time with a single play
-        of the ao card.
-        """
-        num_preview_buffers = 3 # 3 for preprocess, display and filesave
-        assert bytes_per_data_buffer > 0 and num_data_buffers > 0
-        assert bytes_per_preview_buffer > 0
-        print("Allocating shared memory...", end=' ')
-        self.pm = proxy_objects.ProxyManager(shared_memory_sizes=(
-            (bytes_per_data_buffer,   ) * num_data_buffers +
-            (bytes_per_preview_buffer,) * num_preview_buffers))
-        print("done allocating memory.")
-        self.data_buffer_queue = queue.Queue(maxsize=num_data_buffers)
-        for i in range(num_data_buffers):
-            self.data_buffer_queue.put(i)
-        self.preview_buffer_queue = queue.Queue(maxsize=num_preview_buffers)
-        for i in range(num_preview_buffers):
-            self.preview_buffer_queue.put(i + num_data_buffers) # pointer math!
 
     def _init_lowres_camera(self):
         """
         Initialize low resolution camera
         """
-        print("Initializing camera..")
-        #place the Photometrics class as object into a proxy object
-        self.lowres_camera = self.pm.proxy_object(Photometricscamera.Photo_Camera)
-        self.lowres_camera.take_snapshot(20)
+        print("Initializing low resolution camera ..")
+        #place the Photometrics class as object into an Object in Subprocess
+        self.lowres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMPCIECam00')
+        #self.lowres_camera.take_snapshot(20)
         print("done with camera.")
+
+    def _init_highres_camera(self):
+        """
+        Initialize low resolution camera
+        """
+        print("Initializing high resolution camera..")
+        #place the Photometrics class as object into an Object in Subprocess
+        self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
+        #self.lowres_camera.take_snapshot(20)
+        print("done with camera.")
+
+    def _init_display(self):
+        print("Initializing display...")
+        self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop= napari._napari_child_loop, close_method_name='close')
+
+        print("done with display.")
 
     def _init_ao(self):
         """
@@ -162,13 +162,43 @@ class multiScopeModel:
             collected_tasks.append(th)
         return collected_tasks
 
+    def snap_task(self, custody):
+        custody.switch_from(None, to=self.highres_camera)
+        which_buffer = self.data_buffer_queue.get()
+        data_buffer = self.data_buffers[which_buffer]
+        self.highres_camera.record(out=data_buffer)
+        custody.switch_from(self.highres_camera, to=self.display)
+        self.display.show_image(data_buffer)
+        custody.switch_from(self.display, to=None)
+        self.data_buffer_queue.put(which_buffer)
+        self.num_frames += 1
+        if self.num_frames == 100:
+            time_elapsed = time.perf_counter() - self.initial_time
+            print("%0.2f average FPS" % (self.num_frames / time_elapsed))
+            self.num_frames = 0
+            self.initial_time = time.perf_counter()
+
+    def snap(self):
+        th = ct.CustodyThread(first_resource=self.highres_camera, target=self.snap_task)
+        return th.start()
 
 
 if __name__ == '__main__':
     # first code to run in the multiscope
 
     # Create scope object:
-    scope = multiScope()
+    scope = multiScopeModel()
+
+
+    snap_threads = []
+    for i in range(150):
+        th = scope.snap()
+        snap_threads.append(th)
+    print(len(snap_threads), "'snap' threads launched.")
+    for th in snap_threads:
+        th.get_result()
+    print("All 'snap' threads finished execution.")
+    input('Hit enter to close napari...')
 
     #close
     scope.close()

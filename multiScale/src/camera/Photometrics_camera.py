@@ -29,12 +29,17 @@ class Photo_Camera:
     def getinfo(self):
         print(self.cam.trigger_table)
 
+    def getimagesize(self):
+        self.cam.roi
+
     def take_snapshot(self, exposure):
         frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
         plt.imshow(frame, cmap="gray")
         plt.show()
 
-
+    def record(self, out, exposure=20):
+        import numpy as np
+        out[:] = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
 
     def apply_preview_settings_Iris(self):
         """Changes the settings of the Iris camera to preview acquisitions."""
