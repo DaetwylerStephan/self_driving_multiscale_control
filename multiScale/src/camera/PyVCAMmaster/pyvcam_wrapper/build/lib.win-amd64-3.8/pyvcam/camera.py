@@ -389,9 +389,9 @@ class Camera:
         """
 
         frame, fps, frame_count = pvc.get_frame(self.__handle, self.__shape[0], self.__shape[1], self.__bits_per_pixel)
-
         frame['pixel_data'] = frame['pixel_data'].reshape(self.__shape[1], self.__shape[0])
-        if out == None:
+
+        if out.all() == None:
             frame['pixel_data'] = np.copy(frame['pixel_data']) #copy so that python and c don't access the same memory. With copy
         else:
             assert out.shape == frame['pixel_data'].shape

@@ -79,6 +79,15 @@ class Photo_Camera:
         self.cam.speed_table_index = 0
         self.cam.gain = 1
 
+    def set_up_preview(self, exposure=20):
+        self.cam.start_live(exp_time=exposure)
+
+    def run_preview(self, out):
+        frame, fps, frame_count = self.cam.poll_frame2(out)
+
+    def end_preview(self):
+        self.cam.finish()
+
     def preview_live(self):
         self.cam.start_live(exp_time=20)
 

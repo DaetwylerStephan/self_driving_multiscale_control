@@ -374,6 +374,33 @@ class Camera:
         frame['pixel_data'] = np.copy(frame['pixel_data'])
         return frame, fps, frame_count
 
+    def poll_frame2(self, out=None):
+        """Calls the pvc.get_frame function with the current camera settings.
+        out is shared memory
+
+        Usage:
+        data_buf = SharedNDArray(shape=(400, 2000, 2000), dtype='uint16')
+        self.cam.poll_frame2(out=data_buf[4,:,:])
+
+        Parameter:
+            None
+        Returns:
+            A dictionary with the frame containing available meta data and 2D np.array pixel data, frames per second and frame count.
+        """
+
+        frame, fps, frame_count = pvc.get_frame(self.__handle, self.__shape[0], self.__shape[1], self.__bits_per_pixel)
+        frame['pixel_data'] = frame['pixel_data'].reshape(self.__shape[1], self.__shape[0])
+
+        if out.all() == None:
+            frame['pixel_data'] = np.copy(frame['pixel_data']) #copy so that python and c don't access the same memory. With copy
+        else:
+            assert out.shape == frame['pixel_data'].shape
+            assert out.dtype == frame['pixel_data'].dtype
+            out[:] = frame['pixel_data'] #doesn't remove python reference to c memory
+            del frame['pixel_data'] #should remove reference
+
+        return frame, fps, frame_count
+
     def get_frame(self, exp_time=None):
         """Calls the pvc.get_frame function with the current camera settings.
 

@@ -16,6 +16,7 @@ from constants import FilterWheel_parameters
 from constants import Stage_parameters
 from constants import NI_board_parameters
 from constants import SharedMemory_allocation
+from constants import Camera_parameters
 
 class multiScopeModel:
     def __init__(
@@ -38,9 +39,19 @@ class multiScopeModel:
         self.num_frames = 0
         self.initial_time = time.perf_counter()
 
+        #parameters
+        self.exposure_time = 20
+        self.continue_preview = True
+
+        #preview buffers
+        self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+        self.high_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
+        self.low_res_buffer.fill(0) #fill to initialize
+        self.high_res_buffer.fill(0) #fill to initialize
+
         #start initializing all hardware component here by calling the initialization from a ResultThread
         lowres_camera_init = ct.ResultThread(target=self._init_lowres_camera).start() #~3.6s
-        highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
+        #highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
         self._init_display() #~1.3s
 
 
@@ -55,7 +66,7 @@ class multiScopeModel:
 
         #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.get_result()
-        highres_camera_init.get_result()
+        #highres_camera_init.get_result()
         # filterwheel_init.get_result()
         # trans_stage_init.get_result()
         # rot_stage_init.get_result()
@@ -182,6 +193,34 @@ class multiScopeModel:
         th = ct.CustodyThread(first_resource=self.highres_camera, target=self.snap_task)
         return th.start()
 
+    def preview_lowres(self):
+
+        def preview_lowres_task(custody):
+            self.lowres_camera.set_up_preview(self.exposure_time)
+            self.num_frames = 0
+            self.initial_time = time.perf_counter()
+
+            while self.continue_preview:
+
+                custody.switch_from(None, to=self.lowres_camera)
+                self.lowres_camera.run_preview(out=self.low_res_buffer)
+                custody.switch_from(self.lowres_camera, to=self.display)
+                self.display.show_image(self.low_res_buffer)
+                custody.switch_from(self.display, to=None)
+                self.num_frames += 1
+
+                #calculate fps to display
+                if self.num_frames == 100:
+                    time_elapsed = time.perf_counter() - self.initial_time
+                    print("%0.2f average FPS" % (self.num_frames / time_elapsed))
+                    self.num_frames = 0
+                    self.initial_time = time.perf_counter()
+
+            self.lowres_camera.end_preview()
+
+        self.continue_preview = True
+        th = ct.CustodyThread(target=preview_lowres_task, first_resource=None)
+        th.start()
 
 if __name__ == '__main__':
     # first code to run in the multiscope
@@ -190,15 +229,17 @@ if __name__ == '__main__':
     scope = multiScopeModel()
 
 
-    snap_threads = []
-    for i in range(150):
-        th = scope.snap()
-        snap_threads.append(th)
-    print(len(snap_threads), "'snap' threads launched.")
-    for th in snap_threads:
-        th.get_result()
+    # snap_threads = []
+    # for i in range(150):
+    #     th = scope.snap()
+    #     snap_threads.append(th)
+    # print(len(snap_threads), "'snap' threads launched.")
+    # for th in snap_threads:
+    #     th.get_result()
+    scope.preview_lowres()
     print("All 'snap' threads finished execution.")
     input('Hit enter to close napari...')
+    scope.continue_preview = False
 
     #close
     scope.close()
