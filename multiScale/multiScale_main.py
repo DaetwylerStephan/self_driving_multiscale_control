@@ -61,7 +61,13 @@ class MultiScale_Microscope_Controller():
     def run_lowrespreview(self, event):
         self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
         print("running preview")
-        self.model.lowres_camera.take_snapshot(20)
+
+        self.preview_thread = Thread(target=self.model.preview_lowres)
+        self.preview_thread.start()
+        print("All 'snap' threads finished execution.")
+        input('Hit enter to close napari...')
+        self.model.continue_preview_lowres = False
+        self.preview_thread.join()
 
     def run_highrespreview(self, event):
         self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
