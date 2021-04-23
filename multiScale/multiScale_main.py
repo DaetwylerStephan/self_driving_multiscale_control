@@ -7,6 +7,8 @@ import numpy as np
 
 from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
+import auxiliary_code.concurrency_tools as ct
+
 
 class MultiScale_Microscope_Controller():
     """
@@ -27,8 +29,9 @@ class MultiScale_Microscope_Controller():
         self.continuetimelapse = 0 #enable functionality to stop timelapse
 
         #buttons run tab
-        self.view.runtab.bt_preview_lowres.bind("<Button>", self.run_lowrespreview)
+        self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
         self.view.runtab.bt_preview_highres.bind("<Button>", self.run_highrespreview)
+        self.view.runtab.bt_preview_stop.bind("<Button>", self.run_stop_preview)
         self.view.runtab.bt_changeTo488.bind("<Button>", lambda event: self.changefilter(event, '488', '488_filter'))
         self.view.runtab.bt_changeTo552.bind("<Button>", lambda event: self.changefilter(event, '552', '552_filter'))
         self.view.runtab.bt_changeTo594.bind("<Button>", lambda event: self.changefilter(event, '594', '594_filter'))
@@ -59,20 +62,37 @@ class MultiScale_Microscope_Controller():
     ##here follow the call to the functions of the model (microscope) that were bound above:
 
     def run_lowrespreview(self, event):
-        self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
-        print("running preview")
 
-        self.preview_thread = Thread(target=self.model.preview_lowres)
-        self.preview_thread.start()
+        if self.model.continue_preview_lowres == False:
+            self.model.continue_preview_lowres = True
+            self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
+
+        print("running preview")
+        self.view.after(10, self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres))
+        self.model.preview_lowres()
+
+    def wait_forInput(self):
         print("All 'snap' threads finished execution.")
         input('Hit enter to close napari...')
-        self.model.continue_preview_lowres = False
-        self.preview_thread.join()
 
     def run_highrespreview(self, event):
         self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
         print("running preview")
-        self.model.lowres_camera.take_snapshot(20)
+        #self.model.preview_lowres() // this gives an error!
+        self.model.preview_highres()
+
+    def run_stop_preview(self, event):
+      '''
+      Stops an executing preview and resets the profile of the preview buttons that were sunken after starting a preview
+      '''
+      if self.model.continue_preview_lowres == True:
+        self.model.continue_preview_lowres =False
+        self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
+
+      if self.model.continue_preview_highres == True:
+        self.model.continue_preview_highres = False
+        self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
+
 
     def changefilter(self, event, laser, filter):
         print("filter " + filter)

@@ -172,6 +172,7 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo_trans = tk.Button(preview_settings, text="block", command=lambda : self.preview_filter_select(self.bt_changeTo_trans))
         self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview")
         self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview")
+        self.bt_preview_stop = tk.Button(preview_settings, text="Stop Preview")
 
         #preview layout
         self.bt_changeTo488.grid(row=3, column=2)
@@ -182,6 +183,7 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo_trans.grid(row=3, column=7)
         self.bt_preview_lowres.grid(row=4, column=2, columnspan=2, sticky = (tk.W + tk.E))
         self.bt_preview_highres.grid(row=4, column=4, columnspan=2, sticky=(tk.W + tk.E))
+        self.bt_preview_stop.grid(row=4, column=6, columnspan=2, sticky=(tk.W + tk.E))
 
         ### ----------------------------stack acquisition buttons ------------------------------------------------------
         #stack aquisition labels (positioned)

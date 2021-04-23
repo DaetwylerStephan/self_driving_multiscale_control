@@ -41,7 +41,8 @@ class multiScopeModel:
 
         #parameters
         self.exposure_time = 20
-        self.continue_preview = True
+        self.continue_preview_lowres = False
+        self.continue_preview_highres = False
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -230,7 +231,8 @@ class multiScopeModel:
 
         self.continue_preview_lowres = True
         th = ct.CustodyThread(target=preview_lowres_task, first_resource=None)
-        return th.start()
+        th.start()
+        return th
 
     def preview_highres(self):
         def preview_highres_task(custody):
@@ -260,6 +262,7 @@ class multiScopeModel:
         self.continue_preview_highres = True
         th = ct.CustodyThread(target=preview_highres_task, first_resource=self.highres_camera)
         th.start()
+        return th
 
 if __name__ == '__main__':
     # first code to run in the multiscope
