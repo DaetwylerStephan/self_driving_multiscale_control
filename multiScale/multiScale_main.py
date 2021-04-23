@@ -62,14 +62,12 @@ class MultiScale_Microscope_Controller():
     ##here follow the call to the functions of the model (microscope) that were bound above:
 
     def run_lowrespreview(self, event):
-
         if self.model.continue_preview_lowres == False:
             self.model.continue_preview_lowres = True
             self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
-
-        print("running preview")
-        self.view.after(10, self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres))
-        self.model.preview_lowres()
+            print("running preview")
+            self.view.after(10, self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres))
+            self.model.preview_lowres()
 
     def wait_forInput(self):
         print("All 'snap' threads finished execution.")
