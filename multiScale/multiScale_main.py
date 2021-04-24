@@ -8,6 +8,7 @@ import numpy as np
 from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
 import auxiliary_code.concurrency_tools as ct
+from constants import Camera_parameters
 
 
 class MultiScale_Microscope_Controller():
@@ -39,6 +40,7 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.bt_changeTo_block.bind("<Button>", lambda event: self.changefilter(event, 'None', 'Block'))
         self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED', 'No_filter'))
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
+        self.view.runtab.stack_aq_numberOfPlanes.trace_add("write", self.updateNbPlanes)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
 
@@ -97,9 +99,29 @@ class MultiScale_Microscope_Controller():
         self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
         print("laser " + laser)
 
+    def updateNbPlanes(self, var,indx,mode):
+        """
+        generate a new SharedNDArray whenever the number of planes is updated.
+        """
+        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
+        self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+        #self.stack_buffer.fill(0) #too slow - need other solution
+
     def acquire_stack(self, event):
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
         self.view.update()
+
+        #stop all potential previews
+        self.model.continue_preview_lowres = False
+        self.model.continue_preview_highres = False
+
+        self.initial_time = time.perf_counter()
+        data_buf = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
+        time_elapsed = time.perf_counter() - self.initial_time
+        print("time pre-alloc: " + str(time_elapsed))
+        data_buf.fill(0)
+        time_elapsed = time.perf_counter() - self.initial_time
+        print("time post-alloc: " + str(time_elapsed))
 
         print("acquiring low res stack")
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))
@@ -111,6 +133,10 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
         self.view.update_idletasks()
         self.view.update()
+
+        # stop all potential previews
+        self.model.continue_preview_lowres = False
+        self.model.continue_preview_highres = False
 
         self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints-1)
         self.continuetimelapse = 0

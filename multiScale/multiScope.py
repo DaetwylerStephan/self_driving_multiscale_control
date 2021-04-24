@@ -15,7 +15,6 @@ import src.filter_wheel.ludlcontrol as FilterWheel
 from constants import FilterWheel_parameters
 from constants import Stage_parameters
 from constants import NI_board_parameters
-from constants import SharedMemory_allocation
 from constants import Camera_parameters
 
 class multiScopeModel:
