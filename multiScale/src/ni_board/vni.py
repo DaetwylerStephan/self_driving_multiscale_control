@@ -271,6 +271,46 @@ class Analog_Out:
         plt.tight_layout()
         plt.show()
 
+    def get_voltage_array(self,
+                          exposure_time=0.2,
+                          remote_low_vol = -2,
+                          remote_high_vol = 2,
+                          stage_triggertime=0.002,
+                          delay_camera_trigger=0.002,  # how long does stage needs to move
+                          camera_triggertime=0.002,
+                          laser_line=3 #3 or higher
+                          ):
+        '''
+        channels: stage trigger, remote mirror, TTL laser (4), camera trigger
+        :returns Array with voltages for 0: stage, 1: camera trigger, 2: remote mirror
+        '''
+
+        assert laser_line>2, print("Choose parameter 3-7 for laser line")
+
+        returnpoint = ao.s2p(stage_triggertime + delay_camera_trigger)
+        endpoint = ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
+
+        # np.linspace(remote_low_vol, remote_low_vol, num = ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
+        basic_unit = np.zeros((endpoint, 7), np.dtype(np.float64))
+
+        # stage trigger
+        basic_unit[0:ao.s2p(stage_triggertime), 0] = 4
+
+        # camera trigger
+        basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger): ao.s2p(
+            stage_triggertime + delay_camera_trigger + camera_triggertime), 1] = 4
+
+        #remote mirror
+        basic_unit[0: returnpoint, 2] = np.linspace(remote_high_vol, remote_low_vol, num=returnpoint - ao.s2p(0.000))
+        basic_unit[returnpoint: endpoint, 2] = np.linspace(remote_low_vol, remote_high_vol, num=endpoint - returnpoint)
+
+        basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): ao.s2p(
+            stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time), laser_line] = 4  # laser trigger
+        print(ao.s2p(exposure_time + 0.004) - ao.s2p(0.000))
+
+        return basic_unit
+
+
 # DLL api management----------------------------------------------------------------------------------------------------
 
 #int32 DAQmxGetExtendedErrorInfo (char errorString[], uInt32 bufferSize);
@@ -441,30 +481,12 @@ if __name__ == '__main__':
     volts[ao.s2p(8):ao.s2p(10), :] = 5
 
 
-    #channels: stage trigger, remote mirror, TTL laser (4), camera trigger
-    exposure_time = 0.2 # 40 ms
-    remote_low_vol = -2
-    remote_high_vol =+2
-    stage_triggertime = 0.002
-    delay_camera_trigger = 0.002 #how long does stage needs to move
-    camera_triggertime = 0.002
-    returnpoint = ao.s2p(stage_triggertime + delay_camera_trigger)
-    endpoint = ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
-
-    #np.linspace(remote_low_vol, remote_low_vol, num = ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
-    basic_unit = np.zeros((endpoint, 7), np.dtype(np.float64))
-    basic_unit[0:ao.s2p(stage_triggertime), 0] = 4 #stage trigger
-    basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger): ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime),1] =4 # camera trigger
-    basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time),2] =4 # laser trigger
-    print(ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
-
-    basic_unit[0 : returnpoint,3] = np.linspace(remote_high_vol, remote_low_vol, num = returnpoint-ao.s2p(0.000))
-    basic_unit[returnpoint: endpoint,3] = np.linspace(remote_low_vol, remote_high_vol, num = endpoint-returnpoint)
+    basic_unit = ao.get_voltage_array()
 
     nb_frames = 5
     control_array = np.tile(basic_unit, (nb_frames, 1))
     print(control_array)
-    ao.plot_voltages(control_array, ("ao0/stage", "ao5/camera", "ao6/laser", "ao8/remote mirror", "ao11", "ao14", "ao18"))
+    ao.plot_voltages(control_array, ("ao0/stage", "ao5/camera", "ao6/remote mirror", "ao8/laser", "ao11", "ao14", "ao18"))
 
     #volts[ao.s2p(0.001):ao.s2p]
     #do.play_voltages(digits, force_final_zeros=True, block=False)

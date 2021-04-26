@@ -8,7 +8,7 @@ import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.napari_in_subprocess as napari
 
 import src.camera.Photometrics_camera as Photometricscamera
-import src.ni_board.ni as ni
+import src.ni_board.vni as ni
 import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
@@ -16,6 +16,7 @@ from constants import FilterWheel_parameters
 from constants import Stage_parameters
 from constants import NI_board_parameters
 from constants import Camera_parameters
+from tifffile import imread, imwrite
 
 class multiScopeModel:
     def __init__(
@@ -42,6 +43,9 @@ class multiScopeModel:
         self.exposure_time = 20
         self.continue_preview_lowres = False
         self.continue_preview_highres = False
+        self.stack_nbplanes =0
+        self.stack_buffer = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
+        self.stack_buffer.fill(0)
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -73,7 +77,7 @@ class multiScopeModel:
         #filterwheel_init = ct.ResultThread(target=self._init_filterwheel).start()  # ~5.3s
 
 
-        #self._init_ao()  # ~0.2s
+        self._init_ao()  # ~0.2s
 
 
         #wait for all started initialization threads before continuing (by calling thread join)
@@ -117,11 +121,19 @@ class multiScopeModel:
         """
         self.names_to_voltage_channels = NI_board_parameters.names_to_voltage_channels
         print("Initializing ao card...", end=' ')
-        self.ao = ni.Analog_Out(num_channels=30,
-                                rate=1e5,
-                                daq_type='6738',
-                                board_name='Dev1',
-                                verbose=True)
+
+        line_selection = "Dev1/ao0, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14, Dev1/ao18"
+        ao_type = '6738'
+        ao_nchannels = 7
+        rate = 2e4
+
+        self.ao = ni.Analog_Out(
+            num_channels=ao_nchannels,
+            rate=rate,
+            daq_type=ao_type,
+            line=line_selection,
+            verbose=True)
+
         print("done with ao.")
         atexit.register(self.ao.close)
 
@@ -263,6 +275,28 @@ class multiScopeModel:
         th.start()
         return th
 
+    def acquire_stack_lowres(self):
+
+        # move stage to start position
+        # choose right filter wheel position
+        # set remote mirror to right position
+        # set flip mirror to right position
+
+        #prepare camera for stack acquisition
+        self.lowres_camera.prepare_stack_acquisition()
+
+        #prepare voltage array
+        basic_unit = self.ao.get_voltage_array()
+
+
+        #set up camera for acquisition
+        self.lowres_camera.run_stack_aquisition_buffer(self.stack_nbplanes, self.stack_buffer)
+
+        #play voltage
+
+        #save image
+
+
 if __name__ == '__main__':
     # first code to run in the multiscope
 
@@ -278,16 +312,16 @@ if __name__ == '__main__':
     # for th in snap_threads:
     #     th.get_result()
 
-    th = scope.preview_lowres()
-    print("All 'snap' threads finished execution.")
-    input('Hit enter to close napari...')
-    scope.continue_preview_lowres = False
-    th.get_result()
-
-    scope.preview_highres()
-    print("All 'snap' threads finished execution.")
-    input('Hit enter to close napari...')
-    scope.continue_preview_highres = False
+    # th = scope.preview_lowres()
+    # print("All 'snap' threads finished execution.")
+    # input('Hit enter to close napari...')
+    # scope.continue_preview_lowres = False
+    # th.get_result()
+    #
+    # scope.preview_highres()
+    # print("All 'snap' threads finished execution.")
+    # input('Hit enter to close napari...')
+    # scope.continue_preview_highres = False
 
     #close
     scope.close()

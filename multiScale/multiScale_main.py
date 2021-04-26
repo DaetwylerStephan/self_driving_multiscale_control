@@ -48,6 +48,11 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
         self.view.stagessettingstab.keyboard_input_off_bt.bind("<Button>", self.disable_keyboard_movement)
 
+        #define some parameters
+        self.current_stackbuffersize = self.view.runtab.stack_aq_numberOfPlanes.get()
+        self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+
+
     def run(self):
         """
         Run the Tkinter Gui in the main loop
@@ -56,6 +61,7 @@ class MultiScale_Microscope_Controller():
         self.root.title("Multi-scale microscope V1")
         self.root.geometry("800x600")
         self.root.resizable(width=False, height=False)
+        self.automatically_update_stackbuffer()
         self.root.mainloop()
 
     def close(self):
@@ -105,7 +111,19 @@ class MultiScale_Microscope_Controller():
         """
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
         self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+        self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
         #self.stack_buffer.fill(0) #too slow - need other solution
+
+    def automatically_update_stackbuffer(self):
+        print("update stack")
+        try:
+            self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
+            if self.stack_buffer_nb != self.current_stackbuffersize:
+                self.stack_buffer.fill(0)
+                self.current_stackbuffersize = self.stack_buffer_nb
+        except:
+            print("update error")
+        self.root.after(5000, self.automatically_update_stackbuffer)
 
     def acquire_stack(self, event):
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
@@ -115,13 +133,24 @@ class MultiScale_Microscope_Controller():
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
 
+        #set model parameters
+        self.model.stack_nbplanes = self.stack_buffer_nb
+        self.model.stack_buffer = self.stack_buffer
+
         self.initial_time = time.perf_counter()
         data_buf = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
         time_elapsed = time.perf_counter() - self.initial_time
         print("time pre-alloc: " + str(time_elapsed))
         data_buf.fill(0)
+        #data_buf[1, :, :] = 8
         time_elapsed = time.perf_counter() - self.initial_time
         print("time post-alloc: " + str(time_elapsed))
+
+        self.initial_time = time.perf_counter()
+        #data_buf.fill(1)
+        data_buf[2,:,:]=8
+        time_elapsed = time.perf_counter() - self.initial_time
+        print("time re-alloc : " + str(time_elapsed))
 
         print("acquiring low res stack")
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))
