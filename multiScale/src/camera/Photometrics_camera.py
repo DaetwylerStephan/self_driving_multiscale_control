@@ -75,28 +75,34 @@ class Photo_Camera:
     def prepare_stack_acquisition(self):
         """Changes the settings of the camera to stack acquisitions."""
         self.exp_mode = 'Edge Trigger'
-        self.cam.exp_out_mode = "Any Rows"
+        self.cam.exp_out_mode = "Any Row"
+
 
         # Collect frames in live mode
-        self.cam.start_live()
+        self.cam.start_live(exp_time=20)
+        print("camera ready")
 
-    def run_stack_aquisition_buffer(self, nb_planes, out):
+    def run_stack_acquisition_buffer(self, nb_planes, out):
         """Run a stack acquisition."""
 
         framesReceived = 0
+        print("******************cam ready***********************" + str(framesReceived))
 
         while framesReceived < nb_planes:
-            time.sleep(0.005)
+            time.sleep(0.001)
 
             try:
-                frame, fps, frame_count = self.cam.poll_frame2(out[framesReceived,:,:])
+                #frame, fps, frame_count = self.cam.poll_frame2(out[framesReceived,:,:])
+                frame, fps, frame_count = self.cam.poll_frame()
                 print('Count: {} FPS: {} First five pixels of frame: {}'.format(frame_count, round(fps, 2),
                                                                                 frame['pixel_data'][0, 0:5]))
+                out[framesReceived, :, :] = frame
+
                 framesReceived += 1
             except Exception as e:
                 print(str(e))
 
-        self.cam.finish()
+        #self.cam.finish()
 
     def apply_preview_settings_PrimeExpress(self):
         """Changes the settings of the Iris camera to preview acquisitions."""
@@ -150,9 +156,11 @@ class Photo_Camera:
 
 
 if __name__ == '__main__':
-    camera = Photo_Camera('PMUSBCam00')
+    #camera = Photo_Camera('PMUSBCam00')
+    camera = Photo_Camera('PMPCIECam00')
+
     camera.take_snapshot(20)
     camera.getinfo()
-    camera.preview_live()
+    #camera.preview_live()
     camera.take_snapshot(20)
     camera.close()

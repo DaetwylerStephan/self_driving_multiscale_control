@@ -9,9 +9,6 @@ import napari
 from qtpy.QtCore import QTimer
 # Our stuff
 from concurrency_tools import ObjectInSubprocess, SharedNDArray, _dummy_function
-import numpy as np
-from constants import Camera_parameters
-
 
 def display(display_type=None):
     """Creates a simplified non-blocking napari viewer in a subprocess.
@@ -38,23 +35,12 @@ class _NapariDisplay:
     """
     def __init__(self):
         self.viewer = napari.Viewer()
-        self.lowrespreview = self.viewer.add_image(np.zeros((Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel)), name="lowres_preview")
-        self.lowrespreview.contrast_limits=(0,10000)
-        self.highrespreview = self.viewer.add_image(
-            np.zeros((Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel)), name="highres_preview")
-        self.highrespreview.contrast_limits=(0, 10000)
 
-    def show_image_lowres(self, im):
-            self.lowrespreview.data = im
-
-    def show_image_highres(self, im):
-            self.highrespreview.data = im
-
-    def show_stack(self, im):
-        if not hasattr(self, 'stack_image'):
-            self.stack_image = self.viewer.add_image(im)
+    def show_image(self, im):
+        if not hasattr(self, 'image'):
+            self.image = self.viewer.add_image(im)
         else:
-            self.stack_image.data = im
+            self.image.data = im
 
     def close(self):
         self.viewer.close()

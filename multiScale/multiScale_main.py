@@ -136,25 +136,30 @@ class MultiScale_Microscope_Controller():
         #set model parameters
         self.model.stack_nbplanes = self.stack_buffer_nb
         self.model.stack_buffer = self.stack_buffer
+        #self.model.filepath = self.view.welcometab.filepath_string.get()
 
-        self.initial_time = time.perf_counter()
-        data_buf = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
-        time_elapsed = time.perf_counter() - self.initial_time
-        print("time pre-alloc: " + str(time_elapsed))
-        data_buf.fill(0)
-        #data_buf[1, :, :] = 8
-        time_elapsed = time.perf_counter() - self.initial_time
-        print("time post-alloc: " + str(time_elapsed))
-
-        self.initial_time = time.perf_counter()
-        #data_buf.fill(1)
-        data_buf[2,:,:]=8
-        time_elapsed = time.perf_counter() - self.initial_time
-        print("time re-alloc : " + str(time_elapsed))
+        # self.initial_time = time.perf_counter()
+        # data_buf = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
+        # time_elapsed = time.perf_counter() - self.initial_time
+        # print("time pre-alloc: " + str(time_elapsed))
+        # data_buf.fill(0)
+        # #data_buf[1, :, :] = 8
+        # time_elapsed = time.perf_counter() - self.initial_time
+        # print("time post-alloc: " + str(time_elapsed))
+        #
+        # self.initial_time = time.perf_counter()
+        # #data_buf.fill(1)
+        # data_buf[2,:,:]=8
+        # time_elapsed = time.perf_counter() - self.initial_time
+        # print("time re-alloc : " + str(time_elapsed))
 
         print("acquiring low res stack")
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
+
+        self.model.acquire_stack_lowres()
+
+
 
     def acquire_timelapse(self, event):
 

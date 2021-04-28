@@ -272,7 +272,7 @@ class Analog_Out:
         plt.show()
 
     def get_voltage_array(self,
-                          exposure_time=0.2,
+                          exposure_time=0.05,
                           remote_low_vol = -2,
                           remote_high_vol = 2,
                           stage_triggertime=0.002,
@@ -287,26 +287,26 @@ class Analog_Out:
 
         assert laser_line>2, print("Choose parameter 3-7 for laser line")
 
-        returnpoint = ao.s2p(stage_triggertime + delay_camera_trigger)
-        endpoint = ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
+        returnpoint = self.s2p(stage_triggertime + delay_camera_trigger)
+        endpoint = self.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
 
         # np.linspace(remote_low_vol, remote_low_vol, num = ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
         basic_unit = np.zeros((endpoint, 7), np.dtype(np.float64))
 
         # stage trigger
-        basic_unit[0:ao.s2p(stage_triggertime), 0] = 4
+        basic_unit[0:self.s2p(stage_triggertime), 0] = 4
 
         # camera trigger
-        basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger): ao.s2p(
+        basic_unit[self.s2p(stage_triggertime + delay_camera_trigger): self.s2p(
             stage_triggertime + delay_camera_trigger + camera_triggertime), 1] = 4
 
         #remote mirror
-        basic_unit[0: returnpoint, 2] = np.linspace(remote_high_vol, remote_low_vol, num=returnpoint - ao.s2p(0.000))
+        basic_unit[0: returnpoint, 2] = np.linspace(remote_high_vol, remote_low_vol, num=returnpoint - self.s2p(0.000))
         basic_unit[returnpoint: endpoint, 2] = np.linspace(remote_low_vol, remote_high_vol, num=endpoint - returnpoint)
 
-        basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): ao.s2p(
+        basic_unit[self.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): self.s2p(
             stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time), laser_line] = 4  # laser trigger
-        print(ao.s2p(exposure_time + 0.004) - ao.s2p(0.000))
+        print(self.s2p(exposure_time + 0.004) - self.s2p(0.000))
 
         return basic_unit
 

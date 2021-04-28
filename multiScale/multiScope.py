@@ -3,6 +3,7 @@ import time
 import os
 import atexit
 import threading
+import numpy as np
 
 import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.napari_in_subprocess as napari
@@ -46,6 +47,7 @@ class multiScopeModel:
         self.stack_nbplanes =0
         self.stack_buffer = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
         self.stack_buffer.fill(0)
+        self.filepath = 'D:/acquisitions/testimage.tif'
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -111,7 +113,7 @@ class multiScopeModel:
 
     def _init_display(self):
         print("Initializing display...")
-        self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop= napari._napari_child_loop, close_method_name='close')
+        #self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop= napari._napari_child_loop, close_method_name='close')
 
         print("done with display.")
 
@@ -122,6 +124,7 @@ class multiScopeModel:
         self.names_to_voltage_channels = NI_board_parameters.names_to_voltage_channels
         print("Initializing ao card...", end=' ')
 
+        #"ao0/stage", "ao5/camera", "ao6/remote mirror", "ao8/laser", "ao11", "ao14", "ao18"
         line_selection = "Dev1/ao0, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14, Dev1/ao18"
         ao_type = '6738'
         ao_nchannels = 7
@@ -281,20 +284,53 @@ class multiScopeModel:
         # choose right filter wheel position
         # set remote mirror to right position
         # set flip mirror to right position
+        def acquire_task(custody):
+            #prepare camera for stack acquisition
+            self.lowres_camera.prepare_stack_acquisition()
 
-        #prepare camera for stack acquisition
-        self.lowres_camera.prepare_stack_acquisition()
+            #prepare voltage array
+            basic_unit = self.ao.get_voltage_array()
+            control_array = np.tile(basic_unit, (self.stack_nbplanes, 1))
 
-        #prepare voltage array
-        basic_unit = self.ao.get_voltage_array()
+            print(print(control_array[1:10,:]))
+
+            custody.switch_from(None, to=self.lowres_camera)
 
 
-        #set up camera for acquisition
-        self.lowres_camera.run_stack_aquisition_buffer(self.stack_nbplanes, self.stack_buffer)
+            #play voltage
+            #voltagethread = ct.ResultThread(target = self.ao.play_voltages,
+            #    args=(control_array,), kwargs={'force_final_zeros': True, 'block': False}).start()
+            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages,
+                                            args=(control_array,),
+                                            ).start()
 
-        #play voltage
+            # set up camera for acquisition
+            # camera_thread = ct.ResultThread(target=self.lowres_camera.run_stack_aquisition_buffer,
+            #     args=(self.stack_nbplanes, self.stack_buffer,)).start()
 
-        #save image
+            camera_thread = ct.ResultThread(target=self.lowres_camera.run_stack_acquisition_buffer,
+                                            kwargs={'nb_planes': self.stack_nbplanes, 'out': self.stack_buffer}).start()
+
+            write_voltages_thread.get_result()
+            print("Ready to play voltages")
+            self.ao.play_voltages(block=False)
+
+            custody.switch_from(self.lowres_camera, to=None)
+            # save image
+            try:
+                imwrite(self.filepath, self.stack_buffer)
+            except:
+                print("couldn't save image")
+
+            custody.switch_from(None, to=self.display)
+            self.display.show_stack(self.stack_buffer)
+            custody.switch_from(self.display, to=None)
+
+        acquire_thread = ct.CustodyThread(
+            target=acquire_task, first_resource=self.lowres_camera).start()
+
+
+
 
 
 if __name__ == '__main__':
