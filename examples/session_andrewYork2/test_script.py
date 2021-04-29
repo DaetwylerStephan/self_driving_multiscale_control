@@ -9,9 +9,9 @@ if __name__ == '__main__':
     display = napari.display()
     initialtime = time.perf_counter()
     list_images = []
-    for i in range(0,1):
-        out = ct.SharedNDArray(shape=(100, 2048, 2060), dtype='uint16')
-        out[:] = np.random.randint(0, 2 ** 16, size=(100, 2048, 2060), dtype='uint16')
+    for i in range(0,100):
+        out = ct.SharedNDArray(shape=(5, 2048, 2060), dtype='uint16')
+        out[:] = np.random.randint(0, 2 ** 16, size=out.shape, dtype='uint16')
         list_images.append(out)
 
     endtime = time.perf_counter()-initialtime

@@ -92,17 +92,17 @@ class Photo_Camera:
             time.sleep(0.001)
 
             try:
-                #frame, fps, frame_count = self.cam.poll_frame2(out[framesReceived,:,:])
-                frame, fps, frame_count = self.cam.poll_frame()
+                frame, fps, frame_count = self.cam.poll_frame2(out[framesReceived,:,:])
+                #frame, fps, frame_count = self.cam.poll_frame()
                 print('Count: {} FPS: {} First five pixels of frame: {}'.format(frame_count, round(fps, 2),
                                                                                 frame['pixel_data'][0, 0:5]))
-                out[framesReceived, :, :] = frame
+                #out[framesReceived, :, :] = frame
 
                 framesReceived += 1
             except Exception as e:
                 print(str(e))
 
-        #self.cam.finish()
+        self.cam.finish()
 
     def apply_preview_settings_PrimeExpress(self):
         """Changes the settings of the Iris camera to preview acquisitions."""
@@ -156,8 +156,8 @@ class Photo_Camera:
 
 
 if __name__ == '__main__':
-    #camera = Photo_Camera('PMUSBCam00')
-    camera = Photo_Camera('PMPCIECam00')
+    camera = Photo_Camera('PMUSBCam00')
+    # camera = Photo_Camera('PMPCIECam00')
 
     camera.take_snapshot(20)
     camera.getinfo()

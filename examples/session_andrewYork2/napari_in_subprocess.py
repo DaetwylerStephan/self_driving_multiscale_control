@@ -37,10 +37,11 @@ class _NapariDisplay:
         self.viewer = napari.Viewer()
 
     def show_image(self, im):
-        if not hasattr(self, 'image'):
-            self.image = self.viewer.add_image(im)
-        else:
-            self.image.data = im
+        # if not hasattr(self, 'image'):
+        #     self.image = self.viewer.add_image(im)
+        # else:
+        #     self.image.data = im
+        pass
 
     def close(self):
         self.viewer.close()

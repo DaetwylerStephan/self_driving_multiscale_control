@@ -17,18 +17,24 @@ if __name__ == '__main__':
         out = np.random.randint(0, 2 ** 16, size=(1, 2048, 2060), dtype='uint16')
         list_images.append(out)
 
+    def updateimage():
+
+
     with napari.gui_qt():
         viewer = napari.Viewer()
-        layer = viewer.add_image(list_images[0], name="im")
+        layerimage = viewer.add_image(list_images[0], name="im")
 
         #input("press enter")
         t_0 = time.perf_counter()
 
 
         imagecounter =0
-        while True:
-            time.sleep(00.0005)
-            layer.data = list_images[imagecounter]
+        for i in range(0,1000):
+        #while True:
+            time.sleep(00.005)
+            layerimage.data = list_images[imagecounter]
+            layerimage.refresh()
+            viewer.reset_view()
             imagecounter =imagecounter +1
             if imagecounter ==100:
                 t_end = time.perf_counter() - t_0

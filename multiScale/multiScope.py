@@ -255,6 +255,7 @@ class multiScopeModel:
             self.initial_time = time.perf_counter()
 
             while self.continue_preview_highres:
+                imagecounter = 0
                 custody.switch_from(None, to=self.highres_camera)
                 which_buffer = self.high_res_buffers_queue.get()
                 data_buffer = self.high_res_buffers[which_buffer]
@@ -284,7 +285,13 @@ class multiScopeModel:
         # choose right filter wheel position
         # set remote mirror to right position
         # set flip mirror to right position
+
+
+
         def acquire_task(custody):
+
+            custody.switch_from(None, to=self.lowres_camera)
+
             #prepare camera for stack acquisition
             self.lowres_camera.prepare_stack_acquisition()
 
@@ -294,7 +301,6 @@ class multiScopeModel:
 
             print(print(control_array[1:10,:]))
 
-            custody.switch_from(None, to=self.lowres_camera)
 
 
             #play voltage
@@ -315,16 +321,24 @@ class multiScopeModel:
             print("Ready to play voltages")
             self.ao.play_voltages(block=False)
 
-            custody.switch_from(self.lowres_camera, to=None)
-            # save image
-            try:
-                imwrite(self.filepath, self.stack_buffer)
-            except:
-                print("couldn't save image")
+            camera_thread.get_result()
 
-            custody.switch_from(None, to=self.display)
+            custody.switch_from(self.lowres_camera, to=self.display)
+
+            def saveimage():
+                # save image
+                try:
+                    imwrite(self.filepath, self.stack_buffer) #can a thread change self.filepath ? Can someone change stack_buffer?
+                except:
+                    print("couldn't save image")
+
+            savethread = ct.ResultThread(target=saveimage).start()
+
             self.display.show_stack(self.stack_buffer)
+
             custody.switch_from(self.display, to=None)
+            savethread.get_result()
+
 
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
