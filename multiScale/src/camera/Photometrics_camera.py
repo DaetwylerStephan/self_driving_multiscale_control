@@ -51,8 +51,9 @@ class Photo_Camera:
 
     def run_stack_aquisition(self, nb_planes):
         """Changes the settings of the Iris camera to preview acquisitions."""
-        self.exp_mode = 'Edge Trigger'
+        self.cam.exp_mode = 'Edge Trigger'
         self.cam.exp_out_mode = "Any Rows"
+        self.cam.speed_table_index = 0
 
         # Collect frames in live mode
         self.cam.start_live()
@@ -72,35 +73,41 @@ class Photo_Camera:
 
         self.cam.finish()
 
-    def prepare_stack_acquisition(self):
+    def prepare_stack_acquisition(self, exposure_time=20):
         """Changes the settings of the camera to stack acquisitions."""
-        self.exp_mode = 'Edge Trigger'
+        self.cam.exp_mode = 'Edge Trigger'
         self.cam.exp_out_mode = "Any Row"
-
+        self.cam.speed_table_index = 0
 
         # Collect frames in live mode
-        self.cam.start_live(exp_time=20)
+        self.cam.start_live(exp_time=exposure_time)
         print("camera ready")
 
     def run_stack_acquisition_buffer(self, nb_planes, out):
         """Run a stack acquisition."""
 
+
         framesReceived = 0
-        print("******************cam ready***********************" + str(framesReceived))
+        testvar =0
+
+        print("******************cam ready***********************" + str(nb_planes))
 
         while framesReceived < nb_planes:
-            time.sleep(0.001)
+            time.sleep(0.004)
 
             try:
-                frame, fps, frame_count = self.cam.poll_frame2(out[framesReceived,:,:])
+                fps, frame_count = self.cam.poll_frame2(out=out[framesReceived,:,:])
                 #frame, fps, frame_count = self.cam.poll_frame()
-                print('Count: {} FPS: {} First five pixels of frame: {}'.format(frame_count, round(fps, 2),
-                                                                                frame['pixel_data'][0, 0:5]))
-                #out[framesReceived, :, :] = frame
+                #print('Count: {} FPS: {} First five pixels of frame: {}'.format(frame_count, round(fps, 2),
+                #                                                                frame['pixel_data'][0, 0:5]))
+                #out[framesReceived, :, :] = frame['pixel_data'][:]
 
                 framesReceived += 1
+                print(framesReceived)
             except Exception as e:
-                print(str(e))
+                if testvar ==0:
+                    testvar = 1
+                    print(str(e))
 
         self.cam.finish()
 
@@ -115,7 +122,7 @@ class Photo_Camera:
         self.cam.start_live(exp_time=exposure)
 
     def run_preview(self, out):
-        frame, fps, frame_count = self.cam.poll_frame2(out)
+        fps, frame_count = self.cam.poll_frame2(out)
 
     def end_preview(self):
         self.cam.finish()

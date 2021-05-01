@@ -37,7 +37,7 @@ def main():
     # Initialize PVCAM and find the first available camera.
     pvc.init_pvcam()
 
-    cam = [cam for cam in Camera.detect_camera()][1]
+    cam = [cam for cam in Camera.detect_camera()][0]
     cam.open()
     cam.speed_table_index = 0
     print(cam.name)

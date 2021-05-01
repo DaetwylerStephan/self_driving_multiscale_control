@@ -41,7 +41,7 @@ class multiScopeModel:
         self.initial_time = time.perf_counter()
 
         #parameters
-        self.exposure_time = 20
+        self.exposure_time = 200
         self.continue_preview_lowres = False
         self.continue_preview_highres = False
         self.stack_nbplanes =0
@@ -113,7 +113,7 @@ class multiScopeModel:
 
     def _init_display(self):
         print("Initializing display...")
-        #self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop= napari._napari_child_loop, close_method_name='close')
+        self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop= napari._napari_child_loop, close_method_name='close')
 
         print("done with display.")
 
@@ -201,25 +201,6 @@ class multiScopeModel:
             collected_tasks.append(th)
         return collected_tasks
 
-    def snap_task(self, custody):
-        custody.switch_from(None, to=self.lowres_camera)
-        which_buffer = self.data_buffer_queue.get()
-        data_buffer = self.data_buffers[which_buffer]
-        self.lowres_camera.record(out=data_buffer)
-        custody.switch_from(self.lowres_camera, to=self.display)
-        self.display.show_image(data_buffer)
-        custody.switch_from(self.display, to=None)
-        self.data_buffer_queue.put(which_buffer)
-        self.num_frames += 1
-        if self.num_frames == 100:
-            time_elapsed = time.perf_counter() - self.initial_time
-            print("%0.2f average FPS" % (self.num_frames / time_elapsed))
-            self.num_frames = 0
-            self.initial_time = time.perf_counter()
-
-    def snap(self):
-        th = ct.CustodyThread(first_resource=self.lowres_camera, target=self.snap_task)
-        return th.start()
 
     def preview_lowres(self):
         def preview_lowres_task(custody):
@@ -243,6 +224,7 @@ class multiScopeModel:
 
             self.lowres_camera.end_preview()
 
+
         self.continue_preview_lowres = True
         th = ct.CustodyThread(target=preview_lowres_task, first_resource=None)
         th.start()
@@ -250,22 +232,26 @@ class multiScopeModel:
 
     def preview_highres(self):
         def preview_highres_task(custody):
+
             self.highres_camera.set_up_preview(self.exposure_time)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
             while self.continue_preview_highres:
-                imagecounter = 0
-                custody.switch_from(None, to=self.highres_camera)
-                which_buffer = self.high_res_buffers_queue.get()
-                data_buffer = self.high_res_buffers[which_buffer]
-                self.highres_camera.run_preview(out=data_buffer)
-                custody.switch_from(self.highres_camera, to=self.display)
-                self.display.show_image_highres(data_buffer)
-                custody.switch_from(self.display, to=None)
-                self.high_res_buffers_queue.put(which_buffer)
+
                 self.num_frames += 1
+                custody.switch_from(None, to=self.highres_camera)
+                self.highres_camera.run_preview(out=self.high_res_buffer)
+
                 #calculate fps to display
+                if (self.num_frames % 3 ==0): #Napari can only display 20fps
+                    print(self.num_frames)
+                    custody.switch_from(self.highres_camera, to=self.display)
+                    self.display.show_image_highres(self.high_res_buffer)
+                    custody.switch_from(self.display, to=None)
+                else:
+                    custody.switch_from(self.highres_camera, to=None)
+
                 if self.num_frames == 100:
                     time_elapsed = time.perf_counter() - self.initial_time
                     print("%0.2f average FPS" % (self.num_frames / time_elapsed))
@@ -293,15 +279,13 @@ class multiScopeModel:
             custody.switch_from(None, to=self.lowres_camera)
 
             #prepare camera for stack acquisition
-            self.lowres_camera.prepare_stack_acquisition()
+            self.lowres_camera.prepare_stack_acquisition(self.exposure_time)
 
             #prepare voltage array
             basic_unit = self.ao.get_voltage_array()
             control_array = np.tile(basic_unit, (self.stack_nbplanes, 1))
 
             print(print(control_array[1:10,:]))
-
-
 
             #play voltage
             #voltagethread = ct.ResultThread(target = self.ao.play_voltages,

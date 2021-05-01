@@ -393,13 +393,15 @@ class Camera:
 
         if out.all() == None:
             frame['pixel_data'] = np.copy(frame['pixel_data']) #copy so that python and c don't access the same memory. With copy
+            return frame, fps, frame_count
         else:
             assert out.shape == frame['pixel_data'].shape
             assert out.dtype == frame['pixel_data'].dtype
-            out[:] = frame['pixel_data'] #doesn't remove python reference to c memory
+            out[:] = frame['pixel_data'][:] #doesn't remove python reference to c memory
             del frame['pixel_data'] #should remove reference
+            return fps, frame_count
 
-        return frame, fps, frame_count
+
 
     def get_frame(self, exp_time=None):
         """Calls the pvc.get_frame function with the current camera settings.

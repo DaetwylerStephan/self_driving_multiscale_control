@@ -116,14 +116,20 @@ class MultiScale_Microscope_Controller():
 
     def automatically_update_stackbuffer(self):
         print("update stack")
-        try:
-            self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
-            if self.stack_buffer_nb != self.current_stackbuffersize:
-                self.stack_buffer.fill(0)
-                self.current_stackbuffersize = self.stack_buffer_nb
-        except:
-            print("update error")
-        self.root.after(5000, self.automatically_update_stackbuffer)
+
+        def update_stackbuffer():
+            try:
+                    self.stack_buffer.fill(0)
+                    self.current_stackbuffersize = self.stack_buffer_nb
+            except:
+                print("update error")
+
+        self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
+
+        if self.stack_buffer_nb != self.current_stackbuffersize:
+            ct.ResultThread(target=update_stackbuffer).start()
+
+        #self.root.after(5000, self.automatically_update_stackbuffer)
 
     def acquire_stack(self, event):
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
