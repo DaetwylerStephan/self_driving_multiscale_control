@@ -69,7 +69,7 @@ class multiScopeModel:
 
         #start initializing all hardware component here by calling the initialization from a ResultThread
         lowres_camera_init = ct.ResultThread(target=self._init_lowres_camera).start() #~3.6s
-        highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
+        #highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
         self._init_display() #~1.3s
 
 
@@ -84,7 +84,7 @@ class multiScopeModel:
 
         #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.get_result()
-        highres_camera_init.get_result()
+        #highres_camera_init.get_result()
         # filterwheel_init.get_result()
         # trans_stage_init.get_result()
         # rot_stage_init.get_result()

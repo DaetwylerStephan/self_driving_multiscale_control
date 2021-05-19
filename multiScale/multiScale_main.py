@@ -43,6 +43,9 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.stack_aq_numberOfPlanes.trace_add("write", self.updateNbPlanes)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
+        self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.run_stop_preview())#1
+        self.view.runtab.timelapse_aq_progressindicator.bind("<Button>", self.run_stop_preview())#2
+
 
         #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)

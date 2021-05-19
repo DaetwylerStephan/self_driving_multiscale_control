@@ -86,7 +86,7 @@ class SLC_translationstage:
 
             ctl.SetProperty_i32(self.d_handle, channel, ctl.Property.REFERENCING_OPTIONS, 0)
             # Set velocity to 1mm/s
-            ctl.SetProperty_i64(self.d_handle, channel, ctl.Property.MOVE_VELOCITY, 1000000000)
+            ctl.SetProperty_i64(self.d_handle, channel, ctl.Property.MOVE_VELOCITY, 2000000000)
             # Set acceleration to 10mm/s2.
             ctl.SetProperty_i64(self.d_handle, channel, ctl.Property.MOVE_ACCELERATION, 10000000000)
             # Start referencing sequence
@@ -543,9 +543,11 @@ class SLC_translationstage:
         self.stream_done.clear()
         self.stream_abort.clear()
 
+        #get starting position for stream
         startPosition = ctl.GetProperty_i64(self.d_handle, 0, ctl.Property.POSITION)
         print(startPosition)
 
+        #generate array with relative positions to starting value based on the chosen increment
         stream_buffer = []
         for frame_idx in range(no_of_frames):
             frame = [int(0), int(startPosition + frame_idx * increment)]
@@ -554,7 +556,6 @@ class SLC_translationstage:
         stream_buffer.append([int(0), startPosition])
 
         try:
-
             # Spawn a thread to receive events from the controller.
             event_handle_thread = Thread(target=self.waitForEvent_stream)
             event_handle_thread.start()
@@ -566,7 +567,7 @@ class SLC_translationstage:
 
             print("Set trigger condition to rising edge.")
             ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.DEV_INPUT_TRIG_CONDITION, ctl.TriggerCondition.RISING)
-            print("Configure input trigger mode to emergency stop mode.")
+            print("Configure input trigger mode to stream mode.")
             ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.DEV_INPUT_TRIG_MODE,
                                 ctl.DeviceInputTriggerMode.STREAM)
 
@@ -577,7 +578,6 @@ class SLC_translationstage:
             # Set stream base rate to 1kHz
             ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_BASE_RATE, 1000)
             # Prepare for streaming, select desired trigger mode
-            # (using STREAM_TRIGGER_MODE_DIRECT starts the stream as soon as enough frames were sent to the device)
             s_handle = ctl.OpenStream(self.d_handle, ctl.StreamTriggerMode.EXTERNAL)
             # Send all frames in a loop
             # Note: the "AbortStream" function could be used to abort a running stream programmatically.
