@@ -495,6 +495,10 @@ class SLC_translationstage:
             #ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.POSITION, 0)
             ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.SENSOR_POWER_MODE, ctl.SensorPowerMode.ENABLED)
             ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.AMPLIFIER_ENABLED, ctl.TRUE)
+            #ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_VELOCITY, 100000000000)
+            ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_VELOCITY, 0)
+
+            ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_ACCELERATION, 100000000000)
 
             # Configure stream (optional)
             # Note: the stream rate must be a whole-number multiplier of the external sync rate.
@@ -538,7 +542,7 @@ class SLC_translationstage:
             print("Unexpected error: {}, {} in line: {}".format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))
             raise
 
-    def streamStackAcquisition_externalTrigger(self, no_of_frames, increment):
+    def streamStackAcquisition_externalTrigger_setup(self, no_of_frames, increment):
 
         self.stream_done.clear()
         self.stream_abort.clear()
@@ -557,8 +561,8 @@ class SLC_translationstage:
 
         try:
             # Spawn a thread to receive events from the controller.
-            event_handle_thread = Thread(target=self.waitForEvent_stream)
-            event_handle_thread.start()
+            self.event_handle_thread_triggeredStream = Thread(target=self.waitForEvent_stream)
+            self.event_handle_thread_triggeredStream.start()
 
             # Set enable amplifier
             # Sensor power mode: enabled (disable power save, which is not allowed with position streaming)
@@ -571,6 +575,39 @@ class SLC_translationstage:
             ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.DEV_INPUT_TRIG_MODE,
                                 ctl.DeviceInputTriggerMode.STREAM)
 
+            # print("set output trigger to report when target reached")
+            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.IO_MODULE_VOLTAGE, ctl.IOModuleVoltage.VOLTAGE_3V3)
+            # # Enable the digital output driver circuit of the I/O module.
+            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.IO_MODULE_OPTIONS, ctl.IOModuleOption.DIGITAL_OUTPUT_ENABLED)
+            #
+
+            #position compare
+            result = ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_START_THRESHOLD, startPosition)
+            if (result):
+                print("get result 1")
+            result = ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_INCREMENT, increment)
+            result = ctl.SetProperty_i32(self.d_handle,0, ctl.Property.CH_POS_COMP_DIRECTION, ctl.EITHER_DIRECTION)
+            # disable limits
+            ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_LIMIT_MIN, 0)
+            ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_LIMIT_MAX, 0)
+            if (result):
+                print("get result 2")
+            result = ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_POLARITY, ctl.TriggerPolarity.ACTIVE_HIGH)
+            if (result):
+                print("get result 4")
+            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_PULSE_WIDTH, 5000000)
+            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_MODE, ctl.ChannelOutputTriggerMode.POSITION_COMPARE)
+
+
+
+            # ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_POLARITY, ctl.TriggerPolarity.ACTIVE_HIGH)
+            # ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_PULSE_WIDTH, 1000000)
+            # ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_MODE, ctl.ChannelOutputTriggerMode.TARGET_REACHED)
+            #ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_MODE, ctl.ChannelOutputTriggerMode.ACTIVELY_MOVING)
+
+
+
+
             # Configure stream (optional)
             # Note: the stream rate must be a whole-number multiplier of the external sync rate.
             # Set external sync rate to 100Hz (only active when using trigger mode STREAM_TRIGGER_MODE_EXTERNAL_SYNC)
@@ -581,7 +618,7 @@ class SLC_translationstage:
             s_handle = ctl.OpenStream(self.d_handle, ctl.StreamTriggerMode.EXTERNAL)
             # Send all frames in a loop
             # Note: the "AbortStream" function could be used to abort a running stream programmatically.
-            for frame_idx in range(no_of_frames + 1):
+            for frame_idx in stream_buffer:
                 # The "waitForEvent" thread received an "abort" event.
                 if self.stream_abort.isSet():
                     break
@@ -589,17 +626,11 @@ class SLC_translationstage:
                 # target positions for all channels that participate in the trajectory.
                 # The frame data list must have the structure:
                 # <chA>,<posA,<chB>,<posB>
-                frame = stream_buffer[frame_idx]
+                frame = frame_idx
                 ctl.StreamFrame(self.d_handle, s_handle, frame)
 
             # All frames sent, close stream
             ctl.CloseStream(self.d_handle, s_handle)
-            # Wait for the "stream done" event.
-            self.stream_done.wait()
-            # Cancel waiting for events.
-            ctl.Cancel(self.d_handle)
-            # Wait for the "waitForEvent" thread to terminate.
-            event_handle_thread.join()
 
         except ctl.Error as e:
             # Passing an error code to "GetResultInfo" returns a human readable string
@@ -612,6 +643,13 @@ class SLC_translationstage:
             print("Unexpected error: {}, {} in line: {}".format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))
             raise
 
+    def streamStackAcquisition_externalTrigger_waitEnd(self):
+        # Wait for the "stream done" event.
+        self.stream_done.wait()
+        # Cancel waiting for events.
+        ctl.Cancel(self.d_handle)
+        # Wait for the "waitForEvent" thread to terminate.
+        self.event_handle_thread_triggeredStream.join()
 
 if __name__ == '__main__':
     ##test here code of this class
