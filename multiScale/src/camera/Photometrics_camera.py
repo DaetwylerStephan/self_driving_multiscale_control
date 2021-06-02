@@ -83,6 +83,9 @@ class Photo_Camera:
         self.cam.start_live(exp_time=exposure_time)
         print("camera ready")
 
+    def return_camera_readouttime(self):
+        return self.cam.readout_time
+
     def run_stack_acquisition_buffer(self, nb_planes, out):
         """Run a stack acquisition."""
 
