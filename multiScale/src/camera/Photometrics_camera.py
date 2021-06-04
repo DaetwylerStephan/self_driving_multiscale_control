@@ -86,31 +86,19 @@ class Photo_Camera:
     def return_camera_readouttime(self):
         return self.cam.readout_time
 
-    def run_stack_acquisition_buffer(self, nb_planes, out):
+    def run_stack_acquisition_buffer(self, nb_planes, buffer):
         """Run a stack acquisition."""
-
-
         framesReceived = 0
-        testvar =0
-
-        print("******************cam ready***********************" + str(nb_planes))
-
         while framesReceived < nb_planes:
-            time.sleep(0.004)
+            # time.sleep(0.001)
 
             try:
-                fps, frame_count = self.cam.poll_frame2(out=out[framesReceived,:,:])
-                #frame, fps, frame_count = self.cam.poll_frame()
-                #print('Count: {} FPS: {} First five pixels of frame: {}'.format(frame_count, round(fps, 2),
-                #                                                                frame['pixel_data'][0, 0:5]))
-                #out[framesReceived, :, :] = frame['pixel_data'][:]
-
+                fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
                 framesReceived += 1
-                print(framesReceived)
+                print("{}:{}".format(framesReceived, fps))
             except Exception as e:
-                if testvar ==0:
-                    testvar = 1
-                    print(str(e))
+                print(str(e))
+                break
 
         self.cam.finish()
 

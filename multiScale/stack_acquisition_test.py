@@ -17,6 +17,8 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
     ####################------handled by init at beginning
     # camera init
     camera = Photometricscamera.Photo_Camera('PMPCIECam00')
+    #camera = Photometricscamera.Photo_Camera('PMUSBCam00')
+
     #init stages
     stage_id = Stage_parameters.stage_id_XYZ
     XYZ_stage = TransStage.SLC_translationstage(stage_id)
@@ -36,7 +38,7 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
         num_channels=4,
         rate=2e4,
         daq_type='6738',
-        line="Dev1/ao0, Dev1/ao5, Dev1/ao8, Dev1/ao12",
+        line="Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao12",
         verbose=True)
 
     delay_cameratrigger = 0.001 #the time given for the stage to move to the new position
@@ -44,6 +46,7 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
     #the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
     #exposure time, depending on the number of rows that are imaged
     nb_rows = 2960
+    #nb_rows = 2480
     line_digitization_time = 0.01026
     readout_time = nb_rows * line_digitization_time
 
@@ -61,6 +64,8 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
 
     #init memory
     low_res_buffer = ct.SharedNDArray(shape=(frames_unit, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+    # low_res_buffer.fill(0)
+    #low_res_buffer = ct.SharedNDArray(shape=(frames_unit, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
     low_res_buffer.fill(0)
 
     #position_list = [1000000000, 2000000000, 8000000000]
@@ -79,20 +84,7 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
     stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
 
     def start_camera_stream():
-
-        framesReceived = 0
-        while framesReceived < frames_unit:
-            #time.sleep(0.001)
-
-            try:
-                fps, frame_count = camera.cam.poll_frame2(out=low_res_buffer[framesReceived,:,:])
-                framesReceived += 1
-                print("{}:{}".format(framesReceived, fps))
-            except Exception as e:
-                print(str(e))
-                break
-
-
+        camera.run_stack_acquisition_buffer(frames_unit, low_res_buffer)
     camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
 
     #init voltage - write them

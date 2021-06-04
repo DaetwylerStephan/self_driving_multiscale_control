@@ -44,10 +44,14 @@ class multiScopeModel:
         self.exposure_time = 200
         self.continue_preview_lowres = False
         self.continue_preview_highres = False
-        self.stack_nbplanes =0
-        self.stack_buffer = ct.SharedNDArray(shape=(200, 2000, 2000), dtype='uint16')
-        self.stack_buffer.fill(0)
+        self.stack_nbplanes =200
+        self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+        self.stack_buffer_lowres.fill(0)
+        self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
+        self.stack_buffer_highres.fill(0)
         self.filepath = 'D:/acquisitions/testimage.tif'
+        self.planespacing = 10000000
+        self.ao_nchannels = 7
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -69,14 +73,14 @@ class multiScopeModel:
 
         #start initializing all hardware component here by calling the initialization from a ResultThread
         lowres_camera_init = ct.ResultThread(target=self._init_lowres_camera).start() #~3.6s
-        #highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
+        highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
         self._init_display() #~1.3s
 
 
         #initialize stages and stages in ResultThreads
-        #trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start() #~0.4s
-        #rot_stage_init = ct.ResultThread(target=self._init_rotation_stage).start()
-        #filterwheel_init = ct.ResultThread(target=self._init_filterwheel).start()  # ~5.3s
+        trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start() #~0.4s
+        rot_stage_init = ct.ResultThread(target=self._init_rotation_stage).start()
+        filterwheel_init = ct.ResultThread(target=self._init_filterwheel).start()  # ~5.3s
 
 
         self._init_ao()  # ~0.2s
@@ -84,10 +88,10 @@ class multiScopeModel:
 
         #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.get_result()
-        #highres_camera_init.get_result()
-        # filterwheel_init.get_result()
-        # trans_stage_init.get_result()
-        # rot_stage_init.get_result()
+        highres_camera_init.get_result()
+        filterwheel_init.get_result()
+        trans_stage_init.get_result()
+        rot_stage_init.get_result()
 
         print('Finished initializing multiScope')
 
@@ -124,10 +128,10 @@ class multiScopeModel:
         self.names_to_voltage_channels = NI_board_parameters.names_to_voltage_channels
         print("Initializing ao card...", end=' ')
 
-        #"ao0/stage", "ao5/camera", "ao6/remote mirror", "ao8/laser", "ao11", "ao14", "ao18"
+        #"ao0/highrescamera", "ao5/lowrescamera", "ao6/stage", "ao8/laser", "ao11", "ao14", "ao18"
         line_selection = "Dev1/ao0, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14, Dev1/ao18"
         ao_type = '6738'
-        ao_nchannels = 7
+        ao_nchannels = self.ao_nchannels
         rate = 2e4
 
         self.ao = ni.Analog_Out(
@@ -173,7 +177,7 @@ class multiScopeModel:
         print("Initializing rotation stage...")
         stage_id = Stage_parameters.stage_id_rot
         self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
-        self.rotationstage.ManualMove()
+        #self.rotationstage.ManualMove()
         print("done with XY stage.")
         atexit.register(self.rotationstage.close)
 
@@ -272,63 +276,158 @@ class multiScopeModel:
         # set remote mirror to right position
         # set flip mirror to right position
 
-
-
         def acquire_task(custody):
 
             custody.switch_from(None, to=self.lowres_camera)
 
-            #prepare camera for stack acquisition
-            self.lowres_camera.prepare_stack_acquisition(self.exposure_time)
+            delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+            # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
+            # exposure time, depending on the number of rows that are imaged
+            nb_rows = 2960
+            # nb_rows = 2480
+            line_digitization_time = 0.01026
+            readout_time = nb_rows * line_digitization_time
 
             #prepare voltage array
-            basic_unit = self.ao.get_voltage_array()
-            control_array = np.tile(basic_unit, (self.stack_nbplanes, 1))
+            # calculate minimal unit duration
+            minimal_trigger_timeinterval = self.exposure_time / 1000 + readout_time / 1000 + delay_cameratrigger
 
-            print(print(control_array[1:10,:]))
+            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), self.ao_nchannels), np.dtype(np.float64))
+            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
+            basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
 
-            #play voltage
-            #voltagethread = ct.ResultThread(target = self.ao.play_voltages,
-            #    args=(control_array,), kwargs={'force_final_zeros': True, 'block': False}).start()
-            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages,
-                                            args=(control_array,),
+            control_array = np.tile(basic_unit, (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
+
+            #write voltages
+            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
                                             ).start()
 
-            # set up camera for acquisition
-            # camera_thread = ct.ResultThread(target=self.lowres_camera.run_stack_aquisition_buffer,
-            #     args=(self.stack_nbplanes, self.stack_buffer,)).start()
+            #data allocation correct?
+            low_res_buffer = ct.SharedNDArray(
+                 shape=(self.stack_nbplanes, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
+                 dtype='uint16')
+            low_res_buffer.fill(0)
 
-            camera_thread = ct.ResultThread(target=self.lowres_camera.run_stack_acquisition_buffer,
-                                            kwargs={'nb_planes': self.stack_nbplanes, 'out': self.stack_buffer}).start()
+            #set up stage
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes, self.planespacing)
 
-            write_voltages_thread.get_result()
-            print("Ready to play voltages")
-            self.ao.play_voltages(block=False)
+            # prepare camera for stack acquisition
+            self.lowres_camera.prepare_stack_acquisition(self.exposure_time)
 
-            camera_thread.get_result()
+            # start thread on stage to wait for trigger
+            def start_stage_stream():
+                self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
+            stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
+
+            def start_camera_stream():
+                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes, low_res_buffer)
+
+            camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
+
+            # play voltages
+            # you need to use "block true" as otherwise the program finishes without playing the voltages really
+            self.ao.play_voltages(block=True)
+            stream_thread.get_result()
+            camera_stream_thread.get_result()
 
             custody.switch_from(self.lowres_camera, to=self.display)
 
             def saveimage():
                 # save image
                 try:
-                    imwrite(self.filepath, self.stack_buffer) #can a thread change self.filepath ? Can someone change stack_buffer?
+                    imwrite(self.filepath, low_res_buffer) #can a thread change self.filepath ? Can someone change stack_buffer?
+                except:
+                    print("couldn't save image")
+            savethread = ct.ResultThread(target=saveimage).start()
+
+            self.display.show_stack(low_res_buffer)
+
+            custody.switch_from(self.display, to=None)
+            savethread.get_result()
+
+        acquire_thread = ct.CustodyThread(
+            target=acquire_task, first_resource=self.lowres_camera).start()
+
+    def acquire_stack_highres(self):
+
+        # move stage to start position
+        # choose right filter wheel position
+        # set remote mirror to right position
+        # set flip mirror to right position
+
+        def acquire_task(custody):
+
+            custody.switch_from(None, to=self.highres_camera)
+
+            delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+            # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
+            # exposure time, depending on the number of rows that are imaged
+            nb_rows = 2480
+            line_digitization_time = 0.01026
+            readout_time = nb_rows * line_digitization_time
+
+            # prepare voltage array
+            # calculate minimal unit duration
+            minimal_trigger_timeinterval = self.exposure_time / 1000 + readout_time / 1000 + delay_cameratrigger
+
+            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), self.ao_nchannels), np.dtype(np.float64))
+            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002),
+            0] = 4.  # highrescamera - ao0
+            basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
+
+            control_array = np.tile(basic_unit,
+                                    (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
+
+            # write voltages
+            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
+                                                    ).start()
+
+            # data allocation correct?
+            # low_res_buffer = ct.SharedNDArray(
+            #     shape=(self.stack_nbplanes, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel),
+            #     dtype='uint16')
+            # low_res_buffer.fill(0)
+
+            # set up stage
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes, self.planespacing)
+
+            # prepare high res camera for stack acquisition
+            self.highres_camera.prepare_stack_acquisition(self.exposure_time)
+
+            # start thread on stage to wait for trigger
+            def start_stage_stream():
+                self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
+
+            stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
+
+            def start_camera_stream():
+                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes, low_res_buffer)
+
+            # play voltages
+            # you need to use "block true" as otherwise the program finishes without playing the voltages really
+            self.ao.play_voltages(block=True)
+            stream_thread.get_result()
+            camera_stream_thread.get_result()
+
+            custody.switch_from(self.highres_camera, to=self.display)
+
+            def saveimage():
+                # save image
+                try:
+                    imwrite(self.filepath,
+                            self.stack_buffer_highres)  # can a thread change self.filepath ? Can someone change stack_buffer?
                 except:
                     print("couldn't save image")
 
             savethread = ct.ResultThread(target=saveimage).start()
 
-            self.display.show_stack(self.stack_buffer)
+            self.display.show_stack(self.stack_buffer_highres)
 
             custody.switch_from(self.display, to=None)
             savethread.get_result()
 
-
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
-
-
-
 
 
 if __name__ == '__main__':
