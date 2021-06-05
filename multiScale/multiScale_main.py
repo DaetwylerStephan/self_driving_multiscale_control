@@ -31,7 +31,7 @@ class MultiScale_Microscope_Controller():
 
         #buttons run tab
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
-        self.view.runtab.bt_preview_highres.bind("<Button>", self.run_highrespreview)
+        self.view.runtab.bt_preview_highres.bind("<ButtonRelease>", self.run_highrespreview)
         self.view.runtab.bt_preview_stop.bind("<Button>", self.run_stop_preview)
         self.view.runtab.bt_changeTo488.bind("<Button>", lambda event: self.changefilter(event, '488', '488_filter'))
         self.view.runtab.bt_changeTo552.bind("<Button>", lambda event: self.changefilter(event, '552', '552_filter'))
@@ -70,25 +70,54 @@ class MultiScale_Microscope_Controller():
     def close(self):
         self.model.close()
 
-    ##here follow the call to the functions of the model (microscope) that were bound above:
-
-    def run_lowrespreview(self, event):
-        if self.model.continue_preview_lowres == False:
-            self.model.continue_preview_lowres = True
-            self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
-            print("running preview")
-            self.view.after(10, self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres))
-            self.model.preview_lowres()
-
     def wait_forInput(self):
         print("All 'snap' threads finished execution.")
         input('Hit enter to close napari...')
+    ##here follow the call to the functions of the model (microscope) that were bound above:
+
+    def run_lowrespreview(self, event):
+        '''
+        Runs the execution of a low resolution preview.
+        Required:
+        change mirror, set exposure time, start preview, set continue_preview_highres to True.
+        '''
+        if self.model.continue_preview_lowres == False:
+
+            # set parameter that you run a preview
+            self.model.continue_preview_lowres = True
+
+            #set button layout - sunken relief
+            def set_button():
+                time.sleep(0.002)
+                self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
+            ct.ResultThread(target=set_button).start()
+
+            #run preview with given parameters
+            self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
+            self.model.preview_lowres()
+            print("running lowres preview")
 
     def run_highrespreview(self, event):
-        self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
-        print("running preview")
-        #self.model.preview_lowres() // this gives an error!
-        self.model.preview_highres()
+        '''
+        Runs the execution of a high resolution preview.
+        Required:
+        change mirror, set exposure time, start preview, set continue_preview_highres to True.
+        '''
+        if self.model.continue_preview_highres == False:
+            # set parameter that you run a preview
+            self.model.continue_preview_highres = True
+            #set button layout - sunken relief
+            def set_buttonHR():
+                time.sleep(0.002)
+                self.view.runtab.bt_preview_highres.config(relief="sunken")
+
+            ct.ResultThread(target=set_buttonHR).start()
+
+            #run preview with given parameters
+            self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get() # set exposure time
+            self.model.preview_highres()
+            print("running high res preview")
+
 
     def run_stop_preview(self, event):
       '''
@@ -144,6 +173,8 @@ class MultiScale_Microscope_Controller():
 
         #set model parameters
         self.model.stack_nbplanes = self.view.runtab.stack_aq_numberOfPlanes.get()
+        self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
+        self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
 
         self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),
                                               Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),

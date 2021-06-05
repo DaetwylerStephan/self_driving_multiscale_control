@@ -318,12 +318,6 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo_trans.config(relief="raised")
         button.config(relief="sunken")
 
-    def preview_change(self, button):
-        if (button.cget('relief') == "sunken"):
-            button.config(relief="raised")
-        else:
-            button.config(relief="sunken")
-
     def sunk_timelapseButton(self, event):
         print("sink timelapse button")
         self.bt_run_timelapse.config(relief="sunken")

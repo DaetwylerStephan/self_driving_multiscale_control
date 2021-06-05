@@ -41,7 +41,8 @@ class multiScopeModel:
         self.initial_time = time.perf_counter()
 
         #parameters
-        self.exposure_time = 200
+        self.exposure_time_HR = 200
+        self.exposure_time_LR = 200
         self.continue_preview_lowres = False
         self.continue_preview_highres = False
         self.stack_nbplanes =200
@@ -208,7 +209,7 @@ class multiScopeModel:
 
     def preview_lowres(self):
         def preview_lowres_task(custody):
-            self.lowres_camera.set_up_preview(self.exposure_time)
+            self.lowres_camera.set_up_preview(self.exposure_time_LR)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
@@ -237,7 +238,7 @@ class multiScopeModel:
     def preview_highres(self):
         def preview_highres_task(custody):
 
-            self.highres_camera.set_up_preview(self.exposure_time)
+            self.highres_camera.set_up_preview(self.exposure_time_HR)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
@@ -248,8 +249,8 @@ class multiScopeModel:
                 self.highres_camera.run_preview(out=self.high_res_buffer)
 
                 #calculate fps to display
-                if (self.num_frames % 3 ==0): #Napari can only display 20fps
-                    print(self.num_frames)
+                #if (self.num_frames % 2 ==0): #Napari can only display 20fps
+                if 1==1:
                     custody.switch_from(self.highres_camera, to=self.display)
                     self.display.show_image_highres(self.high_res_buffer)
                     custody.switch_from(self.display, to=None)
@@ -290,7 +291,7 @@ class multiScopeModel:
 
             #prepare voltage array
             # calculate minimal unit duration
-            minimal_trigger_timeinterval = self.exposure_time / 1000 + readout_time / 1000 + delay_cameratrigger
+            minimal_trigger_timeinterval = self.exposure_time_LR / 1000 + readout_time / 1000 + delay_cameratrigger
 
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), self.ao_nchannels), np.dtype(np.float64))
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
@@ -312,7 +313,7 @@ class multiScopeModel:
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes, self.planespacing)
 
             # prepare camera for stack acquisition
-            self.lowres_camera.prepare_stack_acquisition(self.exposure_time)
+            self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
 
             # start thread on stage to wait for trigger
             def start_stage_stream():
@@ -368,7 +369,7 @@ class multiScopeModel:
 
             # prepare voltage array
             # calculate minimal unit duration
-            minimal_trigger_timeinterval = self.exposure_time / 1000 + readout_time / 1000 + delay_cameratrigger
+            minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + delay_cameratrigger
 
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), self.ao_nchannels), np.dtype(np.float64))
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002),
@@ -392,16 +393,17 @@ class multiScopeModel:
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes, self.planespacing)
 
             # prepare high res camera for stack acquisition
-            self.highres_camera.prepare_stack_acquisition(self.exposure_time)
+            self.highres_camera.prepare_stack_acquisition(self.exposure_time_HR)
 
             # start thread on stage to wait for trigger
             def start_stage_stream():
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
-
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
 
+            #start thread so that camera waits for trigger
             def start_camera_stream():
-                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes, low_res_buffer)
+                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes, low_res_buffer)
+            camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
 
             # play voltages
             # you need to use "block true" as otherwise the program finishes without playing the voltages really
