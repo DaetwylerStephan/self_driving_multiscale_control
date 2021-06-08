@@ -9,6 +9,7 @@ from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
 import auxiliary_code.concurrency_tools as ct
 from constants import Camera_parameters
+from constants import NI_board_parameters
 
 
 class MultiScale_Microscope_Controller():
@@ -45,6 +46,10 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.run_stop_preview)#1
         self.view.runtab.timelapse_aq_progressindicator.bind("<Button>", self.run_stop_preview)#2
+        self.view.runtab.laser488_percentage.trace_add("read", self.updateLaserPower)
+        self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserPower)
+        self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserPower)
+        self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserPower)
 
 
         #buttons stage tab
@@ -54,7 +59,7 @@ class MultiScale_Microscope_Controller():
         #define some parameters
         self.current_stackbuffersize = self.view.runtab.stack_aq_numberOfPlanes.get()
         self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
-
+        self.current_laser = "488"
 
     def run(self):
         """
@@ -85,6 +90,7 @@ class MultiScale_Microscope_Controller():
 
             # set parameter that you run a preview
             self.model.continue_preview_lowres = True
+            self.model.laserOn = self.current_laser
 
             #set button layout - sunken relief
             def set_button():
@@ -106,6 +112,7 @@ class MultiScale_Microscope_Controller():
         if self.model.continue_preview_highres == False:
             # set parameter that you run a preview
             self.model.continue_preview_highres = True
+            self.model.laserOn = self.current_laser
             #set button layout - sunken relief
             def set_buttonHR():
                 time.sleep(0.002)
@@ -133,9 +140,30 @@ class MultiScale_Microscope_Controller():
 
 
     def changefilter(self, event, laser, filter):
-        print("filter " + filter)
-        self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
-        print("laser " + laser)
+        print("filter " + filter + ", laser: "+ laser)
+        if laser == '488':
+            self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
+            self.model.current_laser = NI_board_parameters.laser488
+        if laser == '552':
+            self.model.filterwheel.set_filter('572/20-25', wait_until_done=False)
+            self.model.current_laser = NI_board_parameters.laser552
+        if laser == '594':
+            self.model.filterwheel.set_filter('615/20-25', wait_until_done=False)
+            self.model.current_laser = NI_board_parameters.laser594
+        if laser == '640':
+            self.model.filterwheel.set_filter('676/37-25', wait_until_done=False)
+            self.model.current_laser = NI_board_parameters.laser640
+
+    def updateLaserPower(self, var,indx, mode):
+        voltage488 = self.view.runtab.laser488_percentage.get()*5/100.
+        voltage552 = self.view.runtab.laser552_percentage.get()*5/100.
+        voltage594 = self.view.runtab.laser594_percentage.get()*5/100.
+        voltage640 = self.view.runtab.laser640_percentage.get()*5/100.
+        power_settings = [voltage488, voltage552, voltage594, voltage640]
+        print("current laser power settings: " + str(power_settings))
+        self.model.set_laserpower(power_settings)
+
+
 
     def updateNbPlanes(self, var,indx,mode):
         """

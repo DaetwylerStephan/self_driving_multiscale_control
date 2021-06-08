@@ -52,7 +52,7 @@ class multiScopeModel:
         self.stack_buffer_highres.fill(0)
         self.filepath = 'D:/acquisitions/testimage.tif'
         self.planespacing = 10000000
-        self.ao_nchannels = 7
+        self.current_laser = NI_board_parameters.laser488
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -126,22 +126,39 @@ class multiScopeModel:
         """
         Initialize National Instruments card 6378 as device 1, Dev1
         """
-        self.names_to_voltage_channels = NI_board_parameters.names_to_voltage_channels
         print("Initializing ao card...", end=' ')
 
-        #"ao0/highrescamera", "ao5/lowrescamera", "ao6/stage", "ao8/laser", "ao11", "ao14", "ao18"
-        line_selection = "Dev1/ao0, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao14, Dev1/ao18"
-        ao_type = '6738'
-        ao_nchannels = self.ao_nchannels
-        rate = 2e4
-
         self.ao = ni.Analog_Out(
-            num_channels=ao_nchannels,
-            rate=rate,
-            daq_type=ao_type,
-            line=line_selection,
+            num_channels=NI_board_parameters.ao_nchannels,
+            rate=NI_board_parameters.rate,
+            daq_type=NI_board_parameters.ao_type,
+            line=NI_board_parameters.line_selection,
             verbose=True)
 
+        self.ao_laser488_power = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.power_488_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.maxVol_constant,
+            verbose=True)
+        self.ao_laser552_power = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.power_552_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.maxVol_constant,
+            verbose=True)
+        self.ao_laser594_power = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.power_594_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.maxVol_constant,
+            verbose=True)
+        self.ao_laser640_power = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.power_640_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.maxVol_constant,
+            verbose=True)
         print("done with ao.")
         atexit.register(self.ao.close)
 
@@ -206,12 +223,30 @@ class multiScopeModel:
             collected_tasks.append(th)
         return collected_tasks
 
+    def set_laserpower(self, powersettings):
+        self.ao_laser488_power.setconstantvoltage(powersettings[0])
+        self.ao_laser552_power.setconstantvoltage(powersettings[1])
+        self.ao_laser594_power.setconstantvoltage(powersettings[2])
+        self.ao_laser640_power.setconstantvoltage(powersettings[3])
 
     def preview_lowres(self):
         def preview_lowres_task(custody):
             self.lowres_camera.set_up_preview(self.exposure_time_LR)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
+
+            #define array for laser
+            basic_unit = np.zeros((self.ao.s2p(0.3), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
+
+            def laser_preview():
+                old_laserline = 0
+                while self.continue_preview_lowres:
+                    basic_unit[:, old_laserline] = 0
+                    old_laserline = self.current_laser
+                    basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
+                    self.ao.play_voltages(basic_unit, block=True)
+
+            ct.ResultThread(target=laser_preview).start()
 
             while self.continue_preview_lowres:
                 custody.switch_from(None, to=self.lowres_camera)
@@ -241,6 +276,19 @@ class multiScopeModel:
             self.highres_camera.set_up_preview(self.exposure_time_HR)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
+
+            # define array for laser
+
+            basic_unit = np.zeros((self.ao.s2p(0.3), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
+            def laser_preview_highres():
+                old_laserline = 0
+                while self.continue_preview_highres:
+                    basic_unit[:,old_laserline] = 0
+                    old_laserline = self.current_laser
+                    basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
+                    self.ao.play_voltages(basic_unit, block=True)
+
+            ct.ResultThread(target=laser_preview_highres).start()
 
             while self.continue_preview_highres:
 
@@ -293,7 +341,7 @@ class multiScopeModel:
             # calculate minimal unit duration
             minimal_trigger_timeinterval = self.exposure_time_LR / 1000 + readout_time / 1000 + delay_cameratrigger
 
-            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), self.ao_nchannels), np.dtype(np.float64))
+            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
 
@@ -371,7 +419,7 @@ class multiScopeModel:
             # calculate minimal unit duration
             minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + delay_cameratrigger
 
-            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), self.ao_nchannels), np.dtype(np.float64))
+            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002),
             0] = 4.  # highrescamera - ao0
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage

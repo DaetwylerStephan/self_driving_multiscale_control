@@ -21,6 +21,28 @@ class Camera_parameters:
 
 
 class NI_board_parameters:
+    # "ao0/highrescamera", "ao1/lowrescamera", "ao3/stage", "ao5/laser488TTL",
+    # "ao6/laser552_TTL", "ao8/laser594_TTL", "ao11/laser640_TTL", "ao12/laser_voicecoil"
+    line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao3, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao12"
+    ao_type = '6738'
+    ao_nchannels = 8
+    rate = 2e4
+    laser488 = 3
+    laser552 = 4
+    laser594 = 5
+    laser640 = 6
+
+    #constant values for laser power etc...
+    ao_type_constant = '6738_constant'
+    power_488_line = "Dev1/ao17"
+    power_552_line = "Dev1/ao18"
+    power_594_line = "Dev1/ao22"
+    power_640_line = "Dev1/ao24"
+    minVol_constant = 0
+    maxVol_constant = 5
+
+
+
     names_to_voltage_channels = {
         'camera_lowres': 0,
         'LED_power': 12,
