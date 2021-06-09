@@ -229,6 +229,13 @@ class multiScopeModel:
         self.ao_laser594_power.setconstantvoltage(powersettings[2])
         self.ao_laser640_power.setconstantvoltage(powersettings[3])
 
+    def move_to_position(self, positionlist):
+        print(str(positionlist[0:2]))
+        positionlistInt = int(positionlist)
+        self.XYZ_stage.moveToPosition(positionlistInt[0:2])
+        #self.rotationstage.moveToAngle(positionlist[3])
+
+
     def preview_lowres(self):
         def preview_lowres_task(custody):
             self.lowres_camera.set_up_preview(self.exposure_time_LR)

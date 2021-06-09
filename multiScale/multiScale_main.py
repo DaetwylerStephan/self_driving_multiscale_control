@@ -50,6 +50,7 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserPower)
         self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserPower)
         self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserPower)
+        self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
 
 
         #buttons stage tab
@@ -138,6 +139,17 @@ class MultiScale_Microscope_Controller():
         self.model.continue_preview_highres = False
         self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
 
+    def movestage(self, event, laser, filter):
+        # self.model.stagessettingstab.stage_trans_stepsize.get()
+        # self.model.stagessettingstab.stage_rot_stepsize.get()
+
+        lateralPosition = self.view.stagessettingstab.stage_moveto_lateral.get() * 1000000000
+        axialPosition =self.view.stagessettingstab.stage_moveto_axial.get() * 1000000000
+        updownPosition =self.view.stagessettingstab.stage_moveto_updown.get() * 1000000000
+        anglePosition =self.view.stagessettingstab.stage_moveto_angle.get() * 1000000000
+        moveToPosition = [lateralPosition, axialPosition, updownPosition, anglePosition]
+
+        self.model.move_to_position(moveToPosition)
 
     def changefilter(self, event, laser, filter):
         print("filter " + filter + ", laser: "+ laser)
@@ -160,7 +172,6 @@ class MultiScale_Microscope_Controller():
         voltage594 = self.view.runtab.laser594_percentage.get()*5/100.
         voltage640 = self.view.runtab.laser640_percentage.get()*5/100.
         power_settings = [voltage488, voltage552, voltage594, voltage640]
-        print("current laser power settings: " + str(power_settings))
         self.model.set_laserpower(power_settings)
 
 
@@ -204,13 +215,23 @@ class MultiScale_Microscope_Controller():
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
 
+        self.view.runtab.stack_aq_lowResCameraOn.get()
+        print(self.view.runtab.stack_aq_highResCameraOn.get())
+        self.view.runtab.stack_acq_laserCycleMode.get()
+        self.view.runtab.stack_aq_488on.get()
+        self.view.runtab.stack_aq_552on.get()
+        self.view.runtab.stack_aq_594on.get()
+        self.view.runtab.stack_aq_640on.get()
+
+        #which parameters to run
+
         self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),
                                               Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
                                              dtype='uint16')
         self.model.stack_buffer_lowres.fill(0)
         #self.model.filepath = self.view.welcometab.filepath_string.get()
 
-        self.model.acquire_stack_lowres()
+        #self.model.acquire_stack_lowres()
 
         print("acquiring low res stack")
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))

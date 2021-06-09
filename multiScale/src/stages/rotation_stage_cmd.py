@@ -80,6 +80,15 @@ class SR2812_rotationstage:
             print('MCS error: {}'.format(error_msg.value[:].decode('utf-8')))
         return
 
+    def moveToAngle(self, angle):
+        self.ExitIfError(SA_GotoAngleAbsolute_S(self.mcsHandle, self.channel, angle, 0, 1000))
+
+    def getAngle(self):
+        revolution = ct.c_ulong()
+        position = ct.c_int()
+        self.ExitIfError(SA_GetAngle_S(self.mcsHandle, self.channel, position, revolution))
+        print("Position: {} ugrad (Press \'s\' to change step size. Press \'q\' to exit.)".format(position.value))
+
     def ManualMove(self):
         '''
         Use the _GetchWindows class to manually operate the initialized stage from the command line.
