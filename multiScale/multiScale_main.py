@@ -51,6 +51,8 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserPower)
         self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserPower)
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
+        self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
+        self.view.stagessettingstab.stage_moveto_updown.trace_add("write", self.movestage)
 
 
         #buttons stage tab
@@ -144,10 +146,10 @@ class MultiScale_Microscope_Controller():
         # self.model.stagessettingstab.stage_rot_stepsize.get()
 
         lateralPosition = self.view.stagessettingstab.stage_moveto_lateral.get() * 1000000000
-        axialPosition =self.view.stagessettingstab.stage_moveto_axial.get() * 1000000000
         updownPosition =self.view.stagessettingstab.stage_moveto_updown.get() * 1000000000
+        axialPosition =self.view.stagessettingstab.stage_moveto_axial.get() * 1000000000
         anglePosition =self.view.stagessettingstab.stage_moveto_angle.get() * 1000000000
-        moveToPosition = [lateralPosition, axialPosition, updownPosition, anglePosition]
+        moveToPosition = [axialPosition, lateralPosition, updownPosition, anglePosition]
 
         self.model.move_to_position(moveToPosition)
 

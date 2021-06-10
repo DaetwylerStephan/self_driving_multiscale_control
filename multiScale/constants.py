@@ -37,7 +37,8 @@ class NI_board_parameters:
     power_488_line = "Dev1/ao17"
     power_552_line = "Dev1/ao18"
     power_594_line = "Dev1/ao22"
-    power_640_line = "Dev1/ao24"
+    power_640_line = "Dev1/ao25"
+    flip_mirror_line = "Dev1/ao26"
     minVol_constant = 0
     maxVol_constant = 5
 
