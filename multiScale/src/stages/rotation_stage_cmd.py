@@ -81,7 +81,8 @@ class SR2812_rotationstage:
         return
 
     def moveToAngle(self, angle):
-        self.ExitIfError(SA_GotoAngleAbsolute_S(self.mcsHandle, self.channel, angle, 0, 1000))
+        angleposition = ct.c_int(int(angle))
+        self.ExitIfError(SA_GotoAngleAbsolute_S(self.mcsHandle, self.channel, angleposition, 0, 1000))
 
     def getAngle(self):
         revolution = ct.c_ulong()

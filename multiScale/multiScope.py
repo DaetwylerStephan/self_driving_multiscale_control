@@ -231,9 +231,9 @@ class multiScopeModel:
 
     def move_to_position(self, positionlist):
         print(str(positionlist[0:2]))
-        positionlistInt = np.array(positionlist, dtype=np.float32)
+        positionlistInt = np.array(positionlist, dtype=np.int64)
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
-        #self.rotationstage.moveToAngle(positionlist[3])
+        self.rotationstage.moveToAngle(positionlist[3])
 
 
     def preview_lowres(self):
