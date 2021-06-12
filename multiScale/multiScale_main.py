@@ -215,26 +215,60 @@ class MultiScale_Microscope_Controller():
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
 
-        self.view.runtab.stack_aq_lowResCameraOn.get()
-        print(self.view.runtab.stack_aq_highResCameraOn.get())
-        self.view.runtab.stack_acq_laserCycleMode.get()
-        self.view.runtab.stack_aq_488on.get()
-        self.view.runtab.stack_aq_552on.get()
-        self.view.runtab.stack_aq_594on.get()
-        self.view.runtab.stack_aq_640on.get()
-
-        #which parameters to run
-
+        #init shared memory
         self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),
-                                              Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
-                                             dtype='uint16')
+                                                           Camera_parameters.LR_height_pixel,
+                                                           Camera_parameters.LR_width_pixel),
+                                                          dtype='uint16')
         self.model.stack_buffer_lowres.fill(0)
-        #self.model.filepath = self.view.welcometab.filepath_string.get()
-
-        #self.model.acquire_stack_lowres()
 
         print("acquiring low res stack")
-        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(self.view.runtab.stack_aq_plane_spacing.get()))
+        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(
+            self.view.runtab.stack_aq_plane_spacing.get()))
+
+        if self.view.runtab.stack_aq_lowResCameraOn.get():
+            for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
+                #get current position from list
+                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1])) * 1000000000
+                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2]))* 1000000000
+                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3]))* 1000000000
+                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4])) * 1000000
+                current_startposition = [zpos, xpos, ypos, angle]
+                print(current_startposition)
+
+                #start stackstreaming
+                if self.view.runtab.stack_aq_488on.get():
+                    print("acquire 488 laser")
+                    filepath = self.view.welcometab.filepath_string.get()
+                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, filepath)
+
+                if self.view.runtab.stack_aq_552on.get():
+                    print("acquire 552 laser")
+                    self.model.laserOn = NI_board_parameters.laser552
+
+                if self.view.runtab.stack_aq_594on.get():
+                    print("acquire 594 laser")
+                    self.model.laserOn = NI_board_parameters.laser594
+
+                if self.view.runtab.stack_aq_640on.get():
+                    print("acquire 640 laser")
+                    self.model.laserOn = NI_board_parameters.laser594
+
+        #high resolution list
+        if self.view.runtab.stack_aq_highResCameraOn.get():
+            for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
+                #get current position from list
+                xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])) * 1000000000
+                ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2]))* 1000000000
+                zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3]))* 1000000000
+                angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4])) * 1000000
+                currentposition = [zpos, xpos, ypos, angle]
+                print(currentposition)
+
+
+
+
+
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
 
 

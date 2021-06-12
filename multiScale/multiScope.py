@@ -230,7 +230,7 @@ class multiScopeModel:
         self.ao_laser640_power.setconstantvoltage(powersettings[3])
 
     def move_to_position(self, positionlist):
-        print(str(positionlist[0:2]))
+        print(str(positionlist[0:3]))
         positionlistInt = np.array(positionlist, dtype=np.int64)
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
         self.rotationstage.moveToAngle(positionlist[3])
@@ -325,7 +325,27 @@ class multiScopeModel:
         th.start()
         return th
 
-    def acquire_stack_lowres(self):
+
+    def prepare_acquisition(self, current_startposition, laser):
+        """
+        prepare acquisition by moving filter wheel and stage system to right position
+        """
+        def movestage():
+            self.move_to_position(current_startposition)
+        thread_stagemove = ct.ResultThread(target=movestage).start()
+
+        if laser == NI_board_parameters.laser488:
+            self.filterwheel.set_filter('515-30-25', wait_until_done=False)
+        if laser == NI_board_parameters.laser552:
+            self.model.filterwheel.set_filter('572/20-25', wait_until_done=False)
+        if laser == NI_board_parameters.laser594:
+            self.model.filterwheel.set_filter('615/20-25', wait_until_done=False)
+        if laser == NI_board_parameters.laser640:
+            self.model.filterwheel.set_filter('676/37-25', wait_until_done=False)
+
+        thread_stagemove.get_result()
+
+    def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
 
         # move stage to start position
         # choose right filter wheel position
@@ -335,6 +355,9 @@ class multiScopeModel:
         def acquire_task(custody):
 
             custody.switch_from(None, to=self.lowres_camera)
+
+            #prepare acquisition by moving filter wheel etc
+            self.prepare_acquisition(current_startposition, current_laserline)
 
             delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
             # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
@@ -351,6 +374,7 @@ class multiScopeModel:
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
+            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), current_laserline] = 4.
 
             control_array = np.tile(basic_unit, (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
 

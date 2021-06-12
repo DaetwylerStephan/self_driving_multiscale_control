@@ -131,7 +131,7 @@ class SLC_translationstage:
         # If the "timeout" parameter is set to "ctl.INFINITE" the call blocks until an event is received.
         # This can be useful in case the WaitForEvent function runs in a separate thread.
         # For simplicity, this is not shown here thus we set a timeout of 3 seconds.
-        timeout = 30000  # in ms
+        timeout = 60000  # in ms
         try:
             event = ctl.WaitForEvent(self.d_handle, timeout)
             # The "type" field specifies the event. The "idx" field holds the device index for this event
