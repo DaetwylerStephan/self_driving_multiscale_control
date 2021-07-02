@@ -4,6 +4,10 @@ from tkinter import ttk
 import time
 from threading import Thread
 import numpy as np
+import datetime as dt
+import os
+import glob
+
 
 from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
@@ -28,7 +32,7 @@ class MultiScale_Microscope_Controller():
         self.view = MultiScope_MainGui(all_tabs_mainGUI, self.model)
 
         #define here which buttons run which function in the multiScope model
-        self.continuetimelapse = 0 #enable functionality to stop timelapse
+        self.continuetimelapse = 1 #enable functionality to stop timelapse
 
         #buttons run tab
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
@@ -54,7 +58,6 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_updown.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_angle.trace_add("write", self.movestage)
-
 
         #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
@@ -174,6 +177,27 @@ class MultiScale_Microscope_Controller():
         power_settings = [voltage488, voltage552, voltage594, voltage640]
         self.model.set_laserpower(power_settings)
 
+    def updatefilename(self):
+        """
+        construct the filename used to save data.
+        """
+        parentdir = "D:/multiScope_Data/"
+
+        modelorganism = self.view.welcometab.welcome_modelorganism.get()
+        date = dt.datetime.now().strftime("%Y%m%d")
+        username = self.view.welcometab.welcome_username.get()
+
+        foldername = date + "_" + modelorganism
+        if username == "Stephan Daetwyler":
+            foldername = date + "_Daetwyler_" + modelorganism
+        if username == "Reto Fiolka":
+            foldername = date + "_Fiolka_" + modelorganism
+        if username == "Bo-Jui Chang":
+            foldername = date + "_Chang_" + modelorganism
+        if username == "Dagan Segal":
+            foldername = date + "_Segal_" + modelorganism
+
+        self.parentfolder = os.path.join(parentdir, foldername)
 
 
     def updateNbPlanes(self, var,indx,mode):
@@ -205,6 +229,7 @@ class MultiScale_Microscope_Controller():
     def acquire_stack(self, event):
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
         self.view.update()
+        self.updatefilename()
 
         #stop all potential previews
         self.model.continue_preview_lowres = False
@@ -214,6 +239,16 @@ class MultiScale_Microscope_Controller():
         self.model.stack_nbplanes = self.view.runtab.stack_aq_numberOfPlanes.get()
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
+
+        #construct file name to save (only if not time-lapse)
+        stackfilepath = self.parentfolder
+        if self.continuetimelapse != 0:
+            nbfiles_folder = len(glob.glob('Cell*'))
+            newfolderind = nbfiles_folder + 1
+            experiment_name = "Cell" + f'{newfolderind:04}'
+            stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
+            print(stackfilepath)
+
 
         #init shared memory
         self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),
@@ -227,6 +262,7 @@ class MultiScale_Microscope_Controller():
             self.view.runtab.stack_aq_plane_spacing.get()))
 
         if self.view.runtab.stack_aq_lowResCameraOn.get():
+            positioniter = -1
             for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
                 #get current position from list
                 xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1])) * 1000000000
@@ -235,23 +271,36 @@ class MultiScale_Microscope_Controller():
                 angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4])) * 1000000
                 current_startposition = [zpos, xpos, ypos, angle]
                 print(current_startposition)
+                positioniter = positioniter + 1
+
+                # filepath
+                current_folder = os.path.join(stackfilepath, "stack" + f'{positioniter:03}')
+                try:
+                    print("filepath : " + current_folder)
+                    os.makedirs(current_folder)
+                except OSError as error:
+                    print("File writing error")
 
                 #start stackstreaming
                 if self.view.runtab.stack_aq_488on.get():
                     print("acquire 488 laser")
-                    filepath = self.view.welcometab.filepath_string.get()
-                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, filepath)
+                    #filepath
+                    current_filepath = os.path.join(current_folder, "1_CH00_000000.tif")
+                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
 
                 if self.view.runtab.stack_aq_552on.get():
                     print("acquire 552 laser")
+                    self.model.channelIndicator = "01"
                     self.model.laserOn = NI_board_parameters.laser552
 
                 if self.view.runtab.stack_aq_594on.get():
                     print("acquire 594 laser")
+                    self.model.channelIndicator = "02"
                     self.model.laserOn = NI_board_parameters.laser594
 
                 if self.view.runtab.stack_aq_640on.get():
                     print("acquire 640 laser")
+                    self.model.channelIndicator = "03"
                     self.model.laserOn = NI_board_parameters.laser594
 
         #high resolution list

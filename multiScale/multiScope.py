@@ -53,6 +53,7 @@ class multiScopeModel:
         self.filepath = 'D:/acquisitions/testimage.tif'
         self.planespacing = 10000000
         self.current_laser = NI_board_parameters.laser488
+        self.channelIndicator = "00"
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -414,8 +415,10 @@ class multiScopeModel:
 
             def saveimage():
                 # save image
+
+
                 try:
-                    imwrite(self.filepath, low_res_buffer) #can a thread change self.filepath ? Can someone change stack_buffer?
+                    imwrite(filepath, low_res_buffer) #can a thread change self.filepath ? Can someone change stack_buffer?
                 except:
                     print("couldn't save image")
             savethread = ct.ResultThread(target=saveimage).start()
