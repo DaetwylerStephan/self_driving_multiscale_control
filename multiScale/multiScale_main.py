@@ -170,6 +170,9 @@ class MultiScale_Microscope_Controller():
             self.model.current_laser = NI_board_parameters.laser640
 
     def updateLaserPower(self, var,indx, mode):
+        """
+        update the laser power
+        """
         voltage488 = self.view.runtab.laser488_percentage.get()*5/100.
         voltage552 = self.view.runtab.laser552_percentage.get()*5/100.
         voltage594 = self.view.runtab.laser594_percentage.get()*5/100.
@@ -179,7 +182,7 @@ class MultiScale_Microscope_Controller():
 
     def updatefilename(self):
         """
-        construct the filename used to save data.
+        construct the filename used to save data, based on the information from the
         """
         parentdir = "D:/multiScope_Data/"
 
@@ -240,14 +243,27 @@ class MultiScale_Microscope_Controller():
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
 
-        #construct file name to save (only if not time-lapse)
+        #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder
         if self.continuetimelapse != 0:
-            nbfiles_folder = len(glob.glob('Cell*'))
+            #generate file path
+            nbfiles_folder = len(glob.glob('Experiment*'))
             newfolderind = nbfiles_folder + 1
-            experiment_name = "Cell" + f'{newfolderind:04}'
+            experiment_name = "Experiment" + f'{newfolderind:04}'
+
+            #write acquisition parameters
+            filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
+            try:
+                print("filepath : " + filepath_write_acquisitionParameters)
+                os.makedirs(filepath_write_acquisitionParameters)
+            except OSError as error:
+                print("File writing error")
+            self.write_to_textfile(os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
+
+            #set timepoint = 0 to be consistent with time-lapse acquisitions
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
             print(stackfilepath)
+
 
 
         #init shared memory
@@ -255,7 +271,7 @@ class MultiScale_Microscope_Controller():
                                                            Camera_parameters.LR_height_pixel,
                                                            Camera_parameters.LR_width_pixel),
                                                           dtype='uint16')
-        self.model.stack_buffer_lowres.fill(0)
+        #self.model.stack_buffer_lowres.fill(0)
 
         print("acquiring low res stack")
         print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(
@@ -290,18 +306,21 @@ class MultiScale_Microscope_Controller():
 
                 if self.view.runtab.stack_aq_552on.get():
                     print("acquire 552 laser")
-                    self.model.channelIndicator = "01"
-                    self.model.laserOn = NI_board_parameters.laser552
+                    current_filepath = os.path.join(current_folder, "1_CH01_000000.tif")
+                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+                                                    current_filepath)
 
                 if self.view.runtab.stack_aq_594on.get():
                     print("acquire 594 laser")
-                    self.model.channelIndicator = "02"
-                    self.model.laserOn = NI_board_parameters.laser594
+                    current_filepath = os.path.join(current_folder, "1_CH02_000000.tif")
+                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+                                                    current_filepath)
 
                 if self.view.runtab.stack_aq_640on.get():
                     print("acquire 640 laser")
-                    self.model.channelIndicator = "03"
-                    self.model.laserOn = NI_board_parameters.laser594
+                    current_filepath = os.path.join(current_folder, "1_CH03_000000.tif")
+                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+                                                    current_filepath)
 
         #high resolution list
         if self.view.runtab.stack_aq_highResCameraOn.get():
@@ -368,6 +387,25 @@ class MultiScale_Microscope_Controller():
     def abort_timelapse(self,event):
         self.continuetimelapse = 1
 
+#write experiment parameters to textfile
+    def write_to_textfile(self, filePath):
+        with open(filePath, 'w') as f:
+            f.write('Experiment parameters of ' + self.parentfolder)
+            f.write('---------------------------------------------')
+            f.write('Plane spacing: ' + str(self.view.runtab.stack_aq_plane_spacing.get()))
+            f.write('Nb of planes: ' + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
+
+            f.write('---------------------------------------------')
+            f.write('low resultion stack positions')
+
+            for iter_lowrespos in self.view.stagessettingstab.stage_savedPos_tree.get_children():
+                #get current position from list
+                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][1]))
+                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][2]))
+                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][3]))
+                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][4]))
+                current_startposition = [zpos, xpos, ypos, angle]
+                f.write(str(current_startposition))
 
 #enable keyboard movements ---------------------------------------------------------------------------------------------
     def enable_keyboard_movement(self, event):

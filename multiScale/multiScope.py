@@ -178,6 +178,14 @@ class multiScopeModel:
         self.filterwheel.set_filter('676/37-25', wait_until_done=False)
         print("done with filterwheel.")
 
+    def _init_shared_Memory(self):
+        #init shared memory
+        self.stack_buffer_lowres = ct.SharedNDArray((200, Camera_parameters.LR_height_pixel,
+                                                           Camera_parameters.LR_width_pixel),
+                                                          dtype='uint16')
+        self.stack_buffer_lowres.fill(0)
+
+
     def _init_XYZ_stage(self):
         """
         Initialize translation stage
@@ -415,8 +423,6 @@ class multiScopeModel:
 
             def saveimage():
                 # save image
-
-
                 try:
                     imwrite(filepath, low_res_buffer) #can a thread change self.filepath ? Can someone change stack_buffer?
                 except:
