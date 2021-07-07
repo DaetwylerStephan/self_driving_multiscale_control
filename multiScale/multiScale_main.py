@@ -14,6 +14,7 @@ from multiScope import multiScopeModel
 import auxiliary_code.concurrency_tools as ct
 from constants import Camera_parameters
 from constants import NI_board_parameters
+from constants import FileSave_parameters
 
 
 class MultiScale_Microscope_Controller():
@@ -38,14 +39,14 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
         self.view.runtab.bt_preview_highres.bind("<ButtonRelease>", self.run_highrespreview)
         self.view.runtab.bt_preview_stop.bind("<Button>", self.run_stop_preview)
-        self.view.runtab.bt_changeTo488.bind("<Button>", lambda event: self.changefilter(event, '488', '488_filter'))
-        self.view.runtab.bt_changeTo552.bind("<Button>", lambda event: self.changefilter(event, '552', '552_filter'))
-        self.view.runtab.bt_changeTo594.bind("<Button>", lambda event: self.changefilter(event, '594', '594_filter'))
-        self.view.runtab.bt_changeTo640.bind("<Button>", lambda event: self.changefilter(event, '640', '640_filter'))
-        self.view.runtab.bt_changeTo_block.bind("<Button>", lambda event: self.changefilter(event, 'None', 'Block'))
-        self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED', 'No_filter'))
+        self.view.runtab.bt_changeTo488.bind("<Button>", lambda event: self.changefilter(event, '488'))
+        self.view.runtab.bt_changeTo552.bind("<Button>", lambda event: self.changefilter(event, '552'))
+        self.view.runtab.bt_changeTo594.bind("<Button>", lambda event: self.changefilter(event, '594'))
+        self.view.runtab.bt_changeTo640.bind("<Button>", lambda event: self.changefilter(event, '640'))
+        self.view.runtab.bt_changeTo_block.bind("<Button>", lambda event: self.changefilter(event, 'None'))
+        self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED'))
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
-        self.view.runtab.stack_aq_numberOfPlanes.trace_add("write", self.updateNbPlanes)
+        #self.view.runtab.stack_aq_numberOfPlanes.trace_add("write", self.updateNbPlanes)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.run_stop_preview)#1
@@ -134,28 +135,36 @@ class MultiScale_Microscope_Controller():
 
 
     def run_stop_preview(self, event):
-      '''
-      Stops an executing preview and resets the profile of the preview buttons that were sunken after starting a preview
-      '''
-      if self.model.continue_preview_lowres == True:
-        self.model.continue_preview_lowres =False
-        self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
+        '''
+        Stops an executing preview and resets the profile of the preview buttons that were sunken after starting a preview
+        '''
+        if self.model.continue_preview_lowres == True:
+            self.model.continue_preview_lowres =False
+            self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
 
-      if self.model.continue_preview_highres == True:
-        self.model.continue_preview_highres = False
-        self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
+        if self.model.continue_preview_highres == True:
+            self.model.continue_preview_highres = False
+            self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
 
-    def movestage(self, event, laser, filter):
+    def movestage(self, event):
+        """
+        moves the stage to a certain position
+        """
+        #get positions from GUI and constract position array "moveToPosition"
         lateralPosition = self.view.stagessettingstab.stage_moveto_lateral.get() * 1000000000
         updownPosition =self.view.stagessettingstab.stage_moveto_updown.get() * 1000000000
         axialPosition =self.view.stagessettingstab.stage_moveto_axial.get() * 1000000000
         anglePosition =self.view.stagessettingstab.stage_moveto_angle.get() * 1000000
         moveToPosition = [axialPosition, lateralPosition, updownPosition, anglePosition]
 
+        #move
         self.model.move_to_position(moveToPosition)
 
-    def changefilter(self, event, laser, filter):
-        print("filter " + filter + ", laser: "+ laser)
+    def changefilter(self, event, laser):
+        """
+        changes the filter to the specified one by the laser active
+        """
+        print("change filter to laser: " + laser)
         if laser == '488':
             self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser488
@@ -173,18 +182,21 @@ class MultiScale_Microscope_Controller():
         """
         update the laser power
         """
+        #get laser power from GUI and constract laser power setting array
         voltage488 = self.view.runtab.laser488_percentage.get()*5/100.
         voltage552 = self.view.runtab.laser552_percentage.get()*5/100.
         voltage594 = self.view.runtab.laser594_percentage.get()*5/100.
         voltage640 = self.view.runtab.laser640_percentage.get()*5/100.
         power_settings = [voltage488, voltage552, voltage594, voltage640]
+
+        #change laser power
         self.model.set_laserpower(power_settings)
 
     def updatefilename(self):
         """
-        construct the filename used to save data, based on the information from the
+        construct the filename used to save data, based on the information from the GUI
         """
-        parentdir = "D:/multiScope_Data/"
+        parentdir = FileSave_parameters.parentdir
 
         modelorganism = self.view.welcometab.welcome_modelorganism.get()
         date = dt.datetime.now().strftime("%Y%m%d")
@@ -203,33 +215,36 @@ class MultiScale_Microscope_Controller():
         self.parentfolder = os.path.join(parentdir, foldername)
 
 
-    def updateNbPlanes(self, var,indx,mode):
-        """
-        generate a new SharedNDArray whenever the number of planes is updated.
-        """
-        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
-        self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
-        self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
-        #self.stack_buffer.fill(0) #too slow - need other solution
+    # def updateNbPlanes(self, var,indx,mode):
+    #     """
+    #     generate a new SharedNDArray whenever the number of planes is updated.
+    #     """
+    #     print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
+    #     self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+    #     self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
+    #     #self.stack_buffer.fill(0) #too slow - need other solution
 
-    def automatically_update_stackbuffer(self):
-        print("update stack")
-
-        def update_stackbuffer():
-            try:
-                    self.stack_buffer.fill(0)
-                    self.current_stackbuffersize = self.stack_buffer_nb
-            except:
-                print("update error")
-
-        self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
-
-        if self.stack_buffer_nb != self.current_stackbuffersize:
-            ct.ResultThread(target=update_stackbuffer).start()
+    # def automatically_update_stackbuffer(self):
+    #     print("update stack")
+    #
+    #     def update_stackbuffer():
+    #         try:
+    #                 self.stack_buffer.fill(0)
+    #                 self.current_stackbuffersize = self.stack_buffer_nb
+    #         except:
+    #             print("update error")
+    #
+    #     self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
+    #
+    #     if self.stack_buffer_nb != self.current_stackbuffersize:
+    #         ct.ResultThread(target=update_stackbuffer).start()
 
         #self.root.after(5000, self.automatically_update_stackbuffer)
 
     def acquire_stack(self, event):
+        """
+        acquire a stack acquisition
+        """
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
         self.view.update()
         self.updatefilename()
@@ -263,7 +278,6 @@ class MultiScale_Microscope_Controller():
             #set timepoint = 0 to be consistent with time-lapse acquisitions
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
             print(stackfilepath)
-
 
 
         #init shared memory
@@ -343,6 +357,9 @@ class MultiScale_Microscope_Controller():
 
 
     def acquire_timelapse(self, event):
+        """
+        start a time-lapse acquisition thread, called from GUI (otherwise it freezes)
+        """
 
         self.view.runtab.updateTimesTimelapse()
         self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
@@ -353,11 +370,18 @@ class MultiScale_Microscope_Controller():
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
 
+        # set button layout - sunken relief
+        def set_buttonTL():
+            time.sleep(0.002)
+            self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
+
+        ct.ResultThread(target=set_buttonTL).start()
+
         self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints-1)
         self.continuetimelapse = 0
         print("acquiring timelapse")
 
-        #(1) NOTE: You cannot use a While loop here as it makes the Tkinter mainloop freeze - but the time lapse instead into a thread
+        #(1) NOTE: You cannot use a While loop here as it makes the Tkinter mainloop freeze - put the time-lapse instead into a thread
         #(2) where you can run while loops etc.
         self.timelapse_thread = Thread(target=self.run_timelapse)
         self.timelapse_thread.start()
@@ -365,20 +389,33 @@ class MultiScale_Microscope_Controller():
 
 
     def run_timelapse(self):
+        """
+        thread that controls time-lapse, started from function acquire_timelapse(self, event):
+        """
         varb = str(np.random.randint(0, 100))
-        self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
         self.view.update()
 
         for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints):
-            self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken") #keep the button pressed while executing the timelapse
+            t0 = time.clock()
             self.view.runtab.timelapse_aq_progress.set(timeiter)
             self.view.runtab.timelapse_aq_progressindicator.config(text=str(timeiter+1) +" of " + str(self.view.runtab.timelapse_aq_nbTimepoints))
 
 
             print("hello " + varb)
             time.sleep(2)
+
+            ## stop time-lapse acquisition if you stop it
             if self.continuetimelapse == 1:
                 break  # Break while loop when stop = 1
+
+
+            #calculate the time until next stack acquisition starts
+            t1 = time.clock() - t0
+            totaltime = self.view.runtab.timelapse_aq_timeinterval_min.get() * 60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
+
+            remaining_waittime = totaltime - t1
+
+
 
         self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="raised")
         self.view.update()

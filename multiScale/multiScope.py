@@ -185,6 +185,11 @@ class multiScopeModel:
                                                           dtype='uint16')
         self.stack_buffer_lowres.fill(0)
 
+        self.stack_buffer_highres = ct.SharedNDArray((200, Camera_parameters.HR_height_pixel,
+                                                     Camera_parameters.HR_width_pixel),
+                                                    dtype='uint16')
+        self.stack_buffer_highres.fill(0)
+
 
     def _init_XYZ_stage(self):
         """
