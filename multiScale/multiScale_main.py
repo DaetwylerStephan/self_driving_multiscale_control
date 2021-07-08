@@ -59,6 +59,9 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_updown.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_angle.trace_add("write", self.movestage)
+        self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
+        self.view.advancedSettingstab.slit_lowres.trace_add("write", self.slit_opening_setPositions)
+        self.view.advancedSettingstab.slit_highres.trace_add("write", self.slit_opening_setPositions)
 
         #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
@@ -77,7 +80,7 @@ class MultiScale_Microscope_Controller():
         self.root.title("Multi-scale microscope V1")
         self.root.geometry("800x600")
         self.root.resizable(width=False, height=False)
-        self.automatically_update_stackbuffer()
+        #self.automatically_update_stackbuffer()
         self.root.mainloop()
 
     def close(self):
@@ -146,7 +149,7 @@ class MultiScale_Microscope_Controller():
             self.model.continue_preview_highres = False
             self.view.runtab.preview_change(self.view.runtab.bt_preview_highres)
 
-    def movestage(self, event):
+    def movestage(self, var,indx, mode):
         """
         moves the stage to a certain position
         """
@@ -159,6 +162,20 @@ class MultiScale_Microscope_Controller():
 
         #move
         self.model.move_to_position(moveToPosition)
+
+    def slit_opening_move(self, var,indx, mode):
+        """
+        changes the slit opening
+        """
+        currentslitopening = self.view.advancedSettingstab.slit_currentsetting
+        self.model.move_adjustableslit(currentslitopening)
+
+    def slit_opening_setPositions(self, var,indx, mode):
+        """
+        set the low resolution and high-resolution slit openings
+        """
+        self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres
+        self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres
 
     def changefilter(self, event, laser):
         """
@@ -312,29 +329,8 @@ class MultiScale_Microscope_Controller():
                     print("File writing error")
 
                 #start stackstreaming
-                if self.view.runtab.stack_aq_488on.get():
-                    print("acquire 488 laser")
-                    #filepath
-                    current_filepath = os.path.join(current_folder, "1_CH00_000000.tif")
-                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
-
-                if self.view.runtab.stack_aq_552on.get():
-                    print("acquire 552 laser")
-                    current_filepath = os.path.join(current_folder, "1_CH01_000000.tif")
-                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
-                                                    current_filepath)
-
-                if self.view.runtab.stack_aq_594on.get():
-                    print("acquire 594 laser")
-                    current_filepath = os.path.join(current_folder, "1_CH02_000000.tif")
-                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
-                                                    current_filepath)
-
-                if self.view.runtab.stack_aq_640on.get():
-                    print("acquire 640 laser")
-                    current_filepath = os.path.join(current_folder, "1_CH03_000000.tif")
-                    self.model.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
-                                                    current_filepath)
+                which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(), self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
+                self.model.low_res_stack_acquisition_master(current_folder, current_startposition, which_channels)
 
         #high resolution list
         if self.view.runtab.stack_aq_highResCameraOn.get():
@@ -427,13 +423,13 @@ class MultiScale_Microscope_Controller():
 #write experiment parameters to textfile
     def write_to_textfile(self, filePath):
         with open(filePath, 'w') as f:
-            f.write('Experiment parameters of ' + self.parentfolder)
-            f.write('---------------------------------------------')
-            f.write('Plane spacing: ' + str(self.view.runtab.stack_aq_plane_spacing.get()))
-            f.write('Nb of planes: ' + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
+            f.write('Experiment parameters of ' + self.parentfolder + "\n")
+            f.write('---------------------------------------------\n')
+            f.write('Plane spacing: ' + str(self.view.runtab.stack_aq_plane_spacing.get()) + "\n")
+            f.write('Nb of planes: ' + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + "\n")
 
-            f.write('---------------------------------------------')
-            f.write('low resultion stack positions')
+            f.write('---------------------------------------------\n')
+            f.write('low resultion stack positions\n')
 
             for iter_lowrespos in self.view.stagessettingstab.stage_savedPos_tree.get_children():
                 #get current position from list
@@ -442,7 +438,7 @@ class MultiScale_Microscope_Controller():
                 zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][3]))
                 angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][4]))
                 current_startposition = [zpos, xpos, ypos, angle]
-                f.write(str(current_startposition))
+                f.write(str(current_startposition) + "\n")
 
 #enable keyboard movements ---------------------------------------------------------------------------------------------
     def enable_keyboard_movement(self, event):

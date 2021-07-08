@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
+
 class AdvancedSettings_Tab(tk.Frame):
     """
     A tab for advanced settings such as rotational stage calibration etc
@@ -43,10 +44,10 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_lowres_entry = tk.Entry(slit_settings, textvariable=self.slit_lowres, width=6)
         self.slit_highres_entry = tk.Entry(slit_settings, textvariable=self.slit_highres, width=6)
 
-        slit_scale = tk.Scale(slit_settings, variable=self.slit_currentsetting, from_=0, to=4000, orient="horizontal")
+        slit_scale = tk.Scale(slit_settings, variable=self.slit_currentsetting, from_=0, to=4558, orient="horizontal")
 
         # set defaults
-        self.slit_lowres.set(4000)
+        self.slit_lowres.set(4558)
         self.slit_highres.set(150)
 
         # slit layout

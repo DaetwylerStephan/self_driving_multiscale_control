@@ -13,6 +13,8 @@ class Stage_parameters:
     stage_id_XYZ = 'network:sn:MCS2-00000382'
     stage_id_rot = 'usb:id:3948963323'
 
+    adjustableslit_max = 4558
+
 class Camera_parameters:
     HR_width_pixel = 2048
     HR_height_pixel = 2048

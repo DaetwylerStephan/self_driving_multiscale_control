@@ -250,7 +250,7 @@ class slit_ximc_control:
         print("Write command result: " + repr(result))
 
     def slit_closing(self):
-        print("\nClosing")
+        print("\nSlit Closing")
         self.lib.close_device(byref(cast(self.device_id, POINTER(c_int))))
 
 
@@ -263,9 +263,12 @@ if __name__ == '__main__':
     test_slit.slit_set_microstep_mode_256()
     startpos, ustartpos = test_slit.slit_get_position()
 
+    print(startpos)
+    print(ustartpos)
+
     # first move
     test_slit.slit_left()
-    time.sleep(3)
+    time.sleep(10)
     test_slit.slit_get_position()
     # second move
     current_speed = test_slit.slit_get_speed()

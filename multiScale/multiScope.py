@@ -13,6 +13,8 @@ import src.ni_board.vni as ni
 import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
+import src.slit.slit_cmd as SlitControl
+
 from constants import FilterWheel_parameters
 from constants import Stage_parameters
 from constants import NI_board_parameters
@@ -54,6 +56,8 @@ class multiScopeModel:
         self.planespacing = 10000000
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
+        self.slitopening_lowres = 4558
+        self.slitopening_highres=150
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -83,10 +87,10 @@ class multiScopeModel:
         trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start() #~0.4s
         rot_stage_init = ct.ResultThread(target=self._init_rotation_stage).start()
         filterwheel_init = ct.ResultThread(target=self._init_filterwheel).start()  # ~5.3s
+        slit_init = ct.ResultThread(target=self._init_slit).start()  #
 
 
         self._init_ao()  # ~0.2s
-
 
         #wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.get_result()
@@ -94,6 +98,7 @@ class multiScopeModel:
         filterwheel_init.get_result()
         trans_stage_init.get_result()
         rot_stage_init.get_result()
+        slit_init.get_result()
 
         print('Finished initializing multiScope')
 
@@ -213,6 +218,15 @@ class multiScopeModel:
         print("done with XY stage.")
         atexit.register(self.rotationstage.close)
 
+    def _init_slit(self):
+        """
+        Initialize motorized slit
+        """
+        self.adjustableslit = SlitControl.slit_ximc_control()
+        self.adjustableslit.slit_info()
+        self.adjustableslit.slit_status()
+        self.adjustableslit.slit_set_microstep_mode_256()
+
     def close(self):
         """
         Close all opened channels, camera etc
@@ -223,6 +237,7 @@ class multiScopeModel:
         self.ao.close()
         #self.rotationstage.close()
         #self.XYZ_stage.close()
+        self.adjustableslit.slit_closing()
         self.display.close()  # more work needed here
         print('Closed multiScope')
 
@@ -249,6 +264,15 @@ class multiScopeModel:
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
         self.rotationstage.moveToAngle(positionlist[3])
 
+    def move_adjustableslit(self, slitopening):
+        """
+        :param slitopening: move to this slitopening
+        :return:
+        """
+        slitopening_ct = ct.c_ulong(slitopening)
+        slitopening_ct_ustep = ct.c_ulong(0)
+
+        self.adjustableslit.slit_move(slitopening_ct,slitopening_ct_ustep)
 
     def preview_lowres(self):
         def preview_lowres_task(custody):
@@ -339,6 +363,37 @@ class multiScopeModel:
         th.start()
         return th
 
+    def low_res_stack_acquisition_master(self, current_folder, current_startposition, whichlaser):
+        """
+        Master to start stack acquisitions of different channels
+        :param current_folder: folder to save the acquired data
+        :param current_startposition: start position for the stack streaming
+        :param whichlaser: which channels to image
+        :return:
+        """
+        if whichlaser[0]==1:
+            print("acquire 488 laser")
+            # filepath
+            current_filepath = os.path.join(current_folder, "1_CH00_000000.tif")
+            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
+
+        if whichlaser[1]==1:
+            print("acquire 552 laser")
+            current_filepath = os.path.join(current_folder, "1_CH01_000000.tif")
+            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+                                            current_filepath)
+
+        if whichlaser[2]==1:
+            print("acquire 594 laser")
+            current_filepath = os.path.join(current_folder, "1_CH02_000000.tif")
+            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+                                            current_filepath)
+
+        if whichlaser[3]==1:
+            print("acquire 640 laser")
+            current_filepath = os.path.join(current_folder, "1_CH03_000000.tif")
+            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+                                            current_filepath)
 
     def prepare_acquisition(self, current_startposition, laser):
         """
