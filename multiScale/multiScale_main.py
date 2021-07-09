@@ -167,15 +167,15 @@ class MultiScale_Microscope_Controller():
         """
         changes the slit opening
         """
-        currentslitopening = self.view.advancedSettingstab.slit_currentsetting
+        currentslitopening = self.view.advancedSettingstab.slit_currentsetting.get()
         self.model.move_adjustableslit(currentslitopening)
 
     def slit_opening_setPositions(self, var,indx, mode):
         """
         set the low resolution and high-resolution slit openings
         """
-        self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres
-        self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres
+        self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
+        self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
 
     def changefilter(self, event, laser):
         """

@@ -47,7 +47,7 @@ class AdvancedSettings_Tab(tk.Frame):
         slit_scale = tk.Scale(slit_settings, variable=self.slit_currentsetting, from_=0, to=4558, orient="horizontal")
 
         # set defaults
-        self.slit_lowres.set(4558)
+        self.slit_lowres.set(4025)
         self.slit_highres.set(150)
 
         # slit layout

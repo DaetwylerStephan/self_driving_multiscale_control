@@ -269,12 +269,14 @@ class multiScopeModel:
         :param slitopening: move to this slitopening
         :return:
         """
-        slitopening_ct = ct.c_ulong(slitopening)
-        slitopening_ct_ustep = ct.c_ulong(0)
 
-        self.adjustableslit.slit_move(slitopening_ct,slitopening_ct_ustep)
+        self.adjustableslit.slit_move(int(slitopening),0)
 
     def preview_lowres(self):
+        """
+        starts a custody thread to run a low resolution preview.
+        :return:
+        """
         def preview_lowres_task(custody):
             self.lowres_camera.set_up_preview(self.exposure_time_LR)
             self.num_frames = 0
@@ -443,7 +445,7 @@ class multiScopeModel:
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
-            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), current_laserline] = 4.
+            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4.
 
             control_array = np.tile(basic_unit, (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
 

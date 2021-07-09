@@ -275,6 +275,7 @@ if __name__ == '__main__':
     test_slit.slit_set_speed(current_speed / 2)
 
     test_slit.slit_move(startpos, ustartpos)
+    #test_slit.slit_move(2000, 0)
     test_slit.slit_wait_for_stop(100)
     test_slit.slit_status()
     test_slit.slit_serial()
