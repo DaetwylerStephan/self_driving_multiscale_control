@@ -235,7 +235,7 @@ class slit_ximc_control:
 
 
     def slit_set_microstep_mode_256(self):
-        print("\nSet microstep mode to 256")
+        print("\nSet microstep mode to 1/256 steps")
         # Create engine settings structure
         # Get current engine settings from controller
         result = self.lib.get_engine_settings(self.device_id, byref(self.eng))
@@ -249,6 +249,25 @@ class slit_ximc_control:
         # Print command return status. It will be 0 if all is OK
         print("Write command result: " + repr(result))
 
+    def slit_set_microstep_mode_2(self):
+        print("\nSet microstep mode to 1/2 steps")
+        # Create engine settings structure
+        # Get current engine settings from controller
+        result = self.lib.get_engine_settings(self.device_id, byref(self.eng))
+        # Print command return status. It will be 0 if all is OK
+        print("Read command result: " + repr(result))
+        # Change MicrostepMode parameter to MICROSTEP_MODE_FRAC_256
+        # (use MICROSTEP_MODE_FRAC_128, MICROSTEP_MODE_FRAC_64 ... for other microstep modes)
+        self.eng.MicrostepMode = self.MicrostepMode.MICROSTEP_MODE_FRAC_2
+        # Write new engine settings to controller
+        result = self.lib.set_engine_settings(self.device_id, byref(self.eng))
+        # Print command return status. It will be 0 if all is OK
+        print("Write command result: " + repr(result))
+
+    def home_stage(self):
+        print("\nSet Position to Zero")
+        self.lib.command_homezero(self.device_id)
+
     def slit_closing(self):
         print("\nSlit Closing")
         self.lib.close_device(byref(cast(self.device_id, POINTER(c_int))))
@@ -261,21 +280,26 @@ if __name__ == '__main__':
     test_slit.slit_info()
     test_slit.slit_status()
     test_slit.slit_set_microstep_mode_256()
+    print("----------------------------------------\n home\n-------------------------------------")
+    test_slit.home_stage()
+
     startpos, ustartpos = test_slit.slit_get_position()
 
     print(startpos)
     print(ustartpos)
 
     # first move
-    test_slit.slit_left()
-    time.sleep(10)
+    test_slit.slit_set_speed(500)
+    #test_slit.slit_left()
+    time.sleep(4)
     test_slit.slit_get_position()
     # second move
     current_speed = test_slit.slit_get_speed()
-    test_slit.slit_set_speed(current_speed / 2)
+    test_slit.slit_set_speed(1800)
 
     test_slit.slit_move(startpos, ustartpos)
-    #test_slit.slit_move(2000, 0)
+    test_slit.slit_move(4000, 0)
+    test_slit.slit_move(4000, 0)
     test_slit.slit_wait_for_stop(100)
     test_slit.slit_status()
     test_slit.slit_serial()

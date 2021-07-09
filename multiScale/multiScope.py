@@ -56,8 +56,8 @@ class multiScopeModel:
         self.planespacing = 10000000
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
-        self.slitopening_lowres = 4558
-        self.slitopening_highres=150
+        self.slitopening_lowres = 150
+        self.slitopening_highres= 4558
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -165,6 +165,12 @@ class multiScopeModel:
             minVol=NI_board_parameters.minVol_constant,
             maxVol=NI_board_parameters.maxVol_constant,
             verbose=True)
+        self.flipMirrorPosition_power = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.flip_mirror_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.maxVol_constant,
+            verbose=True)
         print("done with ao.")
         atexit.register(self.ao.close)
 
@@ -226,6 +232,9 @@ class multiScopeModel:
         self.adjustableslit.slit_info()
         self.adjustableslit.slit_status()
         self.adjustableslit.slit_set_microstep_mode_256()
+        self.adjustableslit.home_stage()
+        self.adjustableslit.slit_set_speed(1000)
+
 
     def close(self):
         """
@@ -269,8 +278,22 @@ class multiScopeModel:
         :param slitopening: move to this slitopening
         :return:
         """
-
         self.adjustableslit.slit_move(int(slitopening),0)
+        self.adjustableslit.slit_wait_for_stop(100)
+
+    def changeLRtoHR(self):
+        """
+        change from low resolution to high resolution acquisition settings
+        """
+        self.move_adjustableslit(self.slitopening_highres)
+        self.flipMirrorPosition_power.setconstantvoltage(0)
+
+    def changeHRtoLR(self):
+        """
+        change from high resolution to low resolution acquisition settings
+        """
+        self.move_adjustableslit(self.slitopening_lowres)
+        self.flipMirrorPosition_power.setconstantvoltage(3)
 
     def preview_lowres(self):
         """
