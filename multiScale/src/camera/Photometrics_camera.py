@@ -55,6 +55,9 @@ class Photo_Camera:
     def return_camera_readouttime(self):
         return self.cam.readout_time
 
+    def prepare_ASLM_acquisition(self, linescan):
+        """Changes the settings of the camera to ASLM acquisitions."""
+
     def run_stack_acquisition_buffer(self, nb_planes, buffer):
         """Run a stack acquisition."""
         framesReceived = 0

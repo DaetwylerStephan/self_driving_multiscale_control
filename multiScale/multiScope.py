@@ -244,8 +244,8 @@ class multiScopeModel:
         self.lowres_camera.close()
         self.highres_camera.close()
         self.ao.close()
-        #self.rotationstage.close()
-        #self.XYZ_stage.close()
+        self.rotationstage.close()
+        self.XYZ_stage.close()
         self.adjustableslit.slit_closing()
         self.display.close()  # more work needed here
         print('Closed multiScope')
@@ -273,32 +273,34 @@ class multiScopeModel:
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
         self.rotationstage.moveToAngle(positionlist[3])
 
-    def move_adjustableslit(self, slitopening):
+    def move_adjustableslit(self, slitopening, wait=0):
         """
-        :param slitopening: move to this slitopening
-        :return:
+        :param slitopening: move to this slitopening;
+        :param if wait==1 - wait for slit move to finish before continuing
         """
         self.adjustableslit.slit_move(int(slitopening),0)
-        self.adjustableslit.slit_wait_for_stop(100)
+        if wait==1:
+            self.adjustableslit.slit_wait_for_stop(100)
+
+
 
     def changeLRtoHR(self):
         """
         change from low resolution to high resolution acquisition settings
         """
-        self.move_adjustableslit(self.slitopening_highres)
+        self.move_adjustableslit(self.slitopening_highres, 1)
         self.flipMirrorPosition_power.setconstantvoltage(0)
 
     def changeHRtoLR(self):
         """
         change from high resolution to low resolution acquisition settings
         """
-        self.move_adjustableslit(self.slitopening_lowres)
+        self.move_adjustableslit(self.slitopening_lowres, 1)
         self.flipMirrorPosition_power.setconstantvoltage(3)
 
     def preview_lowres(self):
         """
         starts a custody thread to run a low resolution preview.
-        :return:
         """
         def preview_lowres_task(custody):
             self.lowres_camera.set_up_preview(self.exposure_time_LR)
