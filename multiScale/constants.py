@@ -24,6 +24,10 @@ class Camera_parameters:
 class FileSave_parameters:
     parentdir = "D:/multiScope_Data/"
 
+class ASLM_parameters:
+    simultaneous_lines = 17 #for a NA0.4 light-sheet, the expected length is around 2 um, with the 55.5x magnification, and 6.5 um pixel size (2*55.5/6.5) this translates to 17 lines
+    line_delay = 0.01026 #10.16us
+
 class NI_board_parameters:
     # "ao0/highrescamera", "ao1/lowrescamera", "ao3/stage", "ao5/laser488TTL",
     # "ao6/laser552_TTL", "ao8/laser594_TTL", "ao11/laser640_TTL", "ao12/laser_voicecoil"

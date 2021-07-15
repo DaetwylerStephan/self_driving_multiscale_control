@@ -99,6 +99,9 @@ class MultiScale_Microscope_Controller():
         '''
         if self.model.continue_preview_lowres == False:
 
+            #change mirror position/slit position
+            self.model.changeHRtoLR()
+
             # set parameter that you run a preview
             self.model.continue_preview_lowres = True
             self.model.laserOn = self.current_laser
@@ -121,6 +124,10 @@ class MultiScale_Microscope_Controller():
         change mirror, set exposure time, start preview, set continue_preview_highres to True.
         '''
         if self.model.continue_preview_highres == False:
+
+            # change mirror position/slit position
+            self.model.changeLRtoHR()
+
             # set parameter that you run a preview
             self.model.continue_preview_highres = True
             self.model.laserOn = self.current_laser
@@ -133,9 +140,15 @@ class MultiScale_Microscope_Controller():
 
             #run preview with given parameters
             self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get() # set exposure time
-            self.model.preview_highres()
-            print("running high res preview")
 
+            #ASLM or static light-sheet mode
+            if self.view.runtab.cam_highresMode.get()=='SPIM Mode':
+                self.model.preview_highres_static()
+                print("running high res static preview")
+            else:
+                self.model.calculate_ASLMparameters(self.view.runtab.cam_highresExposure.get())
+                self.model.preview_highres_ASLM()
+                print("running high res ASLM preview")
 
     def run_stop_preview(self, event):
         '''

@@ -24,14 +24,17 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_lowres = tk. DoubleVar()
         self.slit_highres = tk. DoubleVar()
 
-        #stage settings
+        self.ASLM_linedelay = tk.DoubleVar()
 
+        ### ----------------------------label frames-----------------------------------------------------------------
 
         #set the different label frames
         slit_settings = tk.LabelFrame(self, text="Slit Settings")
+        ASLM_settings = tk.LabelFrame(self, text="Slit Settings")
 
         # overall positioning of label frames
         slit_settings.grid(row=2, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
+        ASLM_settings.grid(row=2, column=1, sticky = tk.W + tk.E+tk.S+tk.N)
 
         ### ----------------------------slit settings -----------------------------------------------------------------
         # slit labels (positioned)
@@ -50,13 +53,23 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_lowres.set(4025)
         self.slit_highres.set(150)
 
-        # slit layout
+        # slit settings layout
         slit_scale.grid(row=2, column=1, rowspan=2, columnspan=4, sticky=tk.W + tk.E)
         self.slit_opening_entry.grid(row=3, column=5, sticky=tk.W + tk.E + tk.S)
         self.slit_lowres_entry.grid(row=4, column=1, columnspan=2, sticky=tk.W + tk.E + tk.S)
         self.slit_highres_entry.grid(row=4, column=4, columnspan=2, sticky=tk.W + tk.E + tk.S)
 
+        ### ----------------------------ASLM settings -----------------------------------------------------------------
+        # ASLM labels (positioned)
+        lineDelay_label = ttk.Label(ASLM_settings, text="Line Delay factor:").grid(row=2, column=0)
 
+        self.lineDelay_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_linedelay, width=6)
+
+        # set defaults
+        self.ASLM_linedelay.set(6)
+
+        #ASLM settings layout
+        self.lineDelay_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
 
     def print_values(self):
         print("test")

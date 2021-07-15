@@ -55,8 +55,23 @@ class Photo_Camera:
     def return_camera_readouttime(self):
         return self.cam.readout_time
 
-    def prepare_ASLM_acquisition(self, linescan):
+    def prepare_ASLM_acquisition(self, exposure_time, scandelay):
         """Changes the settings of the camera to ASLM acquisitions."""
+        self.cam.exp_mode = 'Edge Trigger'
+        self.cam.speed_table_index = 1 # 1 for 100 MHz
+        self.cam.readout_port = 0
+        self.cam.gain = 1
+        self.cam.prog_scan_mode = 1 # Scan mode options: {'Auto': 0, 'Line Delay': 1, 'Scan Width': 2}
+        self.cam.prog_scan_dir = 0 # Scan direction options: {'Down': 0, 'Up': 1, 'Down/Up Alternate': 2}
+        self.cam.prog_scan_line_delay = scandelay  # 10.26 us x factor, a factor = 6 equals 71.82 us
+
+        #The   Line   Output   Mode   is   used   for   synchronization   purposes   when
+        # uses   Programmable Scan mode. Line Output Mode creates a rising edge for each
+        # row that the rolling shutter read out mechanism of the sensor advances
+        self.cam.exp_out_mode = 4
+
+        self.cam.start_live(exp_time=exposure_time)
+
 
     def run_stack_acquisition_buffer(self, nb_planes, buffer):
         """Run a stack acquisition."""
@@ -75,14 +90,26 @@ class Photo_Camera:
         self.cam.finish()
 
 
-    def set_up_preview(self, exposure=20):
+    def set_up_preview(self, exposure=20, speedindex=0):
         self.cam.exp_mode = "Internal Trigger"
         self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = 0
+        self.cam.speed_table_index = speedindex
         self.cam.start_live(exp_time=exposure)
 
     def run_preview(self, out):
         fps, frame_count = self.cam.poll_frame2(out)
+
+    def run_preview_ASLM(self, out):
+        framesReceived = 0
+        while framesReceived < 1:
+            try:
+                fps, frame_count = self.cam.poll_frame2(out)
+                framesReceived += 1
+                print("{}:{}".format(framesReceived, fps))
+            except Exception as e:
+                print(str(e))
+                break
+
 
     def end_preview(self):
         self.cam.finish()

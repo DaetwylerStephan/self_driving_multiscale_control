@@ -19,6 +19,7 @@ from constants import FilterWheel_parameters
 from constants import Stage_parameters
 from constants import NI_board_parameters
 from constants import Camera_parameters
+from constants import ASLM_parameters
 from tifffile import imread, imwrite
 
 class multiScopeModel:
@@ -58,6 +59,9 @@ class multiScopeModel:
         self.channelIndicator = "00"
         self.slitopening_lowres = 150
         self.slitopening_highres= 4558
+        self.currentROI_x = 2048
+        self.currentROI_y = 2048
+        self.ASLM_acquisition_time = 0.3
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -233,6 +237,7 @@ class multiScopeModel:
         self.adjustableslit.slit_status()
         self.adjustableslit.slit_set_microstep_mode_256()
         self.adjustableslit.home_stage()
+        print("slit homed")
         self.adjustableslit.slit_set_speed(1000)
 
 
@@ -288,15 +293,21 @@ class multiScopeModel:
         """
         change from low resolution to high resolution acquisition settings
         """
-        self.move_adjustableslit(self.slitopening_highres, 1)
-        self.flipMirrorPosition_power.setconstantvoltage(0)
+        def moveslitLRtoHR():
+            self.move_adjustableslit(self.slitopening_highres, 1)
+        ct.ResultThread(target=moveslitLRtoHR).start()
+
+        self.flipMirrorPosition_power.setconstantvoltage(3)
 
     def changeHRtoLR(self):
         """
         change from high resolution to low resolution acquisition settings
         """
-        self.move_adjustableslit(self.slitopening_lowres, 1)
-        self.flipMirrorPosition_power.setconstantvoltage(3)
+        def moveslitHRtoLR():
+            self.move_adjustableslit(self.slitopening_lowres, 1)
+        ct.ResultThread(target=moveslitHRtoLR).start()
+
+        self.flipMirrorPosition_power.setconstantvoltage(0)
 
     def preview_lowres(self):
         """
@@ -342,7 +353,7 @@ class multiScopeModel:
         th.start()
         return th
 
-    def preview_highres(self):
+    def preview_highres_static(self):
         def preview_highres_task(custody):
 
             self.highres_camera.set_up_preview(self.exposure_time_HR)
@@ -387,6 +398,84 @@ class multiScopeModel:
 
         self.continue_preview_highres = True
         th = ct.CustodyThread(target=preview_highres_task, first_resource=self.highres_camera)
+        th.start()
+        return th
+
+    def calculate_ASLMparameters(self, desired_exposuretime):
+        """
+        calculate the parameters for an ASLM acquisition
+        :param desired_exposuretime: the exposure time that is desired for the whole acquisition
+        :return: set the important parameters for ASLM acquisitions
+        """
+        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + self.currentROI_y/ASLM_parameters.simultaneous_lines)))
+        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(self.currentROI_y *ASLM_parameters.line_delay)))
+        self.ASLM_acquisition_time = self.ASLM_line_delay * self.currentROI_y * ASLM_parameters.line_delay + self.ASLM_lineExposure
+
+        print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
+
+    def preview_highres_ASLM(self):
+        def preview_highresASLM_task(custody):
+
+            #self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
+            self.highres_camera.prepare_stack_acquisition(200)
+
+            self.num_frames = 0
+            self.initial_time = time.perf_counter()
+
+            while self.continue_preview_highres:
+
+                #generate array
+                basic_unit = np.zeros(
+                    (self.ao.s2p(self.ASLM_acquisition_time/1000 + 0.02), NI_board_parameters.ao_nchannels),
+                    np.dtype(np.float64))
+                basic_unit[:, self.current_laser] = 4
+                basic_unit[self.ao.s2p(0):self.ao.s2p(0.002),0] = 4.  # high-res camera
+
+                print("array generated")
+
+                #todo - add here the voltage of the remote mirror
+
+                custody.switch_from(None, to=self.highres_camera)
+
+                # write voltages
+                write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(basic_unit,),
+                                                        ).start()
+
+                #start camera thread to poll for new images
+                def start_camera_streamASLMpreview():
+                    self.highres_camera.run_preview_ASLM(out=self.high_res_buffer)
+
+                camera_stream_thread_ASLMpreview = ct.ResultThread(target=start_camera_streamASLMpreview).start()
+
+                #play voltages
+                self.ao.play_voltages(block=True)
+
+                print("voltages played")
+                camera_stream_thread_ASLMpreview.get_result()
+                print("camera thread returned")
+                self.num_frames += 1
+
+
+
+                #calculate fps to display
+                #if (self.num_frames % 2 ==0): #Napari can only display 20fps
+                if 1==1:
+                    custody.switch_from(self.highres_camera, to=self.display)
+                    self.display.show_image_highres(self.high_res_buffer)
+                    custody.switch_from(self.display, to=None)
+                else:
+                    custody.switch_from(self.highres_camera, to=None)
+
+                if self.num_frames == 100:
+                    time_elapsed = time.perf_counter() - self.initial_time
+                    print("%0.2f average FPS" % (self.num_frames / time_elapsed))
+                    self.num_frames = 0
+                    self.initial_time = time.perf_counter()
+
+            self.highres_camera.end_preview()
+
+        self.continue_preview_highres = True
+        th = ct.CustodyThread(target=preview_highresASLM_task, first_resource=self.highres_camera)
         th.start()
         return th
 
@@ -460,8 +549,7 @@ class multiScopeModel:
             # exposure time, depending on the number of rows that are imaged
             nb_rows = 2960
             # nb_rows = 2480
-            line_digitization_time = 0.01026
-            readout_time = nb_rows * line_digitization_time
+            readout_time = nb_rows * ASLM_parameters.line_delay
 
             #prepare voltage array
             # calculate minimal unit duration
