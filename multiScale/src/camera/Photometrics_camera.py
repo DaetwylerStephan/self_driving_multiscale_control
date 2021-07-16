@@ -19,6 +19,9 @@ class Photo_Camera:
         print("camera detected")
         self.cam.open()
         print("camera open")
+
+        self.cam.gain = 1
+
         return None
 
     def close(self):

@@ -356,7 +356,7 @@ class multiScopeModel:
     def preview_highres_static(self):
         def preview_highres_task(custody):
 
-            self.highres_camera.set_up_preview(self.exposure_time_HR)
+            self.highres_camera.set_up_preview(self.exposure_time_HR, 1)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
@@ -416,8 +416,8 @@ class multiScopeModel:
     def preview_highres_ASLM(self):
         def preview_highresASLM_task(custody):
 
-            #self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
-            self.highres_camera.prepare_stack_acquisition(200)
+            self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
+            #self.highres_camera.prepare_stack_acquisition(200)
 
             self.num_frames = 0
             self.initial_time = time.perf_counter()
