@@ -62,6 +62,12 @@ class multiScopeModel:
         self.currentROI_x = 2048
         self.currentROI_y = 2048
         self.ASLM_acquisition_time = 0.3
+        self.ASLM_minVolt = 0 #minimal voltage applied at remote mirror
+        self.ASLM_maxVolt = 1 #maximum voltage applied at remote mirror
+        self.ASLM_currentVolt = 0 #current voltage applied to remote mirror
+        self.ASLM_alignmentMode = 0 #param=1 if ASLM alignment mode is on, otherwise zero
+        self.ASLM_staticLowResVolt = 0 #default ASLM low res voltage
+        self.ASLM_staticHighResVolt = 0 #default ASLM high res voltage
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -327,6 +333,13 @@ class multiScopeModel:
                     basic_unit[:, old_laserline] = 0
                     old_laserline = self.current_laser
                     basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
+
+                    if self.ASLM_alignmentMode == 1:
+                        if
+                        basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt #set voltage of remote mirror
+                    else:
+                        basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #set voltage of remote mirror
+
                     self.ao.play_voltages(basic_unit, block=True)
 
             ct.ResultThread(target=laser_preview).start()
@@ -369,6 +382,7 @@ class multiScopeModel:
                     basic_unit[:,old_laserline] = 0
                     old_laserline = self.current_laser
                     basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
+                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt #set voltage of remote mirror
                     self.ao.play_voltages(basic_unit, block=True)
 
             ct.ResultThread(target=laser_preview_highres).start()

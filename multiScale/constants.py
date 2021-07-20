@@ -27,10 +27,12 @@ class FileSave_parameters:
 class ASLM_parameters:
     simultaneous_lines = 17 #for a NA0.4 light-sheet, the expected length is around 2 um, with the 55.5x magnification, and 6.5 um pixel size (2*55.5/6.5) this translates to 17 lines
     line_delay = 0.01026 #10.16us
+    remote_mirror_minVol = -2.5
+    remote_mirror_maxVol = 2.5
 
 class NI_board_parameters:
     # "ao0/highrescamera", "ao1/lowrescamera", "ao3/stage", "ao5/laser488TTL",
-    # "ao6/laser552_TTL", "ao8/laser594_TTL", "ao11/laser640_TTL", "ao12/laser_voicecoil"
+    # "ao6/laser552_TTL", "ao8/laser594_TTL", "ao11/laser640_TTL", "ao12/voicecoil"
     line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao3, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao12"
     ao_type = '6738'
     ao_nchannels = 8
@@ -39,6 +41,7 @@ class NI_board_parameters:
     laser552 = 4
     laser594 = 5
     laser640 = 6
+    voicecoil = 7
 
     #constant values for laser power etc...
     ao_type_constant = '6738_constant'

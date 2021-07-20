@@ -15,6 +15,7 @@ import auxiliary_code.concurrency_tools as ct
 from constants import Camera_parameters
 from constants import NI_board_parameters
 from constants import FileSave_parameters
+from constants import ASLM_parameters
 
 
 class MultiScale_Microscope_Controller():
@@ -35,7 +36,7 @@ class MultiScale_Microscope_Controller():
         #define here which buttons run which function in the multiScope model
         self.continuetimelapse = 1 #enable functionality to stop timelapse
 
-        #buttons run tab
+        #######connect buttons / variables from GUI with functions here-----------------------------------
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
         self.view.runtab.bt_preview_highres.bind("<ButtonRelease>", self.run_highrespreview)
         self.view.runtab.bt_preview_stop.bind("<Button>", self.run_stop_preview)
@@ -62,6 +63,7 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
         self.view.advancedSettingstab.slit_lowres.trace_add("write", self.slit_opening_setPositions)
         self.view.advancedSettingstab.slit_highres.trace_add("write", self.slit_opening_setPositions)
+        self.view.advancedSettingstab.ASLM_volt_current.trace_add("write", self.update_remoteMirrorVoltage)
 
         #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
@@ -147,6 +149,8 @@ class MultiScale_Microscope_Controller():
                 print("running high res static preview")
             else:
                 self.model.calculate_ASLMparameters(self.view.runtab.cam_highresExposure.get())
+                self.model.ASLM_minVolt = min(2.5, max(-2.5, self.view.advancedSettingstab.ASLM_volt_min.get()))
+                self.model.ASLM_maxVolt = max(-2.5,min(2.5,  self.view.advancedSettingstab.ASLM_volt_max.get()))
                 self.model.preview_highres_ASLM()
                 print("running high res ASLM preview")
 
@@ -212,7 +216,7 @@ class MultiScale_Microscope_Controller():
         """
         update the laser power
         """
-        #get laser power from GUI and constract laser power setting array
+        #get laser power from GUI and construct laser power setting array
         voltage488 = self.view.runtab.laser488_percentage.get()*5/100.
         voltage552 = self.view.runtab.laser552_percentage.get()*5/100.
         voltage594 = self.view.runtab.laser594_percentage.get()*5/100.
@@ -221,6 +225,20 @@ class MultiScale_Microscope_Controller():
 
         #change laser power
         self.model.set_laserpower(power_settings)
+
+    def update_remoteMirrorVoltage(self, var,indx, mode):
+        """
+        update the remote mirror voltage power, check for boundaries to not apply too high voltages
+        """
+        #get remote mirror voltage from GUI and update model parameter
+        remotemirrorvoltage = self.view.advancedSettingstab.ASLM_volt_current.get()
+
+        #check for boundaries
+        remotemirrorvoltage = max(ASLM_parameters.remote_mirror_minVol, remotemirrorvoltage)
+        remotemirrorvoltage = min(ASLM_parameters.remote_mirror_maxVol, remotemirrorvoltage)
+
+        self.model.ASLM_currentVolt = remotemirrorvoltage
+
 
     def updatefilename(self):
         """
