@@ -65,9 +65,11 @@ class multiScopeModel:
         self.ASLM_minVolt = 0 #minimal voltage applied at remote mirror
         self.ASLM_maxVolt = 1 #maximum voltage applied at remote mirror
         self.ASLM_currentVolt = 0 #current voltage applied to remote mirror
-        self.ASLM_alignmentMode = 0 #param=1 if ASLM alignment mode is on, otherwise zero
         self.ASLM_staticLowResVolt = 0 #default ASLM low res voltage
         self.ASLM_staticHighResVolt = 0 #default ASLM high res voltage
+        self.ASLM_alignmentOn = 0 #param=1 if ASLM alignment mode is on, otherwise zero
+        self.ASLM_Sawtooth = 0 #alignment mode - run sawtooth
+        self.ASLM_ConstantVoltage = 0 #alignment mode - run constant voltage
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -335,8 +337,12 @@ class multiScopeModel:
                     basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
 
                     if self.ASLM_alignmentMode == 1:
-                        if
-                        basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt #set voltage of remote mirror
+                        if self.ASLM_Sawtooth:
+                            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_minVolt
+                            basic_unit[0: self.ao.s2p(0.2), NI_board_parameters.voicecoil] = np.linspace(self.ASLM_minVolt, self.ASLM_maxVolt, self.ao.s2p(0.2))
+                            basic_unit[(self.ao.s2p(0.2)):self.ao.s2p(0.3), NI_board_parameters.voicecoil] = np.linspace(self.ASLM_maxVolt, self.ASLM_minVolt, self.ao.s2p(0.1))
+                        else:
+                            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt #set voltage of remote mirror
                     else:
                         basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #set voltage of remote mirror
 
@@ -382,7 +388,7 @@ class multiScopeModel:
                     basic_unit[:,old_laserline] = 0
                     old_laserline = self.current_laser
                     basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
-                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt #set voltage of remote mirror
+                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #set voltage of remote mirror
                     self.ao.play_voltages(basic_unit, block=True)
 
             ct.ResultThread(target=laser_preview_highres).start()
@@ -439,20 +445,33 @@ class multiScopeModel:
             while self.continue_preview_highres:
 
                 #generate array
-                basic_unit = np.zeros(
-                    (self.ao.s2p(self.ASLM_acquisition_time/1000 + 0.02), NI_board_parameters.ao_nchannels),
-                    np.dtype(np.float64))
-                basic_unit[:, self.current_laser] = 4
-                basic_unit[self.ao.s2p(0):self.ao.s2p(0.002),0] = 4.  # high-res camera
+                totallength = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02)
+                basic_unit = np.zeros((totallength, NI_board_parameters.ao_nchannels), np.dtype(np.float64))
+
+                basic_unit[self.ao.s2p(0.001):totallength, self.current_laser] = 4
+                basic_unit[self.ao.s2p(0.001) : self.ao.s2p(0.002),0] = 4.  # high-res camera
+
+                if self.ASLM_alignmentOn == 1:
+                    #during alignment, set constant voltage
+                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt  # high-res camera
+                else:
+                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_minVolt
+                    goinguppoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000)
+                    goingdownpoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02) - goinguppoints
+                    basic_unit[0:goinguppoints, NI_board_parameters.voicecoil] = np.linspace(self.ASLM_minVolt,
+                                                                                                 self.ASLM_maxVolt,
+                                                                                                 goinguppoints)
+                    basic_unit[goinguppoints:, NI_board_parameters.voicecoil] = np.linspace(self.ASLM_maxVolt, self.ASLM_minVolt,
+                                                                                  goingdownpoints)
+
+                    print(basic_unit[totallength-1, NI_board_parameters.voicecoil])
 
                 print("array generated")
-
-                #todo - add here the voltage of the remote mirror
 
                 custody.switch_from(None, to=self.highres_camera)
 
                 # write voltages
-                write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(basic_unit,),
+                write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(basic_unit,False),
                                                         ).start()
 
                 #start camera thread to poll for new images
@@ -462,7 +481,7 @@ class multiScopeModel:
                 camera_stream_thread_ASLMpreview = ct.ResultThread(target=start_camera_streamASLMpreview).start()
 
                 #play voltages
-                self.ao.play_voltages(block=True)
+                self.ao.play_voltages(block=True, force_final_zeros=False)
 
                 print("voltages played")
                 camera_stream_thread_ASLMpreview.get_result()
@@ -573,6 +592,7 @@ class multiScopeModel:
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4.
+            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #remote mirror
 
             control_array = np.tile(basic_unit, (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
 
@@ -708,6 +728,10 @@ class multiScopeModel:
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
 
+    def smooth_sawtooth(self, array):
+
+
+        return array
 
 if __name__ == '__main__':
     # first code to run in the multiscope

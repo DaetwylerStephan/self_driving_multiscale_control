@@ -29,10 +29,12 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_volt_min = tk.DoubleVar()
         self.ASLM_volt_max = tk.DoubleVar()
         self.ASLM_volt_current = tk.DoubleVar()
-        self.ASLM_alignmentmodeOn = tk.IntVar()
-        self.ASLM_SawToothOn = tk.IntVar()
-        self.ASLM_constantVoltageOn = tk.IntVar()
-
+        self.ASLM_alignmentmodeOn = tk.IntVar() #switch ASLM alignment mode on/off
+        self.ASLM_SawToothOn = tk.IntVar() #choose SawTooth in ASLM alignment mode
+        self.ASLM_constantVoltageOn = tk.IntVar() #choose constant voltage in ASLM alignment mode
+        self.ASLM_volt_lowRes_static = tk.DoubleVar() #parameter for low resolution static light sheet
+        self.ASLM_volt_highRes_static = tk.DoubleVar() #parameter for high resolution static light sheet
+        self.ASLM_SawtoothORconstant = tk.StringVar()
         ### ----------------------------label frames-----------------------------------------------------------------
 
         #set the different label frames
@@ -71,21 +73,26 @@ class AdvancedSettings_Tab(tk.Frame):
         lineDelay_label = ttk.Label(ASLM_settings, text="Line Delay factor:").grid(row=2, column=0)
         voltageminimal_label = ttk.Label(ASLM_settings, text="ASLM remote mirror min voltage:").grid(row=4, column=0)
         voltagemaximal_label = ttk.Label(ASLM_settings, text="ASLM remote mirror max voltage:").grid(row=7, column=0)
-        voltagecurrent_label = ttk.Label(ASLM_settings, text="Set ASLM remote mirror voltage:").grid(row=9, column=0)
+        voltagecurrent_label = ttk.Label(ASLM_settings, text="Current ASLM remote mirror voltage:").grid(row=9, column=0)
+        voltagelowRes_label = ttk.Label(ASLM_settings, text="Low Resolution ASLM remote mirror voltage (static):").grid(row=14, column=0)
+        voltagehighRes_label = ttk.Label(ASLM_settings, text="High Resolution ASLM remote mirror voltage (static:").grid(row=16, column=0)
 
         self.lineDelay_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_linedelay, width=6)
         self.voltageminimal_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_min, width=6)
         self.voltagemaximal_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_max, width=6)
         self.voltagecurrent_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_current, width=6)
+        self.voltageLowRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_lowRes_static, width=6)
+        self.voltageHighRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_highRes_static, width=6)
 
         # choice of scan mode
         self.ASLM_alignmentmodeOn_chkbt = tk.Checkbutton(ASLM_settings, text='Alignment mode on',
                                                          variable=self.ASLM_alignmentmodeOn, onvalue=1, offvalue=0)
 
-        self.ASLM_sawtoothON_chkbt = tk.Checkbutton(ASLM_settings, text='Apply Saw Tooth ASLM',
-                                                        variable=self.ASLM_SawToothOn, onvalue=1, offvalue=0)
-        self.ASLM_constantRemoteOn_chkbt = tk.Checkbutton(ASLM_settings, text='Apply Constant ASLM voltage',
-                                                         variable=self.ASLM_constantVoltageOn, onvalue=1, offvalue=0)
+        # choice of ASLM run mode
+        ASLM_runoptions = ('Sawtooth', 'Constant Voltage')
+        self.ASLM_runOptionsMenu = tk.OptionMenu(ASLM_settings, self.ASLM_SawtoothORconstant,
+                                                   *ASLM_runoptions)
+        self.ASLM_SawtoothORconstant.set(ASLM_runoptions[0])
 
 
         # set defaults
@@ -93,6 +100,8 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_volt_min.set(-1)
         self.ASLM_volt_max.set(1)
         self.ASLM_volt_current.set(0)
+        self.ASLM_volt_lowRes_static.set(0)
+        self.ASLM_volt_highRes_static.set(0)
 
 
         #ASLM settings layout
@@ -101,8 +110,9 @@ class AdvancedSettings_Tab(tk.Frame):
         self.voltagemaximal_entry.grid(row=7, column=1, sticky=tk.W + tk.E + tk.S)
         self.voltagecurrent_entry.grid(row=9, column=1, sticky=tk.W + tk.E + tk.S)
         self.ASLM_alignmentmodeOn_chkbt.grid(row=11, column=0, sticky=tk.W + tk.S)
-        self.ASLM_sawtoothON_chkbt.grid(row=12, column=0, sticky=tk.W + tk.S)
-        self.ASLM_constantRemoteOn_chkbt.grid(row=14, column=0, sticky=tk.W + tk.S)
+        self.ASLM_runOptionsMenu.grid(row=11, column=1, sticky=tk.W + tk.S)
+        self.voltageLowRes_entry.grid(row=14, column=1, sticky=tk.W + tk.S)
+        self.voltageHighRes_entry.grid(row=16, column=1, sticky=tk.W + tk.S)
 
     def print_values(self):
         print("test")

@@ -64,6 +64,9 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.slit_lowres.trace_add("write", self.slit_opening_setPositions)
         self.view.advancedSettingstab.slit_highres.trace_add("write", self.slit_opening_setPositions)
         self.view.advancedSettingstab.ASLM_volt_current.trace_add("write", self.update_remoteMirrorVoltage)
+        self.view.advancedSettingstab.ASLM_alignmentmodeOn.trace_add("write", self.update_ASLM_alignmentsettings)
+        self.view.advancedSettingstab.ASLM_SawToothOn.trace_add("write", self.update_ASLM_alignmentsettings)
+        self.view.advancedSettingstab.ASLM_constantVoltageOn.trace_add("write", self.update_ASLM_alignmentsettings)
 
         #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
@@ -239,6 +242,20 @@ class MultiScale_Microscope_Controller():
 
         self.model.ASLM_currentVolt = remotemirrorvoltage
 
+    def update_ASLM_alignmentsettings(self, var,indx, mode):
+        """
+        update the ASLM alignment settings
+        """
+        #get remote mirror voltage from GUI and update model parameter
+        self.model.ASLM_alignmentOn = self.view.advancedSettingstab.ASLM_volt_current.get()
+
+        runmode = self.view.advancedSettingstab.ASLM_SawtoothORconstant.get()
+        if runmode =='Sawtooth':
+            self.model.ASLM_Sawtooth =1
+            self.model.ASLM_ConstantVoltage = 0
+        else:
+            self.model.ASLM_Sawtooth = 0
+            self.model.ASLM_ConstantVoltage = 1
 
     def updatefilename(self):
         """
