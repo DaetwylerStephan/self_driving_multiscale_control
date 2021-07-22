@@ -60,6 +60,7 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_updown.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_angle.trace_add("write", self.movestage)
+        #buttons advanced settings tab
         self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
         self.view.advancedSettingstab.slit_lowres.trace_add("write", self.slit_opening_setPositions)
         self.view.advancedSettingstab.slit_highres.trace_add("write", self.slit_opening_setPositions)
@@ -67,6 +68,8 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_alignmentmodeOn.trace_add("write", self.update_ASLM_alignmentsettings)
         self.view.advancedSettingstab.ASLM_SawToothOn.trace_add("write", self.update_ASLM_alignmentsettings)
         self.view.advancedSettingstab.ASLM_constantVoltageOn.trace_add("write", self.update_ASLM_alignmentsettings)
+        self.view.advancedSettingstab.ASLM_volt_min.trace_add("write", self.update_remoteMirrorVoltage)
+        self.view.advancedSettingstab.ASLM_volt_max.trace_add("write", self.update_remoteMirrorVoltage)
 
         #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
@@ -152,8 +155,6 @@ class MultiScale_Microscope_Controller():
                 print("running high res static preview")
             else:
                 self.model.calculate_ASLMparameters(self.view.runtab.cam_highresExposure.get())
-                self.model.ASLM_minVolt = min(2.5, max(-2.5, self.view.advancedSettingstab.ASLM_volt_min.get()))
-                self.model.ASLM_maxVolt = max(-2.5,min(2.5,  self.view.advancedSettingstab.ASLM_volt_max.get()))
                 self.model.preview_highres_ASLM()
                 print("running high res ASLM preview")
 
@@ -233,14 +234,16 @@ class MultiScale_Microscope_Controller():
         """
         update the remote mirror voltage power, check for boundaries to not apply too high voltages
         """
-        #get remote mirror voltage from GUI and update model parameter
-        remotemirrorvoltage = self.view.advancedSettingstab.ASLM_volt_current.get()
+        minVol = ASLM_parameters.remote_mirror_minVol
+        maxVol = ASLM_parameters.remote_mirror_maxVol
 
-        #check for boundaries
-        remotemirrorvoltage = max(ASLM_parameters.remote_mirror_minVol, remotemirrorvoltage)
-        remotemirrorvoltage = min(ASLM_parameters.remote_mirror_maxVol, remotemirrorvoltage)
+        #get remote mirror voltage from GUI and update model parameter, also check for boundaries
+        self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()))
+        self.model.ASLM_minVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_min.get()))
+        self.model.ASLM_maxVolt = max(minVol, min(maxVol, self.view.advancedSettingstab.ASLM_volt_max.get()))
 
-        self.model.ASLM_currentVolt = remotemirrorvoltage
+        print("update voltages")
+
 
     def update_ASLM_alignmentsettings(self, var,indx, mode):
         """

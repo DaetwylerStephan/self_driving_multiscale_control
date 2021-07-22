@@ -336,7 +336,7 @@ class multiScopeModel:
                     old_laserline = self.current_laser
                     basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
 
-                    if self.ASLM_alignmentMode == 1:
+                    if self.ASLM_alignmentOn == 1:
                         if self.ASLM_Sawtooth:
                             basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_minVolt
                             basic_unit[0: self.ao.s2p(0.2), NI_board_parameters.voicecoil] = np.linspace(self.ASLM_minVolt, self.ASLM_maxVolt, self.ao.s2p(0.2))
@@ -455,16 +455,14 @@ class multiScopeModel:
                     #during alignment, set constant voltage
                     basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt  # high-res camera
                 else:
-                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_minVolt
+                    sawtooth_array = np.zeros(totallength, np.dtype(np.float64))
+                    sawtooth_array[:] = self.ASLM_minVolt
                     goinguppoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000)
                     goingdownpoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02) - goinguppoints
-                    basic_unit[0:goinguppoints, NI_board_parameters.voicecoil] = np.linspace(self.ASLM_minVolt,
-                                                                                                 self.ASLM_maxVolt,
-                                                                                                 goinguppoints)
-                    basic_unit[goinguppoints:, NI_board_parameters.voicecoil] = np.linspace(self.ASLM_maxVolt, self.ASLM_minVolt,
-                                                                                  goingdownpoints)
+                    sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_minVolt,self.ASLM_maxVolt, goinguppoints)
+                    sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_maxVolt, self.ASLM_minVolt, goingdownpoints)
 
-                    print(basic_unit[totallength-1, NI_board_parameters.voicecoil])
+                    basic_unit[:, NI_board_parameters.voicecoil] = self.smooth_sawtooth(sawtooth_array, window_len = self.ao.s2p(0.01))
 
                 print("array generated")
 
@@ -728,10 +726,19 @@ class multiScopeModel:
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
 
-    def smooth_sawtooth(self, array):
+    def smooth_sawtooth(self, array, window_len = 101):
 
+        if (window_len % 2) == 0:
+            window_len = window_len + 1
+        startwindow = int((window_len - 1) / 2)
 
-        return array
+        s = np.r_[array[startwindow:0:-1], array, array[-2:-(startwindow + 2):-1]] #make array bigger on both sides
+
+        w = np.ones(window_len, 'd') #define a flat window - all values have equal weight
+
+        returnarray = np.convolve(w / w.sum(), s, mode='valid') #convolve with window to smooth
+
+        return returnarray
 
 if __name__ == '__main__':
     # first code to run in the multiscope
