@@ -51,8 +51,10 @@ class Run_Tab(tk.Frame):
         self.stack_aq_lowResCameraOn = tk.IntVar()
         self.stack_aq_highResCameraOn = tk.IntVar()
         self.stack_acq_laserCycleMode = tk.StringVar()
-        self.stack_aq_numberOfPlanes = tk.IntVar()
-        self.stack_aq_plane_spacing = tk.DoubleVar()
+        self.stack_aq_numberOfPlanes_lowres = tk.IntVar()
+        self.stack_aq_numberOfPlanes_highres = tk.IntVar()
+        self.stack_aq_plane_spacing_lowres = tk.DoubleVar()
+        self.stack_aq_plane_spacing_highres = tk.DoubleVar()
 
         #time-lapse setting parameters
         self.timelapse_aq_progress = tk.DoubleVar()
@@ -188,8 +190,10 @@ class Run_Tab(tk.Frame):
         ### ----------------------------stack acquisition buttons ------------------------------------------------------
         #stack aquisition labels (positioned)
         laseron_label = ttk.Label(stack_aquisition_settings, text="Laser On:").grid(row=2, column=0)
-        numberOfPlanes_label= ttk.Label(stack_aquisition_settings, text="Number of planes:").grid(row = 6, column = 0)
-        plane_spacing_label= ttk.Label(stack_aquisition_settings, text="Spacing of planes:").grid(row = 10, column = 0)
+        numberOfPlanes_label_lowres= ttk.Label(stack_aquisition_settings, text="Number of planes (lowres):").grid(row = 6, column = 0)
+        numberOfPlanes_label_highres= ttk.Label(stack_aquisition_settings, text="Number of planes (highres):").grid(row = 7, column = 0)
+        plane_spacing_label_lowres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (lowres):").grid(row = 10, column = 0)
+        plane_spacing_label_highres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (highres):").grid(row = 11, column = 0)
         laser_cyclemode_label= ttk.Label(stack_aquisition_settings, text="Laser Cycle Mode:").grid(row = 3, column = 0)
         cameraOn_label= ttk.Label(stack_aquisition_settings, text="Camera On:").grid(row = 4, column = 0)
 
@@ -211,12 +215,17 @@ class Run_Tab(tk.Frame):
         self.stack_acq_laserCycleMode.set(laserCycles[0])
 
         #number of planes
-        self.stack_aq_entry_numberOfPlanes = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes)
-        self.stack_aq_entry_numberOfPlanes.insert(0, "20")
+        self.stack_aq_entry_numberOfPlanes_lowres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes_lowres)
+        self.stack_aq_numberOfPlanes_lowres.set(200)
+        self.stack_aq_entry_numberOfPlanes_highres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes_highres)
+        self.stack_aq_numberOfPlanes_highres.set(200)
 
         #plane spacing
-        self.stack_aq_entry_plane_spacing = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing)
-        self.stack_aq_entry_plane_spacing.insert(0, "1")
+        self.stack_aq_entry_plane_spacing_lowres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing_lowres)
+        self.stack_aq_entry_plane_spacing_lowres.insert(0, "1")
+        self.stack_aq_entry_plane_spacing_highres = tk.Entry(stack_aquisition_settings,
+                                                     textvariable=self.stack_aq_plane_spacing_highres)
+        self.stack_aq_entry_plane_spacing_highres.insert(0, "1")
 
         #run buttons
         self.stack_aq_bt_run_stack = tk.Button(stack_aquisition_settings, text="Acquire Stack")
@@ -232,8 +241,10 @@ class Run_Tab(tk.Frame):
         self.stack_aq_ckb_lowresCamera.grid(row=4, column=1, columnspan=2)
         self.stack_aq_ckb_highresCamera.grid(row=4, column=3, columnspan=2)
 
-        self.stack_aq_entry_numberOfPlanes.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
-        self.stack_aq_entry_plane_spacing.grid(row =10, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_entry_numberOfPlanes_lowres.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_entry_numberOfPlanes_highres.grid(row =7, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_entry_plane_spacing_lowres.grid(row =10, column=1, columnspan=3, sticky = tk.W + tk.E)
+        self.stack_aq_entry_plane_spacing_highres.grid(row =11, column=1, columnspan=3, sticky = tk.W + tk.E)
         self.stack_aq_bt_run_stack.grid(row = 15, column =0, columnspan=3, sticky = tk.W + tk.E)
         self.stack_aq_bt_abort_stack.grid(row=15, column=3, columnspan=4, sticky=tk.W + tk.E)
 

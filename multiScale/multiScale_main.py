@@ -76,8 +76,8 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.keyboard_input_off_bt.bind("<Button>", self.disable_keyboard_movement)
 
         #define some parameters
-        self.current_stackbuffersize = self.view.runtab.stack_aq_numberOfPlanes.get()
-        self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+
+        #self.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_lowres.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
         self.current_laser = "488"
 
     def run(self):
@@ -112,7 +112,7 @@ class MultiScale_Microscope_Controller():
 
             # set parameter that you run a preview
             self.model.continue_preview_lowres = True
-            self.model.laserOn = self.current_laser
+            #self.model.laserOn = self.current_laser
 
             #set button layout - sunken relief
             def set_button():
@@ -138,12 +138,12 @@ class MultiScale_Microscope_Controller():
 
             # set parameter that you run a preview
             self.model.continue_preview_highres = True
-            self.model.laserOn = self.current_laser
+            #self.model.laserOn = self.current_laser
+
             #set button layout - sunken relief
             def set_buttonHR():
                 time.sleep(0.002)
                 self.view.runtab.bt_preview_highres.config(relief="sunken")
-
             ct.ResultThread(target=set_buttonHR).start()
 
             #run preview with given parameters
@@ -154,8 +154,7 @@ class MultiScale_Microscope_Controller():
                 self.model.preview_highres_static()
                 print("running high res static preview")
             else:
-                self.model.calculate_ASLMparameters(self.view.runtab.cam_highresExposure.get())
-                self.model.preview_highres_ASLM()
+                self.model.preview_highres_ASLM(self.view.runtab.cam_highresExposure.get())
                 print("running high res ASLM preview")
 
     def run_stop_preview(self, event):
@@ -283,31 +282,6 @@ class MultiScale_Microscope_Controller():
         self.parentfolder = os.path.join(parentdir, foldername)
 
 
-    # def updateNbPlanes(self, var,indx,mode):
-    #     """
-    #     generate a new SharedNDArray whenever the number of planes is updated.
-    #     """
-    #     print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()))
-    #     self.stack_buffer = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
-    #     self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
-    #     #self.stack_buffer.fill(0) #too slow - need other solution
-
-    # def automatically_update_stackbuffer(self):
-    #     print("update stack")
-    #
-    #     def update_stackbuffer():
-    #         try:
-    #                 self.stack_buffer.fill(0)
-    #                 self.current_stackbuffersize = self.stack_buffer_nb
-    #         except:
-    #             print("update error")
-    #
-    #     self.stack_buffer_nb = self.view.runtab.stack_aq_numberOfPlanes.get()
-    #
-    #     if self.stack_buffer_nb != self.current_stackbuffersize:
-    #         ct.ResultThread(target=update_stackbuffer).start()
-
-        #self.root.after(5000, self.automatically_update_stackbuffer)
 
     def acquire_stack(self, event):
         """
@@ -322,7 +296,8 @@ class MultiScale_Microscope_Controller():
         self.model.continue_preview_highres = False
 
         #set model parameters
-        self.model.stack_nbplanes = self.view.runtab.stack_aq_numberOfPlanes.get()
+        self.model.stack_nbplanes_lowres = self.view.runtab.stack_aq_numberOfPlanes_lowres.get()
+        self.model.stack_nbplanes_highres = self.view.runtab.stack_aq_numberOfPlanes_highres.get()
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
 
@@ -349,30 +324,36 @@ class MultiScale_Microscope_Controller():
 
 
         #init shared memory
-        self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes.get(),
+        self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_lowres.get(),
                                                            Camera_parameters.LR_height_pixel,
                                                            Camera_parameters.LR_width_pixel),
+                                                          dtype='uint16')
+        self.model.stack_buffer_highres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_highes.get(),
+                                                           Camera_parameters.HR_height_pixel,
+                                                           Camera_parameters.HR_width_pixel),
                                                           dtype='uint16')
         #self.model.stack_buffer_lowres.fill(0)
 
         print("acquiring low res stack")
-        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + ", plane spacing: " + str(
+        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + ", plane spacing: " + str(
             self.view.runtab.stack_aq_plane_spacing.get()))
 
+        ########-------------------------------------------------------------------------------------------------------
+        #start low resolution stack acquisition
         if self.view.runtab.stack_aq_lowResCameraOn.get():
             positioniter = -1
             for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1])) * 1000000000
-                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2]))* 1000000000
-                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3]))* 1000000000
-                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4])) * 1000000
+                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1]) * 1000000000)
+                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2])* 1000000000)
+                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3])* 1000000000)
+                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4]) * 1000000)
                 current_startposition = [zpos, xpos, ypos, angle]
                 print(current_startposition)
                 positioniter = positioniter + 1
 
                 # filepath
-                current_folder = os.path.join(stackfilepath, "stack" + f'{positioniter:03}')
+                current_folder = os.path.join(stackfilepath, "low_stack" + f'{positioniter:03}')
                 try:
                     print("filepath : " + current_folder)
                     os.makedirs(current_folder)
@@ -381,22 +362,41 @@ class MultiScale_Microscope_Controller():
 
                 #start stackstreaming
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(), self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
-                self.model.low_res_stack_acquisition_master(current_folder, current_startposition, which_channels)
+                self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "low")
 
+        ########-------------------------------------------------------------------------------------------------------
+        # start high resolution stack acquisition
         #high resolution list
         if self.view.runtab.stack_aq_highResCameraOn.get():
             for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])) * 1000000000
-                ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2]))* 1000000000
-                zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3]))* 1000000000
-                angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4])) * 1000000
+                xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1]) * 1000000000)
+                ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2])* 1000000000)
+                zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3])* 1000000000)
+                angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4]) * 1000000)
                 currentposition = [zpos, xpos, ypos, angle]
                 print(currentposition)
 
+                #define highresolution stack path by corner positions.
+                xpos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
+                ypos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
 
+                # filepath
+                current_folder = os.path.join(stackfilepath, "high_stack_" + str(xpos_label)+ "_" + str(ypos_label))
+                try:
+                    print("filepath : " + current_folder)
+                    os.makedirs(current_folder)
+                except OSError as error:
+                    print("File writing error")
 
+                # start stackstreaming
+                which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
+                                      self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
 
+                if self.view.runtab.cam_highresMode.get()=="SPIM Mode":
+                    self.model.high_res_stack_acquisition_master(current_folder, current_startposition, which_channels, "highSPIM")
+                else:
+                    self.model.high_res_stack_acquisition_master(current_folder, current_startposition, which_channels, "highASLM")
 
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
 
@@ -408,23 +408,21 @@ class MultiScale_Microscope_Controller():
         start a time-lapse acquisition thread, called from GUI (otherwise it freezes)
         """
 
+        #update GUI
         self.view.runtab.updateTimesTimelapse()
-        self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
         self.view.update_idletasks()
         self.view.update()
+        self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints-1)
+        # set button layout - sunken relief
+        def set_buttonTL():
+            time.sleep(0.002)
+            self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
+        ct.ResultThread(target=set_buttonTL).start()
 
         # stop all potential previews
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
 
-        # set button layout - sunken relief
-        def set_buttonTL():
-            time.sleep(0.002)
-            self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="sunken")
-
-        ct.ResultThread(target=set_buttonTL).start()
-
-        self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints-1)
         self.continuetimelapse = 0
         print("acquiring timelapse")
 
@@ -439,6 +437,8 @@ class MultiScale_Microscope_Controller():
         """
         thread that controls time-lapse, started from function acquire_timelapse(self, event):
         """
+
+        #todo implement here time-lapse functionalities
         varb = str(np.random.randint(0, 100))
         self.view.update()
 
@@ -476,8 +476,10 @@ class MultiScale_Microscope_Controller():
         with open(filePath, 'w') as f:
             f.write('Experiment parameters of ' + self.parentfolder + "\n")
             f.write('---------------------------------------------\n')
-            f.write('Plane spacing: ' + str(self.view.runtab.stack_aq_plane_spacing.get()) + "\n")
-            f.write('Nb of planes: ' + str(self.view.runtab.stack_aq_numberOfPlanes.get()) + "\n")
+            f.write('Plane spacing lowres: ' + str(self.view.runtab.stack_aq_plane_spacing_lowres.get()) + "\n")
+            f.write('Plane spacing highres: ' + str(self.view.runtab.stack_aq_plane_spacing_highres.get()) + "\n")
+            f.write('Nb of planes lowres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_lowres.get()) + "\n")
+            f.write('Nb of planes highres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + "\n")
 
             f.write('---------------------------------------------\n')
             f.write('low resultion stack positions\n')

@@ -48,16 +48,17 @@ class multiScopeModel:
         self.exposure_time_LR = 200
         self.continue_preview_lowres = False
         self.continue_preview_highres = False
-        self.stack_nbplanes =200
-        self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+        self.stack_nbplanes_lowres =200
+        self.stack_nbplanes_highres = 200
+        self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
         self.stack_buffer_lowres.fill(0)
-        self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
+        self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
         self.stack_buffer_highres.fill(0)
         self.filepath = 'D:/acquisitions/testimage.tif'
         self.planespacing = 10000000
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
-        self.slitopening_lowres = 150
+        self.slitopening_lowres = 1500
         self.slitopening_highres= 4558
         self.currentROI_x = 2048
         self.currentROI_y = 2048
@@ -433,7 +434,7 @@ class multiScopeModel:
 
         print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
 
-    def preview_highres_ASLM(self):
+    def preview_highres_ASLM(self, exposure_overall):
         def preview_highresASLM_task(custody):
 
             self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
@@ -468,7 +469,7 @@ class multiScopeModel:
 
                 custody.switch_from(None, to=self.highres_camera)
 
-                # write voltages
+                # write voltages, indicate "False" so that the voltages are not set back to zero at the end (for the remote mirror)
                 write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(basic_unit,False),
                                                         ).start()
 
@@ -503,16 +504,24 @@ class multiScopeModel:
                     self.num_frames = 0
                     self.initial_time = time.perf_counter()
 
+            #end preview by setting voltages back to zero
+            end_unit = np.zeros((100, NI_board_parameters.ao_nchannels), np.dtype(np.float64))
+            self.ao.play_voltages(voltages=end_unit, block=True, force_final_zeros=False)
+
             self.highres_camera.end_preview()
 
+        #parameters for preview
         self.continue_preview_highres = True
+        self.calculate_ASLMparameters(exposure_overall)
+
+        #start preview custody thread
         th = ct.CustodyThread(target=preview_highresASLM_task, first_resource=self.highres_camera)
         th.start()
         return th
 
-    def low_res_stack_acquisition_master(self, current_folder, current_startposition, whichlaser):
+    def stack_acquisition_master(self, current_folder, current_startposition, whichlaser, resolutionmode):
         """
-        Master to start stack acquisitions of different channels
+        Master to start stack acquisitions of different channels and resolution modes. Decides which stack acquisition method to call
         :param current_folder: folder to save the acquired data
         :param current_startposition: start position for the stack streaming
         :param whichlaser: which channels to image
@@ -522,25 +531,45 @@ class multiScopeModel:
             print("acquire 488 laser")
             # filepath
             current_filepath = os.path.join(current_folder, "1_CH00_000000.tif")
-            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
+            if resolutionmode == "low":
+                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
+            if resolutionmode == "highASLM":
+                print("acquire highALSM")
+            if resolutionmode == "highSPIM":
+                print("acquire highSPIM")
 
         if whichlaser[1]==1:
             print("acquire 552 laser")
             current_filepath = os.path.join(current_folder, "1_CH01_000000.tif")
-            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+            if resolutionmode == "low":
+                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser552,
                                             current_filepath)
+            if resolutionmode == "highASLM":
+                print("acquire highALSM")
+            if resolutionmode == "highSPIM":
+                print("acquire highSPIM")
 
         if whichlaser[2]==1:
             print("acquire 594 laser")
             current_filepath = os.path.join(current_folder, "1_CH02_000000.tif")
-            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+            if resolutionmode == "low":
+                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser594,
                                             current_filepath)
+            if resolutionmode == "highASLM":
+                print("acquire highALSM")
+            if resolutionmode == "highSPIM":
+                print("acquire highSPIM")
 
         if whichlaser[3]==1:
             print("acquire 640 laser")
             current_filepath = os.path.join(current_folder, "1_CH03_000000.tif")
-            self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488,
+            if resolutionmode == "low":
+                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser640,
                                             current_filepath)
+            if resolutionmode == "highASLM":
+                print("acquire highALSM")
+            if resolutionmode == "highSPIM":
+                print("acquire highSPIM")
 
     def prepare_acquisition(self, current_startposition, laser):
         """
@@ -592,7 +621,7 @@ class multiScopeModel:
             basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4.
             basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #remote mirror
 
-            control_array = np.tile(basic_unit, (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
+            control_array = np.tile(basic_unit, (self.stack_nbplanes_lowres + 1, 1))  # add +1 as you want to return to origin position
 
             #write voltages
             write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
@@ -600,12 +629,12 @@ class multiScopeModel:
 
             #data allocation correct?
             low_res_buffer = ct.SharedNDArray(
-                 shape=(self.stack_nbplanes, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
+                 shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
                  dtype='uint16')
             low_res_buffer.fill(0)
 
             #set up stage
-            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes, self.planespacing)
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.planespacing)
 
             # prepare camera for stack acquisition
             self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
@@ -616,7 +645,7 @@ class multiScopeModel:
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
 
             def start_camera_stream():
-                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes, low_res_buffer)
+                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_lowres, low_res_buffer)
 
             camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
 
@@ -672,7 +701,7 @@ class multiScopeModel:
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
 
             control_array = np.tile(basic_unit,
-                                    (self.stack_nbplanes + 1, 1))  # add +1 as you want to return to origin position
+                                    (self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
 
             # write voltages
             write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),

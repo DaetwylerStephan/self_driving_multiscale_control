@@ -1,10 +1,10 @@
 class FilterWheel_parameters:
-    avail_filters = {'515-30-25': 0,
-               '572/20-25': 1,
-               '615/20-25': 2,
-               '676/37-25': 3,
-               'transmission': 4,
-               'block': 5,
+    avail_filters = {'515-30-25': 1,
+               '572/20-25': 2,
+               '615/20-25': 3,
+               '676/37-25': 4,
+               'transmission': 5,
+               'block': 0,
                 }
     comport= 'COM6'
 
@@ -52,32 +52,6 @@ class NI_board_parameters:
     flip_mirror_line = "Dev1/ao26"
     minVol_constant = 0
     maxVol_constant = 5
-
-
-
-    # names_to_voltage_channels = {
-    #     'camera_lowres': 0,
-    #     'LED_power': 12,
-    #     '488_TTL': 20,
-    #     '488_power': 21,
-    #     }
-
-    # #available: 0,1, 3,5,6,8,11,12,14,17,18, 22
-    # #hardware; control type (analog, digital, constant); minvoltage; maxvoltage; devicename;
-    # NI_board_allocation ={
-    #     ('laser488_power', 'constant', 0, 5, "Dev1", 0),
-    #     ('laser488_TTL', 'analog',  0, 5, "Dev1", 1),
-    #     ('laser552_power', 'constant', 0, 5, "Dev1", 3),
-    #     ('laser552_TTL', 'analog', 0, 5, "Dev1", 5),
-    #     ('laser594_power', 'constant', 0, 5, "Dev1", 6),
-    #     ('laser594_TTL', 'analog',  0, 5, "Dev1", 8),
-    #     ('laser640_power', 'constant', 0, 5, "Dev1", 11),
-    #     ('laser640_TTL', 'analog',  0, 5, "Dev1", 12),
-    #     ('voicecoil', 'analog', 0,10,"Dev1", 14),
-    #     ('stagetrigger', 'analog',0,5,"Dev1",17),
-    #     ('lowres_cameratrigger', 'analog', 0, 5, "Dev1", 18),
-    #     ('highres_cameratrigger', 'analog', 0, 5, "Dev1", 22),
-    # }
 
 
 class SharedMemory_allocation:
