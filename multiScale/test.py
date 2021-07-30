@@ -19,7 +19,9 @@ if __name__ == '__main__':
         window_len = window_len+1
 
     startwindow=int((window_len-1)/2)
-    s=np.r_[x[startwindow:0:-1],x,x[-2:-(startwindow+2):-1]]
+    startarray = np.ones(startwindow)*x[0]
+    endarray = np.ones(startwindow)*x[-1]
+    s=np.r_[startarray,x,endarray]
 
     w = np.ones(window_len, 'd')
     print(s)

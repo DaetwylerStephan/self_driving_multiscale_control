@@ -299,9 +299,9 @@ class Run_Tab(tk.Frame):
 ### ----------------------------progress display settings ------------------------------------------------------
         stackprogress_label = ttk.Label(statusprogress_settings, text="Stack progress:").grid(row=1, column=0)
         self.stack_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.stack_aq_progress,
-                                                        maximum=self.stack_aq_numberOfPlanes.get())
+                                                        maximum=self.stack_aq_numberOfPlanes_lowres.get())
         self.stack_aq_progressbar.grid(row=1, column=2, sticky=tk.E)
-        self.stack_aq_progressindicator.config(text="0 of " + str(self.stack_aq_numberOfPlanes.get()))
+        self.stack_aq_progressindicator.config(text="0 of " + str(self.stack_aq_numberOfPlanes_lowres.get()))
         self.stack_aq_progressindicator.grid(row=1, column=4, sticky=tk.E)
 
         timelapseprogress_label = ttk.Label(statusprogress_settings, text="Timelapse progress:").grid(row=2, column=0)

@@ -37,6 +37,11 @@ class MultiScale_Microscope_Controller():
         self.continuetimelapse = 1 #enable functionality to stop timelapse
 
         #######connect buttons / variables from GUI with functions here-----------------------------------
+        # connect all the buttons that start a functionality like preview, stack acquisition, etc.
+        # connect all the buttons that you want to dynamically change, e.g. during preview
+        # don't connect buttons that you want to be "static" during a stack acquisition, such as number of planes, plane spacing
+        # those parameters, you can get at the beginning of e.g. a stack acquisition call
+
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
         self.view.runtab.bt_preview_highres.bind("<ButtonRelease>", self.run_highrespreview)
         self.view.runtab.bt_preview_stop.bind("<Button>", self.run_stop_preview)
@@ -47,37 +52,41 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.bt_changeTo_block.bind("<Button>", lambda event: self.changefilter(event, 'None'))
         self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED'))
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
-        #self.view.runtab.stack_aq_numberOfPlanes.trace_add("write", self.updateNbPlanes)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.run_stop_preview)#1
         self.view.runtab.timelapse_aq_progressindicator.bind("<Button>", self.run_stop_preview)#2
-        self.view.runtab.laser488_percentage.trace_add("read", self.updateLaserPower)
-        self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserPower)
-        self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserPower)
-        self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserPower)
+
+        self.view.runtab.laser488_percentage.trace_add("read", self.updateLaserParameters)
+        self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserParameters)
+        self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserParameters)
+        self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserParameters)
+        self.view.runtab.cam_lowresExposure.trace_add("read", self.updateExposureParameters)
+        self.view.runtab.cam_highresExposure.trace_add("read", self.updateExposureParameters)
+
+        #stage settings tab
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_updown.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_angle.trace_add("write", self.movestage)
-        #buttons advanced settings tab
-        self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
-        self.view.advancedSettingstab.slit_lowres.trace_add("write", self.slit_opening_setPositions)
-        self.view.advancedSettingstab.slit_highres.trace_add("write", self.slit_opening_setPositions)
-        self.view.advancedSettingstab.ASLM_volt_current.trace_add("write", self.update_remoteMirrorVoltage)
-        self.view.advancedSettingstab.ASLM_alignmentmodeOn.trace_add("write", self.update_ASLM_alignmentsettings)
-        self.view.advancedSettingstab.ASLM_SawToothOn.trace_add("write", self.update_ASLM_alignmentsettings)
-        self.view.advancedSettingstab.ASLM_constantVoltageOn.trace_add("write", self.update_ASLM_alignmentsettings)
-        self.view.advancedSettingstab.ASLM_volt_min.trace_add("write", self.update_remoteMirrorVoltage)
-        self.view.advancedSettingstab.ASLM_volt_max.trace_add("write", self.update_remoteMirrorVoltage)
-
-        #buttons stage tab
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
         self.view.stagessettingstab.keyboard_input_off_bt.bind("<Button>", self.disable_keyboard_movement)
 
-        #define some parameters
+        #buttons advanced settings tab
+        self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
+        self.view.advancedSettingstab.slit_lowres.trace_add("write", self.updateSlitParameters)
+        self.view.advancedSettingstab.slit_highres.trace_add("write", self.updateSlitParameters)
+        self.view.advancedSettingstab.ASLM_volt_current.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_alignmentmodeOn.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_SawToothOn.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_constantVoltageOn.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_volt_interval.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_volt_middle.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_voltageDirection.trace_add("write", self.update_ASLMParameters)
+        #buttons stage tab
 
-        #self.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_lowres.get(),Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+
+        #define some parameters
         self.current_laser = "488"
 
     def run(self):
@@ -98,6 +107,77 @@ class MultiScale_Microscope_Controller():
         print("All 'snap' threads finished execution.")
         input('Hit enter to close napari...')
     ##here follow the call to the functions of the model (microscope) that were bound above:
+
+    def updateLaserParameters(self, var, indx, mode):
+        """
+        update the laser power
+        """
+        # get laser power from GUI and construct laser power setting array
+        voltage488 = self.view.runtab.laser488_percentage.get() * 5 / 100.
+        voltage552 = self.view.runtab.laser552_percentage.get() * 5 / 100.
+        voltage594 = self.view.runtab.laser594_percentage.get() * 5 / 100.
+        voltage640 = self.view.runtab.laser640_percentage.get() * 5 / 100.
+        power_settings = [voltage488, voltage552, voltage594, voltage640]
+
+        # change laser power
+        self.model.set_laserpower(power_settings)
+
+    def updateSlitParameters(self, var, indx, mode):
+        # set the low resolution and high-resolution slit openings
+        self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
+        self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
+
+    def updateExposureParameters(self, var, indx, mode):
+        # exposure time
+        self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
+        self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()  # set exposure time
+
+    def update_ASLMParameters(self, var, indx, mode):
+        # get remote mirror voltage from GUI and update model parameter, also check for boundaries
+        minVol = ASLM_parameters.remote_mirror_minVol
+        maxVol = ASLM_parameters.remote_mirror_maxVol
+        #
+        try:
+            interval = self.view.advancedSettingstab.ASLM_volt_interval.get() / 1000
+            middle_range = self.view.advancedSettingstab.ASLM_volt_middle.get() / 1000
+            print(interval)
+        except:
+            interval = 0
+            middle_range = 10
+        #
+
+        setvoltage_first = 0
+        setvoltage_second = 0
+        if self.view.advancedSettingstab.ASLM_voltageDirection.get() == 'highTolow':
+            setvoltage_first = middle_range + interval / 2
+            setvoltage_second = middle_range - interval / 2
+            print(setvoltage_first)
+        else:
+            setvoltage_first = middle_range - interval / 2
+            setvoltage_second = middle_range + interval / 2
+
+        #check boundaries
+        setvoltage_first = min(maxVol, max(setvoltage_first, minVol))
+        setvoltage_second = min(maxVol, max(setvoltage_second, minVol))
+
+        self.model.ASLM_from_Volt = setvoltage_first
+        self.model.ASLM_to_Volt = setvoltage_second
+
+        # display calculated voltages
+        self.view.advancedSettingstab.voltage_minIndicator.config(text=str(self.model.ASLM_from_Volt))
+        self.view.advancedSettingstab.voltage_maxIndicator.config(text=str(self.model.ASLM_to_Volt))
+
+        self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()))
+
+        # update the ASLM alignment settings
+        self.model.ASLM_alignmentOn = self.view.advancedSettingstab.ASLM_alignmentmodeOn.get()
+        runmode = self.view.advancedSettingstab.ASLM_SawtoothORconstant.get()
+        if runmode == 'Sawtooth':
+            self.model.ASLM_Sawtooth = 1
+            self.model.ASLM_ConstantVoltage = 0
+        else:
+            self.model.ASLM_Sawtooth = 0
+            self.model.ASLM_ConstantVoltage = 1
 
     def run_lowrespreview(self, event):
         '''
@@ -121,7 +201,6 @@ class MultiScale_Microscope_Controller():
             ct.ResultThread(target=set_button).start()
 
             #run preview with given parameters
-            self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
             self.model.preview_lowres()
             print("running lowres preview")
 
@@ -147,7 +226,6 @@ class MultiScale_Microscope_Controller():
             ct.ResultThread(target=set_buttonHR).start()
 
             #run preview with given parameters
-            self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get() # set exposure time
 
             #ASLM or static light-sheet mode
             if self.view.runtab.cam_highresMode.get()=='SPIM Mode':
@@ -190,12 +268,6 @@ class MultiScale_Microscope_Controller():
         currentslitopening = self.view.advancedSettingstab.slit_currentsetting.get()
         self.model.move_adjustableslit(currentslitopening)
 
-    def slit_opening_setPositions(self, var,indx, mode):
-        """
-        set the low resolution and high-resolution slit openings
-        """
-        self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
-        self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
 
     def changefilter(self, event, laser):
         """
@@ -215,49 +287,7 @@ class MultiScale_Microscope_Controller():
             self.model.filterwheel.set_filter('676/37-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser640
 
-    def updateLaserPower(self, var,indx, mode):
-        """
-        update the laser power
-        """
-        #get laser power from GUI and construct laser power setting array
-        voltage488 = self.view.runtab.laser488_percentage.get()*5/100.
-        voltage552 = self.view.runtab.laser552_percentage.get()*5/100.
-        voltage594 = self.view.runtab.laser594_percentage.get()*5/100.
-        voltage640 = self.view.runtab.laser640_percentage.get()*5/100.
-        power_settings = [voltage488, voltage552, voltage594, voltage640]
 
-        #change laser power
-        self.model.set_laserpower(power_settings)
-
-    def update_remoteMirrorVoltage(self, var,indx, mode):
-        """
-        update the remote mirror voltage power, check for boundaries to not apply too high voltages
-        """
-        minVol = ASLM_parameters.remote_mirror_minVol
-        maxVol = ASLM_parameters.remote_mirror_maxVol
-
-        #get remote mirror voltage from GUI and update model parameter, also check for boundaries
-        self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()))
-        self.model.ASLM_minVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_min.get()))
-        self.model.ASLM_maxVolt = max(minVol, min(maxVol, self.view.advancedSettingstab.ASLM_volt_max.get()))
-
-        print("update voltages")
-
-
-    def update_ASLM_alignmentsettings(self, var,indx, mode):
-        """
-        update the ASLM alignment settings
-        """
-        #get remote mirror voltage from GUI and update model parameter
-        self.model.ASLM_alignmentOn = self.view.advancedSettingstab.ASLM_volt_current.get()
-
-        runmode = self.view.advancedSettingstab.ASLM_SawtoothORconstant.get()
-        if runmode =='Sawtooth':
-            self.model.ASLM_Sawtooth =1
-            self.model.ASLM_ConstantVoltage = 0
-        else:
-            self.model.ASLM_Sawtooth = 0
-            self.model.ASLM_ConstantVoltage = 1
 
     def updatefilename(self):
         """

@@ -63,8 +63,8 @@ class multiScopeModel:
         self.currentROI_x = 2048
         self.currentROI_y = 2048
         self.ASLM_acquisition_time = 0.3
-        self.ASLM_minVolt = 0 #minimal voltage applied at remote mirror
-        self.ASLM_maxVolt = 1 #maximum voltage applied at remote mirror
+        self.ASLM_from_Volt = 0 #first voltage applied at remote mirror
+        self.ASLM_to_Volt = 1 #voltage applied at remote mirror at the end of sawtooth
         self.ASLM_currentVolt = 0 #current voltage applied to remote mirror
         self.ASLM_staticLowResVolt = 0 #default ASLM low res voltage
         self.ASLM_staticHighResVolt = 0 #default ASLM high res voltage
@@ -457,11 +457,11 @@ class multiScopeModel:
                     basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt  # high-res camera
                 else:
                     sawtooth_array = np.zeros(totallength, np.dtype(np.float64))
-                    sawtooth_array[:] = self.ASLM_minVolt
+                    sawtooth_array[:] = self.ASLM_from_Volt
                     goinguppoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000)
                     goingdownpoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02) - goinguppoints
-                    sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_minVolt,self.ASLM_maxVolt, goinguppoints)
-                    sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_maxVolt, self.ASLM_minVolt, goingdownpoints)
+                    sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_from_Volt,self.ASLM_to_Volt, goinguppoints)
+                    sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_to_Volt, self.ASLM_from_Volt, goingdownpoints)
 
                     basic_unit[:, NI_board_parameters.voicecoil] = self.smooth_sawtooth(sawtooth_array, window_len = self.ao.s2p(0.01))
 
@@ -761,7 +761,10 @@ class multiScopeModel:
             window_len = window_len + 1
         startwindow = int((window_len - 1) / 2)
 
-        s = np.r_[array[startwindow:0:-1], array, array[-2:-(startwindow + 2):-1]] #make array bigger on both sides
+        startarray = np.ones(startwindow) * array[0]
+        endarray = np.ones(startwindow) * array[-1]
+
+        s = np.r_[startarray, array, endarray] #make array bigger on both sides
 
         w = np.ones(window_len, 'd') #define a flat window - all values have equal weight
 
