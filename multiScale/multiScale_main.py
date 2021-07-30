@@ -358,7 +358,7 @@ class MultiScale_Microscope_Controller():
                                                            Camera_parameters.LR_height_pixel,
                                                            Camera_parameters.LR_width_pixel),
                                                           dtype='uint16')
-        self.model.stack_buffer_highres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_highes.get(),
+        self.model.stack_buffer_highres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_highres.get(),
                                                            Camera_parameters.HR_height_pixel,
                                                            Camera_parameters.HR_width_pixel),
                                                           dtype='uint16')
