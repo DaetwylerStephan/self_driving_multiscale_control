@@ -78,6 +78,9 @@ class multiScopeModel:
         self.low_res_buffer.fill(0) #fill to initialize
         self.high_res_buffer.fill(0) #fill to initialize
 
+        #textlabels for GUI
+        self.currentFPS = str(0)
+
         self.high_res_buffers = [
             ct.SharedNDArray(shape=(Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
             for i in range(2)]
@@ -373,6 +376,7 @@ class multiScopeModel:
         th.start()
         return th
 
+    ###this is the code to run a high resolution preview with a static light-sheet
     def preview_highres_static(self):
         def preview_highres_task(custody):
 
@@ -381,8 +385,9 @@ class multiScopeModel:
             self.initial_time = time.perf_counter()
 
             # define array for laser
+            min_time=max(self.exposure_time_HR/1000, 0.3)
+            basic_unit = np.zeros((self.ao.s2p(min_time), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
 
-            basic_unit = np.zeros((self.ao.s2p(0.3), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
             def laser_preview_highres():
                 old_laserline = 0
                 while self.continue_preview_highres:
@@ -392,6 +397,7 @@ class multiScopeModel:
                     basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #set voltage of remote mirror
                     self.ao.play_voltages(basic_unit, block=True)
 
+            #run laser as sub-thread that is terminated when the preview button is pressed (self.continue_preview_highres is false).
             ct.ResultThread(target=laser_preview_highres).start()
 
             while self.continue_preview_highres:
@@ -400,18 +406,15 @@ class multiScopeModel:
                 custody.switch_from(None, to=self.highres_camera)
                 self.highres_camera.run_preview(out=self.high_res_buffer)
 
-                #calculate fps to display
-                #if (self.num_frames % 2 ==0): #Napari can only display 20fps
-                if 1==1:
-                    custody.switch_from(self.highres_camera, to=self.display)
-                    self.display.show_image_highres(self.high_res_buffer)
-                    custody.switch_from(self.display, to=None)
-                else:
-                    custody.switch_from(self.highres_camera, to=None)
+                custody.switch_from(self.highres_camera, to=self.display)
+                self.display.show_image_highres(self.high_res_buffer)
+                custody.switch_from(self.display, to=None)
 
                 if self.num_frames == 100:
                     time_elapsed = time.perf_counter() - self.initial_time
-                    print("%0.2f average FPS" % (self.num_frames / time_elapsed))
+                    avg_FPS = (self.num_frames / time_elapsed)
+                    print("%0.2f average FPS" % avg_FPS)
+                    self.currentFPS = str(avg_FPS)
                     self.num_frames = 0
                     self.initial_time = time.perf_counter()
 
@@ -460,7 +463,7 @@ class multiScopeModel:
                     sawtooth_array[:] = self.ASLM_from_Volt
                     goinguppoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000)
                     goingdownpoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02) - goinguppoints
-                    sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_from_Volt,self.ASLM_to_Volt, goinguppoints)
+                    sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_from_Volt, self.ASLM_to_Volt, goinguppoints)
                     sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_to_Volt, self.ASLM_from_Volt, goingdownpoints)
 
                     basic_unit[:, NI_board_parameters.voicecoil] = self.smooth_sawtooth(sawtooth_array, window_len = self.ao.s2p(0.01))

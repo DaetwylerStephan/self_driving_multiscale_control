@@ -12,6 +12,7 @@ import glob
 from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
 import auxiliary_code.concurrency_tools as ct
+import auxiliary_code.write_parameters as write_params
 from constants import Camera_parameters
 from constants import NI_board_parameters
 from constants import FileSave_parameters
@@ -32,6 +33,9 @@ class MultiScale_Microscope_Controller():
         #create the gui as view
         all_tabs_mainGUI = ttk.Notebook(self.root)
         self.view = MultiScope_MainGui(all_tabs_mainGUI, self.model)
+
+        #init param file writer class
+        self.paramwriter = write_params.write_Params(self.view)
 
         #define here which buttons run which function in the multiScope model
         self.continuetimelapse = 1 #enable functionality to stop timelapse
@@ -167,7 +171,7 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.voltage_minIndicator.config(text=str(self.model.ASLM_from_Volt))
         self.view.advancedSettingstab.voltage_maxIndicator.config(text=str(self.model.ASLM_to_Volt))
 
-        self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()))
+        self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()/1000))
 
         # update the ASLM alignment settings
         self.model.ASLM_alignmentOn = self.view.advancedSettingstab.ASLM_alignmentmodeOn.get()
@@ -178,6 +182,14 @@ class MultiScale_Microscope_Controller():
         else:
             self.model.ASLM_Sawtooth = 0
             self.model.ASLM_ConstantVoltage = 1
+
+    def updateGUItext(self):
+        '''
+        update text labes in GUI here
+        :return:
+        '''
+        self.model.currentFPS #todo
+
 
     def run_lowrespreview(self, event):
         '''
@@ -311,11 +323,15 @@ class MultiScale_Microscope_Controller():
 
         self.parentfolder = os.path.join(parentdir, foldername)
 
-
-
     def acquire_stack(self, event):
         """
-        acquire a stack acquisition
+        start a stack acquisition thread
+        """
+        ct.ResultThread(target=self.acquire_stack_task).start()
+
+    def acquire_stack_task(self):
+        """
+        acquire a stack acquisition - processes in thread (to not stop GUI from working)
         """
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
         self.view.update()
@@ -346,31 +362,31 @@ class MultiScale_Microscope_Controller():
                 os.makedirs(filepath_write_acquisitionParameters)
             except OSError as error:
                 print("File writing error")
-            self.write_to_textfile(os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
+
+            #write parameters in a thread
+            def write_paramconfig():
+                self.paramwriter.write_to_textfile(
+                    os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
+                print("parameters saved")
+            ct.ResultThread(target=write_paramconfig).start()
+
 
             #set timepoint = 0 to be consistent with time-lapse acquisitions
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
             print(stackfilepath)
 
-
-        #init shared memory
-        self.model.stack_buffer_lowres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_lowres.get(),
-                                                           Camera_parameters.LR_height_pixel,
-                                                           Camera_parameters.LR_width_pixel),
-                                                          dtype='uint16')
-        self.model.stack_buffer_highres = ct.SharedNDArray((self.view.runtab.stack_aq_numberOfPlanes_highres.get(),
-                                                           Camera_parameters.HR_height_pixel,
-                                                           Camera_parameters.HR_width_pixel),
-                                                          dtype='uint16')
-        #self.model.stack_buffer_lowres.fill(0)
-
-        print("acquiring low res stack")
-        print("number of planes: " + str(self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + ", plane spacing: " + str(
-            self.view.runtab.stack_aq_plane_spacing.get()))
-
         ########-------------------------------------------------------------------------------------------------------
         #start low resolution stack acquisition
         if self.view.runtab.stack_aq_lowResCameraOn.get():
+            print("acquiring low res stack")
+
+            #set nb of planes, plane spacing
+            print("number of planes: " + str(
+                self.view.runtab.stack_aq_numberOfPlanes_lowres.get()) + ", plane spacing: " + str(
+                self.view.runtab.stack_aq_entry_plane_spacing_lowres.get()))
+            self.planespacing = self.view.runtab.stack_aq_entry_plane_spacing_lowres.get() * 1000000
+            self.stack_nbplanes_lowres = self.view.runtab.stack_aq_numberOfPlanes_lowres.get()
+
             positioniter = -1
             for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
                 #get current position from list
@@ -398,6 +414,14 @@ class MultiScale_Microscope_Controller():
         # start high resolution stack acquisition
         #high resolution list
         if self.view.runtab.stack_aq_highResCameraOn.get():
+
+            # set nb of planes, plane spacing
+            print("number of planes: " + str(
+                self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + ", plane spacing: " + str(
+                self.view.runtab.stack_aq_entry_plane_spacing_highres.get()))
+            self.planespacing = self.view.runtab.stack_aq_entry_plane_spacing_highres.get() * 1000000
+            self.stack_nbplanes_highres = self.view.runtab.stack_aq_numberOfPlanes_highres.get()
+
             for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
                 #get current position from list
                 xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1]) * 1000000000)
@@ -424,9 +448,9 @@ class MultiScale_Microscope_Controller():
                                       self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
 
                 if self.view.runtab.cam_highresMode.get()=="SPIM Mode":
-                    self.model.high_res_stack_acquisition_master(current_folder, current_startposition, which_channels, "highSPIM")
+                    self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "highSPIM")
                 else:
-                    self.model.high_res_stack_acquisition_master(current_folder, current_startposition, which_channels, "highASLM")
+                    self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "highASLM")
 
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
 
@@ -501,27 +525,6 @@ class MultiScale_Microscope_Controller():
     def abort_timelapse(self,event):
         self.continuetimelapse = 1
 
-#write experiment parameters to textfile
-    def write_to_textfile(self, filePath):
-        with open(filePath, 'w') as f:
-            f.write('Experiment parameters of ' + self.parentfolder + "\n")
-            f.write('---------------------------------------------\n')
-            f.write('Plane spacing lowres: ' + str(self.view.runtab.stack_aq_plane_spacing_lowres.get()) + "\n")
-            f.write('Plane spacing highres: ' + str(self.view.runtab.stack_aq_plane_spacing_highres.get()) + "\n")
-            f.write('Nb of planes lowres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_lowres.get()) + "\n")
-            f.write('Nb of planes highres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + "\n")
-
-            f.write('---------------------------------------------\n')
-            f.write('low resultion stack positions\n')
-
-            for iter_lowrespos in self.view.stagessettingstab.stage_savedPos_tree.get_children():
-                #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][1]))
-                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][2]))
-                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][3]))
-                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][4]))
-                current_startposition = [zpos, xpos, ypos, angle]
-                f.write(str(current_startposition) + "\n")
 
 #enable keyboard movements ---------------------------------------------------------------------------------------------
     def enable_keyboard_movement(self, event):

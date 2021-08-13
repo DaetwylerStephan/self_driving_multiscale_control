@@ -192,8 +192,8 @@ class Run_Tab(tk.Frame):
         laseron_label = ttk.Label(stack_aquisition_settings, text="Laser On:").grid(row=2, column=0)
         numberOfPlanes_label_lowres= ttk.Label(stack_aquisition_settings, text="Number of planes (lowres):").grid(row = 6, column = 0)
         numberOfPlanes_label_highres= ttk.Label(stack_aquisition_settings, text="Number of planes (highres):").grid(row = 7, column = 0)
-        plane_spacing_label_lowres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (lowres):").grid(row = 10, column = 0)
-        plane_spacing_label_highres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (highres):").grid(row = 11, column = 0)
+        plane_spacing_label_lowres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (um, lowres):").grid(row = 10, column = 0)
+        plane_spacing_label_highres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (um, highres):").grid(row = 11, column = 0)
         laser_cyclemode_label= ttk.Label(stack_aquisition_settings, text="Laser Cycle Mode:").grid(row = 3, column = 0)
         cameraOn_label= ttk.Label(stack_aquisition_settings, text="Camera On:").grid(row = 4, column = 0)
 

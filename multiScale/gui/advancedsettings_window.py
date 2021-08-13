@@ -74,7 +74,7 @@ class AdvancedSettings_Tab(tk.Frame):
         lineDelay_label = ttk.Label(ASLM_settings, text="Line Delay factor:").grid(row=2, column=0)
         voltageinterval_label = ttk.Label(ASLM_settings, text="ASLM remote voltage interval (mV):").grid(row=4, column=0)
         voltagemiddle_label = ttk.Label(ASLM_settings, text="ASLM remote voltage middle (mV):").grid(row=7, column=0)
-        voltagecurrent_label = ttk.Label(ASLM_settings, text="Current ASLM remote mirror voltage:").grid(row=8, column=0)
+        voltagecurrent_label = ttk.Label(ASLM_settings, text="Current ASLM remote mirror voltage (mV):").grid(row=8, column=0)
         voltagedirection_label = ttk.Label(ASLM_settings, text="Voltage up-down or down-up:").grid(row=9, column=0)
         voltagelowRes_label = ttk.Label(ASLM_settings, text="Low Resolution ASLM remote mirror voltage (static, mV):").grid(row=14, column=0)
         voltagehighRes_label = ttk.Label(ASLM_settings, text="High Resolution ASLM remote mirror voltage (static, mV):").grid(row=16, column=0)
