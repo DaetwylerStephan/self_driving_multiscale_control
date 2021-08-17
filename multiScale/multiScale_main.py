@@ -65,8 +65,8 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserParameters)
         self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserParameters)
         self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserParameters)
-        self.view.runtab.cam_lowresExposure.trace_add("read", self.updateExposureParameters)
-        self.view.runtab.cam_highresExposure.trace_add("read", self.updateExposureParameters)
+        self.view.runtab.cam_lowresExposure.trace_add("write", self.updateExposureParameters)
+        self.view.runtab.cam_highresExposure.trace_add("write", self.updateExposureParameters)
 
         #stage settings tab
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
@@ -135,6 +135,7 @@ class MultiScale_Microscope_Controller():
         # exposure time
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()  # set exposure time
+        print("updated exposure time")
 
     def update_ASLMParameters(self, var, indx, mode):
         # get remote mirror voltage from GUI and update model parameter, also check for boundaries
@@ -244,7 +245,7 @@ class MultiScale_Microscope_Controller():
                 self.model.preview_highres_static()
                 print("running high res static preview")
             else:
-                self.model.preview_highres_ASLM(self.view.runtab.cam_highresExposure.get())
+                self.model.preview_highres_ASLM()
                 print("running high res ASLM preview")
 
     def run_stop_preview(self, event):
@@ -351,7 +352,8 @@ class MultiScale_Microscope_Controller():
         stackfilepath = self.parentfolder
         if self.continuetimelapse != 0:
             #generate file path
-            nbfiles_folder = len(glob.glob('Experiment*'))
+            nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
+            print("foldernumber:" + str(nbfiles_folder))
             newfolderind = nbfiles_folder + 1
             experiment_name = "Experiment" + f'{newfolderind:04}'
 

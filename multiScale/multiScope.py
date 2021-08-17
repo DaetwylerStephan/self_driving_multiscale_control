@@ -326,7 +326,6 @@ class multiScopeModel:
         starts a custody thread to run a low resolution preview.
         """
         def preview_lowres_task(custody):
-            self.lowres_camera.set_up_preview(self.exposure_time_LR)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
@@ -355,6 +354,8 @@ class multiScopeModel:
             ct.ResultThread(target=laser_preview).start()
 
             while self.continue_preview_lowres:
+                self.lowres_camera.set_up_preview(self.exposure_time_LR)
+
                 custody.switch_from(None, to=self.lowres_camera)
                 self.lowres_camera.run_preview(out=self.low_res_buffer)
                 custody.switch_from(self.lowres_camera, to=self.display)
@@ -380,19 +381,21 @@ class multiScopeModel:
     def preview_highres_static(self):
         def preview_highres_task(custody):
 
-            self.highres_camera.set_up_preview(self.exposure_time_HR, 1)
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
-            # define array for laser
-            min_time=max(self.exposure_time_HR/1000, 0.3)
-            basic_unit = np.zeros((self.ao.s2p(min_time), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
+
 
             def laser_preview_highres():
-                old_laserline = 0
+                #old_laserline = 0
                 while self.continue_preview_highres:
-                    basic_unit[:,old_laserline] = 0
-                    old_laserline = self.current_laser
+                    # define array for laser
+                    min_time = max(self.exposure_time_HR / 1000, 0.3)
+                    basic_unit = np.zeros((self.ao.s2p(min_time), NI_board_parameters.ao_nchannels),
+                                          np.dtype(np.float64))
+
+                    #basic_unit[:,old_laserline] = 0
+                    #old_laserline = self.current_laser
                     basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
                     basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #set voltage of remote mirror
                     self.ao.play_voltages(basic_unit, block=True)
@@ -401,7 +404,7 @@ class multiScopeModel:
             ct.ResultThread(target=laser_preview_highres).start()
 
             while self.continue_preview_highres:
-
+                self.highres_camera.set_up_preview(self.exposure_time_HR, 1)
                 self.num_frames += 1
                 custody.switch_from(None, to=self.highres_camera)
                 self.highres_camera.run_preview(out=self.high_res_buffer)
@@ -437,16 +440,17 @@ class multiScopeModel:
 
         print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
 
-    def preview_highres_ASLM(self, exposure_overall):
+    def preview_highres_ASLM(self):
         def preview_highresASLM_task(custody):
-
-            self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
-            #self.highres_camera.prepare_stack_acquisition(200)
 
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
             while self.continue_preview_highres:
+
+                #calculate ALSM parameters
+                self.calculate_ASLMparameters(self.exposure_time_HR)
+                self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
 
                 #generate array
                 totallength = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02)
@@ -515,7 +519,6 @@ class multiScopeModel:
 
         #parameters for preview
         self.continue_preview_highres = True
-        self.calculate_ASLMparameters(exposure_overall)
 
         #start preview custody thread
         th = ct.CustodyThread(target=preview_highresASLM_task, first_resource=self.highres_camera)
@@ -585,11 +588,11 @@ class multiScopeModel:
         if laser == NI_board_parameters.laser488:
             self.filterwheel.set_filter('515-30-25', wait_until_done=False)
         if laser == NI_board_parameters.laser552:
-            self.model.filterwheel.set_filter('572/20-25', wait_until_done=False)
+            self.filterwheel.set_filter('572/20-25', wait_until_done=False)
         if laser == NI_board_parameters.laser594:
-            self.model.filterwheel.set_filter('615/20-25', wait_until_done=False)
+            self.filterwheel.set_filter('615/20-25', wait_until_done=False)
         if laser == NI_board_parameters.laser640:
-            self.model.filterwheel.set_filter('676/37-25', wait_until_done=False)
+            self.filterwheel.set_filter('676/37-25', wait_until_done=False)
 
         thread_stagemove.get_result()
 
@@ -634,7 +637,7 @@ class multiScopeModel:
             low_res_buffer = ct.SharedNDArray(
                  shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
                  dtype='uint16')
-            low_res_buffer.fill(0)
+            #low_res_buffer.fill(0)
 
             #set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.planespacing)
@@ -675,6 +678,7 @@ class multiScopeModel:
 
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
+        acquire_thread.get_result()
 
     def acquire_stack_highres(self):
 
