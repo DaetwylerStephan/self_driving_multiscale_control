@@ -50,18 +50,23 @@ class multiScopeModel:
         self.continue_preview_highres = False
         self.stack_nbplanes_lowres =200
         self.stack_nbplanes_highres = 200
-        self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
-        self.stack_buffer_lowres.fill(0)
-        self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
-        self.stack_buffer_highres.fill(0)
+        self.lowres_planespacing = 10000000
+        self.highres_planespacing = 10000000
+        # self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
+        # self.stack_buffer_lowres.fill(0)
+        # self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
+        # self.stack_buffer_highres.fill(0)
         self.filepath = 'D:/acquisitions/testimage.tif'
-        self.planespacing = 10000000
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
         self.slitopening_lowres = 1500
         self.slitopening_highres= 4558
-        self.currentROI_x = 2048
-        self.currentROI_y = 2048
+
+        self.current_lowresROI_width = Camera_parameters.LR_width_pixel
+        self.current_lowresROI_height = Camera_parameters.LR_height_pixel
+        self.current_highresROI_width = Camera_parameters.HR_width_pixel
+        self.current_highresROI_height = Camera_parameters.HR_height_pixel
+
         self.ASLM_acquisition_time = 0.3
         self.ASLM_from_Volt = 0 #first voltage applied at remote mirror
         self.ASLM_to_Volt = 1 #voltage applied at remote mirror at the end of sawtooth
@@ -71,6 +76,7 @@ class multiScopeModel:
         self.ASLM_alignmentOn = 0 #param=1 if ASLM alignment mode is on, otherwise zero
         self.ASLM_Sawtooth = 0 #alignment mode - run sawtooth
         self.ASLM_ConstantVoltage = 0 #alignment mode - run constant voltage
+        self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -597,12 +603,6 @@ class multiScopeModel:
         thread_stagemove.get_result()
 
     def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
-
-        # move stage to start position
-        # choose right filter wheel position
-        # set remote mirror to right position
-        # set flip mirror to right position
-
         def acquire_task(custody):
 
             custody.switch_from(None, to=self.lowres_camera)
@@ -610,21 +610,22 @@ class multiScopeModel:
             #prepare acquisition by moving filter wheel etc
             self.prepare_acquisition(current_startposition, current_laserline)
 
-            delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+
             # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
             # exposure time, depending on the number of rows that are imaged
             nb_rows = 2960
             # nb_rows = 2480
-            readout_time = nb_rows * ASLM_parameters.line_delay
+            readout_time = nb_rows * Camera_parameters.lowres_line_digitization_time
 
             #prepare voltage array
-            # calculate minimal unit duration
-            minimal_trigger_timeinterval = self.exposure_time_LR / 1000 + readout_time / 1000 + delay_cameratrigger
-
+            # calculate minimal unit duration and set up array
+            minimal_trigger_timeinterval = self.exposure_time_LR / 1000 + readout_time / 1000 + self.delay_cameratrigger
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
-            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
+
+            #set voltages in array - camera, stage, remote mirror, laser
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
-            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4.
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4. #laser
             basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #remote mirror
 
             control_array = np.tile(basic_unit, (self.stack_nbplanes_lowres + 1, 1))  # add +1 as you want to return to origin position
@@ -633,14 +634,14 @@ class multiScopeModel:
             write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
                                             ).start()
 
-            #data allocation correct?
+            #data allocation correct
             low_res_buffer = ct.SharedNDArray(
-                 shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
+                 shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
                  dtype='uint16')
             #low_res_buffer.fill(0)
 
             #set up stage
-            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.planespacing)
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing)
 
             # prepare camera for stack acquisition
             self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
@@ -652,7 +653,6 @@ class multiScopeModel:
 
             def start_camera_stream():
                 self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_lowres, low_res_buffer)
-
             camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
 
             # play voltages
@@ -680,32 +680,29 @@ class multiScopeModel:
             target=acquire_task, first_resource=self.lowres_camera).start()
         acquire_thread.get_result()
 
-    def acquire_stack_highres(self):
-
-        # move stage to start position
-        # choose right filter wheel position
-        # set remote mirror to right position
-        # set flip mirror to right position
-
-        def acquire_task(custody):
+    def acquire_stack_highres(self, current_startposition, current_laserline, filepath):
+        def acquire_taskHighResSPIM(custody):
 
             custody.switch_from(None, to=self.highres_camera)
 
-            delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+            # prepare acquisition by moving filter wheel etc
+            self.prepare_acquisition(current_startposition, current_laserline)
+
             # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
             # exposure time, depending on the number of rows that are imaged
             nb_rows = 2480
-            line_digitization_time = 0.01026
-            readout_time = nb_rows * line_digitization_time
+            readout_time = nb_rows * Camera_parameters.highres_line_digitization_time
 
             # prepare voltage array
-            # calculate minimal unit duration
-            minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + delay_cameratrigger
-
+            # calculate minimal unit duration and set up array
+            minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + self.delay_cameratrigger
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
-            basic_unit[self.ao.s2p(delay_cameratrigger):self.ao.s2p(delay_cameratrigger + 0.002),
-            0] = 4.  # highrescamera - ao0
+
+            #set voltages in array - camera, stage, remote mirror, laser
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), 0] = 4.  # highrescamera - ao0
             basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
+            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #remote mirror
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_HR / 1000), current_laserline] = 4. #laser
 
             control_array = np.tile(basic_unit,
                                     (self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
@@ -714,27 +711,25 @@ class multiScopeModel:
             write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
                                                     ).start()
 
-            # data allocation correct?
-            # low_res_buffer = ct.SharedNDArray(
-            #     shape=(self.stack_nbplanes, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel),
-            #     dtype='uint16')
-            # low_res_buffer.fill(0)
+            # data allocation correct
+            highres_buffer = ct.SharedNDArray(
+                shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
 
             # set up stage
-            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes, self.planespacing)
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres, self.highres_planespacing)
 
             # prepare high res camera for stack acquisition
             self.highres_camera.prepare_stack_acquisition(self.exposure_time_HR)
 
             # start thread on stage to wait for trigger
-            def start_stage_stream():
+            def start_stage_streamHighResSPIM():
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
-            stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
+            stream_thread = ct.ResultThread(target=start_stage_streamHighResSPIM).start()  # ~3.6s
 
             #start thread so that camera waits for trigger
-            def start_camera_stream():
-                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes, low_res_buffer)
-            camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
+            def start_camera_streamHighResSPIM():
+                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_highres, highres_buffer)
+            camera_stream_thread = ct.ResultThread(target=start_camera_streamHighResSPIM).start()
 
             # play voltages
             # you need to use "block true" as otherwise the program finishes without playing the voltages really
@@ -744,23 +739,23 @@ class multiScopeModel:
 
             custody.switch_from(self.highres_camera, to=self.display)
 
-            def saveimage():
+            def saveimage_highresSPIM():
                 # save image
                 try:
-                    imwrite(self.filepath,
-                            self.stack_buffer_highres)  # can a thread change self.filepath ? Can someone change stack_buffer?
+                    imwrite(filepath, highres_buffer)
                 except:
                     print("couldn't save image")
+            savethread = ct.ResultThread(target=saveimage_highresSPIM).start()
 
-            savethread = ct.ResultThread(target=saveimage).start()
-
-            self.display.show_stack(self.stack_buffer_highres)
+            self.display.show_stack(highres_buffer)
 
             custody.switch_from(self.display, to=None)
             savethread.get_result()
 
-        acquire_thread = ct.CustodyThread(
-            target=acquire_task, first_resource=self.lowres_camera).start()
+        #start thread and wait for its completion
+        acquire_threadHighResSPIM = ct.CustodyThread(
+            target=acquire_taskHighResSPIM, first_resource=self.highres_camera).start()
+        acquire_threadHighResSPIM.get_result()
 
     def smooth_sawtooth(self, array, window_len = 101):
 

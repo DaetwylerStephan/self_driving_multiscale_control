@@ -24,6 +24,9 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_lowres = tk. DoubleVar()
         self.slit_highres = tk. DoubleVar()
 
+        #stack acquisition settings
+        self.stack_aq_camera_delay = tk.DoubleVar()
+
         #ASLM settings
         self.ASLM_linedelay = tk.DoubleVar()
         self.ASLM_volt_interval = tk.DoubleVar()
@@ -40,10 +43,12 @@ class AdvancedSettings_Tab(tk.Frame):
 
         #set the different label frames
         slit_settings = tk.LabelFrame(self, text="Slit Settings")
+        stack_aq_settings = tk.LabelFrame(self, text="Stack Acquisition Settings")
         ASLM_settings = tk.LabelFrame(self, text="Slit Settings")
 
         # overall positioning of label frames
         slit_settings.grid(row=2, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
+        stack_aq_settings.grid(row=4, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
         ASLM_settings.grid(row=2, column=1, sticky = tk.W + tk.E+tk.S+tk.N)
 
         ### ----------------------------slit settings -----------------------------------------------------------------
@@ -68,6 +73,18 @@ class AdvancedSettings_Tab(tk.Frame):
         self.slit_opening_entry.grid(row=3, column=5, sticky=tk.W + tk.E + tk.S)
         self.slit_lowres_entry.grid(row=4, column=1, columnspan=2, sticky=tk.W + tk.E + tk.S)
         self.slit_highres_entry.grid(row=4, column=4, columnspan=2, sticky=tk.W + tk.E + tk.S)
+
+        ### ----------------------------stack acquisition settings -----------------------------------------------------------------
+        # slit labels (positioned)
+        delay_camera_label = ttk.Label(stack_aq_settings, text="Delay time camera after stage signal sent (ms):").grid(row=2, column=0)
+
+        self.delay_camera_entry = tk.Entry(stack_aq_settings, textvariable=self.stack_aq_camera_delay, width=4)
+
+        # set defaults
+        self.stack_aq_camera_delay.set(1)
+
+        # layout
+        self.delay_camera_entry.grid(row=1, column=0, sticky=tk.W + tk.E + tk.S)
 
         ### ----------------------------ASLM settings -----------------------------------------------------------------
         # ASLM labels (positioned)

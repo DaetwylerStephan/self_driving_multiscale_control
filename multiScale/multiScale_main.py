@@ -68,6 +68,11 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.cam_lowresExposure.trace_add("write", self.updateExposureParameters)
         self.view.runtab.cam_highresExposure.trace_add("write", self.updateExposureParameters)
 
+        self.view.runtab.stack_aq_numberOfPlanes_highres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_numberOfPlanes_lowres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_numberOfPlanes_highres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_numberOfPlanes_lowres.trace_add("write", self.update_stack_aq_parameters)
+
         #stage settings tab
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
@@ -76,7 +81,7 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
         self.view.stagessettingstab.keyboard_input_off_bt.bind("<Button>", self.disable_keyboard_movement)
 
-        #buttons advanced settings tab
+        #advanced settings tab
         self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
         self.view.advancedSettingstab.slit_lowres.trace_add("write", self.updateSlitParameters)
         self.view.advancedSettingstab.slit_highres.trace_add("write", self.updateSlitParameters)
@@ -87,7 +92,7 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_volt_interval.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_volt_middle.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_voltageDirection.trace_add("write", self.update_ASLMParameters)
-        #buttons stage tab
+        self.view.advancedSettingstab.stack_aq_camera_delay.trace_add("write", self.update_stack_aq_parameters)
 
 
         #define some parameters
@@ -136,6 +141,15 @@ class MultiScale_Microscope_Controller():
         self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
         self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()  # set exposure time
         print("updated exposure time")
+
+    def update_stack_aq_parameters(self, var, indx, mode):
+        #advanced stack acquisition parameters from advanced settings tab
+        self.model.delay_cameratrigger = self.view.advancedSettingstab.stack_aq_camera_delay.get()/1000 #divide by 1000 - from ms to seconds
+        self.model.highres_planespacing = self.view.runtab.stack_aq_plane_spacing_highres.get() * 1000000
+        self.model.lowres_planespacing = self.view.runtab.stack_aq_plane_spacing_lowres.get() * 1000000
+        self.model.stack_nbplanes_highres = self.view.runtab.stack_aq_numberOfPlanes_highres.get()
+        self.model.stack_nbplanes_lowres = self.view.runtab.stack_aq_numberOfPlanes_lowres.get()
+        print("stack acquisition settings updated")
 
     def update_ASLMParameters(self, var, indx, mode):
         # get remote mirror voltage from GUI and update model parameter, also check for boundaries
@@ -300,8 +314,6 @@ class MultiScale_Microscope_Controller():
             self.model.filterwheel.set_filter('676/37-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser640
 
-
-
     def updatefilename(self):
         """
         construct the filename used to save data, based on the information from the GUI
@@ -342,12 +354,6 @@ class MultiScale_Microscope_Controller():
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
 
-        #set model parameters
-        self.model.stack_nbplanes_lowres = self.view.runtab.stack_aq_numberOfPlanes_lowres.get()
-        self.model.stack_nbplanes_highres = self.view.runtab.stack_aq_numberOfPlanes_highres.get()
-        self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
-        self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()
-
         #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder
         if self.continuetimelapse != 0:
@@ -380,15 +386,8 @@ class MultiScale_Microscope_Controller():
         ########-------------------------------------------------------------------------------------------------------
         #start low resolution stack acquisition
         if self.view.runtab.stack_aq_lowResCameraOn.get():
+
             print("acquiring low res stack")
-
-            #set nb of planes, plane spacing
-            print("number of planes: " + str(
-                self.view.runtab.stack_aq_numberOfPlanes_lowres.get()) + ", plane spacing: " + str(
-                self.view.runtab.stack_aq_entry_plane_spacing_lowres.get()))
-            self.planespacing = self.view.runtab.stack_aq_entry_plane_spacing_lowres.get() * 1000000
-            self.stack_nbplanes_lowres = self.view.runtab.stack_aq_numberOfPlanes_lowres.get()
-
             positioniter = -1
             for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
                 #get current position from list
@@ -416,14 +415,7 @@ class MultiScale_Microscope_Controller():
         # start high resolution stack acquisition
         #high resolution list
         if self.view.runtab.stack_aq_highResCameraOn.get():
-
-            # set nb of planes, plane spacing
-            print("number of planes: " + str(
-                self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + ", plane spacing: " + str(
-                self.view.runtab.stack_aq_entry_plane_spacing_highres.get()))
-            self.planespacing = self.view.runtab.stack_aq_entry_plane_spacing_highres.get() * 1000000
-            self.stack_nbplanes_highres = self.view.runtab.stack_aq_numberOfPlanes_highres.get()
-
+            print("acquiring high res stack")
             for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
                 #get current position from list
                 xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1]) * 1000000000)
@@ -433,7 +425,7 @@ class MultiScale_Microscope_Controller():
                 currentposition = [zpos, xpos, ypos, angle]
                 print(currentposition)
 
-                #define highresolution stack path by corner positions.
+                #define highresolution stack file path label by corner positions.
                 xpos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
                 ypos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
 

@@ -20,13 +20,16 @@ class Camera_parameters:
     HR_height_pixel = 2048
     LR_width_pixel = 5056
     LR_height_pixel = 2960
+    highres_line_digitization_time = 0.01026
+    lowres_line_digitization_time = 0.01026 #10.16us
+
+
 
 class FileSave_parameters:
     parentdir = "D:/multiScope_Data/"
 
 class ASLM_parameters:
     simultaneous_lines = 17 #for a NA0.4 light-sheet, the expected length is around 2 um, with the 55.5x magnification, and 6.5 um pixel size (2*55.5/6.5) this translates to 17 lines
-    line_delay = 0.01026 #10.16us
     remote_mirror_minVol = -2.5
     remote_mirror_maxVol = 2.5
 
