@@ -145,10 +145,10 @@ class MultiScale_Microscope_Controller():
     def update_stack_aq_parameters(self, var, indx, mode):
         #advanced stack acquisition parameters from advanced settings tab
         self.model.delay_cameratrigger = self.view.advancedSettingstab.stack_aq_camera_delay.get()/1000 #divide by 1000 - from ms to seconds
-        self.model.highres_planespacing = self.view.runtab.stack_aq_plane_spacing_highres.get() * 1000000
-        self.model.lowres_planespacing = self.view.runtab.stack_aq_plane_spacing_lowres.get() * 1000000
-        self.model.stack_nbplanes_highres = self.view.runtab.stack_aq_numberOfPlanes_highres.get()
-        self.model.stack_nbplanes_lowres = self.view.runtab.stack_aq_numberOfPlanes_lowres.get()
+        self.model.highres_planespacing = int(self.view.runtab.stack_aq_plane_spacing_highres.get() * 1000000)
+        self.model.lowres_planespacing = int(self.view.runtab.stack_aq_plane_spacing_lowres.get() * 1000000)
+        self.model.stack_nbplanes_highres = int(self.view.runtab.stack_aq_numberOfPlanes_highres.get())
+        self.model.stack_nbplanes_lowres = int(self.view.runtab.stack_aq_numberOfPlanes_lowres.get())
         print("stack acquisition settings updated")
 
     def update_ASLMParameters(self, var, indx, mode):
@@ -386,7 +386,8 @@ class MultiScale_Microscope_Controller():
         ########-------------------------------------------------------------------------------------------------------
         #start low resolution stack acquisition
         if self.view.runtab.stack_aq_lowResCameraOn.get():
-
+            # change mirror position/slit position
+            self.model.changeHRtoLR()
             print("acquiring low res stack")
             positioniter = -1
             for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
@@ -415,6 +416,9 @@ class MultiScale_Microscope_Controller():
         # start high resolution stack acquisition
         #high resolution list
         if self.view.runtab.stack_aq_highResCameraOn.get():
+            # change mirror position/slit position
+            self.model.changeLRtoHR()
+
             print("acquiring high res stack")
             for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
                 #get current position from list

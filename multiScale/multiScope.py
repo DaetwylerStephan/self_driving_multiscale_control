@@ -311,21 +311,17 @@ class multiScopeModel:
         """
         change from low resolution to high resolution acquisition settings
         """
-        def moveslitLRtoHR():
-            self.move_adjustableslit(self.slitopening_highres, 1)
-        ct.ResultThread(target=moveslitLRtoHR).start()
-
         self.flipMirrorPosition_power.setconstantvoltage(3)
+        self.move_adjustableslit(self.slitopening_highres, 1)
+
 
     def changeHRtoLR(self):
         """
         change from high resolution to low resolution acquisition settings
         """
-        def moveslitHRtoLR():
-            self.move_adjustableslit(self.slitopening_lowres, 1)
-        ct.ResultThread(target=moveslitHRtoLR).start()
-
         self.flipMirrorPosition_power.setconstantvoltage(0)
+        self.move_adjustableslit(self.slitopening_lowres, 1)
+
 
     def preview_lowres(self):
         """
@@ -549,6 +545,8 @@ class multiScopeModel:
                 print("acquire highALSM")
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath)
+
 
         if whichlaser[1]==1:
             print("acquire 552 laser")
@@ -560,6 +558,8 @@ class multiScopeModel:
                 print("acquire highALSM")
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath)
+
 
         if whichlaser[2]==1:
             print("acquire 594 laser")
@@ -571,6 +571,7 @@ class multiScopeModel:
                 print("acquire highALSM")
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath)
 
         if whichlaser[3]==1:
             print("acquire 640 laser")
@@ -582,6 +583,8 @@ class multiScopeModel:
                 print("acquire highALSM")
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath)
+
 
     def prepare_acquisition(self, current_startposition, laser):
         """
