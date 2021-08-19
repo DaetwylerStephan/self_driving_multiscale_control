@@ -24,6 +24,11 @@ class MultiScale_Microscope_Controller():
     This is the controller in an MVC-scheme for mediating the interaction between the View (GUI) and the model (multiScope.py).
     Use: https://www.python-course.eu/tkinter_events_binds.php
     """
+
+    #todo: check that stage values - e.g. with plane spacing, plane number don't expand beyond the possible travel range
+    #todo: ROI selection tool - in napari
+    #todo: move to selected region in high resolution.
+
     def __init__(self):
         self.root = tk.Tk()
 
@@ -70,8 +75,8 @@ class MultiScale_Microscope_Controller():
 
         self.view.runtab.stack_aq_numberOfPlanes_highres.trace_add("write", self.update_stack_aq_parameters)
         self.view.runtab.stack_aq_numberOfPlanes_lowres.trace_add("write", self.update_stack_aq_parameters)
-        self.view.runtab.stack_aq_numberOfPlanes_highres.trace_add("write", self.update_stack_aq_parameters)
-        self.view.runtab.stack_aq_numberOfPlanes_lowres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_plane_spacing_lowres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_plane_spacing_highres.trace_add("write", self.update_stack_aq_parameters)
 
         #stage settings tab
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
@@ -353,6 +358,9 @@ class MultiScale_Microscope_Controller():
         #stop all potential previews
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
+
+        #some parameters.
+        self.model.displayImStack = self.view.runtab.stack_aq_displayON.get() #whether to display images during stack acq or not
 
         #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder

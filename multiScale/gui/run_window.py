@@ -13,13 +13,6 @@ class Run_Tab(tk.Frame):
     - preview button
     - number of planes
     - plane spacing
-
-
-
-    Todo: pixel width light sheet mode
-    field of view
-    range of remote voice coil
-    offset
     """
 
     def __init__(self, parent, *args, **kwargs):
@@ -48,6 +41,7 @@ class Run_Tab(tk.Frame):
         self.stack_aq_552on = tk.IntVar()
         self.stack_aq_594on = tk.IntVar()
         self.stack_aq_640on = tk.IntVar()
+        self.stack_aq_displayON = tk.IntVar()
         self.stack_aq_lowResCameraOn = tk.IntVar()
         self.stack_aq_highResCameraOn = tk.IntVar()
         self.stack_acq_laserCycleMode = tk.StringVar()
@@ -205,6 +199,9 @@ class Run_Tab(tk.Frame):
         self.stack_aq_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594on, onvalue=1, offvalue=0)
         self.stack_aq_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640on, onvalue=1, offvalue=0)
 
+        self.stack_aq_displayIm = tk.Checkbutton(stack_aquisition_settings, text ='Display Images during Stack Acquisition', variable=self.stack_aq_displayON, onvalue=1, offvalue=0)
+
+
         #choice of camera
         self.stack_aq_ckb_lowresCamera  = tk.Checkbutton(stack_aquisition_settings, text ='Low Res Camera', variable=self.stack_aq_lowResCameraOn, onvalue=1, offvalue=0)
         self.stack_aq_ckb_highresCamera = tk.Checkbutton(stack_aquisition_settings, text ='High Res Camera', variable=self.stack_aq_highResCameraOn, onvalue=1, offvalue=0)
@@ -240,7 +237,7 @@ class Run_Tab(tk.Frame):
 
         self.stack_aq_ckb_lowresCamera.grid(row=4, column=1, columnspan=2)
         self.stack_aq_ckb_highresCamera.grid(row=4, column=3, columnspan=2)
-
+        self.stack_aq_displayIm.grid(row=5, column=1, columnspan=4)
         self.stack_aq_entry_numberOfPlanes_lowres.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
         self.stack_aq_entry_numberOfPlanes_highres.grid(row =7, column=1, columnspan=3, sticky = tk.W + tk.E)
         self.stack_aq_entry_plane_spacing_lowres.grid(row =10, column=1, columnspan=3, sticky = tk.W + tk.E)

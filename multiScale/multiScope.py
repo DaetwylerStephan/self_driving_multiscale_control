@@ -52,6 +52,7 @@ class multiScopeModel:
         self.stack_nbplanes_highres = 200
         self.lowres_planespacing = 10000000
         self.highres_planespacing = 10000000
+        self.displayImStack = 1
         # self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
         # self.stack_buffer_lowres.fill(0)
         # self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
@@ -67,6 +68,8 @@ class multiScopeModel:
         self.current_highresROI_width = Camera_parameters.HR_width_pixel
         self.current_highresROI_height = Camera_parameters.HR_height_pixel
 
+        self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+
         self.ASLM_acquisition_time = 0.3
         self.ASLM_from_Volt = 0 #first voltage applied at remote mirror
         self.ASLM_to_Volt = 1 #voltage applied at remote mirror at the end of sawtooth
@@ -76,7 +79,8 @@ class multiScopeModel:
         self.ASLM_alignmentOn = 0 #param=1 if ASLM alignment mode is on, otherwise zero
         self.ASLM_Sawtooth = 0 #alignment mode - run sawtooth
         self.ASLM_ConstantVoltage = 0 #alignment mode - run constant voltage
-        self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+        self.ASLM_delaybeforevoltagereturn = 0.001 #1 ms
+        self.ASLM_additionalreturntime = 0.001 # 1ms
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -436,9 +440,9 @@ class multiScopeModel:
         :param desired_exposuretime: the exposure time that is desired for the whole acquisition
         :return: set the important parameters for ASLM acquisitions
         """
-        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + self.currentROI_y/ASLM_parameters.simultaneous_lines)))
-        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(self.currentROI_y *ASLM_parameters.line_delay)))
-        self.ASLM_acquisition_time = self.ASLM_line_delay * self.currentROI_y * ASLM_parameters.line_delay + self.ASLM_lineExposure
+        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + self.current_highresROI_height/ASLM_parameters.simultaneous_lines)))
+        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(self.current_highresROI_height *ASLM_parameters.line_delay)))
+        self.ASLM_acquisition_time = self.ASLM_line_delay * self.current_highresROI_height * ASLM_parameters.line_delay + self.ASLM_lineExposure
 
         print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
 
@@ -538,11 +542,12 @@ class multiScopeModel:
         if whichlaser[0]==1:
             print("acquire 488 laser")
             # filepath
-            current_filepath = os.path.join(current_folder, "1_CH00_000000.tif")
+            current_filepath = os.path.join(current_folder, "1_CH488_000000.tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath)
@@ -550,12 +555,13 @@ class multiScopeModel:
 
         if whichlaser[1]==1:
             print("acquire 552 laser")
-            current_filepath = os.path.join(current_folder, "1_CH01_000000.tif")
+            current_filepath = os.path.join(current_folder, "1_CH552_000000.tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser552,
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath)
@@ -563,24 +569,27 @@ class multiScopeModel:
 
         if whichlaser[2]==1:
             print("acquire 594 laser")
-            current_filepath = os.path.join(current_folder, "1_CH02_000000.tif")
+            current_filepath = os.path.join(current_folder, "1_CH594_000000.tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser594,
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
+
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath)
 
         if whichlaser[3]==1:
             print("acquire 640 laser")
-            current_filepath = os.path.join(current_folder, "1_CH03_000000.tif")
+            current_filepath = os.path.join(current_folder, "1_CH640_000000.tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser640,
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath)
@@ -674,7 +683,8 @@ class multiScopeModel:
                     print("couldn't save image")
             savethread = ct.ResultThread(target=saveimage).start()
 
-            self.display.show_stack(low_res_buffer)
+            if self.displayImStack ==1:
+                self.display.show_stack(low_res_buffer)
 
             custody.switch_from(self.display, to=None)
             savethread.get_result()
@@ -750,7 +760,8 @@ class multiScopeModel:
                     print("couldn't save image")
             savethread = ct.ResultThread(target=saveimage_highresSPIM).start()
 
-            self.display.show_stack(highres_buffer)
+            if self.displayImStack ==1:
+                self.display.show_stack(highres_buffer)
 
             custody.switch_from(self.display, to=None)
             savethread.get_result()
@@ -759,6 +770,113 @@ class multiScopeModel:
         acquire_threadHighResSPIM = ct.CustodyThread(
             target=acquire_taskHighResSPIM, first_resource=self.highres_camera).start()
         acquire_threadHighResSPIM.get_result()
+
+    def acquire_stack_highresASLM(self, current_startposition, current_laserline, filepath):
+        def acquire_taskHighResASLM(custody):
+
+            custody.switch_from(None, to=self.highres_camera)
+
+            # prepare acquisition by moving filter wheel etc
+            self.prepare_acquisition(current_startposition, current_laserline)
+
+            #obtain ASLM parameters
+            self.calculate_ASLMparameters(self.exposure_time_HR)
+            print("ASLM parameters calculated")
+            # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
+            # exposure time, depending on the number of rows that are imaged
+            nb_rows = 2480
+            readout_time = nb_rows * Camera_parameters.highres_line_digitization_time
+
+            # prepare voltage array
+            # calculate minimal unit duration and set up array
+            minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_additionalreturntime
+            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
+                                  np.dtype(np.float64))
+
+            # set voltages in array - camera, stage, laser
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002),
+            0] = 4.  # highrescamera - ao0
+            basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_HR / 1000),
+            current_laserline] = 4.  # laser
+
+            #
+            sawtooth_array = np.zeros(self.ao.s2p(minimal_trigger_timeinterval), np.dtype(np.float64))
+            sawtooth_array[:] = self.ASLM_from_Volt
+            goinguppoints = self.ao.s2p(self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_acquisition_time / 1000)
+            goingdownpoints = self.ao.s2p(minimal_trigger_timeinterval) - goinguppoints
+            sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_from_Volt, self.ASLM_to_Volt, goinguppoints)
+            sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_to_Volt, self.ASLM_from_Volt, goingdownpoints)
+
+
+            basic_unit[:, NI_board_parameters.voicecoil] = sawtooth_array  # remote mirror
+
+
+            control_array = np.tile(basic_unit,
+                                    (self.stack_nbplanes_highres + 1,
+                                     1))  # add +1 as you want to return to origin position
+            #smooth remote mirror voltage
+            control_array[:,NI_board_parameters.voicecoil] = self.smooth_sawtooth(control_array[:,NI_board_parameters.voicecoil],
+                                                                                window_len=self.ao.s2p(0.002))
+            print("voltage array calculated")
+
+            # write voltages
+            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
+                                                    ).start()
+
+            # data allocation correct
+            highres_buffer = ct.SharedNDArray(
+                shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width),
+                dtype='uint16')
+
+            # set up stage
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres,
+                                                                        self.highres_planespacing)
+
+            # prepare high res camera for stack acquisition
+            self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
+
+            print("stage and camera ready")
+            # start thread on stage to wait for trigger
+            def start_stage_streamHighResASLM():
+                self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
+            stream_thread_ASLM = ct.ResultThread(target=start_stage_streamHighResASLM).start()  # ~3.6s
+
+            # start thread so that camera waits for trigger
+            def start_camera_streamHighResASLM():
+                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_highres, highres_buffer)
+            camera_stream_thread_ASLM = ct.ResultThread(target=start_camera_streamHighResASLM).start()
+
+            print("stage and camera threads waiting ...")
+
+            # play voltages
+            # you need to use "block true" as otherwise the program finishes without playing the voltages really
+            self.ao.play_voltages(block=True)
+            stream_thread_ASLM.get_result()
+            camera_stream_thread_ASLM.get_result()
+
+            custody.switch_from(self.highres_camera, to=self.display)
+
+            def saveimage_highresSPIM():
+                # save image
+                try:
+                    imwrite(filepath, highres_buffer)
+                except:
+                    print("couldn't save image")
+
+            savethread = ct.ResultThread(target=saveimage_highresSPIM).start()
+
+            if self.displayImStack == 1:
+                self.display.show_stack(highres_buffer)
+
+            custody.switch_from(self.display, to=None)
+            savethread.get_result()
+
+        # start thread and wait for its completion
+        acquire_threadHighResASLM = ct.CustodyThread(
+            target=acquire_taskHighResASLM, first_resource=self.highres_camera).start()
+        acquire_threadHighResASLM.get_result()
+
 
     def smooth_sawtooth(self, array, window_len = 101):
 

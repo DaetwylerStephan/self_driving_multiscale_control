@@ -16,6 +16,17 @@ class write_Params:
             f.write('Nb of planes highres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + "\n")
 
             f.write('---------------------------------------------\n')
+            f.write('Laser power\n')
+            if self.view.runtab.stack_aq_488on.get() ==1:
+                f.write('Laser power 488: ' + str(self.view.runtab.laser488_percentage.get()) + "\n")
+            if self.view.runtab.stack_aq_552on.get() == 1:
+                f.write('Laser power 552: ' + str(self.view.runtab.laser552_percentage.get()) + "\n")
+            if self.view.runtab.stack_aq_594on.get() ==1:
+                f.write('Laser power 594: ' + str(self.view.runtab.laser594_percentage.get()) + "\n")
+            if self.view.runtab.stack_aq_640on.get() ==1:
+                f.write('Laser power 640: ' + str(self.view.runtab.laser640_percentage.get()) + "\n")
+
+            f.write('---------------------------------------------\n')
             f.write('low resolution stack positions\n')
 
             for iter_lowrespos in self.view.stagessettingstab.stage_savedPos_tree.get_children():
@@ -38,3 +49,12 @@ class write_Params:
                 angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][4]))
                 current_startposition = [zpos, xpos, ypos, angle]
                 f.write(str(current_startposition) + "\n")
+
+            f.write('\n---------------------------------------------\n')
+            f.write('SPIM / ASLM: ')
+            if self.view.runtab.cam_highresMode.get() == "SPIM Mode":
+                f.write("SPIM mode\n")
+            else:
+                f.write("ASLM mode\n")
+                f.write('Volt interval (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_interval.get()) + "\n")
+                f.write('Volt center (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle.get()) + "\n")
