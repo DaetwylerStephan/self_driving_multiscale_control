@@ -440,9 +440,10 @@ class multiScopeModel:
         :param desired_exposuretime: the exposure time that is desired for the whole acquisition
         :return: set the important parameters for ASLM acquisitions
         """
+        linedelay = Camera_parameters.highres_line_digitization_time
         self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + self.current_highresROI_height/ASLM_parameters.simultaneous_lines)))
-        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(self.current_highresROI_height *ASLM_parameters.line_delay)))
-        self.ASLM_acquisition_time = self.ASLM_line_delay * self.current_highresROI_height * ASLM_parameters.line_delay + self.ASLM_lineExposure
+        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(self.current_highresROI_height *linedelay)))
+        self.ASLM_acquisition_time = self.ASLM_line_delay * self.current_highresROI_height * linedelay + self.ASLM_lineExposure
 
         print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
 
@@ -463,7 +464,7 @@ class multiScopeModel:
                 basic_unit = np.zeros((totallength, NI_board_parameters.ao_nchannels), np.dtype(np.float64))
 
                 basic_unit[self.ao.s2p(0.001):totallength, self.current_laser] = 4
-                basic_unit[self.ao.s2p(0.001) : self.ao.s2p(0.002),0] = 4.  # high-res camera
+                basic_unit[self.ao.s2p(0.001) : self.ao.s2p(0.002),NI_board_parameters.highres_camera] = 4.  # high-res camera
 
                 if self.ASLM_alignmentOn == 1:
                     #during alignment, set constant voltage
@@ -547,7 +548,7 @@ class multiScopeModel:
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser488, current_filepath)
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath)
@@ -561,7 +562,7 @@ class multiScopeModel:
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser552, current_filepath)
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath)
@@ -575,7 +576,7 @@ class multiScopeModel:
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire highALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
+                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser594, current_filepath)
 
             if resolutionmode == "highSPIM":
                 print("acquire highSPIM")
@@ -619,7 +620,7 @@ class multiScopeModel:
 
             custody.switch_from(None, to=self.lowres_camera)
 
-            #prepare acquisition by moving filter wheel etc
+            #prepare acquisition by moving filter wheel and stage
             self.prepare_acquisition(current_startposition, current_laserline)
 
 
@@ -635,8 +636,8 @@ class multiScopeModel:
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
 
             #set voltages in array - camera, stage, remote mirror, laser
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), 1] = 4.  # camera - ao5
-            basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), NI_board_parameters.lowres_camera] = 4.  # camera - ao5
+            basic_unit[0:self.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
             basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4. #laser
             basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #remote mirror
 
@@ -712,8 +713,8 @@ class multiScopeModel:
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
 
             #set voltages in array - camera, stage, remote mirror, laser
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), 0] = 4.  # highrescamera - ao0
-            basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), NI_board_parameters.highres_camera] = 4.  # highrescamera - ao0
+            basic_unit[0:self.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
             basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #remote mirror
             basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_HR / 1000), current_laserline] = 4. #laser
 
@@ -776,7 +777,7 @@ class multiScopeModel:
 
             custody.switch_from(None, to=self.highres_camera)
 
-            # prepare acquisition by moving filter wheel etc
+            # prepare acquisition by moving filter wheel and stage
             self.prepare_acquisition(current_startposition, current_laserline)
 
             #obtain ASLM parameters
@@ -789,18 +790,18 @@ class multiScopeModel:
 
             # prepare voltage array
             # calculate minimal unit duration and set up array
-            minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_additionalreturntime
+            minimal_trigger_timeinterval = 0.1 + self.ASLM_acquisition_time / 1000 + readout_time / 1000 + self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_additionalreturntime
             basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
                                   np.dtype(np.float64))
 
             # set voltages in array - camera, stage, laser
             basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002),
-            0] = 4.  # highrescamera - ao0
-            basic_unit[0:self.ao.s2p(0.002), 2] = 4.  # stage
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_HR / 1000),
+            NI_board_parameters.highres_camera] = 4
+            basic_unit[0:self.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
+            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.ASLM_acquisition_time / 1000),
             current_laserline] = 4.  # laser
 
-            #
+            #remote mirror voltage
             sawtooth_array = np.zeros(self.ao.s2p(minimal_trigger_timeinterval), np.dtype(np.float64))
             sawtooth_array[:] = self.ASLM_from_Volt
             goinguppoints = self.ao.s2p(self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_acquisition_time / 1000)
@@ -811,7 +812,7 @@ class multiScopeModel:
 
             basic_unit[:, NI_board_parameters.voicecoil] = sawtooth_array  # remote mirror
 
-
+            print("plane nb> " + str(self.stack_nbplanes_highres))
             control_array = np.tile(basic_unit,
                                     (self.stack_nbplanes_highres + 1,
                                      1))  # add +1 as you want to return to origin position
@@ -854,6 +855,7 @@ class multiScopeModel:
             self.ao.play_voltages(block=True)
             stream_thread_ASLM.get_result()
             camera_stream_thread_ASLM.get_result()
+            print("camera stream over")
 
             custody.switch_from(self.highres_camera, to=self.display)
 

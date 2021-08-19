@@ -454,9 +454,9 @@ class MultiScale_Microscope_Controller():
                                       self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
 
                 if self.view.runtab.cam_highresMode.get()=="SPIM Mode":
-                    self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "highSPIM")
+                    self.model.stack_acquisition_master(current_folder, currentposition, which_channels, "highSPIM")
                 else:
-                    self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "highASLM")
+                    self.model.stack_acquisition_master(current_folder, currentposition, which_channels, "highASLM")
 
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
 

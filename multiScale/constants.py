@@ -40,11 +40,15 @@ class NI_board_parameters:
     ao_type = '6738'
     ao_nchannels = 8
     rate = 2e4
+    highres_camera = 0
+    lowres_camera = 1
+    stage = 2
     laser488 = 3
     laser552 = 4
     laser594 = 5
     laser640 = 6
     voicecoil = 7
+
 
     #constant values for laser power etc...
     ao_type_constant = '6738_constant'
