@@ -8,7 +8,7 @@ import traceback
 import napari
 from qtpy.QtCore import QTimer
 # Our stuff
-from concurrency_tools import ObjectInSubprocess, SharedNDArray, _dummy_function
+from .concurrency_tools import ObjectInSubprocess, SharedNDArray, _dummy_function
 import numpy as np
 from constants import Camera_parameters
 

@@ -57,8 +57,11 @@ class NI_board_parameters:
     power_594_line = "Dev1/ao22"
     power_640_line = "Dev1/ao25"
     flip_mirror_line = "Dev1/ao26"
+    mSPIM_mirror_line = "Dev1/ao29"
+    mSPIM_mirror_voltage = 0.1
     minVol_constant = 0
     maxVol_constant = 5
+    max_mSPIM_constant = 2
 
 
 class SharedMemory_allocation:

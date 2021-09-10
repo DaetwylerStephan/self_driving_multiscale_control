@@ -98,6 +98,7 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_volt_middle.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_voltageDirection.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.stack_aq_camera_delay.trace_add("write", self.update_stack_aq_parameters)
+        self.view.advancedSettingstab.adv_settings_mSPIMvoltage.trace_add("write", self.update_mSPIMvoltage)
 
 
         #define some parameters
@@ -140,6 +141,13 @@ class MultiScale_Microscope_Controller():
         # set the low resolution and high-resolution slit openings
         self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
         self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
+
+    def update_mSPIMvoltage(self, var, indx, mode):
+        # set the low resolution and high-resolution slit openings
+        voltage = self.view.advancedSettingstab.adv_settings_mSPIMvoltage.get()
+        print(voltage)
+        if voltage > 0 and voltage < NI_board_parameters.max_mSPIM_constant:
+            self.model.mSPIMmirror_voltage.setconstantvoltage(voltage)
 
     def updateExposureParameters(self, var, indx, mode):
         # exposure time
@@ -289,6 +297,9 @@ class MultiScale_Microscope_Controller():
         axialPosition =self.view.stagessettingstab.stage_moveto_axial.get() * 1000000000
         anglePosition =self.view.stagessettingstab.stage_moveto_angle.get() * 1000000
         moveToPosition = [axialPosition, lateralPosition, updownPosition, anglePosition]
+
+        #check not to exceed limits
+        moveToPosition = self.model.check_movementboundaries(moveToPosition)
 
         #move
         self.model.move_to_position(moveToPosition)

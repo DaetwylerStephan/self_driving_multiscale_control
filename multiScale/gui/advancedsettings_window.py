@@ -39,17 +39,23 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_volt_highRes_static = tk.DoubleVar() #parameter for high resolution static light sheet
         self.ASLM_SawtoothORconstant = tk.StringVar()
         self.ASLM_voltageDirection = tk.StringVar()
+
+        #mSPIM settings
+        self.adv_settings_mSPIMvoltage = tk.DoubleVar() #set voltage for remote galvo mirror
+
         ### ----------------------------label frames-----------------------------------------------------------------
 
         #set the different label frames
         slit_settings = tk.LabelFrame(self, text="Slit Settings")
         stack_aq_settings = tk.LabelFrame(self, text="Stack Acquisition Settings")
-        ASLM_settings = tk.LabelFrame(self, text="Slit Settings")
+        ASLM_settings = tk.LabelFrame(self, text="ASLM Settings")
+        mSPIM_settings = tk.LabelFrame(self, text="mSPIM Settings")
 
         # overall positioning of label frames
         slit_settings.grid(row=2, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
         stack_aq_settings.grid(row=4, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
         ASLM_settings.grid(row=2, column=1, sticky = tk.W + tk.E+tk.S+tk.N)
+        mSPIM_settings.grid(row=6, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
 
         ### ----------------------------slit settings -----------------------------------------------------------------
         # slit labels (positioned)
@@ -65,8 +71,8 @@ class AdvancedSettings_Tab(tk.Frame):
         slit_scale = tk.Scale(slit_settings, variable=self.slit_currentsetting, from_=0, to=4558, orient="horizontal")
 
         # set defaults
-        self.slit_lowres.set(4025)
-        self.slit_highres.set(150)
+        self.slit_lowres.set(3700)
+        self.slit_highres.set(4558)
 
         # slit settings layout
         slit_scale.grid(row=2, column=1, rowspan=2, columnspan=4, sticky=tk.W + tk.E)
@@ -84,7 +90,20 @@ class AdvancedSettings_Tab(tk.Frame):
         self.stack_aq_camera_delay.set(1)
 
         # layout
-        self.delay_camera_entry.grid(row=1, column=0, sticky=tk.W + tk.E + tk.S)
+        self.delay_camera_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
+
+        ### ----------------------------mSPIM settings -----------------------------------------------------------------
+        # slit labels (positioned)
+        mSPIM_voltage_label = ttk.Label(mSPIM_settings, text="voltage @resonant galvo:").grid(
+            row=2, column=0)
+
+        self.mSPIM_voltage_entry = tk.Entry(mSPIM_settings, textvariable=self.adv_settings_mSPIMvoltage, width=4)
+
+        # set defaults
+        self.adv_settings_mSPIMvoltage.set(0.1)
+
+        # layout
+        self.mSPIM_voltage_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
 
         ### ----------------------------ASLM settings -----------------------------------------------------------------
         # ASLM labels (positioned)

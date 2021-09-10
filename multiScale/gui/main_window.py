@@ -8,13 +8,11 @@ try:
     from .run_window import Run_Tab
     from .stages_window import Stages_Tab
     from .advancedsettings_window import AdvancedSettings_Tab
-    from .settings_window import Settings_Tab
 except ImportError:
     from Welcome_window import Welcome_Tab
     from run_window import Run_Tab
     from stages_window import Stages_Tab
     from advancedsettings_window import AdvancedSettings_Tab
-    from settings_window import Settings_Tab
 
 
 

@@ -7,6 +7,7 @@ import numpy as np
 
 import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.napari_in_subprocess as napari
+import acquisition_array_class as acq_arrays
 
 import src.camera.Photometrics_camera as Photometricscamera
 import src.ni_board.vni as ni
@@ -60,7 +61,7 @@ class multiScopeModel:
         self.filepath = 'D:/acquisitions/testimage.tif'
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
-        self.slitopening_lowres = 1500
+        self.slitopening_lowres = 3700
         self.slitopening_highres= 4558
 
         self.current_lowresROI_width = Camera_parameters.LR_width_pixel
@@ -107,6 +108,9 @@ class multiScopeModel:
         lowres_camera_init = ct.ResultThread(target=self._init_lowres_camera).start() #~3.6s
         highres_camera_init = ct.ResultThread(target=self._init_highres_camera).start() #~3.6s
         self._init_display() #~1.3s
+
+        #init acquisition array writing class
+        self.get_acq_array = acq_arrays.acquisition_arrays(self)
 
 
         #initialize stages and stages in ResultThreads
@@ -197,6 +201,13 @@ class multiScopeModel:
             minVol=NI_board_parameters.minVol_constant,
             maxVol=NI_board_parameters.maxVol_constant,
             verbose=True)
+        self.mSPIMmirror_voltage = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.mSPIM_mirror_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.max_mSPIM_constant,
+            verbose=True)
+        self.mSPIMmirror_voltage.setconstantvoltage(0.1)
         print("done with ao.")
         atexit.register(self.ao.close)
 
@@ -294,6 +305,28 @@ class multiScopeModel:
         self.ao_laser594_power.setconstantvoltage(powersettings[2])
         self.ao_laser640_power.setconstantvoltage(powersettings[3])
 
+    def check_movementboundaries(self, array):
+        '''
+        :param array = [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to
+        :return: an array which has no out of range positions
+        '''
+        if array[0] > 20 * 1000000000:
+            array[0] = 19.9 * 1000000000
+        if array[0] < -20 * 1000000000:
+            array[0] = -19.9 * 1000000000
+
+        if array[1] > 20 * 1000000000:
+            array[1] = 19.9 * 1000000000
+        if array[1] < -20 * 1000000000:
+            array[1] = -19.9 * 1000000000
+
+        if array[2] > 41.9 * 1000000000:
+            array[2] = 41.5 * 1000000000
+        if array[2] < -41.9 * 1000000000:
+            array[2] = -41.5 * 1000000000
+
+        return array
+
     def move_to_position(self, positionlist):
         print(str(positionlist[0:3]))
         positionlistInt = np.array(positionlist, dtype=np.int64)
@@ -326,6 +359,7 @@ class multiScopeModel:
         self.flipMirrorPosition_power.setconstantvoltage(0)
         self.move_adjustableslit(self.slitopening_lowres, 1)
 
+    ### ---------------------------below here are the preview functions -----------------------------------------------
 
     def preview_lowres(self):
         """
@@ -335,26 +369,9 @@ class multiScopeModel:
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
-            #define array for laser
-            basic_unit = np.zeros((self.ao.s2p(0.3), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
-
             def laser_preview():
-                old_laserline = 0
                 while self.continue_preview_lowres:
-                    basic_unit[:, old_laserline] = 0
-                    old_laserline = self.current_laser
-                    basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
-
-                    if self.ASLM_alignmentOn == 1:
-                        if self.ASLM_Sawtooth:
-                            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_minVolt
-                            basic_unit[0: self.ao.s2p(0.2), NI_board_parameters.voicecoil] = np.linspace(self.ASLM_minVolt, self.ASLM_maxVolt, self.ao.s2p(0.2))
-                            basic_unit[(self.ao.s2p(0.2)):self.ao.s2p(0.3), NI_board_parameters.voicecoil] = np.linspace(self.ASLM_maxVolt, self.ASLM_minVolt, self.ao.s2p(0.1))
-                        else:
-                            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt #set voltage of remote mirror
-                    else:
-                        basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #set voltage of remote mirror
-
+                    basic_unit = self.get_acq_array.get_lowres_preview_array()
                     self.ao.play_voltages(basic_unit, block=True)
 
             ct.ResultThread(target=laser_preview).start()
@@ -390,20 +407,10 @@ class multiScopeModel:
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
-
-
             def laser_preview_highres():
                 #old_laserline = 0
                 while self.continue_preview_highres:
-                    # define array for laser
-                    min_time = max(self.exposure_time_HR / 1000, 0.3)
-                    basic_unit = np.zeros((self.ao.s2p(min_time), NI_board_parameters.ao_nchannels),
-                                          np.dtype(np.float64))
-
-                    #basic_unit[:,old_laserline] = 0
-                    #old_laserline = self.current_laser
-                    basic_unit[:, self.current_laser] = 4.  # set TTL signal of the right laser to 4
-                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #set voltage of remote mirror
+                    basic_unit = self.get_acq_array.get_lowres_preview_array()
                     self.ao.play_voltages(basic_unit, block=True)
 
             #run laser as sub-thread that is terminated when the preview button is pressed (self.continue_preview_highres is false).
@@ -459,26 +466,8 @@ class multiScopeModel:
                 self.calculate_ASLMparameters(self.exposure_time_HR)
                 self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
 
-                #generate array
-                totallength = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02)
-                basic_unit = np.zeros((totallength, NI_board_parameters.ao_nchannels), np.dtype(np.float64))
-
-                basic_unit[self.ao.s2p(0.001):totallength, self.current_laser] = 4
-                basic_unit[self.ao.s2p(0.001) : self.ao.s2p(0.002),NI_board_parameters.highres_camera] = 4.  # high-res camera
-
-                if self.ASLM_alignmentOn == 1:
-                    #during alignment, set constant voltage
-                    basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_currentVolt  # high-res camera
-                else:
-                    sawtooth_array = np.zeros(totallength, np.dtype(np.float64))
-                    sawtooth_array[:] = self.ASLM_from_Volt
-                    goinguppoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000)
-                    goingdownpoints = self.ao.s2p(0.001 + self.ASLM_acquisition_time/1000 + 0.02) - goinguppoints
-                    sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_from_Volt, self.ASLM_to_Volt, goinguppoints)
-                    sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_to_Volt, self.ASLM_from_Volt, goingdownpoints)
-
-                    basic_unit[:, NI_board_parameters.voicecoil] = self.smooth_sawtooth(sawtooth_array, window_len = self.ao.s2p(0.01))
-
+                #generate acquisition array
+                basic_unit = self.get_acq_array.get_highresASLM_preview_array()
                 print("array generated")
 
                 custody.switch_from(None, to=self.highres_camera)
@@ -500,8 +489,6 @@ class multiScopeModel:
                 camera_stream_thread_ASLMpreview.get_result()
                 print("camera thread returned")
                 self.num_frames += 1
-
-
 
                 #calculate fps to display
                 #if (self.num_frames % 2 ==0): #Napari can only display 20fps
@@ -531,6 +518,8 @@ class multiScopeModel:
         th = ct.CustodyThread(target=preview_highresASLM_task, first_resource=self.highres_camera)
         th.start()
         return th
+
+    ### ---------------------------below here are the stack acquisition functions --------------------------------
 
     def stack_acquisition_master(self, current_folder, current_startposition, whichlaser, resolutionmode):
         """
@@ -598,7 +587,7 @@ class multiScopeModel:
 
     def prepare_acquisition(self, current_startposition, laser):
         """
-        prepare acquisition by moving filter wheel and stage system to right position
+        prepare acquisition by moving filter wheel and stage system to the correct position
         """
         def movestage():
             self.move_to_position(current_startposition)
@@ -623,24 +612,8 @@ class multiScopeModel:
             #prepare acquisition by moving filter wheel and stage
             self.prepare_acquisition(current_startposition, current_laserline)
 
-
-            # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
-            # exposure time, depending on the number of rows that are imaged
-            nb_rows = 2960
-            # nb_rows = 2480
-            readout_time = nb_rows * Camera_parameters.lowres_line_digitization_time
-
-            #prepare voltage array
-            # calculate minimal unit duration and set up array
-            minimal_trigger_timeinterval = self.exposure_time_LR / 1000 + readout_time / 1000 + self.delay_cameratrigger
-            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
-
-            #set voltages in array - camera, stage, remote mirror, laser
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), NI_board_parameters.lowres_camera] = 4.  # camera - ao5
-            basic_unit[0:self.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_LR / 1000), current_laserline] = 4. #laser
-            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticLowResVolt #remote mirror
-
+            #define NI board voltage array
+            basic_unit = self.get_acq_array.get_lowRes_StackAq_array(current_laserline)
             control_array = np.tile(basic_unit, (self.stack_nbplanes_lowres + 1, 1))  # add +1 as you want to return to origin position
 
             #write voltages
@@ -651,7 +624,6 @@ class multiScopeModel:
             low_res_buffer = ct.SharedNDArray(
                  shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
                  dtype='uint16')
-            #low_res_buffer.fill(0)
 
             #set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing)
@@ -702,22 +674,8 @@ class multiScopeModel:
             # prepare acquisition by moving filter wheel etc
             self.prepare_acquisition(current_startposition, current_laserline)
 
-            # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
-            # exposure time, depending on the number of rows that are imaged
-            nb_rows = 2480
-            readout_time = nb_rows * Camera_parameters.highres_line_digitization_time
-
-            # prepare voltage array
-            # calculate minimal unit duration and set up array
-            minimal_trigger_timeinterval = self.exposure_time_HR / 1000 + readout_time / 1000 + self.delay_cameratrigger
-            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels), np.dtype(np.float64))
-
-            #set voltages in array - camera, stage, remote mirror, laser
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002), NI_board_parameters.highres_camera] = 4.  # highrescamera - ao0
-            basic_unit[0:self.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
-            basic_unit[:, NI_board_parameters.voicecoil] = self.ASLM_staticHighResVolt #remote mirror
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.exposure_time_HR / 1000), current_laserline] = 4. #laser
-
+            # define NI board voltage array
+            basic_unit = self.get_acq_array.get_highResSPIM_StackAq_array(current_laserline)
             control_array = np.tile(basic_unit,
                                     (self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
 
@@ -783,39 +741,11 @@ class multiScopeModel:
             #obtain ASLM parameters
             self.calculate_ASLMparameters(self.exposure_time_HR)
             print("ASLM parameters calculated")
-            # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
-            # exposure time, depending on the number of rows that are imaged
-            nb_rows = 2480
-            readout_time = nb_rows * Camera_parameters.highres_line_digitization_time
 
-            # prepare voltage array
-            # calculate minimal unit duration and set up array
-            minimal_trigger_timeinterval = 0.1 + self.ASLM_acquisition_time / 1000 + readout_time / 1000 + self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_additionalreturntime
-            basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
-                                  np.dtype(np.float64))
+            # define NI board voltage array
+            basic_unit = self.get_acq_array.get_highResASLM_StackAq_array(current_laserline)
+            control_array = np.tile(basic_unit,(self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
 
-            # set voltages in array - camera, stage, laser
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.delay_cameratrigger + 0.002),
-            NI_board_parameters.highres_camera] = 4
-            basic_unit[0:self.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
-            basic_unit[self.ao.s2p(self.delay_cameratrigger):self.ao.s2p(self.ASLM_acquisition_time / 1000),
-            current_laserline] = 4.  # laser
-
-            #remote mirror voltage
-            sawtooth_array = np.zeros(self.ao.s2p(minimal_trigger_timeinterval), np.dtype(np.float64))
-            sawtooth_array[:] = self.ASLM_from_Volt
-            goinguppoints = self.ao.s2p(self.delay_cameratrigger + self.ASLM_delaybeforevoltagereturn + self.ASLM_acquisition_time / 1000)
-            goingdownpoints = self.ao.s2p(minimal_trigger_timeinterval) - goinguppoints
-            sawtooth_array[0:goinguppoints] = np.linspace(self.ASLM_from_Volt, self.ASLM_to_Volt, goinguppoints)
-            sawtooth_array[goinguppoints:] = np.linspace(self.ASLM_to_Volt, self.ASLM_from_Volt, goingdownpoints)
-
-
-            basic_unit[:, NI_board_parameters.voicecoil] = sawtooth_array  # remote mirror
-
-            print("plane nb> " + str(self.stack_nbplanes_highres))
-            control_array = np.tile(basic_unit,
-                                    (self.stack_nbplanes_highres + 1,
-                                     1))  # add +1 as you want to return to origin position
             #smooth remote mirror voltage
             control_array[:,NI_board_parameters.voicecoil] = self.smooth_sawtooth(control_array[:,NI_board_parameters.voicecoil],
                                                                                 window_len=self.ao.s2p(0.002))
