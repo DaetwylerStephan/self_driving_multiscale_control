@@ -29,6 +29,11 @@ class MultiScale_Microscope_Controller():
     #todo: ROI selection tool - in napari
     #todo: move to selected region in high resolution.
 
+    #todo>MIP from side and top to Napari
+    #hard coded ROIs 512
+    #todo> startup guide
+
+
     def __init__(self):
         self.root = tk.Tk()
 
@@ -85,6 +90,7 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.stage_moveto_angle.trace_add("write", self.movestage)
         self.view.stagessettingstab.keyboard_input_on_bt.bind("<Button>", self.enable_keyboard_movement)
         self.view.stagessettingstab.keyboard_input_off_bt.bind("<Button>", self.disable_keyboard_movement)
+        self.view.stagessettingstab.move_to_specificPosition_Button.bind("<Button>", self.movestageToPosition)
 
         #advanced settings tab
         self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
@@ -303,6 +309,46 @@ class MultiScale_Microscope_Controller():
 
         #move
         self.model.move_to_position(moveToPosition)
+
+    def movestageToPosition(self, event):
+        """
+        moves the stage to a saved position, indicated by a field in the GUI
+        """
+        position = self.view.stagessettingstab.stage_move_to_specificposition.get()
+        print(position)
+
+        if self.view.stagessettingstab.move_to_specific_pos_resolution.get() == "on":
+            print("move:")
+            for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
+                savedpos = int(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][0])
+                if savedpos == position:
+                    #set positions in the moving panel:
+                    self.view.stagessettingstab.stage_moveto_lateral.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1])
+                    self.view.stagessettingstab.stage_moveto_updown.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2])
+                    self.view.stagessettingstab.stage_moveto_axial.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3])
+                    self.view.stagessettingstab.stage_moveto_angle.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4])
+                    #move to these positions:
+                    xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1]) * 1000000000)
+                    ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2]) * 1000000000)
+                    zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3]) * 1000000000)
+                    angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4]) * 1000000)
+                    current_position = [zpos, xpos, ypos, angle]
+                    self.model.move_to_position(current_position)
+        else:
+            for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
+                savedpos = int(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][0])
+                if savedpos == position:
+                    self.view.stagessettingstab.stage_moveto_lateral.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])
+                    self.view.stagessettingstab.stage_moveto_updown.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2])
+                    self.view.stagessettingstab.stage_moveto_axial.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3])
+                    self.view.stagessettingstab.stage_moveto_angle.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4])
+
+                    xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1]) * 1000000000)
+                    ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2]) * 1000000000)
+                    zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3]) * 1000000000)
+                    angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4]) * 1000000)
+                    current_position = [zpos, xpos, ypos, angle]
+                    self.model.move_to_position(current_position)
 
     def slit_opening_move(self, var,indx, mode):
         """

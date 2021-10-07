@@ -62,14 +62,14 @@ class acquisition_arrays:
         # prepare voltage array
         # calculate minimal unit duration and set up array
         minimal_trigger_timeinterval = self.model.exposure_time_LR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger
-        basic_unit = np.zeros((self.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
+        basic_unit = np.zeros((self.model.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
                               np.dtype(np.float64))
 
         # set voltages in array - camera, stage, remote mirror, laser
         basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.002),
         NI_board_parameters.lowres_camera] = 4.  # camera - ao5
         basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.ao.s2p(self.model.exposure_time_LR / 1000),
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.exposure_time_LR / 1000),
         current_laserline] = 4.  # laser
         basic_unit[:, NI_board_parameters.voicecoil] = self.model.ASLM_staticLowResVolt  # remote mirror
 

@@ -44,6 +44,7 @@ class Stages_Tab(tk.Frame):
         self.stage_mosaic_upDown = 2
         self.stage_mosaic_lateral = 2
         self.stage_last_key = tk.StringVar()
+        self.stage_move_to_specificposition = tk.IntVar()
 
         #mosaic parameters
         self.stage_mosaic_upDown_Nb = tk.IntVar()
@@ -97,6 +98,7 @@ class Stages_Tab(tk.Frame):
         positionY_label = ttk.Label(movetoposition, text="Y").grid(row=4, column=0)
         positionZ_label = ttk.Label(movetoposition, text="Z").grid(row=6, column=0)
         positionAngle_label = ttk.Label(movetoposition, text="Phi").grid(row=8, column=0)
+        movetospecificPosition_label = ttk.Label(movetoposition, text="Move to position:").grid(row=14, column=0, columnspan=2)
 
         self.stage_move_left_bt = tk.Button(movetoposition, text="<", command=lambda : self.change_currentposition(self.stage_moveto_lateral, -1))
         self.stage_move_right_bt = tk.Button(movetoposition, text=">", command=lambda : self.change_currentposition(self.stage_moveto_lateral, 1))
@@ -117,6 +119,14 @@ class Stages_Tab(tk.Frame):
         self.keyboard_input_off_bt = tk.Radiobutton(movetoposition, text="Disable Keyboard", value="off", variable =self.keyboardinput, indicatoron=False)
         self.keyboard_entry = tk.Entry(movetoposition, textvariable=self.stage_last_key, width=7)
 
+        self.move_to_specificPosition_Entry = tk.Entry(movetoposition, textvariable=self.stage_move_to_specificposition, width=7)
+        self.move_to_specificPosition_Button = tk.Button(movetoposition, text="Move")
+        self.move_to_specific_pos_resolution = tk.StringVar(value="on")
+        self.move_to_specific_pos_low_on = tk.Radiobutton(movetoposition, text="Low", value="on",
+                                                   variable=self.move_to_specific_pos_resolution, indicatoron=False)
+        self.move_to_specific_pos_low_off = tk.Radiobutton(movetoposition, text="High", value="off",
+                                                    variable=self.move_to_specific_pos_resolution, indicatoron=False)
+
         # move to widgets layout
         self.stage_moveto_lateral_entry.grid(row=2, column=1,columnspan=1,sticky = tk.W + tk.E)
         self.stage_moveto_updown_entry.grid(row=4, column=1,columnspan=1,sticky = tk.W + tk.E)
@@ -134,6 +144,11 @@ class Stages_Tab(tk.Frame):
         self.keyboard_input_on_bt.grid(row=12, column=0,columnspan=2,sticky = tk.W + tk.E)
         self.keyboard_input_off_bt.grid(row=12, column=2,columnspan=4,sticky = tk.W + tk.E)
         self.keyboard_entry.grid(row=12, column=6,columnspan=2,sticky = tk.W + tk.E)
+
+        self.move_to_specificPosition_Entry.grid(row=15, column=0, columnspan=2, sticky=tk.W + tk.E)
+        self.move_to_specificPosition_Button.grid(row=15, column=7, columnspan=2, sticky=tk.W + tk.E)
+        self.move_to_specific_pos_low_on.grid(row=15, column=3, columnspan=2, sticky=tk.W + tk.E)
+        self.move_to_specific_pos_low_off.grid(row=15, column=5, columnspan=2, sticky=tk.W + tk.E)
 
         ### ----------------------------mosaic settings -----------------------------------------------------------------
         # stage labels (positioned)
