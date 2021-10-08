@@ -64,6 +64,14 @@ class Run_Tab(tk.Frame):
         self.timelapse_aq_length_seconds = tk.DoubleVar()
         self.timelapse_aq_length_seconds.set(00)
 
+        #roi setting
+        self.roi_startX = tk.IntVar()
+        self.roi_startY = tk.IntVar()
+        self.roi_width = tk.IntVar()
+        self.roi_height = tk.IntVar()
+        self.roi_ac_settings_type = tk.StringVar()
+
+
         #set the different label frames
         laser_settings = tk.LabelFrame(self, text="Laser Settings")
         camera_settings = tk.LabelFrame(self, text="Camera Settings")
@@ -71,14 +79,17 @@ class Run_Tab(tk.Frame):
         stack_aquisition_settings = tk.LabelFrame(self, text="Stack acquisition")
         timelapse_acquisition_settings = tk.LabelFrame(self, text="Time-lapse acquisition")
         statusprogress_settings = tk.LabelFrame(self, text="Progress")
+        roi_settings = tk.LabelFrame(self, text="Region of Interest (ROI)")
 
         # overall positioning of label frames
-        laser_settings.grid(row=1, column=3, rowspan=3, sticky = tk.W + tk.E+tk.S+tk.N)
-        camera_settings.grid(row=4, column=3, sticky = tk.W + tk.E+tk.S+tk.N)
-        preview_settings.grid(row=1, column=2, rowspan=2, sticky = tk.W + tk.E+tk.S+tk.N)
-        stack_aquisition_settings.grid(row=3, column=2, sticky = tk.W + tk.E+tk.S+tk.N)
+        preview_settings.grid(row=1, column=2, rowspan=1, sticky = tk.W + tk.E+tk.S+tk.N)
+        stack_aquisition_settings.grid(row=2, column=2, rowspan=2, sticky = tk.W + tk.E+tk.S+tk.N)
         timelapse_acquisition_settings.grid(row=4, column=2, rowspan=2,sticky=tk.W + tk.E+tk.S+tk.N)
         statusprogress_settings.grid(row=7, column=2, sticky=tk.W + tk.E+tk.S+tk.N)
+
+        laser_settings.grid(row=1, column=3, rowspan=2, sticky=tk.W + tk.E + tk.S + tk.N)
+        camera_settings.grid(row=3, column=3, sticky=tk.W + tk.E + tk.S + tk.N)
+        roi_settings.grid(row=4, column=3, rowspan=2, sticky=tk.W + tk.E+tk.S+tk.N)
 
         #define some labels here to ensure existance for code
         self.stack_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
@@ -293,7 +304,54 @@ class Run_Tab(tk.Frame):
         self.timelapse_aq_bt_run_timelapse.grid(row=15, column=0, columnspan=2, sticky=tk.W + tk.E)
         self.timelapse_aq_bt_abort_timelapse.grid(row=15, column=2, columnspan=3, sticky=tk.W + tk.E)
 
-### ----------------------------progress display settings ------------------------------------------------------
+        ### ----------------------------roi setting buttons ------------------------------------------------------
+        # roi settings label
+        roi_typelabel = ttk.Label(roi_settings, text="Roi type:").grid(row=2, column=0)
+        roi_xstartlabel = ttk.Label(roi_settings, text="x start:").grid(row=6, column=0)
+        roi_ystartlabel = ttk.Label(roi_settings, text="y start").grid(row=7, column=0)
+        roi_widthlabel = ttk.Label(roi_settings, text="width").grid(row=8, column=0)
+        roi_heightlabel = ttk.Label(roi_settings, text="height").grid(row=9, column=0)
+        roi_reslabel = ttk.Label(roi_settings, text="Resolution").grid(row=4, column=5)
+
+        # roi setting entries
+        self.roi_xstartEntry = tk.Entry(roi_settings, textvariable=self.roi_startX, width=5)
+        self.roi_ystartEntry = tk.Entry(roi_settings, textvariable=self.roi_startY, width=5)
+        self.roi_widthEntry = tk.Entry(roi_settings, textvariable=self.roi_width, width=5)
+        self.roi_heightEntry = tk.Entry(roi_settings, textvariable=self.roi_height, width=5)
+
+        self.roi_startX.set(0)
+        self.roi_startY.set(0)
+        self.roi_width.set(5056)
+        self.roi_height.set(2960)
+
+        #roi types
+        roiTypes = ('Full Chip', '1024x1024', '512x512', '256x256', 'Custom')
+        self.roi_option_type = tk.OptionMenu(roi_settings, self.roi_ac_settings_type,
+                                                        *roiTypes)
+        self.roi_ac_settings_type.set(roiTypes[0])
+
+        #low or high res roi
+        self.roi_whichresolution = tk.StringVar(value="on")
+        self.roi_low_on = tk.Radiobutton(roi_settings, text="Low", value="on",
+                                                          variable=self.roi_whichresolution,
+                                                          indicatoron=False)
+        self.roi_low_off = tk.Radiobutton(roi_settings, text="High", value="off",
+                                                           variable=self.roi_whichresolution,
+                                                           indicatoron=False)
+
+        self.roi_applybutton = tk.Button(roi_settings, text="Apply ROI")
+
+
+        self.roi_option_type.grid(row=2,column =1, columnspan=5,sticky = tk.W + tk.E)
+        self.roi_low_on.grid(row=4, column=0, columnspan=2, sticky=tk.W + tk.E)
+        self.roi_low_off.grid(row=4, column=2, columnspan=2, sticky=tk.W + tk.E)
+        self.roi_xstartEntry.grid(row=6, column=2,columnspan=1,sticky = tk.W + tk.E)
+        self.roi_ystartEntry.grid(row=7, column=2,columnspan=1,sticky = tk.W + tk.E)
+        self.roi_widthEntry.grid(row=8, column=2,columnspan=1,sticky = tk.W + tk.E)
+        self.roi_heightEntry.grid(row=9, column=2,columnspan=1,sticky = tk.W + tk.E)
+        self.roi_applybutton.grid(row=2, column=6,columnspan=1,sticky = tk.W + tk.E)
+
+        ### ----------------------------progress display settings ------------------------------------------------------
         stackprogress_label = ttk.Label(statusprogress_settings, text="Stack progress:").grid(row=1, column=0)
         self.stack_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.stack_aq_progress,
                                                         maximum=self.stack_aq_numberOfPlanes_lowres.get())

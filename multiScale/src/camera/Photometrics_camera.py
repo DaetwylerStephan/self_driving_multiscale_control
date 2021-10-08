@@ -35,6 +35,13 @@ class Photo_Camera:
     def getimagesize(self):
         self.cam.roi
 
+    def get_imageroi(self):
+        return self.cam.roi
+
+    def set_imageroi(self, startx, endx, starty, endy):
+        roi = (startx, endx, starty, endy)
+        self.cam.roi = roi
+
     def take_snapshot(self, exposure):
         frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
         plt.imshow(frame, cmap="gray")
@@ -43,7 +50,6 @@ class Photo_Camera:
     def record(self, out, exposure=20):
         import numpy as np
         out[:] = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
-
 
     def prepare_stack_acquisition(self, exposure_time=20):
         """Changes the settings of the camera to stack acquisitions."""

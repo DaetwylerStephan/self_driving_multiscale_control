@@ -139,6 +139,8 @@ class multiScopeModel:
         print("Initializing low resolution camera ..")
         #place the Photometrics class as object into an Object in Subprocess
         self.lowres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMPCIECam00')
+        self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
+        print(self.lowres_camera_ROI)
         #self.lowres_camera.take_snapshot(20)
         print("done with camera.")
 
@@ -149,6 +151,8 @@ class multiScopeModel:
         print("Initializing high resolution camera..")
         #place the Photometrics class as object into an Object in Subprocess
         self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
+        self.highres_camera_ROI = self.highres_camera.get_imageroi()
+        print(self.highres_camera_ROI)
         #self.lowres_camera.take_snapshot(20)
         print("done with camera.")
 
@@ -394,7 +398,7 @@ class multiScopeModel:
 
             self.lowres_camera.end_preview()
 
-
+        self.low_res_buffer = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
         self.continue_preview_lowres = True
         th = ct.CustodyThread(target=preview_lowres_task, first_resource=None)
         th.start()
@@ -436,6 +440,7 @@ class multiScopeModel:
 
             self.highres_camera.end_preview()
 
+        self.high_res_buffer = ct.SharedNDArray(shape=(self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
         self.continue_preview_highres = True
         th = ct.CustodyThread(target=preview_highres_task, first_resource=self.highres_camera)
         th.start()

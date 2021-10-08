@@ -83,6 +83,9 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.stack_aq_plane_spacing_lowres.trace_add("write", self.update_stack_aq_parameters)
         self.view.runtab.stack_aq_plane_spacing_highres.trace_add("write", self.update_stack_aq_parameters)
 
+        self.view.runtab.roi_applybutton.bind("<Button>", self.changeROI)
+
+
         #stage settings tab
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
         self.view.stagessettingstab.stage_moveto_lateral.trace_add("write", self.movestage)
@@ -127,7 +130,6 @@ class MultiScale_Microscope_Controller():
     def wait_forInput(self):
         print("All 'snap' threads finished execution.")
         input('Hit enter to close napari...')
-    ##here follow the call to the functions of the model (microscope) that were bound above:
 
     def updateLaserParameters(self, var, indx, mode):
         """
@@ -224,6 +226,78 @@ class MultiScale_Microscope_Controller():
         '''
         self.model.currentFPS #todo
 
+    def changeROI(self,event):
+        '''
+        change the ROI - options ('Full Chip', '1024x1024', '512x512', '256x256', 'Custom')
+
+        :return:
+        '''
+
+
+        #which ROI selected
+        if self.view.runtab.roi_whichresolution.get()=='on': #low-resolution
+            if self.model.continue_preview_lowres == False:
+                if self.view.runtab.roi_ac_settings_type.get() == 'Full Chip':
+                    self.model.current_lowresROI_height = Camera_parameters.LR_height_pixel
+                    self.model.current_lowresROI_width = Camera_parameters.LR_width_pixel
+                    self.model.lowres_camera.set_imageroi(0, Camera_parameters.LR_width_pixel, 0, Camera_parameters.LR_height_pixel)
+                if self.view.runtab.roi_ac_settings_type.get() == '1024x1024':
+                    self.model.current_lowresROI_height = 1024
+                    self.model.current_lowresROI_width = 1024
+                    startx = int(Camera_parameters.LR_width_pixel/2)-512
+                    starty = int(Camera_parameters.LR_height_pixel/2)-512
+                    self.model.lowres_camera.set_imageroi(startx, startx + 1024, starty,starty + 1024)
+                if self.view.runtab.roi_ac_settings_type.get() == '512x512':
+                    self.model.current_lowresROI_height = 512
+                    self.model.current_lowresROI_width = 512
+                    startx = int(Camera_parameters.LR_width_pixel/2)-256
+                    starty = int(Camera_parameters.LR_height_pixel/2)-256
+                    self.model.lowres_camera.set_imageroi(startx, startx + 512, starty,starty + 512)
+                if self.view.runtab.roi_ac_settings_type.get() == '256x256':
+                    self.model.current_lowresROI_height = 256
+                    self.model.current_lowresROI_width = 256
+                    startx = int(Camera_parameters.LR_width_pixel / 2) - 128
+                    starty = int(Camera_parameters.LR_height_pixel / 2) - 128
+                    self.model.lowres_camera.set_imageroi(startx, startx + 256, starty, starty + 256)
+                if self.view.runtab.roi_ac_settings_type.get() == 'Custom':
+                    self.model.current_lowresROI_height = self.view.runtab.roi_height.get()
+                    self.model.current_lowresROI_width = self.view.runtab.roi_width.get()
+                    startx = self.view.runtab.roi_startX.get()
+                    starty = self.view.runtab.roi_startY.get()
+                    self.model.lowres_camera.set_imageroi(startx, startx + self.model.current_lowresROI_width, starty, starty + self.model.current_lowresROI_height)
+
+        else: #change high-res ROI
+            if self.model.continue_preview_highres == False:
+                if self.view.runtab.roi_ac_settings_type.get() == 'Full Chip':
+                    self.model.current_highresROI_height = Camera_parameters.HR_height_pixel
+                    self.model.current_highresROI_width = Camera_parameters.HR_width_pixel
+                    self.model.highres_camera.set_imageroi(0, Camera_parameters.HR_width_pixel, 0,
+                                                          Camera_parameters.HR_height_pixel)
+                if self.view.runtab.roi_ac_settings_type.get() == '1024x1024':
+                    self.model.current_highresROI_height = 1024
+                    self.model.current_highresROI_width = 1024
+                    startx = int(Camera_parameters.HR_width_pixel / 2) - 512
+                    starty = int(Camera_parameters.HR_height_pixel / 2) - 512
+                    self.model.highres_camera.set_imageroi(startx, startx + 1024, starty, starty + 1024)
+                if self.view.runtab.roi_ac_settings_type.get() == '512x512':
+                    self.model.current_highresROI_height = 512
+                    self.model.current_highresROI_width = 512
+                    startx = int(Camera_parameters.HR_width_pixel/2)-256
+                    starty = int(Camera_parameters.HR_height_pixel/2)-256
+                    self.model.highres_camera.set_imageroi(startx, startx + 512, starty,starty + 512)
+                if self.view.runtab.roi_ac_settings_type.get() == '256x256':
+                    self.model.current_highresROI_height = 256
+                    self.model.current_highresROI_width = 256
+                    startx = int(Camera_parameters.HR_width_pixel / 2) - 128
+                    starty = int(Camera_parameters.HR_height_pixel / 2) - 128
+                    self.model.highres_camera.set_imageroi(startx, startx + 256, starty, starty + 256)
+                if self.view.runtab.roi_ac_settings_type.get() == 'Custom':
+                    self.model.current_highresROI_height = self.view.runtab.roi_height.get()
+                    self.model.current_highresROI_width = self.view.runtab.roi_width.get()
+                    startx = self.view.runtab.roi_startX.get()
+                    starty = self.view.runtab.roi_startY.get()
+                    self.model.highres_camera.set_imageroi(startx, startx + self.model.current_highresROI_width, starty,
+                                                          starty + self.model.current_highresROI_height)
 
     def run_lowrespreview(self, event):
         '''
