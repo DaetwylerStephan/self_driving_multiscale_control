@@ -211,13 +211,7 @@ class MultiScale_Microscope_Controller():
 
         # update the ASLM alignment settings
         self.model.ASLM_alignmentOn = self.view.advancedSettingstab.ASLM_alignmentmodeOn.get()
-        runmode = self.view.advancedSettingstab.ASLM_SawtoothORconstant.get()
-        if runmode == 'Sawtooth':
-            self.model.ASLM_Sawtooth = 1
-            self.model.ASLM_ConstantVoltage = 0
-        else:
-            self.model.ASLM_Sawtooth = 0
-            self.model.ASLM_ConstantVoltage = 1
+        print(self.model.ASLM_alignmentOn)
 
     def updateGUItext(self):
         '''
@@ -430,6 +424,7 @@ class MultiScale_Microscope_Controller():
         """
         currentslitopening = self.view.advancedSettingstab.slit_currentsetting.get()
         self.model.move_adjustableslit(currentslitopening)
+        self.view.advancedSettingstab.slit_currentsetting.set(currentslitopening)
 
 
     def changefilter(self, event, laser):

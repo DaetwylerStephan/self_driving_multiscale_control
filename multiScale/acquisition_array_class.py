@@ -20,7 +20,7 @@ class acquisition_arrays:
 
     def get_highres_preview_array(self):
         # define array for laser
-        min_time = max(self.model.exposure_time_HR / 1000, 0.3)
+        min_time = max(self.model.exposure_time_HR / 1000, 3)
         basic_unit = np.zeros((self.model.ao.s2p(min_time), NI_board_parameters.ao_nchannels),
                               np.dtype(np.float64))
 

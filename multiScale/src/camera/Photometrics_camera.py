@@ -99,10 +99,17 @@ class Photo_Camera:
         self.cam.finish()
 
 
-    def set_up_preview(self, exposure=20, speedindex=0):
+    def set_up_lowres_preview(self, exposure=20):
         self.cam.exp_mode = "Internal Trigger"
         self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = speedindex
+        self.cam.speed_table_index = 0
+        self.cam.start_live(exp_time=exposure)
+
+    def set_up_highrespreview(self, exposure=20):
+        self.cam.exp_mode = "Internal Trigger"
+        self.cam.exp_out_mode = "Any Row"
+        self.cam.speed_table_index = 1
+        self.cam.gain = 1
         self.cam.start_live(exp_time=exposure)
 
     def run_preview(self, out):

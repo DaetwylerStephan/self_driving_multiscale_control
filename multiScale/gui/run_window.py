@@ -23,6 +23,7 @@ class Run_Tab(tk.Frame):
         intro_text = tk.Label(self, text=welcometext, height=2, width=115, fg="black", bg="grey")
         intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E))
 
+        self.preview_autoIntensity = tk.IntVar()
 
         #laser settings
         self.laser488_percentage = tk.IntVar()
@@ -160,8 +161,8 @@ class Run_Tab(tk.Frame):
         self.cam_highresMode.set(highresModeOptions[0])
 
         #set defaults
-        self.cam_lowresExposure.set(20)
-        self.cam_highresExposure.set(20)
+        self.cam_lowresExposure.set(200)
+        self.cam_highresExposure.set(200)
 
         #Layout Camera settings
         self.cam_lowresExposure_entry.grid(row=2, column=3, sticky=tk.W + tk.E + tk.S)
@@ -181,6 +182,9 @@ class Run_Tab(tk.Frame):
         self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview")
         self.bt_preview_stop = tk.Button(preview_settings, text="Stop Preview")
 
+        self.preview_rescale = tk.Checkbutton(preview_settings, text ='Autom. intensity rescaling', variable=self.preview_autoIntensity, onvalue=1, offvalue=0)
+
+
         #preview layout
         self.bt_changeTo488.grid(row=3, column=2)
         self.bt_changeTo552.grid(row=3, column=3)
@@ -191,6 +195,7 @@ class Run_Tab(tk.Frame):
         self.bt_preview_lowres.grid(row=4, column=2, columnspan=2, sticky = (tk.W + tk.E))
         self.bt_preview_highres.grid(row=4, column=4, columnspan=2, sticky=(tk.W + tk.E))
         self.bt_preview_stop.grid(row=4, column=6, columnspan=2, sticky=(tk.W + tk.E))
+        self.preview_rescale.grid(row=3, column=8)
 
         ### ----------------------------stack acquisition buttons ------------------------------------------------------
         #stack aquisition labels (positioned)

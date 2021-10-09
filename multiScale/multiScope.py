@@ -78,8 +78,6 @@ class multiScopeModel:
         self.ASLM_staticLowResVolt = 0 #default ASLM low res voltage
         self.ASLM_staticHighResVolt = 0 #default ASLM high res voltage
         self.ASLM_alignmentOn = 0 #param=1 if ASLM alignment mode is on, otherwise zero
-        self.ASLM_Sawtooth = 0 #alignment mode - run sawtooth
-        self.ASLM_ConstantVoltage = 0 #alignment mode - run constant voltage
         self.ASLM_delaybeforevoltagereturn = 0.001 #1 ms
         self.ASLM_additionalreturntime = 0.001 # 1ms
 
@@ -230,17 +228,17 @@ class multiScopeModel:
         self.filterwheel.set_filter('676/37-25', wait_until_done=False)
         print("done with filterwheel.")
 
-    def _init_shared_Memory(self):
-        #init shared memory
-        self.stack_buffer_lowres = ct.SharedNDArray((200, Camera_parameters.LR_height_pixel,
-                                                           Camera_parameters.LR_width_pixel),
-                                                          dtype='uint16')
-        self.stack_buffer_lowres.fill(0)
-
-        self.stack_buffer_highres = ct.SharedNDArray((200, Camera_parameters.HR_height_pixel,
-                                                     Camera_parameters.HR_width_pixel),
-                                                    dtype='uint16')
-        self.stack_buffer_highres.fill(0)
+    # def _init_shared_Memory(self):
+    #     #init shared memory
+    #     self.stack_buffer_lowres = ct.SharedNDArray((200, Camera_parameters.LR_height_pixel,
+    #                                                        Camera_parameters.LR_width_pixel),
+    #                                                       dtype='uint16')
+    #     self.stack_buffer_lowres.fill(0)
+    #
+    #     self.stack_buffer_highres = ct.SharedNDArray((200, Camera_parameters.HR_height_pixel,
+    #                                                  Camera_parameters.HR_width_pixel),
+    #                                                 dtype='uint16')
+    #     self.stack_buffer_highres.fill(0)
 
 
     def _init_XYZ_stage(self):
@@ -381,7 +379,7 @@ class multiScopeModel:
             ct.ResultThread(target=laser_preview).start()
 
             while self.continue_preview_lowres:
-                self.lowres_camera.set_up_preview(self.exposure_time_LR)
+                self.lowres_camera.set_up_lowres_preview(self.exposure_time_LR)
 
                 custody.switch_from(None, to=self.lowres_camera)
                 self.lowres_camera.run_preview(out=self.low_res_buffer)
@@ -414,14 +412,14 @@ class multiScopeModel:
             def laser_preview_highres():
                 #old_laserline = 0
                 while self.continue_preview_highres:
-                    basic_unit = self.get_acq_array.get_lowres_preview_array()
+                    basic_unit = self.get_acq_array.get_highres_preview_array()
                     self.ao.play_voltages(basic_unit, block=True)
 
             #run laser as sub-thread that is terminated when the preview button is pressed (self.continue_preview_highres is false).
             ct.ResultThread(target=laser_preview_highres).start()
 
             while self.continue_preview_highres:
-                self.highres_camera.set_up_preview(self.exposure_time_HR, 1)
+                self.highres_camera.set_up_highrespreview(self.exposure_time_HR)
                 self.num_frames += 1
                 custody.switch_from(None, to=self.highres_camera)
                 self.highres_camera.run_preview(out=self.high_res_buffer)
@@ -515,6 +513,8 @@ class multiScopeModel:
             self.ao.play_voltages(voltages=end_unit, block=True, force_final_zeros=False)
 
             self.highres_camera.end_preview()
+
+        self.high_res_buffer = ct.SharedNDArray(shape=(self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
 
         #parameters for preview
         self.continue_preview_highres = True
