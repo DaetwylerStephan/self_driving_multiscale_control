@@ -65,6 +65,9 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.bt_changeTo640.bind("<Button>", lambda event: self.changefilter(event, '640'))
         self.view.runtab.bt_changeTo_block.bind("<Button>", lambda event: self.changefilter(event, 'None'))
         self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED'))
+        self.view.runtab.preview_autoIntensity.trace_add("write", self.updatepreview)
+
+
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
@@ -84,6 +87,7 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.stack_aq_plane_spacing_highres.trace_add("write", self.update_stack_aq_parameters)
 
         self.view.runtab.roi_applybutton.bind("<Button>", self.changeROI)
+
 
 
         #stage settings tab
@@ -348,6 +352,16 @@ class MultiScale_Microscope_Controller():
             else:
                 self.model.preview_highres_ASLM()
                 print("running high res ASLM preview")
+
+    def updatepreview(self, var, indx, mode):
+        '''
+        Updates preview functionalities: auto-scaling of intensity values
+        '''
+        if self.view.runtab.preview_autoIntensity.get() == 1:
+            self.model.autoscale_preview = 1
+            print("updated ---------------------------------------1")
+        else:
+            self.model.autoscale_preview =0
 
     def run_stop_preview(self, event):
         '''

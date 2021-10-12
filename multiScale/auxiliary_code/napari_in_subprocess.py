@@ -56,6 +56,18 @@ class _NapariDisplay:
         else:
             self.stack_image.data = im
 
+    def set_contrast(self, minval, maxval, imagetoscale):
+        if imagetoscale == "highrespreview":
+            self.highrespreview.contrast_limits_range = (minval, maxval)
+            self.highrespreview.contrast_limits = (minval, maxval)
+            print("updated ---------------------------------------2")
+
+        if imagetoscale == "lowrespreview":
+            print("updated ---------------------------------------2low")
+
+            self.lowrespreview.contrast_limits_range = (minval, maxval)
+            self.lowrespreview.contrast_limits = (minval, maxval)
+
     def close(self):
         self.viewer.close()
 

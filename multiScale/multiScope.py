@@ -63,6 +63,7 @@ class multiScopeModel:
         self.channelIndicator = "00"
         self.slitopening_lowres = 3700
         self.slitopening_highres= 4558
+        self.autoscale_preview = 0
 
         self.current_lowresROI_width = Camera_parameters.LR_width_pixel
         self.current_lowresROI_height = Camera_parameters.LR_height_pixel
@@ -374,7 +375,9 @@ class multiScopeModel:
             def laser_preview():
                 while self.continue_preview_lowres:
                     basic_unit = self.get_acq_array.get_lowres_preview_array()
+                    self.ao.verbose == False
                     self.ao.play_voltages(basic_unit, block=True)
+
 
             ct.ResultThread(target=laser_preview).start()
 
@@ -383,8 +386,17 @@ class multiScopeModel:
 
                 custody.switch_from(None, to=self.lowres_camera)
                 self.lowres_camera.run_preview(out=self.low_res_buffer)
+
+                #display
                 custody.switch_from(self.lowres_camera, to=self.display)
                 self.display.show_image_lowres(self.low_res_buffer)
+
+                if self.autoscale_preview == 1:
+                    minval = np.amin(self.low_res_buffer)
+                    maxval = np.amax(self.low_res_buffer)
+                    self.display.set_contrast(minval, maxval, "lowrespreview")
+                    print("updated preview settings")
+
                 custody.switch_from(self.display, to=None)
                 self.num_frames += 1
                 #calculate fps to display
@@ -424,8 +436,15 @@ class multiScopeModel:
                 custody.switch_from(None, to=self.highres_camera)
                 self.highres_camera.run_preview(out=self.high_res_buffer)
 
+                #display acquired image
                 custody.switch_from(self.highres_camera, to=self.display)
                 self.display.show_image_highres(self.high_res_buffer)
+
+                if self.autoscale_preview == 1:
+                    minval = np.amin(self.high_res_buffer)
+                    maxval = np.amax(self.high_res_buffer)
+                    self.display.set_contrast(minval, maxval, "highrespreview")
+
                 custody.switch_from(self.display, to=None)
 
                 if self.num_frames == 100:
@@ -493,14 +512,17 @@ class multiScopeModel:
                 print("camera thread returned")
                 self.num_frames += 1
 
-                #calculate fps to display
-                #if (self.num_frames % 2 ==0): #Napari can only display 20fps
-                if 1==1:
-                    custody.switch_from(self.highres_camera, to=self.display)
-                    self.display.show_image_highres(self.high_res_buffer)
-                    custody.switch_from(self.display, to=None)
-                else:
-                    custody.switch_from(self.highres_camera, to=None)
+                #display
+                custody.switch_from(self.highres_camera, to=self.display)
+                self.display.show_image_highres(self.high_res_buffer)
+
+                if self.autoscale_preview == 1:
+                    minval = np.amin(self.high_res_buffer)
+                    maxval = np.amax(self.high_res_buffer)
+                    self.display.set_contrast(minval, maxval, "highrespreview")
+
+                custody.switch_from(self.display, to=None)
+
 
                 if self.num_frames == 100:
                     time_elapsed = time.perf_counter() - self.initial_time
