@@ -52,10 +52,21 @@ class Photo_Camera:
         out[:] = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
 
     def prepare_stack_acquisition(self, exposure_time=20):
-        """Changes the settings of the camera to stack acquisitions."""
+        """Changes the settings of the low res camera to start stack acquisitions."""
         self.cam.exp_mode = 'Edge Trigger'
         self.cam.exp_out_mode = "Any Row"
         self.cam.speed_table_index = 0
+
+        # Collect frames in live mode
+        self.cam.start_live(exp_time=exposure_time)
+        print("camera ready")
+
+    def prepare_stack_acquisition_highres(self, exposure_time=20):
+        """Changes the settings of the highres camera to start stack acquisitions."""
+        self.cam.exp_mode = 'Edge Trigger'
+        self.cam.exp_out_mode = "Any Row"
+        self.cam.speed_table_index = 1
+        self.cam.gain = 1
 
         # Collect frames in live mode
         self.cam.start_live(exp_time=exposure_time)
@@ -82,7 +93,7 @@ class Photo_Camera:
         self.cam.start_live(exp_time=exposure_time)
 
 
-    def run_stack_acquisition_buffer(self, nb_planes, buffer):
+    def run_stack_acquisition_buffer(self, nb_planes, buffer, maxproj_xy, maxproj_xz, maxproj_yz):
         """Run a stack acquisition."""
         framesReceived = 0
         while framesReceived < nb_planes:
@@ -90,6 +101,12 @@ class Photo_Camera:
 
             try:
                 fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+
+
+                maxproj_xy[:] = np.maximum(maxproj_xy, buffer[framesReceived, :, :])
+                maxproj_xz[framesReceived, :] = np.max(buffer[framesReceived, :, :], axis=0)
+                maxproj_yz[:, framesReceived] = np.max(buffer[framesReceived, :, :], axis=1)
+
                 framesReceived += 1
                 print("{}:{}".format(framesReceived, fps))
             except Exception as e:

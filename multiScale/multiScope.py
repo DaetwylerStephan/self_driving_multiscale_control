@@ -651,6 +651,13 @@ class multiScopeModel:
             low_res_buffer = ct.SharedNDArray(
                  shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
                  dtype='uint16')
+            maxproj_xy = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
+            maxproj_xz = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_width), dtype='uint16')
+            maxproj_yz = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.stack_nbplanes_lowres), dtype='uint16')
+            maxproj_xy.fill(0)
+            maxproj_xz.fill(0)
+            maxproj_yz.fill(0)
+            all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres, self.current_lowresROI_width + self.stack_nbplanes_lowres ])
 
             #set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing)
@@ -664,7 +671,7 @@ class multiScopeModel:
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
 
             def start_camera_stream():
-                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_lowres, low_res_buffer)
+                self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_lowres, low_res_buffer, maxproj_xy, maxproj_xz, maxproj_yz)
             camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
 
             # play voltages
@@ -685,6 +692,13 @@ class multiScopeModel:
 
             if self.displayImStack ==1:
                 self.display.show_stack(low_res_buffer)
+
+            ##display max projection
+            all_proj[0:self.current_lowresROI_height, 0:self.current_lowresROI_width] = maxproj_xy
+            all_proj[self.current_lowresROI_height:, 0:self.current_lowresROI_width] = maxproj_xz
+            all_proj[0:self.current_lowresROI_height, self.current_lowresROI_width:] = maxproj_yz
+
+            self.display.show_maxproj(all_proj)
 
             custody.switch_from(self.display, to=None)
             savethread.get_result()
@@ -713,12 +727,21 @@ class multiScopeModel:
             # data allocation correct
             highres_buffer = ct.SharedNDArray(
                 shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
+            maxproj_xy = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
+            maxproj_xz = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_width), dtype='uint16')
+            maxproj_yz = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.stack_nbplanes_lowres), dtype='uint16')
+            maxproj_xy.fill(0)
+            maxproj_xz.fill(0)
+            maxproj_yz.fill(0)
+
+            all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres,
+                                 self.current_lowresROI_width + self.stack_nbplanes_lowres])
 
             # set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres, self.highres_planespacing)
 
             # prepare high res camera for stack acquisition
-            self.highres_camera.prepare_stack_acquisition(self.exposure_time_HR)
+            self.highres_camera.prepare_stack_acquisition_highres(self.exposure_time_HR)
 
             # start thread on stage to wait for trigger
             def start_stage_streamHighResSPIM():
@@ -727,7 +750,7 @@ class multiScopeModel:
 
             #start thread so that camera waits for trigger
             def start_camera_streamHighResSPIM():
-                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_highres, highres_buffer)
+                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_highres, highres_buffer, maxproj_xy, maxproj_xz, maxproj_yz)
             camera_stream_thread = ct.ResultThread(target=start_camera_streamHighResSPIM).start()
 
             # play voltages
@@ -737,6 +760,13 @@ class multiScopeModel:
             camera_stream_thread.get_result()
 
             custody.switch_from(self.highres_camera, to=self.display)
+
+            ##display max projection
+            all_proj[0:self.current_lowresROI_height, 0:self.current_lowresROI_width] = maxproj_xy
+            all_proj[self.current_lowresROI_height:, 0:self.current_lowresROI_width] = maxproj_xz
+            all_proj[0:self.current_lowresROI_height, self.current_lowresROI_width:] = maxproj_yz
+
+            self.display.show_maxproj(all_proj)
 
             def saveimage_highresSPIM():
                 # save image
@@ -786,6 +816,13 @@ class multiScopeModel:
             highres_buffer = ct.SharedNDArray(
                 shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width),
                 dtype='uint16')
+            maxproj_xy = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
+            maxproj_xz = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_width), dtype='uint16')
+            maxproj_yz = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.stack_nbplanes_lowres), dtype='uint16')
+            maxproj_xy.fill(0)
+            maxproj_xz.fill(0)
+            maxproj_yz.fill(0)
+            all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres, self.current_lowresROI_width + self.stack_nbplanes_lowres ])
 
             # set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres,
@@ -802,7 +839,7 @@ class multiScopeModel:
 
             # start thread so that camera waits for trigger
             def start_camera_streamHighResASLM():
-                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_highres, highres_buffer)
+                self.highres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_highres, highres_buffer, maxproj_xy, maxproj_xz, maxproj_yz)
             camera_stream_thread_ASLM = ct.ResultThread(target=start_camera_streamHighResASLM).start()
 
             print("stage and camera threads waiting ...")
@@ -827,6 +864,13 @@ class multiScopeModel:
 
             if self.displayImStack == 1:
                 self.display.show_stack(highres_buffer)
+
+            ##display max projection
+            all_proj[0:self.current_lowresROI_height, 0:self.current_lowresROI_width] = maxproj_xy
+            all_proj[self.current_lowresROI_height:, 0:self.current_lowresROI_width] = maxproj_xz
+            all_proj[0:self.current_lowresROI_height, self.current_lowresROI_width:] = maxproj_yz
+
+            self.display.show_maxproj(all_proj)
 
             custody.switch_from(self.display, to=None)
             savethread.get_result()

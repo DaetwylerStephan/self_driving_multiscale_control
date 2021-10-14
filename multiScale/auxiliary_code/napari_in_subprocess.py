@@ -56,6 +56,12 @@ class _NapariDisplay:
         else:
             self.stack_image.data = im
 
+    def show_maxproj(self, im):
+        if not hasattr(self, 'stack_maxproj_image'):
+            self.stack_maxproj_image = self.viewer.add_image(im, name="stack max projections")
+        else:
+            self.stack_maxproj_image.data = im
+
     def set_contrast(self, minval, maxval, imagetoscale):
         if imagetoscale == "highrespreview":
             self.highrespreview.contrast_limits_range = (minval, maxval)

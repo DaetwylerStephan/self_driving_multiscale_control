@@ -112,7 +112,7 @@ class acquisition_arrays:
         NI_board_parameters.highres_camera] = 4
         basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
         basic_unit[
-        self.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + self.model.ASLM_acquisition_time / 1000),
+        self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + self.model.ASLM_acquisition_time / 1000),
         current_laserline] = 4.  # laser
 
         # remote mirror voltage
