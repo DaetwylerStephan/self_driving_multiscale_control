@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import time
 import cv2
 import numpy as np
-
+import auxiliary_code.concurrency_tools as ct
 
 class Photo_Camera:
     def __init__(self, camera_name):
@@ -102,19 +102,41 @@ class Photo_Camera:
             try:
                 fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
 
+                def maxprojection_generation(framenb, bufferimage):
+                    maxproj_xy[:] = np.maximum(maxproj_xy, bufferimage)
+                    maxproj_xz[framenb, :] = np.max(bufferimage, axis=0)
+                    maxproj_yz[:, framenb] = np.max(bufferimage, axis=1)
+                    print(framenb, flush=True)
 
-                maxproj_xy[:] = np.maximum(maxproj_xy, buffer[framesReceived, :, :])
-                maxproj_xz[framesReceived, :] = np.max(buffer[framesReceived, :, :], axis=0)
-                maxproj_yz[:, framesReceived] = np.max(buffer[framesReceived, :, :], axis=1)
+                maxprojection_thread = ct.ResultThread(target=maxprojection_generation, args=(framesReceived, buffer[framesReceived, :, :])).start()
 
                 framesReceived += 1
-                print("{}:{}".format(framesReceived, fps))
+                print("{}:{}".format(framesReceived, fps), flush=True)
+
+
             except Exception as e:
                 print(str(e))
                 break
 
         self.cam.finish()
 
+    def run_stack_acquisition_buffer_fast(self, nb_planes, buffer):
+        """Run a stack acquisition."""
+        framesReceived = 0
+        while framesReceived < nb_planes:
+            # time.sleep(0.001)
+
+            try:
+                fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+
+                framesReceived += 1
+                print("{}:{}".format(framesReceived, fps), flush=True)
+
+            except Exception as e:
+                print(str(e))
+                break
+
+        self.cam.finish()
 
     def set_up_lowres_preview(self, exposure=20):
         self.cam.exp_mode = "Internal Trigger"
