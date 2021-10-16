@@ -29,8 +29,11 @@ class MultiScale_Microscope_Controller():
     #todo: ROI selection tool - in napari
     #todo: move to selected region in high resolution.
 
-    #todo>MIP from side and top to Napari
-    #hard coded ROIs 512
+    #todo: pixel width to 60 pixel
+    #512x512 running - adjust
+    #SPIM and ASLM - intensity changes: counts
+    #timelapse saving - wrong!
+    #
     #todo> startup guide
 
 
@@ -71,8 +74,6 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
-        self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.run_stop_preview)#1
-        self.view.runtab.timelapse_aq_progressindicator.bind("<Button>", self.run_stop_preview)#2
 
         self.view.runtab.laser488_percentage.trace_add("read", self.updateLaserParameters)
         self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserParameters)
@@ -530,6 +531,8 @@ class MultiScale_Microscope_Controller():
             #set timepoint = 0 to be consistent with time-lapse acquisitions
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
             print(stackfilepath)
+        else:
+            stackfilepath = self.current_timelapse_filepath
 
         ########-------------------------------------------------------------------------------------------------------
         #start low resolution stack acquisition
@@ -579,10 +582,10 @@ class MultiScale_Microscope_Controller():
 
                 #define highresolution stack file path label by corner positions.
                 xpos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
-                ypos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
+                ypos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2])*1000)
 
                 # filepath
-                current_folder = os.path.join(stackfilepath, "high_stack_" + str(xpos_label)+ "_" + str(ypos_label))
+                current_folder = os.path.join(stackfilepath, "high_stack_" + str(xpos_label) + "_" + str(ypos_label))
                 try:
                     print("filepath : " + current_folder)
                     os.makedirs(current_folder)
@@ -613,6 +616,8 @@ class MultiScale_Microscope_Controller():
         self.view.update_idletasks()
         self.view.update()
         self.view.runtab.timelapse_aq_progressbar.config(maximum=self.view.runtab.timelapse_aq_nbTimepoints-1)
+        self.updatefilename()
+
         # set button layout - sunken relief
         def set_buttonTL():
             time.sleep(0.002)
@@ -638,32 +643,64 @@ class MultiScale_Microscope_Controller():
         thread that controls time-lapse, started from function acquire_timelapse(self, event):
         """
 
-        #todo implement here time-lapse functionalities
-        varb = str(np.random.randint(0, 100))
         self.view.update()
+        ####----------set up file path
+        # generate file path
+        nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
+        print("foldernumber:" + str(nbfiles_folder))
+        newfolderind = nbfiles_folder + 1
+        experiment_name = "Experiment" + f'{newfolderind:04}'
 
+        # write acquisition parameters
+        filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
+        try:
+            print("filepath : " + filepath_write_acquisitionParameters)
+            os.makedirs(filepath_write_acquisitionParameters)
+        except OSError as error:
+            print("File writing error")
+
+        # write parameters in a thread
+        def write_paramconfigtimelapse():
+            self.paramwriter.write_to_textfile(
+                os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
+            print("parameters saved")
+        ct.ResultThread(target=write_paramconfigtimelapse).start()
+
+        # set timepoint = 0 to be consistent with time-lapse acquisitions
+        experimentpath = os.path.join(self.parentfolder, experiment_name)
+
+
+        ###run timelapse
         for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints):
-            t0 = time.clock()
+            t0 = time.perf_counter()
+
+            numStr = str(timeiter).zfill(5)
+            timepoint = "t" + numStr
+            self.current_timelapse_filepath = os.path.join(experimentpath, timepoint)
+
             self.view.runtab.timelapse_aq_progress.set(timeiter)
             self.view.runtab.timelapse_aq_progressindicator.config(text=str(timeiter+1) +" of " + str(self.view.runtab.timelapse_aq_nbTimepoints))
 
-
-            print("hello " + varb)
-            time.sleep(2)
+            timeinterval = self.view.runtab.timelapse_aq_timeinterval_min.get()*60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
+            print("time interval:"  + str(timeinterval))
 
             ## stop time-lapse acquisition if you stop it
             if self.continuetimelapse == 1:
                 break  # Break while loop when stop = 1
 
+            stackacquisitionthread = ct.ResultThread(target=self.acquire_stack_task).start()
+            stackacquisitionthread.get_result()
 
             #calculate the time until next stack acquisition starts
-            t1 = time.clock() - t0
+            t1 = time.perf_counter() - t0
             totaltime = self.view.runtab.timelapse_aq_timeinterval_min.get() * 60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
 
-            remaining_waittime = totaltime - t1
+            remaining_waittime = 1
+            while remaining_waittime>0:
+                t1 = time.perf_counter() - t0
+                remaining_waittime = totaltime - t1
 
-
-
+        self.continuetimelapse = 1
         self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="raised")
         self.view.update()
 
