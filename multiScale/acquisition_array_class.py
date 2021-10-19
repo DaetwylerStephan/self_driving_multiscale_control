@@ -55,19 +55,19 @@ class acquisition_arrays:
     def get_lowRes_StackAq_array(self, current_laserline):
         # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
         # exposure time, depending on the number of rows that are imaged
-        nb_rows = 2960
-        # nb_rows = 2480
-        readout_time = nb_rows * Camera_parameters.lowres_line_digitization_time
+        #nb_rows = 2960
+        nb_rows = self.model.current_lowresROI_height
+        readout_time = (nb_rows+1) * Camera_parameters.lowres_line_digitization_time #+1 for the reset time at the first row before the start
 
         # prepare voltage array
         # calculate minimal unit duration and set up array
-        minimal_trigger_timeinterval = self.model.exposure_time_LR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger
+        minimal_trigger_timeinterval = self.model.exposure_time_LR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger + 0.001
         basic_unit = np.zeros((self.model.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
                               np.dtype(np.float64))
 
         # set voltages in array - camera, stage, remote mirror, laser
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.002),
-        NI_board_parameters.lowres_camera] = 4.  # camera - ao5
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.001),
+        NI_board_parameters.lowres_camera] = 4.  # low res camera
         basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
         basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.exposure_time_LR / 1000),
         current_laserline] = 4.  # laser
@@ -79,16 +79,19 @@ class acquisition_arrays:
         # the camera needs time to read out the pixels - this is the camera readout time, and it adds to the
         # exposure time, depending on the number of rows that are imaged
         nb_rows = 2480
-        readout_time = nb_rows * Camera_parameters.highres_line_digitization_time
+        nb_rows = self.model.current_highresROI_height
+
+        readout_time = (nb_rows+1) * Camera_parameters.highres_line_digitization_time #+1 for the reset time at the first row before the start
+
 
         # prepare voltage array
         # calculate minimal unit duration and set up array
-        minimal_trigger_timeinterval = self.model.exposure_time_HR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger
+        minimal_trigger_timeinterval = self.model.exposure_time_HR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger + 0.001
         basic_unit = np.zeros((self.model.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
                               np.dtype(np.float64))
 
         # set voltages in array - camera, stage, remote mirror, laser
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.002),
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.001),
         NI_board_parameters.highres_camera] = 4.  # highrescamera - ao0
         basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
         basic_unit[:, NI_board_parameters.voicecoil] = self.model.ASLM_staticHighResVolt  # remote mirror
@@ -98,8 +101,10 @@ class acquisition_arrays:
         return basic_unit
 
     def get_highResASLM_StackAq_array(self, current_laserline):
-        nb_rows = 2480
-        readout_time = nb_rows * Camera_parameters.highres_line_digitization_time
+
+        #nb_rows = 2480: maximal number
+        nb_rows = self.model.current_highresROI_height
+        readout_time = (nb_rows+1) * Camera_parameters.highres_line_digitization_time #+1 for the reset time at the first row before the start
 
         # prepare voltage array
         # calculate minimal unit duration and set up array

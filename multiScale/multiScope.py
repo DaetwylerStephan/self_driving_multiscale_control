@@ -476,9 +476,10 @@ class multiScopeModel:
         :return: set the important parameters for ASLM acquisitions
         """
         linedelay = Camera_parameters.highres_line_digitization_time
-        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + self.current_highresROI_height/ASLM_parameters.simultaneous_lines)))
-        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(self.current_highresROI_height *linedelay)))
-        self.ASLM_acquisition_time = self.ASLM_line_delay * self.current_highresROI_height * linedelay + self.ASLM_lineExposure
+        nbrows = self.current_highresROI_height
+        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + nbrows/ASLM_parameters.simultaneous_lines)))
+        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(nbrows *linedelay)))
+        self.ASLM_acquisition_time = self.ASLM_line_delay * nbrows * linedelay + self.ASLM_lineExposure
 
         print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
 

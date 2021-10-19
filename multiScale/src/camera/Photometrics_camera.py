@@ -66,7 +66,9 @@ class Photo_Camera:
         self.cam.exp_mode = 'Edge Trigger'
         self.cam.exp_out_mode = "Any Row"
         self.cam.speed_table_index = 1
+        self.cam.readout_port = 0
         self.cam.gain = 1
+        self.cam.prog_scan_mode = 0
 
         # Collect frames in live mode
         self.cam.start_live(exp_time=exposure_time)
@@ -149,6 +151,8 @@ class Photo_Camera:
         self.cam.exp_out_mode = "Any Row"
         self.cam.speed_table_index = 1
         self.cam.gain = 1
+        self.cam.prog_scan_mode = 0
+
         self.cam.start_live(exp_time=exposure)
 
     def run_preview(self, out):
