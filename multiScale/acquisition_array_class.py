@@ -104,18 +104,24 @@ class acquisition_arrays:
 
         #nb_rows = 2480: maximal number
         nb_rows = self.model.current_highresROI_height
-        readout_time = (nb_rows+1) * Camera_parameters.highres_line_digitization_time #+1 for the reset time at the first row before the start
+        readout_time = (nb_rows+1) * Camera_parameters.highres_line_digitization_time * self.model.ASLM_line_delay #+1 for the reset time at the first row before the start
 
         # prepare voltage array
         # calculate minimal unit duration and set up array
-        minimal_trigger_timeinterval = 0.1 + self.model.ASLM_acquisition_time / 1000 + readout_time / 1000 + self.model.delay_cameratrigger + self.model.ASLM_delaybeforevoltagereturn + self.model.ASLM_additionalreturntime
+        minimal_trigger_timeinterval = self.model.ASLM_acquisition_time / 1000 + \
+                                       readout_time / 1000 +\
+                                       self.model.delay_cameratrigger +\
+                                       self.model.ASLM_delaybeforevoltagereturn + \
+                                       self.model.ASLM_additionalreturntime +\
+                                       0.001 #camera acquisition starts after camera puls
+
         basic_unit = np.zeros((self.model.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
                               np.dtype(np.float64))
 
         # set voltages in array - camera, stage, laser
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.002),
-        NI_board_parameters.highres_camera] = 4
-        basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.001),
+        NI_board_parameters.highres_camera] = 4 #camera trigger to start ASLM acquisition
+        basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage - move to position
         basic_unit[
         self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + self.model.ASLM_acquisition_time / 1000),
         current_laserline] = 4.  # laser
@@ -124,7 +130,7 @@ class acquisition_arrays:
         sawtooth_array = np.zeros(self.model.ao.s2p(minimal_trigger_timeinterval), np.dtype(np.float64))
         sawtooth_array[:] = self.model.ASLM_from_Volt
         goinguppoints = self.model.ao.s2p(
-            self.model.delay_cameratrigger + self.model.ASLM_delaybeforevoltagereturn + self.model.ASLM_acquisition_time / 1000)
+            self.model.delay_cameratrigger + 0.001 + self.model.ASLM_delaybeforevoltagereturn + self.model.ASLM_acquisition_time / 1000)
         goingdownpoints = self.model.ao.s2p(minimal_trigger_timeinterval) - goinguppoints
         sawtooth_array[0:goinguppoints] = np.linspace(self.model.ASLM_from_Volt, self.model.ASLM_to_Volt, goinguppoints)
         sawtooth_array[goinguppoints:] = np.linspace(self.model.ASLM_to_Volt, self.model.ASLM_from_Volt, goingdownpoints)

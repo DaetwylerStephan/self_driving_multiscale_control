@@ -6,6 +6,7 @@ Script containing all functions to initialize and operate the translation stages
 
 import sys
 from threading import Event, Thread
+import numpy as np
 
 try:
     from .smaract import ctl as ctl
@@ -468,84 +469,97 @@ class SLC_translationstage:
 
         print("Position channel 0: {} pm, channel 1: {} pm, channel 2: {} pm.".format(position_0, position_1, position_2))
 
-    def streamStackAcquisition(self, no_of_frames, increment):
+    # def streamStackAcquisition(self, no_of_frames, increment):
+    #
+    #     self.stream_done.clear()
+    #     self.stream_abort.clear()
+    #
+    #     startPosition = ctl.GetProperty_i64(self.d_handle, 0, ctl.Property.POSITION)
+    #     print(startPosition)
+    #
+    #     stream_buffer = []
+    #     for frame_idx in range(no_of_frames):
+    #         frame = [int(0), int(startPosition + frame_idx * increment)]
+    #         stream_buffer.append(frame)
+    #
+    #     stream_buffer.append([int(0), startPosition])
+    #
+    #     try:
+    #
+    #         # Spawn a thread to receive events from the controller.
+    #         event_handle_thread = Thread(target=self.waitForEvent_stream)
+    #         event_handle_thread.start()
+    #
+    #         # Set position zero, enable amplifier
+    #         # Sensor power mode: enabled (disable power save, which is not allowed with position streaming)
+    #
+    #         #ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.POSITION, 0)
+    #         ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.SENSOR_POWER_MODE, ctl.SensorPowerMode.ENABLED)
+    #         ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.AMPLIFIER_ENABLED, ctl.TRUE)
+    #         #ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_VELOCITY, 100000000000)
+    #         ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_VELOCITY, 0)
+    #
+    #         ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_ACCELERATION, 100000000000)
+    #
+    #         # Configure stream (optional)
+    #         # Note: the stream rate must be a whole-number multiplier of the external sync rate.
+    #         # Set external sync rate to 100Hz (only active when using trigger mode STREAM_TRIGGER_MODE_EXTERNAL_SYNC)
+    #         ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_EXT_SYNC_RATE, 100)
+    #         # Set stream base rate to 1kHz
+    #         ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_BASE_RATE, 1000)
+    #         # Prepare for streaming, select desired trigger mode
+    #         # (using STREAM_TRIGGER_MODE_DIRECT starts the stream as soon as enough frames were sent to the device)
+    #         s_handle = ctl.OpenStream(self.d_handle, ctl.StreamTriggerMode.DIRECT)
+    #         # Send all frames in a loop
+    #         # Note: the "AbortStream" function could be used to abort a running stream programmatically.
+    #         for frame_idx in range(no_of_frames+1):
+    #             # The "waitForEvent" thread received an "abort" event.
+    #             if self.stream_abort.isSet():
+    #                 break
+    #             # Make list from stream data, each frame contains all
+    #             # target positions for all channels that participate in the trajectory.
+    #             # The frame data list must have the structure:
+    #             # <chA>,<posA,<chB>,<posB>
+    #             frame = stream_buffer[frame_idx]
+    #             ctl.StreamFrame(self.d_handle, s_handle, frame)
+    #
+    #         # All frames sent, close stream
+    #         ctl.CloseStream(self.d_handle, s_handle)
+    #         # Wait for the "stream done" event.
+    #         self.stream_done.wait()
+    #         # Cancel waiting for events.
+    #         ctl.Cancel(self.d_handle)
+    #         # Wait for the "waitForEvent" thread to terminate.
+    #         event_handle_thread.join()
+    #
+    #     except ctl.Error as e:
+    #         # Passing an error code to "GetResultInfo" returns a human readable string
+    #         # specifying the error.
+    #         print("MCS2 {}: {}, error: {} (0x{:04X}) in line: {}."
+    #               .format(e.func, ctl.GetResultInfo(e.code), ctl.ErrorCode(e.code).name, e.code,
+    #                       (sys.exc_info()[-1].tb_lineno)))
+    #
+    #     except Exception as ex:
+    #         print("Unexpected error: {}, {} in line: {}".format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))
+    #         raise
 
+    def streamStackAcquisition_externalTrigger_setup(self, no_of_frames, increment, slow_velocity, slow_acceleration):
+        """
+
+        :param no_of_frames: how many frames the stream will be
+        :param increment: how many um the stream will go up
+        :param slow_velocity: the factor for velocity of 10 mm/s
+        :param slow_acceleration: the factor for acceleration 100 mm/s2
+        :return: a waiting stream to receive voltage inputs
+        """
         self.stream_done.clear()
         self.stream_abort.clear()
 
-        startPosition = ctl.GetProperty_i64(self.d_handle, 0, ctl.Property.POSITION)
-        print(startPosition)
-
-        stream_buffer = []
-        for frame_idx in range(no_of_frames):
-            frame = [int(0), int(startPosition + frame_idx * increment)]
-            stream_buffer.append(frame)
-
-        stream_buffer.append([int(0), startPosition])
-
-        try:
-
-            # Spawn a thread to receive events from the controller.
-            event_handle_thread = Thread(target=self.waitForEvent_stream)
-            event_handle_thread.start()
-
-            # Set position zero, enable amplifier
-            # Sensor power mode: enabled (disable power save, which is not allowed with position streaming)
-
-            #ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.POSITION, 0)
-            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.SENSOR_POWER_MODE, ctl.SensorPowerMode.ENABLED)
-            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.AMPLIFIER_ENABLED, ctl.TRUE)
-            #ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_VELOCITY, 100000000000)
-            ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_VELOCITY, 0)
-
-            ctl.SetProperty_i32(self.d_handle,0, ctl.Property.MOVE_ACCELERATION, 100000000000)
-
-            # Configure stream (optional)
-            # Note: the stream rate must be a whole-number multiplier of the external sync rate.
-            # Set external sync rate to 100Hz (only active when using trigger mode STREAM_TRIGGER_MODE_EXTERNAL_SYNC)
-            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_EXT_SYNC_RATE, 100)
-            # Set stream base rate to 1kHz
-            ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_BASE_RATE, 1000)
-            # Prepare for streaming, select desired trigger mode
-            # (using STREAM_TRIGGER_MODE_DIRECT starts the stream as soon as enough frames were sent to the device)
-            s_handle = ctl.OpenStream(self.d_handle, ctl.StreamTriggerMode.DIRECT)
-            # Send all frames in a loop
-            # Note: the "AbortStream" function could be used to abort a running stream programmatically.
-            for frame_idx in range(no_of_frames+1):
-                # The "waitForEvent" thread received an "abort" event.
-                if self.stream_abort.isSet():
-                    break
-                # Make list from stream data, each frame contains all
-                # target positions for all channels that participate in the trajectory.
-                # The frame data list must have the structure:
-                # <chA>,<posA,<chB>,<posB>
-                frame = stream_buffer[frame_idx]
-                ctl.StreamFrame(self.d_handle, s_handle, frame)
-
-            # All frames sent, close stream
-            ctl.CloseStream(self.d_handle, s_handle)
-            # Wait for the "stream done" event.
-            self.stream_done.wait()
-            # Cancel waiting for events.
-            ctl.Cancel(self.d_handle)
-            # Wait for the "waitForEvent" thread to terminate.
-            event_handle_thread.join()
-
-        except ctl.Error as e:
-            # Passing an error code to "GetResultInfo" returns a human readable string
-            # specifying the error.
-            print("MCS2 {}: {}, error: {} (0x{:04X}) in line: {}."
-                  .format(e.func, ctl.GetResultInfo(e.code), ctl.ErrorCode(e.code).name, e.code,
-                          (sys.exc_info()[-1].tb_lineno)))
-
-        except Exception as ex:
-            print("Unexpected error: {}, {} in line: {}".format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))
-            raise
-
-    def streamStackAcquisition_externalTrigger_setup(self, no_of_frames, increment):
-
-        self.stream_done.clear()
-        self.stream_abort.clear()
+        #check velocity not too high
+        if slow_velocity >= 1:
+            slow_velocity =1
+        if slow_acceleration >= 1:
+            slow_acceleration =1
 
         #get starting position for stream
         startPosition = ctl.GetProperty_i64(self.d_handle, 0, ctl.Property.POSITION)
@@ -558,6 +572,12 @@ class SLC_translationstage:
             stream_buffer.append(frame)
 
         stream_buffer.append([int(0), startPosition])
+
+        #set stage speed
+        velocityvalue = np.ulonglong(slow_velocity * 10000000000)
+        accelerationvalue = np.ulonglong(slow_acceleration * 100000000000)
+        ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.MOVE_VELOCITY, velocityvalue)
+        ctl.SetProperty_i64(self.d_handle,0, ctl.Property.MOVE_ACCELERATION, accelerationvalue)
 
         try:
             # Spawn a thread to receive events from the controller.

@@ -26,9 +26,11 @@ class AdvancedSettings_Tab(tk.Frame):
 
         #stack acquisition settings
         self.stack_aq_camera_delay = tk.DoubleVar()
+        self.stack_aq_stage_velocity = tk.DoubleVar()
+        self.stack_aq_stage_acceleration = tk.DoubleVar()
 
         #ASLM settings
-        self.ASLM_linedelay = tk.DoubleVar()
+        self.ASLM_scanWidth = tk.DoubleVar()
         self.ASLM_volt_interval = tk.DoubleVar()
         self.ASLM_volt_middle = tk.DoubleVar()
         self.ASLM_volt_current = tk.DoubleVar()
@@ -83,14 +85,22 @@ class AdvancedSettings_Tab(tk.Frame):
         ### ----------------------------stack acquisition settings -----------------------------------------------------------------
         # slit labels (positioned)
         delay_camera_label = ttk.Label(stack_aq_settings, text="Delay time camera after stage signal sent (ms):").grid(row=2, column=0)
+        stage_velocity_label = ttk.Label(stack_aq_settings, text="Stage velocity:").grid(row=4, column=0)
+        stage_acceleration_label = ttk.Label(stack_aq_settings, text="Stage acceleration:").grid(row=6, column=0)
 
-        self.delay_camera_entry = tk.Entry(stack_aq_settings, textvariable=self.stack_aq_camera_delay, width=4)
+        self.delay_camera_entry = tk.Entry(stack_aq_settings, textvariable=self.stack_aq_camera_delay, width=10)
+        self.stage_velocity_entry = tk.Entry(stack_aq_settings, textvariable=self.stack_aq_stage_velocity, width=10)
+        self.stage_acceleration_entry = tk.Entry(stack_aq_settings, textvariable=self.stack_aq_stage_acceleration, width=10)
 
         # set defaults
         self.stack_aq_camera_delay.set(1)
+        self.stack_aq_stage_velocity.set(1)
+        self.stack_aq_stage_acceleration.set(1)
 
         # layout
         self.delay_camera_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
+        self.stage_velocity_entry.grid(row=4, column=1, sticky=tk.W + tk.E + tk.S)
+        self.stage_acceleration_entry.grid(row=6, column=1, sticky=tk.W + tk.E + tk.S)
 
         ### ----------------------------mSPIM settings -----------------------------------------------------------------
         # slit labels (positioned)
@@ -107,7 +117,7 @@ class AdvancedSettings_Tab(tk.Frame):
 
         ### ----------------------------ASLM settings -----------------------------------------------------------------
         # ASLM labels (positioned)
-        lineDelay_label = ttk.Label(ASLM_settings, text="Line Delay factor:").grid(row=2, column=0)
+        lineDelay_label = ttk.Label(ASLM_settings, text="Scan Width:").grid(row=2, column=0)
         voltageinterval_label = ttk.Label(ASLM_settings, text="ASLM remote voltage interval (mV):").grid(row=4, column=0)
         voltagemiddle_label = ttk.Label(ASLM_settings, text="ASLM remote voltage middle (mV):").grid(row=7, column=0)
         voltagecurrent_label = ttk.Label(ASLM_settings, text="Current ASLM remote mirror voltage (mV):").grid(row=13, column=0)
@@ -117,7 +127,7 @@ class AdvancedSettings_Tab(tk.Frame):
         voltageminimal_label = ttk.Label(ASLM_settings, text="Min Vol@mirror:").grid(row=10, column=0)
         voltagemaximal_label = ttk.Label(ASLM_settings, text="Max Vol@mirror:").grid(row=11, column=0)
 
-        self.lineDelay_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_linedelay, width=6)
+        self.scanWidth_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_scanWidth, width=6)
         self.voltageinterval_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_interval, width=6)
         self.voltagemiddle_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_middle, width=6)
         self.voltagecurrent_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_current, width=6)
@@ -139,7 +149,7 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_voltageDirection.set(ASLM_voltage_run[1])
 
         # set defaults
-        self.ASLM_linedelay.set(6)
+        self.ASLM_scanWidth.set(60)
         self.ASLM_volt_interval.set(60)
         self.ASLM_volt_middle.set(0)
         self.ASLM_volt_current.set(0)
@@ -148,7 +158,7 @@ class AdvancedSettings_Tab(tk.Frame):
 
 
         #ASLM settings layout
-        self.lineDelay_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
+        self.scanWidth_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
         self.voltageinterval_entry.grid(row=4, column=1, sticky=tk.W + tk.E + tk.S)
         self.voltagemiddle_entry.grid(row=7, column=1, sticky=tk.W + tk.E + tk.S)
         self.ASLM_runOptionsMenu_Voltage.grid(row=9, column=1, sticky=tk.W + tk.E + tk.S)

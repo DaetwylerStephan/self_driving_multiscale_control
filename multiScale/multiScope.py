@@ -82,6 +82,7 @@ class multiScopeModel:
         self.ASLM_alignmentOn = 0 #param=1 if ASLM alignment mode is on, otherwise zero
         self.ASLM_delaybeforevoltagereturn = 0.001 #1 ms
         self.ASLM_additionalreturntime = 0.001 # 1ms
+        self.ASLM_scanWidth = ASLM_parameters.simultaneous_lines
 
         #preview buffers
         self.low_res_buffer = ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
@@ -477,11 +478,11 @@ class multiScopeModel:
         """
         linedelay = Camera_parameters.highres_line_digitization_time
         nbrows = self.current_highresROI_height
-        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + nbrows/ASLM_parameters.simultaneous_lines)))
-        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(nbrows *linedelay)))
-        self.ASLM_acquisition_time = self.ASLM_line_delay * nbrows * linedelay + self.ASLM_lineExposure
+        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + nbrows/self.ASLM_scanWidth)))
+        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure)/(nbrows *linedelay))) - 1
+        self.ASLM_acquisition_time = (self.ASLM_line_delay + 1) * nbrows * linedelay + self.ASLM_lineExposure + (self.ASLM_line_delay +1) *linedelay
 
-        print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time))
+        print("ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time for {} scan width".format(self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time, self.ASLM_scanWidth))
 
     def preview_highres_ASLM(self):
         def preview_highresASLM_task(custody):
@@ -674,7 +675,7 @@ class multiScopeModel:
             all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres, self.current_lowresROI_width + self.stack_nbplanes_lowres ])
 
             #set up stage
-            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing)
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing, self.slow_velocity, self.slow_acceleration)
 
             # prepare camera for stack acquisition
             self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
@@ -782,7 +783,7 @@ class multiScopeModel:
                                  self.current_highresROI_width + self.stack_nbplanes_highres])
 
             # set up stage
-            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres, self.highres_planespacing)
+            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres, self.highres_planespacing, self.slow_velocity, self.slow_acceleration)
 
             # prepare high res camera for stack acquisition
             self.highres_camera.prepare_stack_acquisition_highres(self.exposure_time_HR)
@@ -891,7 +892,7 @@ class multiScopeModel:
                                  self.current_highresROI_width + self.stack_nbplanes_highres])
             # set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres,
-                                                                        self.highres_planespacing)
+                                                                        self.highres_planespacing, self.slow_velocity, self.slow_acceleration)
 
             # prepare high res camera for stack acquisition
             self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
@@ -981,26 +982,5 @@ if __name__ == '__main__':
 
     # Create scope object:
     scope = multiScopeModel()
-
-
-    # snap_threads = []
-    # for i in range(150):
-    #     th = scope.snap()
-    #     snap_threads.append(th)
-    # print(len(snap_threads), "'snap' threads launched.")
-    # for th in snap_threads:
-    #     th.get_result()
-
-    # th = scope.preview_lowres()
-    # print("All 'snap' threads finished execution.")
-    # input('Hit enter to close napari...')
-    # scope.continue_preview_lowres = False
-    # th.get_result()
-    #
-    # scope.preview_highres()
-    # print("All 'snap' threads finished execution.")
-    # input('Hit enter to close napari...')
-    # scope.continue_preview_highres = False
-
     #close
     scope.close()

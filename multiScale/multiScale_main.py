@@ -104,6 +104,11 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
         self.view.advancedSettingstab.slit_lowres.trace_add("write", self.updateSlitParameters)
         self.view.advancedSettingstab.slit_highres.trace_add("write", self.updateSlitParameters)
+
+        self.view.advancedSettingstab.stack_aq_stage_velocity.trace_add("write", self.update_stack_aq_parameters)
+        self.view.advancedSettingstab.stack_aq_stage_acceleration.trace_add("write", self.update_stack_aq_parameters)
+        self.view.advancedSettingstab.stack_aq_camera_delay.trace_add("write", self.update_stack_aq_parameters)
+
         self.view.advancedSettingstab.ASLM_volt_current.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_alignmentmodeOn.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_SawToothOn.trace_add("write", self.update_ASLMParameters)
@@ -111,9 +116,8 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_volt_interval.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_volt_middle.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_voltageDirection.trace_add("write", self.update_ASLMParameters)
-        self.view.advancedSettingstab.stack_aq_camera_delay.trace_add("write", self.update_stack_aq_parameters)
         self.view.advancedSettingstab.adv_settings_mSPIMvoltage.trace_add("write", self.update_mSPIMvoltage)
-
+        self.view.advancedSettingstab.ASLM_scanWidth.trace_add("write", self.update_ASLMParameters)
 
         #define some parameters
         self.current_laser = "488"
@@ -175,6 +179,9 @@ class MultiScale_Microscope_Controller():
         self.model.lowres_planespacing = int(self.view.runtab.stack_aq_plane_spacing_lowres.get() * 1000000)
         self.model.stack_nbplanes_highres = int(self.view.runtab.stack_aq_numberOfPlanes_highres.get())
         self.model.stack_nbplanes_lowres = int(self.view.runtab.stack_aq_numberOfPlanes_lowres.get())
+        self.model.slow_velocity = self.view.advancedSettingstab.stack_aq_stage_velocity.get()
+        self.model.slow_acceleration = self.view.advancedSettingstab.stack_aq_stage_acceleration.get()
+
         print("stack acquisition settings updated")
 
     def update_ASLMParameters(self, var, indx, mode):
@@ -217,6 +224,9 @@ class MultiScale_Microscope_Controller():
         # update the ASLM alignment settings
         self.model.ASLM_alignmentOn = self.view.advancedSettingstab.ASLM_alignmentmodeOn.get()
         print(self.model.ASLM_alignmentOn)
+
+        #update scanwidth
+        self.model.ASLM_scanWidth = self.view.advancedSettingstab.ASLM_scanWidth.get()
 
     def updateGUItext(self):
         '''

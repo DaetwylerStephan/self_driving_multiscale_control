@@ -85,7 +85,7 @@ class Photo_Camera:
         self.cam.gain = 1
         self.cam.prog_scan_mode = 1 # Scan mode options: {'Auto': 0, 'Line Delay': 1, 'Scan Width': 2}
         self.cam.prog_scan_dir = 0 # Scan direction options: {'Down': 0, 'Up': 1, 'Down/Up Alternate': 2}
-        self.cam.prog_scan_line_delay = scandelay  # 10.26 us x factor, a factor = 6 equals 71.82 us
+        self.cam.prog_scan_line_delay = scandelay  # 11.2 us x factor, e.g. a factor = 6 equals 67.2 us
 
         #The   Line   Output   Mode   is   used   for   synchronization   purposes   when
         # uses   Programmable Scan mode. Line Output Mode creates a rising edge for each
