@@ -55,16 +55,15 @@ class multiScopeModel:
         self.lowres_planespacing = 10000000
         self.highres_planespacing = 10000000
         self.displayImStack = 1
-        # self.stack_buffer_lowres = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel), dtype='uint16')
-        # self.stack_buffer_lowres.fill(0)
-        # self.stack_buffer_highres = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
-        # self.stack_buffer_highres.fill(0)
+
         self.filepath = 'D:/acquisitions/testimage.tif'
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
         self.slitopening_lowres = 3700
         self.slitopening_highres= 4558
         self.autoscale_preview = 0
+        self.slow_velocity=1
+        self.slow_acceleration =1
 
         self.current_lowresROI_width = Camera_parameters.LR_width_pixel
         self.current_lowresROI_height = Camera_parameters.LR_height_pixel
@@ -234,19 +233,6 @@ class multiScopeModel:
         self.filterwheel.set_filter('615/20-25', wait_until_done=False)
         self.filterwheel.set_filter('676/37-25', wait_until_done=False)
         print("done with filterwheel.")
-
-    # def _init_shared_Memory(self):
-    #     #init shared memory
-    #     self.stack_buffer_lowres = ct.SharedNDArray((200, Camera_parameters.LR_height_pixel,
-    #                                                        Camera_parameters.LR_width_pixel),
-    #                                                       dtype='uint16')
-    #     self.stack_buffer_lowres.fill(0)
-    #
-    #     self.stack_buffer_highres = ct.SharedNDArray((200, Camera_parameters.HR_height_pixel,
-    #                                                  Camera_parameters.HR_width_pixel),
-    #                                                 dtype='uint16')
-    #     self.stack_buffer_highres.fill(0)
-
 
     def _init_XYZ_stage(self):
         """
@@ -572,10 +558,10 @@ class multiScopeModel:
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire high res ALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser488, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath, "ASLM")
             if resolutionmode == "highSPIM":
                 print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath, "SPIM")
 
 
         if whichlaser[1]==1:
@@ -586,10 +572,10 @@ class multiScopeModel:
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire high res ALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser552, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath, "ASLM")
             if resolutionmode == "highSPIM":
                 print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath, "SPIM")
 
 
         if whichlaser[2]==1:
@@ -600,11 +586,11 @@ class multiScopeModel:
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire high res ALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser594, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath, "ASLM")
 
             if resolutionmode == "highSPIM":
                 print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath, "SPIM")
 
         if whichlaser[3]==1:
             print("acquire 640 laser")
@@ -614,10 +600,10 @@ class multiScopeModel:
                                             current_filepath)
             if resolutionmode == "highASLM":
                 print("acquire high res ALSM")
-                self.acquire_stack_highresASLM(current_startposition, NI_board_parameters.laser640, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath, "ASLM")
             if resolutionmode == "highSPIM":
                 print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath)
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath, "SPIM")
 
 
     def prepare_acquisition(self, current_startposition, laser):
@@ -641,14 +627,6 @@ class multiScopeModel:
 
     def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
         def acquire_task(custody):
-
-            ##navigate buffer queue - where to save current image.
-            current_bufferiter = self.low_res_buffers_queue.get()  # get current buffer iter
-            self.low_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
-            print("------------------------------------------------------------")
-            print(current_bufferiter)
-            print("------------------------------------------------------------")
-
             custody.switch_from(None, to=self.lowres_camera)
 
             #prepare acquisition by moving filter wheel and stage
@@ -662,18 +640,6 @@ class multiScopeModel:
             write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
                                             ).start()
 
-            #data allocation correct
-            low_res_buffer = ct.SharedNDArray(
-                 shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
-                 dtype='uint16')
-            maxproj_xy = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
-            maxproj_xz = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_width), dtype='uint16')
-            maxproj_yz = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.stack_nbplanes_lowres), dtype='uint16')
-            maxproj_xy.fill(0)
-            maxproj_xz.fill(0)
-            maxproj_yz.fill(0)
-            all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres, self.current_lowresROI_width + self.stack_nbplanes_lowres ])
-
             #set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing, self.slow_velocity, self.slow_acceleration)
 
@@ -684,29 +650,40 @@ class multiScopeModel:
             def start_stage_stream():
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
+            #
+            # def start_camera_streamfast():
+            #     framesReceived = 0
+            #     while framesReceived < self.stack_nbplanes_lowres:
+            #         time.sleep(0.001)
+            #         try:
+            #             # fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+            #             frame = self.lowres_camera.run_stack_acquisition_buffer_pull()
+            #             self.low_res_buffers[current_bufferiter][framesReceived, :, :] = np.copy(frame['pixel_data'])
+            #             framesReceived += 1
+            #             print(framesReceived, flush=True)
+            #             # frame = None
+            #             # del frame
+            #         except Exception as e:
+            #             print(str(e))
+            #             break
+            #     self.lowres_camera.end_stackacquisition()
+            #     print("camera acquisition done")
+            # start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
-
-
-            # if self.exposure_time_LR>19:
-            #     def start_camera_stream():
-            #         self.lowres_camera.run_stack_acquisition_buffer(self.stack_nbplanes_lowres, low_res_buffer, maxproj_xy, maxproj_xz, maxproj_yz)
-            #     camera_stream_thread = ct.ResultThread(target=start_camera_stream).start()
-            # else:
             def start_camera_streamfast():
-                self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, low_res_buffer)
+                self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, self.low_res_buffers[current_bufferiter])
             start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
             # play voltages
-            # you need to use "block true" as otherwise the program finishes without playing the voltages really
+            # you need to use "block true" as otherwise the program finishes without playing the voltages
             self.ao.play_voltages(block=True)
-            stream_thread.get_result()
 
-            # if self.exposure_time_LR > 19:
-            #     camera_stream_thread.get_result()
-            # else:
+            stream_thread.get_result()
             start_camera_streamfast_thread.get_result()
 
-            self.low_res_buffers[current_bufferiter] = low_res_buffer
+            #self.low_res_buffers[current_bufferiter] = low_res_buffer
+
+            #self.low_res_buffers[current_bufferiter] = np.ones([self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width], dtype='uint16')
 
             custody.switch_from(self.lowres_camera, to=self.display)
 
@@ -719,7 +696,7 @@ class multiScopeModel:
             savethread = ct.ResultThread(target=saveimage).start()
 
             if self.displayImStack ==1:
-                self.display.show_stack(low_res_buffer)
+                self.display.show_stack(self.low_res_buffers[current_bufferiter])
 
             def calculate_projection():
                 #calculate projections
@@ -732,6 +709,9 @@ class multiScopeModel:
                 print("time: " + str(t1))
 
                 ##display max projection
+                all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres,
+                                     self.current_lowresROI_width + self.stack_nbplanes_lowres])
+
                 all_proj[0:self.current_lowresROI_height, 0:self.current_lowresROI_width] = maxproj_xy
                 all_proj[self.current_lowresROI_height:, 0:self.current_lowresROI_width] = maxproj_xz
                 all_proj[0:self.current_lowresROI_height, self.current_lowresROI_width:] = np.transpose(maxproj_yz)
@@ -741,53 +721,69 @@ class multiScopeModel:
 
             custody.switch_from(self.display, to=None)
             #savethread.get_result()
+            #projection_thread.get_result()
+            return
 
+        ##navigate buffer queue - where to save current image.
+        current_bufferiter = self.low_res_buffers_queue.get()  # get current buffer iter
+        self.low_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
+        print("------------------------------------------------------------")
+        print(current_bufferiter)
+        print("------------------------------------------------------------")
+
+        # data allocation correct
+        self.low_res_buffers[current_bufferiter] = None
+        self.low_res_buffers[current_bufferiter] = ct.SharedNDArray(
+            shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
+            dtype='uint16')
+        self.low_res_buffers[current_bufferiter].fill(0)
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
         acquire_thread.get_result()
 
-    def acquire_stack_highres(self, current_startposition, current_laserline, filepath):
+    def acquire_stack_highres(self, current_startposition, current_laserline, filepath, modality):
         def acquire_taskHighResSPIM(custody):
             print("start")
-            ##navigate buffer queue - where to save current image.
-            current_bufferiter = self.high_res_buffers_queue.get()  # get current buffer iter
-            self.high_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
-            print("------------------------------------------------------------")
-            print(current_bufferiter)
-            print("------------------------------------------------------------")
-
             custody.switch_from(None, to=self.highres_camera)
 
             # prepare acquisition by moving filter wheel etc
             self.prepare_acquisition(current_startposition, current_laserline)
 
-            # define NI board voltage array
-            basic_unit = self.get_acq_array.get_highResSPIM_StackAq_array(current_laserline)
-            control_array = np.tile(basic_unit,
-                                    (self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
+            if modality=="ASLM":
+                # obtain ASLM parameters
+                self.calculate_ASLMparameters(self.exposure_time_HR)
+
+                # define NI board voltage array
+                basic_unit = self.get_acq_array.get_highResASLM_StackAq_array(current_laserline)
+                control_array = np.tile(basic_unit, (
+                self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
+
+                # smooth remote mirror voltage
+                control_array[:, NI_board_parameters.voicecoil] = self.smooth_sawtooth(
+                    control_array[:, NI_board_parameters.voicecoil],
+                    window_len=self.ao.s2p(0.002))
+                print("voltage array calculated")
+
+                # prepare high res camera for stack acquisition
+                self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
+            else:
+                # define NI board voltage array
+                basic_unit = self.get_acq_array.get_highResSPIM_StackAq_array(current_laserline)
+                control_array = np.tile(basic_unit,
+                                        (self.stack_nbplanes_highres + 1,
+                                         1))  # add +1 as you want to return to origin position
+
+                # prepare high res camera for stack acquisition
+                self.highres_camera.prepare_stack_acquisition_highres(self.exposure_time_HR)
+                print("camera initialized")
 
             # write voltages
             write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
                                                     ).start()
 
-            # data allocation correct
-            highres_buffer = ct.SharedNDArray(
-                shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
-            # maxproj_xy = ct.SharedNDArray(shape=(self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
-            # maxproj_xz = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, self.current_highresROI_width), dtype='uint16')
-            # maxproj_yz = ct.SharedNDArray(shape=(self.current_highresROI_height, self.stack_nbplanes_highres), dtype='uint16')
-            # maxproj_xy.fill(0)
-            # maxproj_xz.fill(0)
-            # maxproj_yz.fill(0)
-            all_proj = np.zeros([self.current_highresROI_height + self.stack_nbplanes_highres,
-                                 self.current_highresROI_width + self.stack_nbplanes_highres])
-
             # set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres, self.highres_planespacing, self.slow_velocity, self.slow_acceleration)
 
-            # prepare high res camera for stack acquisition
-            self.highres_camera.prepare_stack_acquisition_highres(self.exposure_time_HR)
-            print("prepared")
             # start thread on stage to wait for trigger
             def start_stage_streamHighResSPIM():
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
@@ -795,17 +791,28 @@ class multiScopeModel:
 
             #start thread so that camera waits for trigger
             def start_camera_streamHighResSPIM():
-                self.highres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_highres, highres_buffer)
+                framesReceived = 0
+                while framesReceived < self.stack_nbplanes_highres:
+                    try:
+                        # fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+                        frame = self.highres_camera.run_stack_acquisition_buffer_pull()
+                        self.high_res_buffers[current_bufferiter][framesReceived, :, :] = np.copy(frame['pixel_data'])
+                        framesReceived += 1
+                        frame = None
+                        del frame
+                    except Exception as e:
+                        print(str(e))
+                        break
+                self.highres_camera.end_stackacquisition()
             camera_stream_thread = ct.ResultThread(target=start_camera_streamHighResSPIM).start()
+
+            print("stage and camera threads waiting ...")
 
             # play voltages
             # you need to use "block true" as otherwise the program finishes without playing the voltages really
             self.ao.play_voltages(block=True)
             stream_thread.get_result()
             camera_stream_thread.get_result()
-
-            self.high_res_buffers[current_bufferiter] = highres_buffer
-
 
             custody.switch_from(self.highres_camera, to=self.display)
 
@@ -818,8 +825,7 @@ class multiScopeModel:
             savethread = ct.ResultThread(target=saveimage_highresSPIM).start()
 
             if self.displayImStack ==1:
-                self.display.show_stack(highres_buffer)
-
+                self.display.show_stack(self.high_res_buffers[current_bufferiter])
 
             def calculate_projection_highres():
                 #calculate projections
@@ -832,6 +838,8 @@ class multiScopeModel:
                 print("time: " + str(t1))
 
                 ##display max projection
+                all_proj = np.zeros([self.current_highresROI_height + self.stack_nbplanes_highres,
+                                     self.current_highresROI_width + self.stack_nbplanes_highres])
                 all_proj[0:self.current_highresROI_height, 0:self.current_highresROI_width] = maxproj_xy
                 all_proj[self.current_highresROI_height:, 0:self.current_highresROI_width] = maxproj_xz
                 all_proj[0:self.current_highresROI_height, self.current_highresROI_width:] = np.transpose(maxproj_yz)
@@ -841,123 +849,24 @@ class multiScopeModel:
 
 
             custody.switch_from(self.display, to=None)
+            #savethread.get_result()
 
-            savethread.get_result()
+        ##navigate buffer queue - where to save current image.
+        current_bufferiter = self.high_res_buffers_queue.get()  # get current buffer iter
+        self.high_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
+        print("------------------------------------------------------------")
+        print(current_bufferiter)
+        print("------------------------------------------------------------")
+
+        # data allocation correct
+        self.high_res_buffers[current_bufferiter] = None
+        self.high_res_buffers[current_bufferiter] = ct.SharedNDArray(
+                shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
 
         #start thread and wait for its completion
         acquire_threadHighResSPIM = ct.CustodyThread(
             target=acquire_taskHighResSPIM, first_resource=self.highres_camera).start()
         acquire_threadHighResSPIM.get_result()
-
-    def acquire_stack_highresASLM(self, current_startposition, current_laserline, filepath):
-        def acquire_taskHighResASLM(custody):
-
-            ##navigate buffer queue - where to save current image.
-            current_bufferiter = self.high_res_buffers_queue.get()  # get current buffer iter
-            self.high_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
-
-            custody.switch_from(None, to=self.highres_camera)
-
-            # prepare acquisition by moving filter wheel and stage
-            self.prepare_acquisition(current_startposition, current_laserline)
-
-            #obtain ASLM parameters
-            self.calculate_ASLMparameters(self.exposure_time_HR)
-            print("ASLM parameters calculated")
-
-            # define NI board voltage array
-            basic_unit = self.get_acq_array.get_highResASLM_StackAq_array(current_laserline)
-            control_array = np.tile(basic_unit,(self.stack_nbplanes_highres + 1, 1))  # add +1 as you want to return to origin position
-
-            #smooth remote mirror voltage
-            control_array[:,NI_board_parameters.voicecoil] = self.smooth_sawtooth(control_array[:,NI_board_parameters.voicecoil],
-                                                                                window_len=self.ao.s2p(0.002))
-            print("voltage array calculated")
-
-            # write voltages
-            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
-                                                    ).start()
-
-            # data allocation correct
-            highres_buffer = ct.SharedNDArray(
-                shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width),
-                dtype='uint16')
-            maxproj_xy = ct.SharedNDArray(shape=(self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
-            maxproj_xz = ct.SharedNDArray(shape=(self.stack_nbplanes_highres, self.current_highresROI_width), dtype='uint16')
-            maxproj_yz = ct.SharedNDArray(shape=(self.current_highresROI_height, self.stack_nbplanes_highres), dtype='uint16')
-            maxproj_xy.fill(0)
-            maxproj_xz.fill(0)
-            maxproj_yz.fill(0)
-            all_proj = np.zeros([self.current_highresROI_height + self.stack_nbplanes_highres,
-                                 self.current_highresROI_width + self.stack_nbplanes_highres])
-            # set up stage
-            self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_highres,
-                                                                        self.highres_planespacing, self.slow_velocity, self.slow_acceleration)
-
-            # prepare high res camera for stack acquisition
-            self.highres_camera.prepare_ASLM_acquisition(self.ASLM_lineExposure, self.ASLM_line_delay)
-
-            print("stage and camera ready")
-            # start thread on stage to wait for trigger
-            def start_stage_streamHighResASLM():
-                self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
-            stream_thread_ASLM = ct.ResultThread(target=start_stage_streamHighResASLM).start()  # ~3.6s
-
-            # start thread so that camera waits for trigger
-            def start_camera_streamHighResASLM():
-                self.highres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_highres, highres_buffer)
-            camera_stream_thread_ASLM = ct.ResultThread(target=start_camera_streamHighResASLM).start()
-
-            print("stage and camera threads waiting ...")
-
-            # play voltages
-            # you need to use "block true" as otherwise the program finishes without playing the voltages really
-            self.ao.play_voltages(block=True)
-            stream_thread_ASLM.get_result()
-            camera_stream_thread_ASLM.get_result()
-            print("camera stream over")
-
-            self.high_res_buffers[current_bufferiter] = highres_buffer
-
-            custody.switch_from(self.highres_camera, to=self.display)
-
-            def saveimage_highresSPIM():
-                # save image
-                try:
-                    imwrite(filepath, self.high_res_buffers[current_bufferiter])
-                except:
-                    print("couldn't save image")
-
-            savethread = ct.ResultThread(target=saveimage_highresSPIM).start()
-
-            if self.displayImStack == 1:
-                self.display.show_stack(highres_buffer)
-
-            def calculate_projection_highresASLM():
-                # calculate projections
-                t0 = time.perf_counter()
-                maxproj_xy = np.max(self.high_res_buffers[current_bufferiter], axis=0)
-                maxproj_xz = np.max(self.high_res_buffers[current_bufferiter], axis=1)
-                maxproj_yz = np.max(self.high_res_buffers[current_bufferiter], axis=2)
-                t1 = time.perf_counter() - t0
-
-                print("time: " + str(t1))
-
-                ##display max projection
-                all_proj[0:self.current_highresROI_height, 0:self.current_highresROI_width] = maxproj_xy
-                all_proj[self.current_highresROI_height:, 0:self.current_highresROI_width] = maxproj_xz
-                all_proj[0:self.current_highresROI_height, self.current_highresROI_width:] = np.transpose(maxproj_yz)
-
-                self.display.show_maxproj(all_proj)
-            projection_thread = ct.ResultThread(target=calculate_projection_highresASLM).start()
-
-            custody.switch_from(self.display, to=None)
-            #savethread.get_result()
-
-        # start thread and wait for its completion
-        acquire_threadHighResASLM = ct.CustodyThread(
-            target=acquire_taskHighResASLM, first_resource=self.highres_camera).start()
-        acquire_threadHighResASLM.get_result()
 
 
     def smooth_sawtooth(self, array, window_len = 101):

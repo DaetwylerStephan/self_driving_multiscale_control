@@ -119,8 +119,30 @@ class Photo_Camera:
             except Exception as e:
                 print(str(e))
                 break
-
         self.cam.finish()
+        return
+
+    # def run_stack_acquisition_buffer_fast(self, nb_planes, buffer):
+    #     """Run a stack acquisition."""
+    #     framesReceived = 0
+    #     while framesReceived < nb_planes:
+    #         # time.sleep(0.001)
+    #
+    #         try:
+    #             #fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+    #             frame, fps, frame_count = self.cam.poll_frame()
+    #
+    #             framesReceived += 1
+    #             print("{}:{}".format(framesReceived, fps), flush=True)
+    #
+    #             buffer[framesReceived, :, :] = np.copy(frame['pixel_data'])
+    #             frame = None
+    #             del frame
+    #
+    #         except Exception as e:
+    #             print(str(e))
+    #             break
+    #     self.cam.finish()
 
     def run_stack_acquisition_buffer_fast(self, nb_planes, buffer):
         """Run a stack acquisition."""
@@ -130,15 +152,27 @@ class Photo_Camera:
 
             try:
                 fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-
+                buffer[framesReceived,:,:] = np.zeros([2960, 5056],dtype='uint16')
                 framesReceived += 1
-                print("{}:{}".format(framesReceived, fps), flush=True)
+                #print("{}:{}".format(framesReceived, fps), flush=True)
 
             except Exception as e:
                 print(str(e))
                 break
 
         self.cam.finish()
+        return
+
+    def run_stack_acquisition_buffer_pull(self):
+        """Run a stack acquisition."""
+        try:
+            #fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+            frame, fps, frame_count = self.cam.poll_frame()
+            return frame
+        except Exception as e:
+            print(str(e))
+        return
+
 
     def set_up_lowres_preview(self, exposure=20):
         self.cam.exp_mode = "Internal Trigger"
@@ -169,6 +203,8 @@ class Photo_Camera:
                 print(str(e))
                 break
 
+    def end_stackacquisition(self):
+        self.cam.finish()
 
     def end_preview(self):
         self.cam.finish()

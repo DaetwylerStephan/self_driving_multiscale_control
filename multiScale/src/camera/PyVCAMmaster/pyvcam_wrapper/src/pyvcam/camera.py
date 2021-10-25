@@ -397,8 +397,9 @@ class Camera:
         else:
             assert out.shape == frame['pixel_data'].shape
             assert out.dtype == frame['pixel_data'].dtype
-            out[:] = frame['pixel_data'][:] #doesn't remove python reference to c memory
-            del frame['pixel_data'] #should remove reference
+            out[:] = np.copy(frame['pixel_data'][:]) #doesn't remove python reference to c memory
+            frame = None
+            del frame #should remove reference
             return fps, frame_count
 
 
