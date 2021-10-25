@@ -6,6 +6,7 @@ import atexit
 import threading
 import numpy as np
 
+from multiprocessing import shared_memory
 import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.napari_in_subprocess as napari
 import acquisition_array_class as acq_arrays
@@ -34,14 +35,14 @@ class multiScopeModel:
         """
         self.unfinished_tasks = queue.Queue()
 
-        self.data_buffers = [
-            ct.SharedNDArray(shape=(2960, 5056), dtype='uint16')
-            for i in range(2)]
-        self.data_buffer_queue = queue.Queue()
-        for i in range(len(self.data_buffers)):
-            self.data_buffer_queue.put(i)
-        print("Displaying", self.data_buffers[0].shape,
-              self.data_buffers[0].dtype, 'images.')
+        # self.data_buffers = [
+        #     ct.SharedNDArray(shape=(2960, 5056), dtype='uint16')
+        #     for i in range(2)]
+        # self.data_buffer_queue = queue.Queue()
+        # for i in range(len(self.data_buffers)):
+        #     self.data_buffer_queue.put(i)
+        # print("Displaying", self.data_buffers[0].shape,
+        #       self.data_buffers[0].dtype, 'images.')
         self.num_frames = 0
         self.initial_time = time.perf_counter()
 
@@ -70,6 +71,16 @@ class multiScopeModel:
         self.current_highresROI_width = Camera_parameters.HR_width_pixel
         self.current_highresROI_height = Camera_parameters.HR_height_pixel
 
+        #for keeping track of the allocated buffer size (so that it doesn't have to be allocated twice)
+        self.updatebuffer_highres_width = 0
+        self.updatebuffer_highres_height = 0
+        self.updatebuffer_highres_stacknb = 0
+        self.updatebuffer_lowres_width = 0
+        self.updatebuffer_lowres_height = 0
+        self.updatebuffer_lowres_stacknb = 0
+        self.high_res_memory_names = None
+        self.low_res_memory_names = None
+
         self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
 
         self.ASLM_acquisition_time = 0.3
@@ -92,14 +103,8 @@ class multiScopeModel:
         #textlabels for GUI
         self.currentFPS = str(0)
 
-        self.high_res_buffers = [
-            ct.SharedNDArray(shape=(Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
-            for i in range(2)]
-
-        self.low_res_buffers = [
-            ct.SharedNDArray(shape=(Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel),
-                             dtype='uint16')
-            for i in range(2)]
+        #initialize buffers
+        self.update_bufferSize()
 
         self.high_res_buffers_queue = queue.Queue()
         self.low_res_buffers_queue = queue.Queue()
@@ -114,7 +119,6 @@ class multiScopeModel:
 
         #init acquisition array writing class
         self.get_acq_array = acq_arrays.acquisition_arrays(self)
-
 
         #initialize stages and stages in ResultThreads
         trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start() #~0.4s
@@ -267,6 +271,53 @@ class multiScopeModel:
         self.adjustableslit.home_stage()
         print("slit homed")
         self.adjustableslit.slit_set_speed(1000)
+
+    def update_bufferSize(self):
+        """
+        This handles the size of the buffers during acquisitions.
+        """
+
+        #check for whether some image dimension parameters were changed
+        if (self.updatebuffer_highres_width != self.current_highresROI_width) or (
+                self.updatebuffer_highres_height != self.current_highresROI_height) or (
+                self.updatebuffer_highres_stacknb != self.stack_nbplanes_highres):
+
+            #make sure to delete previous shared memory
+            if self.high_res_memory_names != None:
+                print("Delete previous shared memory arrays")
+                print(self.high_res_memory_names[0])
+                print(self.high_res_memory_names[1])
+
+            #allocate memory
+            self.high_res_buffers = [ct.SharedNDArray(shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
+                for i in range(2)]
+            self.high_res_memory_names = [self.high_res_buffers[i].shared_memory.name for i in range(2)]
+            #save current parameters so that you don't have to reallocate the memory again without image dimension changes
+            self.updatebuffer_highres_width = self.current_highresROI_width
+            self.updatebuffer_highres_height = self.current_highresROI_height
+            self.updatebuffer_highres_stacknb = self.stack_nbplanes_highres
+            print("high res buffer updated")
+
+        if (self.updatebuffer_lowres_width != self.current_lowresROI_width) or (
+                self.updatebuffer_lowres_height != self.current_lowresROI_height) or (
+                self.updatebuffer_lowres_stacknb != self.stack_nbplanes_lowres):
+
+            # make sure to delete previous shared memory
+            if self.low_res_memory_names != None:
+                print("Delete previous shared memory arrays")
+                shared_memory.SharedMemory(name=self.low_res_memory_names[0]).unlink()
+                shared_memory.SharedMemory(name=self.low_res_memory_names[1]).unlink()
+
+
+            self.low_res_buffers = [
+                ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
+                for i in range(2)]
+            self.updatebuffer_lowres_width = self.current_lowresROI_width
+            self.updatebuffer_lowres_height = self.current_lowresROI_height
+            self.updatebuffer_lowres_stacknb = self.stack_nbplanes_lowres
+            print("low res buffer updated")
+            self.low_res_memory_names = [self.high_res_buffers[i].shared_memory.name for i in range(2)]
+
 
 
     def close(self):
@@ -623,6 +674,8 @@ class multiScopeModel:
         if laser == NI_board_parameters.laser640:
             self.filterwheel.set_filter('676/37-25', wait_until_done=False)
 
+        self.update_bufferSize()
+
         thread_stagemove.get_result()
 
     def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
@@ -630,15 +683,15 @@ class multiScopeModel:
 
             custody.switch_from(None, to=self.lowres_camera)
 
+            # prepare acquisition by moving filter wheel and stage, and set buffer size
+            self.prepare_acquisition(current_startposition, current_laserline)
+
             # prepare camera for stack acquisition
             def prepare_camera():
                 self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
-                self.lowres_camera.init_camerabuffer(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width)
+                #self.lowres_camera.init_camerabuffer(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width)
                 #self.lowres_camera.init_camerabuffer2(self.low_res_buffers[current_bufferiter])
             camera_prepare_thread = ct.ResultThread(target=prepare_camera).start()
-
-            #prepare acquisition by moving filter wheel and stage
-            self.prepare_acquisition(current_startposition, current_laserline)
 
             #define NI board voltage array
             basic_unit = self.get_acq_array.get_lowRes_StackAq_array(current_laserline)
@@ -660,34 +713,14 @@ class multiScopeModel:
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
 
             # def start_camera_streamfast():
-            #     framesReceived = 0
-            #     while framesReceived < self.stack_nbplanes_lowres:
-            #         time.sleep(0.001)
-            #         try:
-            #             # fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-            #
-            #             self.low_res_buffers[current_bufferiter][framesReceived, :, :] =  self.lowres_camera.run_stack_acquisition_buffer_pull()
-            #             #self.low_res_buffers[current_bufferiter][framesReceived, :, :] = np.copy(frame['pixel_data'])
-            #             framesReceived += 1
-            #             #print(framesReceived, flush=True)
-            #             # frame = None
-            #             # del frame
-            #         except Exception as e:
-            #             print(str(e))
-            #             break
-            #     self.lowres_camera.end_stackacquisition()
-            #     print("camera acquisition done")
+            #     self.lowres_camera.run_stack_acquisitionV2_preallocated(self.stack_nbplanes_lowres)
             # start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
             def start_camera_streamfast():
-                self.lowres_camera.run_stack_acquisitionV2_preallocated(self.stack_nbplanes_lowres)
+                self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, self.low_res_buffers[current_bufferiter])
+                #self.lowres_camera.end_stackacquisition()
+                return
             start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
-
-            # def start_camera_streamfast():
-            #     self.low_res_buffers[current_bufferiter] = self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, self.low_res_buffers[current_bufferiter])
-            #     self.lowres_camera.end_stackacquisition()
-            #     return
-            # start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
             # play voltages
             # you need to use "block true" as otherwise the program finishes without playing the voltages
@@ -696,7 +729,7 @@ class multiScopeModel:
             stream_thread.get_result()
             start_camera_streamfast_thread.get_result()
 
-            self.low_res_buffers[current_bufferiter] = self.lowres_camera.get_camerabuffer()
+            #self.low_res_buffers[current_bufferiter] = self.lowres_camera.get_camerabuffer()
 
 
             #self.low_res_buffers[current_bufferiter] = np.ones([self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width], dtype='uint16')
@@ -748,12 +781,12 @@ class multiScopeModel:
         print("------------------------------------------------------------")
 
         # data allocation correct
-        #self.low_res_buffers[current_bufferiter] = None
-        self.low_res_buffers[current_bufferiter] = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
-        name = str(self.low_res_buffers[current_bufferiter].shared_memory.name) # Really make sure we don't get a ref
-        print("------------------------------------------------------------")
-        print(name)
-        print("------------------------------------------------------------")
+        # self.low_res_buffers[current_bufferiter] = None
+        # self.low_res_buffers[current_bufferiter] = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
+        # name = str(self.low_res_buffers[current_bufferiter].shared_memory.name) # Really make sure we don't get a ref
+        # print("------------------------------------------------------------")
+        # print(name)
+        # print("------------------------------------------------------------")
         # self.low_res_buffers[current_bufferiter].fill(0)
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()

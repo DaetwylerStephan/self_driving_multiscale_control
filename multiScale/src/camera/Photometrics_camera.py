@@ -162,14 +162,14 @@ class Photo_Camera:
             # time.sleep(0.001)
 
             try:
-                frame, fps, frame_count = self.cam.poll_frame()
-                #fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+                #frame, fps, frame_count = self.cam.poll_frame()
+                fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
 
-                buffer[framesReceived, :, :] = np.copy(frame['pixel_data'][:])
-                frame['pixel_data'][:] = None
-                frame = None
-                del frame
-                gc.collect()
+                #buffer[framesReceived, :, :] = np.copy(frame['pixel_data'][:])
+                #frame['pixel_data'][:] = None
+                #frame = None
+                #del frame
+                #gc.collect()
 
                 #buffer[framesReceived,:,:] = np.zeros([2960, 5056],dtype='uint16')
                 framesReceived += 1
