@@ -627,7 +627,15 @@ class multiScopeModel:
 
     def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
         def acquire_task(custody):
+
             custody.switch_from(None, to=self.lowres_camera)
+
+            # prepare camera for stack acquisition
+            def prepare_camera():
+                self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
+                self.lowres_camera.init_camerabuffer(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width)
+                #self.lowres_camera.init_camerabuffer2(self.low_res_buffers[current_bufferiter])
+            camera_prepare_thread = ct.ResultThread(target=prepare_camera).start()
 
             #prepare acquisition by moving filter wheel and stage
             self.prepare_acquisition(current_startposition, current_laserline)
@@ -643,24 +651,25 @@ class multiScopeModel:
             #set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing, self.slow_velocity, self.slow_acceleration)
 
-            # prepare camera for stack acquisition
-            self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
+            #wait for camera allocation before proceeding
+            camera_prepare_thread.get_result()
 
             # start thread on stage to wait for trigger
             def start_stage_stream():
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
-            #
+
             # def start_camera_streamfast():
             #     framesReceived = 0
             #     while framesReceived < self.stack_nbplanes_lowres:
             #         time.sleep(0.001)
             #         try:
             #             # fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-            #             frame = self.lowres_camera.run_stack_acquisition_buffer_pull()
-            #             self.low_res_buffers[current_bufferiter][framesReceived, :, :] = np.copy(frame['pixel_data'])
+            #
+            #             self.low_res_buffers[current_bufferiter][framesReceived, :, :] =  self.lowres_camera.run_stack_acquisition_buffer_pull()
+            #             #self.low_res_buffers[current_bufferiter][framesReceived, :, :] = np.copy(frame['pixel_data'])
             #             framesReceived += 1
-            #             print(framesReceived, flush=True)
+            #             #print(framesReceived, flush=True)
             #             # frame = None
             #             # del frame
             #         except Exception as e:
@@ -671,8 +680,14 @@ class multiScopeModel:
             # start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
             def start_camera_streamfast():
-                self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, self.low_res_buffers[current_bufferiter])
+                self.lowres_camera.run_stack_acquisitionV2_preallocated(self.stack_nbplanes_lowres)
             start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
+
+            # def start_camera_streamfast():
+            #     self.low_res_buffers[current_bufferiter] = self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, self.low_res_buffers[current_bufferiter])
+            #     self.lowres_camera.end_stackacquisition()
+            #     return
+            # start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
             # play voltages
             # you need to use "block true" as otherwise the program finishes without playing the voltages
@@ -681,7 +696,8 @@ class multiScopeModel:
             stream_thread.get_result()
             start_camera_streamfast_thread.get_result()
 
-            #self.low_res_buffers[current_bufferiter] = low_res_buffer
+            self.low_res_buffers[current_bufferiter] = self.lowres_camera.get_camerabuffer()
+
 
             #self.low_res_buffers[current_bufferiter] = np.ones([self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width], dtype='uint16')
 
@@ -732,11 +748,13 @@ class multiScopeModel:
         print("------------------------------------------------------------")
 
         # data allocation correct
-        self.low_res_buffers[current_bufferiter] = None
-        self.low_res_buffers[current_bufferiter] = ct.SharedNDArray(
-            shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
-            dtype='uint16')
-        self.low_res_buffers[current_bufferiter].fill(0)
+        #self.low_res_buffers[current_bufferiter] = None
+        self.low_res_buffers[current_bufferiter] = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
+        name = str(self.low_res_buffers[current_bufferiter].shared_memory.name) # Really make sure we don't get a ref
+        print("------------------------------------------------------------")
+        print(name)
+        print("------------------------------------------------------------")
+        # self.low_res_buffers[current_bufferiter].fill(0)
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
         acquire_thread.get_result()

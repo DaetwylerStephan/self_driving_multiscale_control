@@ -506,6 +506,8 @@ class MultiScale_Microscope_Controller():
         self.view.update()
         self.updatefilename()
 
+
+
         #stop all potential previews
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
