@@ -285,8 +285,11 @@ class multiScopeModel:
             #make sure to delete previous shared memory
             if self.high_res_memory_names != None:
                 print("Delete previous shared memory arrays")
-                print(self.high_res_memory_names[0])
-                print(self.high_res_memory_names[1])
+                try:
+                    shared_memory.SharedMemory(name=self.high_res_memory_names[0]).unlink()
+                    shared_memory.SharedMemory(name=self.high_res_memory_names[1]).unlink()
+                except FileNotFoundError:
+                    pass  # This is the error we expected if the memory was unlinked.
 
             #allocate memory
             self.high_res_buffers = [ct.SharedNDArray(shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
@@ -305,9 +308,11 @@ class multiScopeModel:
             # make sure to delete previous shared memory
             if self.low_res_memory_names != None:
                 print("Delete previous shared memory arrays")
-                shared_memory.SharedMemory(name=self.low_res_memory_names[0]).unlink()
-                shared_memory.SharedMemory(name=self.low_res_memory_names[1]).unlink()
-
+                try:
+                    shared_memory.SharedMemory(name=self.low_res_memory_names[0]).unlink()
+                    shared_memory.SharedMemory(name=self.low_res_memory_names[1]).unlink()
+                except FileNotFoundError:
+                    pass  # This is the error we expected if the memory was unlinked.
 
             self.low_res_buffers = [
                 ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
@@ -686,11 +691,9 @@ class multiScopeModel:
             # prepare acquisition by moving filter wheel and stage, and set buffer size
             self.prepare_acquisition(current_startposition, current_laserline)
 
-            # prepare camera for stack acquisition
+            # prepare camera for stack acquisition - put in thread so that program executes faster :)
             def prepare_camera():
                 self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
-                #self.lowres_camera.init_camerabuffer(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width)
-                #self.lowres_camera.init_camerabuffer2(self.low_res_buffers[current_bufferiter])
             camera_prepare_thread = ct.ResultThread(target=prepare_camera).start()
 
             #define NI board voltage array
@@ -704,7 +707,7 @@ class multiScopeModel:
             #set up stage
             self.XYZ_stage.streamStackAcquisition_externalTrigger_setup(self.stack_nbplanes_lowres, self.lowres_planespacing, self.slow_velocity, self.slow_acceleration)
 
-            #wait for camera allocation before proceeding
+            #wait for camera set up before proceeding
             camera_prepare_thread.get_result()
 
             # start thread on stage to wait for trigger
@@ -712,27 +715,16 @@ class multiScopeModel:
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
             stream_thread = ct.ResultThread(target=start_stage_stream).start()  # ~3.6s
 
-            # def start_camera_streamfast():
-            #     self.lowres_camera.run_stack_acquisitionV2_preallocated(self.stack_nbplanes_lowres)
-            # start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
-
             def start_camera_streamfast():
                 self.lowres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_lowres, self.low_res_buffers[current_bufferiter])
-                #self.lowres_camera.end_stackacquisition()
                 return
             start_camera_streamfast_thread = ct.ResultThread(target=start_camera_streamfast).start()
 
-            # play voltages
-            # you need to use "block true" as otherwise the program finishes without playing the voltages
+            # play voltages - you need to use "block true" as otherwise the program finishes without playing the voltages
             self.ao.play_voltages(block=True)
 
             stream_thread.get_result()
             start_camera_streamfast_thread.get_result()
-
-            #self.low_res_buffers[current_bufferiter] = self.lowres_camera.get_camerabuffer()
-
-
-            #self.low_res_buffers[current_bufferiter] = np.ones([self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width], dtype='uint16')
 
             custody.switch_from(self.lowres_camera, to=self.display)
 
@@ -773,21 +765,10 @@ class multiScopeModel:
             #projection_thread.get_result()
             return
 
-        ##navigate buffer queue - where to save current image.
+        ##navigate buffer queue - where to save current image: this allows you to acquire another stack, while the stack before is still being processed
         current_bufferiter = self.low_res_buffers_queue.get()  # get current buffer iter
         self.low_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
-        print("------------------------------------------------------------")
-        print(current_bufferiter)
-        print("------------------------------------------------------------")
 
-        # data allocation correct
-        # self.low_res_buffers[current_bufferiter] = None
-        # self.low_res_buffers[current_bufferiter] = ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
-        # name = str(self.low_res_buffers[current_bufferiter].shared_memory.name) # Really make sure we don't get a ref
-        # print("------------------------------------------------------------")
-        # print(name)
-        # print("------------------------------------------------------------")
-        # self.low_res_buffers[current_bufferiter].fill(0)
         acquire_thread = ct.CustodyThread(
             target=acquire_task, first_resource=self.lowres_camera).start()
         acquire_thread.get_result()
@@ -840,30 +821,22 @@ class multiScopeModel:
                 self.XYZ_stage.streamStackAcquisition_externalTrigger_waitEnd()
             stream_thread = ct.ResultThread(target=start_stage_streamHighResSPIM).start()  # ~3.6s
 
-            #start thread so that camera waits for trigger
             def start_camera_streamHighResSPIM():
-                framesReceived = 0
-                while framesReceived < self.stack_nbplanes_highres:
-                    try:
-                        # fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-                        frame = self.highres_camera.run_stack_acquisition_buffer_pull()
-                        self.high_res_buffers[current_bufferiter][framesReceived, :, :] = np.copy(frame['pixel_data'])
-                        framesReceived += 1
-                        frame = None
-                        del frame
-                    except Exception as e:
-                        print(str(e))
-                        break
-                self.highres_camera.end_stackacquisition()
-            camera_stream_thread = ct.ResultThread(target=start_camera_streamHighResSPIM).start()
+                self.highres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_highres,
+                                                                     self.high_res_buffers[current_bufferiter])
+                return
+
+            start_highrescamera_stream_thread = ct.ResultThread(target=start_camera_streamHighResSPIM).start()
+
 
             print("stage and camera threads waiting ...")
 
             # play voltages
             # you need to use "block true" as otherwise the program finishes without playing the voltages really
             self.ao.play_voltages(block=True)
+
             stream_thread.get_result()
-            camera_stream_thread.get_result()
+            start_highrescamera_stream_thread.get_result()
 
             custody.switch_from(self.highres_camera, to=self.display)
 
@@ -905,14 +878,6 @@ class multiScopeModel:
         ##navigate buffer queue - where to save current image.
         current_bufferiter = self.high_res_buffers_queue.get()  # get current buffer iter
         self.high_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
-        print("------------------------------------------------------------")
-        print(current_bufferiter)
-        print("------------------------------------------------------------")
-
-        # data allocation correct
-        self.high_res_buffers[current_bufferiter] = None
-        self.high_res_buffers[current_bufferiter] = ct.SharedNDArray(
-                shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
 
         #start thread and wait for its completion
         acquire_threadHighResSPIM = ct.CustodyThread(
