@@ -56,7 +56,7 @@ class Welcome_Tab(tk.Frame):
         #widgets
         username_box = ttk.Combobox(experiment_settings, textvariable=self.welcome_username, values=["Stephan Daetwyler", "Reto Fiolka", "Bo-Jui Chang"])
         modelOrganism_box = ttk.Combobox(experiment_settings, textvariable=self.welcome_modelorganism,
-                                    values=["Cell", "Xenograft", "Colon", "Beads"])
+                                    values=["Cell", "Xenograft", "Colon", "Beads", "Vasculature"])
         fluorescent_marker_box = ttk.Combobox(experiment_settings, textvariable=self.welcome_marker,
                                          values=["kdrl:mCherry", "kdrl:GFP", "UAS:GFP"])
 

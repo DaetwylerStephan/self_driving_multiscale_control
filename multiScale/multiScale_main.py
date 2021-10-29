@@ -34,7 +34,7 @@ class MultiScale_Microscope_Controller():
     #SPIM and ASLM - intensity changes: counts
     #timelapse saving - wrong!
     #
-    #todo> startup guide
+    #todo> startup guide. https://www.drivereasy.com/knowledge/fixed-ntkrnlmp-exe-blue-screen-error/
 
 
     def __init__(self):

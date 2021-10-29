@@ -294,6 +294,9 @@ class multiScopeModel:
             #allocate memory
             self.high_res_buffers = [ct.SharedNDArray(shape=(self.stack_nbplanes_highres, self.current_highresROI_height, self.current_highresROI_width), dtype='uint16')
                 for i in range(2)]
+            self.high_res_buffers[0].fill(0)
+            self.high_res_buffers[1].fill(0)
+
             self.high_res_memory_names = [self.high_res_buffers[i].shared_memory.name for i in range(2)]
             #save current parameters so that you don't have to reallocate the memory again without image dimension changes
             self.updatebuffer_highres_width = self.current_highresROI_width
@@ -317,6 +320,10 @@ class multiScopeModel:
             self.low_res_buffers = [
                 ct.SharedNDArray(shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
                 for i in range(2)]
+
+            self.low_res_buffers[0].fill(0)
+            self.low_res_buffers[1].fill(0)
+
             self.updatebuffer_lowres_width = self.current_lowresROI_width
             self.updatebuffer_lowres_height = self.current_lowresROI_height
             self.updatebuffer_lowres_stacknb = self.stack_nbplanes_lowres
