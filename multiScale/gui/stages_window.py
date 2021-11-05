@@ -22,6 +22,7 @@ class Stages_Tab(tk.Frame):
 
         # general stage settings
         self.stage_trans_stepsize = tk.DoubleVar()
+        self.linear_stage_trans_stepsize = tk.DoubleVar()
         self.stage_rot_stepsize = tk.DoubleVar()
 
         # parameters move to
@@ -74,7 +75,7 @@ class Stages_Tab(tk.Frame):
         anglestepsizelabel = ttk.Label(generalstage_settings, text="degree").grid(row=8, column=4)
         rotstagestepsizelabel = ttk.Label(generalstage_settings, text="Rot. stage step size:").grid(row=6, column=0)
 
-        transstage_scale = tk.Scale(generalstage_settings, variable=self.stage_trans_stepsize,from_=0, to=2, resolution = 0.001, orient="horizontal")
+        transstage_scale = tk.Scale(generalstage_settings, variable=self.linear_stage_trans_stepsize,from_=0, to=2, resolution = 0.001, orient="horizontal", showvalue=False, command=self.update_stage_trans_stepsize)
         self.stage_trans_entry = tk.Entry(generalstage_settings, textvariable=self.stage_trans_stepsize, width=7)
         self.stage_rot_entry = tk.Entry(generalstage_settings, textvariable=self.stage_rot_stepsize, width=7)
         rotstage_scale = tk.Scale(generalstage_settings, variable=self.stage_rot_stepsize, from_=0, to=360,
@@ -272,6 +273,11 @@ class Stages_Tab(tk.Frame):
         self.stage_highres_savedPos_tree.grid(row=2, column=0, columnspan=400)
     #-------functions---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
+
+    def update_stage_trans_stepsize(self, event):
+        newvalue = 100 * 0.02 ** (3-self.linear_stage_trans_stepsize.get())
+        newvalue = round(newvalue,5)
+        self.stage_trans_stepsize.set(newvalue)
 
     def change_currentposition(self, direction, factor):
         new_position = round(direction.get() + self.stage_trans_stepsize.get() * factor,7)

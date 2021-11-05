@@ -57,7 +57,13 @@ class multiScopeModel:
         self.highres_planespacing = 10000000
         self.displayImStack = 1
 
+        #filepath variables for saving image and projections
         self.filepath = 'D:/acquisitions/testimage.tif'
+        self.current_projectionfilepath = 'D:/acquisitions/testimage.tif'
+        self.projectionfilepath = 'D:/acquisitions'
+        self.current_timepointstring = "t00000"
+        self.current_region = "low_stack001"
+
         self.current_laser = NI_board_parameters.laser488
         self.channelIndicator = "00"
         self.slitopening_lowres = 3700
@@ -609,6 +615,7 @@ class multiScopeModel:
         """
         Master to start stack acquisitions of different channels and resolution modes. Decides which stack acquisition method to call
         :param current_folder: folder to save the acquired data
+        :param current_folder: folder to save the projected data
         :param current_startposition: start position for the stack streaming
         :param whichlaser: which channels to image
         :return:
@@ -617,6 +624,7 @@ class multiScopeModel:
             print("acquire 488 laser")
             # filepath
             current_filepath = os.path.join(current_folder, "1_CH488_000000.tif")
+            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH488", self.current_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
             if resolutionmode == "highASLM":
@@ -630,6 +638,7 @@ class multiScopeModel:
         if whichlaser[1]==1:
             print("acquire 552 laser")
             current_filepath = os.path.join(current_folder, "1_CH552_000000.tif")
+            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH552", self.current_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser552,
                                             current_filepath)
@@ -644,6 +653,7 @@ class multiScopeModel:
         if whichlaser[2]==1:
             print("acquire 594 laser")
             current_filepath = os.path.join(current_folder, "1_CH594_000000.tif")
+            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH594", self.current_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser594,
                                             current_filepath)
@@ -658,6 +668,7 @@ class multiScopeModel:
         if whichlaser[3]==1:
             print("acquire 640 laser")
             current_filepath = os.path.join(current_folder, "1_CH640_000000.tif")
+            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH640", self.current_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser640,
                                             current_filepath)
@@ -700,7 +711,7 @@ class multiScopeModel:
 
             # prepare camera for stack acquisition - put in thread so that program executes faster :)
             def prepare_camera():
-                self.lowres_camera.prepare_stack_acquisition(self.exposure_time_LR)
+                self.lowres_camera.prepare_stack_acquisition_seq(self.exposure_time_LR)
             camera_prepare_thread = ct.ResultThread(target=prepare_camera).start()
 
             #define NI board voltage array
@@ -748,6 +759,7 @@ class multiScopeModel:
 
             def calculate_projection():
                 #calculate projections
+                filepathforprojection = self.current_projectionfilepath # assign now as filepath is updated for next stack acquired
                 t0 = time.perf_counter()
                 maxproj_xy = np.max(self.low_res_buffers[current_bufferiter], axis=0)
                 maxproj_xz = np.max(self.low_res_buffers[current_bufferiter], axis=1)
@@ -758,13 +770,23 @@ class multiScopeModel:
 
                 ##display max projection
                 all_proj = np.zeros([self.current_lowresROI_height + self.stack_nbplanes_lowres,
-                                     self.current_lowresROI_width + self.stack_nbplanes_lowres])
+                                     self.current_lowresROI_width + self.stack_nbplanes_lowres], dtype="uint16")
 
                 all_proj[0:self.current_lowresROI_height, 0:self.current_lowresROI_width] = maxproj_xy
                 all_proj[self.current_lowresROI_height:, 0:self.current_lowresROI_width] = maxproj_xz
                 all_proj[0:self.current_lowresROI_height, self.current_lowresROI_width:] = np.transpose(maxproj_yz)
 
                 self.display.show_maxproj(all_proj)
+                try:
+                    os.makedirs(os.path.dirname(filepathforprojection))
+                except:
+                    print("folder not created")
+
+                try:
+                    imwrite(filepathforprojection, all_proj)
+                except:
+                    print("couldn't save projection image:" + filepathforprojection)
+
             projection_thread = ct.ResultThread(target=calculate_projection).start()
 
             custody.switch_from(self.display, to=None)
@@ -860,6 +882,7 @@ class multiScopeModel:
 
             def calculate_projection_highres():
                 #calculate projections
+                filepathforprojection = self.current_projectionfilepath # assign now as filepath is updated for next stack acquired
                 t0 = time.perf_counter()
                 maxproj_xy = np.max(self.high_res_buffers[current_bufferiter], axis=0)
                 maxproj_xz = np.max(self.high_res_buffers[current_bufferiter], axis=1)
@@ -870,12 +893,22 @@ class multiScopeModel:
 
                 ##display max projection
                 all_proj = np.zeros([self.current_highresROI_height + self.stack_nbplanes_highres,
-                                     self.current_highresROI_width + self.stack_nbplanes_highres])
+                                     self.current_highresROI_width + self.stack_nbplanes_highres], dtype="uint16")
                 all_proj[0:self.current_highresROI_height, 0:self.current_highresROI_width] = maxproj_xy
                 all_proj[self.current_highresROI_height:, 0:self.current_highresROI_width] = maxproj_xz
                 all_proj[0:self.current_highresROI_height, self.current_highresROI_width:] = np.transpose(maxproj_yz)
 
                 self.display.show_maxproj(all_proj)
+
+                try:
+                    os.makedirs(os.path.dirname(filepathforprojection))
+                except:
+                    print("folder not created")
+
+                try:
+                    imwrite(filepathforprojection, all_proj)
+                except:
+                    print("couldn't save projection image")
             projection_thread2 = ct.ResultThread(target=calculate_projection_highres).start()
 
 

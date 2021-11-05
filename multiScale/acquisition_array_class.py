@@ -61,15 +61,15 @@ class acquisition_arrays:
 
         # prepare voltage array
         # calculate minimal unit duration and set up array
-        minimal_trigger_timeinterval = self.model.exposure_time_LR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger + 0.001
+        minimal_trigger_timeinterval = self.model.exposure_time_LR / 1000 + readout_time / 1000 + self.model.delay_cameratrigger + 0.002
         basic_unit = np.zeros((self.model.ao.s2p(minimal_trigger_timeinterval), NI_board_parameters.ao_nchannels),
                               np.dtype(np.float64))
 
         # set voltages in array - camera, stage, remote mirror, laser
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.001),
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + 0.002),
         NI_board_parameters.lowres_camera] = 4.  # low res camera
         basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.exposure_time_LR / 1000),
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger+self.model.exposure_time_LR / 1000),
         current_laserline] = 4.  # laser
         basic_unit[:, NI_board_parameters.voicecoil] = self.model.ASLM_staticLowResVolt  # remote mirror
 
@@ -95,7 +95,7 @@ class acquisition_arrays:
         NI_board_parameters.highres_camera] = 4.  # highrescamera - ao0
         basic_unit[0:self.model.ao.s2p(0.002), NI_board_parameters.stage] = 4.  # stage
         basic_unit[:, NI_board_parameters.voicecoil] = self.model.ASLM_staticHighResVolt  # remote mirror
-        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.exposure_time_HR / 1000),
+        basic_unit[self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger+self.model.exposure_time_HR / 1000),
         current_laserline] = 4.  # laser
 
         return basic_unit

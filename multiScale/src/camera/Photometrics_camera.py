@@ -33,15 +33,15 @@ class Photo_Camera:
     def getinfo(self):
         print(self.cam.trigger_table)
 
-    def getimagesize(self):
-        self.cam.roi
+    # def getimagesize(self):
+    #     self.cam.roi
 
     def get_imageroi(self):
-        return self.cam.roi
+        return self.cam.shape()
 
     def set_imageroi(self, startx, endx, starty, endy):
-        roi = (startx, endx, starty, endy)
-        self.cam.roi = roi
+        self.cam.reset_rois()
+        self.cam.set_roi(startx, endx, starty, endy)
 
     def take_snapshot(self, exposure):
         frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
@@ -60,6 +60,16 @@ class Photo_Camera:
 
         # Collect frames in live mode
         self.cam.start_live(exp_time=exposure_time)
+        print("camera ready")
+
+    def prepare_stack_acquisition_seq(self, exposure_time=20):
+        """Changes the settings of the low res camera to start stack acquisitions."""
+        self.cam.exp_mode = 'Edge Trigger'
+        self.cam.exp_out_mode = "Any Row"
+        self.cam.speed_table_index = 0
+
+        # Collect frames in live mode
+        self.cam.start_live(exp_time=exposure_time,  buffer_frame_count=70)
         print("camera ready")
 
     def init_camerabuffer(self, nbplanes, width, height):
@@ -84,6 +94,7 @@ class Photo_Camera:
         # Collect frames in live mode
         self.cam.start_live(exp_time=exposure_time)
         print("camera ready")
+
 
     def return_camera_readouttime(self):
         return self.cam.readout_time
@@ -162,17 +173,18 @@ class Photo_Camera:
             # time.sleep(0.001)
 
             try:
-                #frame, fps, frame_count = self.cam.poll_frame()
-                fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-
-                #buffer[framesReceived, :, :] = np.copy(frame['pixel_data'][:])
+                frame, fps, frame_count = self.cam.poll_frame(timeout_ms=10000)
+                #fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+                t0 = time.perf_counter()
+                buffer[framesReceived, :, :] = np.copy(frame['pixel_data'][:])
                 #frame['pixel_data'][:] = None
-                #frame = None
-                #del frame
+                frame = None
+                del frame
                 #gc.collect()
-
+                t1= t0-time.perf_counter()
                 #buffer[framesReceived,:,:] = np.zeros([2960, 5056],dtype='uint16')
                 framesReceived += 1
+                print(t1)
                 #print("{}:{}".format(framesReceived, fps), flush=True)
 
             except Exception as e:
@@ -245,13 +257,17 @@ class Photo_Camera:
         self.cam.start_live(exp_time=exposure)
 
     def run_preview(self, out):
-        fps, frame_count = self.cam.poll_frame2(out)
+        frame, fps, frame_count = self.cam.poll_frame()
+        out[:] = np.copy(frame['pixel_data'][:])
+        frame = None
+        del frame
 
     def run_preview_ASLM(self, out):
         framesReceived = 0
         while framesReceived < 1:
             try:
-                fps, frame_count = self.cam.poll_frame2(out)
+                frame, fps, frame_count = self.cam.poll_frame()
+                out[:] = np.copy(frame['pixel_data'][:])
                 framesReceived += 1
                 print("{}:{}".format(framesReceived, fps))
             except Exception as e:

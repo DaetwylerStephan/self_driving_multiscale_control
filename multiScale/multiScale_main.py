@@ -56,8 +56,6 @@ class MultiScale_Microscope_Controller():
         #######connect buttons / variables from GUI with functions here-----------------------------------
         # connect all the buttons that start a functionality like preview, stack acquisition, etc.
         # connect all the buttons that you want to dynamically change, e.g. during preview
-        # don't connect buttons that you want to be "static" during a stack acquisition, such as number of planes, plane spacing
-        # those parameters, you can get at the beginning of e.g. a stack acquisition call
 
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
         self.view.runtab.bt_preview_highres.bind("<ButtonRelease>", self.run_highrespreview)
@@ -145,6 +143,7 @@ class MultiScale_Microscope_Controller():
         update the laser power
         """
         # get laser power from GUI and construct laser power setting array
+        # multiply with 5 here as the laser is modulated within 0 to 5 V
         voltage488 = self.view.runtab.laser488_percentage.get() * 5 / 100.
         voltage552 = self.view.runtab.laser552_percentage.get() * 5 / 100.
         voltage594 = self.view.runtab.laser594_percentage.get() * 5 / 100.
@@ -160,7 +159,7 @@ class MultiScale_Microscope_Controller():
         self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
 
     def update_mSPIMvoltage(self, var, indx, mode):
-        # set the low resolution and high-resolution slit openings
+        # set the voltage for the mSPIM mirror
         voltage = self.view.advancedSettingstab.adv_settings_mSPIMvoltage.get()
         print(voltage)
         if voltage > 0 and voltage < NI_board_parameters.max_mSPIM_constant:
@@ -249,64 +248,63 @@ class MultiScale_Microscope_Controller():
                 if self.view.runtab.roi_ac_settings_type.get() == 'Full Chip':
                     self.model.current_lowresROI_height = Camera_parameters.LR_height_pixel
                     self.model.current_lowresROI_width = Camera_parameters.LR_width_pixel
-                    self.model.lowres_camera.set_imageroi(0, Camera_parameters.LR_width_pixel, 0, Camera_parameters.LR_height_pixel)
+                    self.model.lowres_camera.set_imageroi(0, 0, Camera_parameters.LR_width_pixel, Camera_parameters.LR_height_pixel)
                 if self.view.runtab.roi_ac_settings_type.get() == '1024x1024':
                     self.model.current_lowresROI_height = 1024
                     self.model.current_lowresROI_width = 1024
                     startx = int(Camera_parameters.LR_width_pixel/2)-512
                     starty = int(Camera_parameters.LR_height_pixel/2)-512
-                    self.model.lowres_camera.set_imageroi(startx, startx + 1024, starty,starty + 1024)
+                    self.model.lowres_camera.set_imageroi(startx, starty, 1024, 1024)
                 if self.view.runtab.roi_ac_settings_type.get() == '512x512':
                     self.model.current_lowresROI_height = 512
                     self.model.current_lowresROI_width = 512
                     startx = int(Camera_parameters.LR_width_pixel/2)-256
                     starty = int(Camera_parameters.LR_height_pixel/2)-256
-                    self.model.lowres_camera.set_imageroi(startx, startx + 512, starty,starty + 512)
+                    self.model.lowres_camera.set_imageroi(startx, starty, 512, 512)
                 if self.view.runtab.roi_ac_settings_type.get() == '256x256':
                     self.model.current_lowresROI_height = 256
                     self.model.current_lowresROI_width = 256
                     startx = int(Camera_parameters.LR_width_pixel / 2) - 128
                     starty = int(Camera_parameters.LR_height_pixel / 2) - 128
-                    self.model.lowres_camera.set_imageroi(startx, startx + 256, starty, starty + 256)
+                    self.model.lowres_camera.set_imageroi(startx, starty, 256, 256)
                 if self.view.runtab.roi_ac_settings_type.get() == 'Custom':
                     self.model.current_lowresROI_height = self.view.runtab.roi_height.get()
                     self.model.current_lowresROI_width = self.view.runtab.roi_width.get()
                     startx = self.view.runtab.roi_startX.get()
                     starty = self.view.runtab.roi_startY.get()
-                    self.model.lowres_camera.set_imageroi(startx, startx + self.model.current_lowresROI_width, starty, starty + self.model.current_lowresROI_height)
+                    self.model.lowres_camera.set_imageroi(startx, starty, self.model.current_lowresROI_width, self.model.current_lowresROI_height)
 
         else: #change high-res ROI
             if self.model.continue_preview_highres == False:
                 if self.view.runtab.roi_ac_settings_type.get() == 'Full Chip':
                     self.model.current_highresROI_height = Camera_parameters.HR_height_pixel
                     self.model.current_highresROI_width = Camera_parameters.HR_width_pixel
-                    self.model.highres_camera.set_imageroi(0, Camera_parameters.HR_width_pixel, 0,
+                    self.model.highres_camera.set_imageroi(0, 0, Camera_parameters.HR_width_pixel,
                                                           Camera_parameters.HR_height_pixel)
                 if self.view.runtab.roi_ac_settings_type.get() == '1024x1024':
                     self.model.current_highresROI_height = 1024
                     self.model.current_highresROI_width = 1024
                     startx = int(Camera_parameters.HR_width_pixel / 2) - 512
                     starty = int(Camera_parameters.HR_height_pixel / 2) - 512
-                    self.model.highres_camera.set_imageroi(startx, startx + 1024, starty, starty + 1024)
+                    self.model.highres_camera.set_imageroi(startx, starty, 1024, 1024)
                 if self.view.runtab.roi_ac_settings_type.get() == '512x512':
                     self.model.current_highresROI_height = 512
                     self.model.current_highresROI_width = 512
                     startx = int(Camera_parameters.HR_width_pixel/2)-256
                     starty = int(Camera_parameters.HR_height_pixel/2)-256
-                    self.model.highres_camera.set_imageroi(startx, startx + 512, starty,starty + 512)
+                    self.model.highres_camera.set_imageroi(startx, starty, 512, 512)
                 if self.view.runtab.roi_ac_settings_type.get() == '256x256':
                     self.model.current_highresROI_height = 256
                     self.model.current_highresROI_width = 256
                     startx = int(Camera_parameters.HR_width_pixel / 2) - 128
                     starty = int(Camera_parameters.HR_height_pixel / 2) - 128
-                    self.model.highres_camera.set_imageroi(startx, startx + 256, starty, starty + 256)
+                    self.model.highres_camera.set_imageroi(startx, starty, 256, 256)
                 if self.view.runtab.roi_ac_settings_type.get() == 'Custom':
                     self.model.current_highresROI_height = self.view.runtab.roi_height.get()
                     self.model.current_highresROI_width = self.view.runtab.roi_width.get()
                     startx = self.view.runtab.roi_startX.get()
                     starty = self.view.runtab.roi_startY.get()
-                    self.model.highres_camera.set_imageroi(startx, startx + self.model.current_highresROI_width, starty,
-                                                          starty + self.model.current_highresROI_height)
+                    self.model.highres_camera.set_imageroi(startx, starty, self.model.current_highresROI_width, self.model.current_highresROI_height)
 
     def run_lowrespreview(self, event):
         '''
@@ -506,8 +504,6 @@ class MultiScale_Microscope_Controller():
         self.view.update()
         self.updatefilename()
 
-
-
         #stop all potential previews
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
@@ -539,9 +535,10 @@ class MultiScale_Microscope_Controller():
                 print("parameters saved")
             ct.ResultThread(target=write_paramconfig).start()
 
-
             #set timepoint = 0 to be consistent with time-lapse acquisitions
+            self.model.current_timepointstring = "t00000"
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
+            self.model.projectionfilepath = os.path.join(self.parentfolder, experiment_name, "projections")
             print(stackfilepath)
         else:
             stackfilepath = self.current_timelapse_filepath
@@ -565,6 +562,10 @@ class MultiScale_Microscope_Controller():
 
                 # filepath
                 current_folder = os.path.join(stackfilepath, "low_stack" + f'{positioniter:03}')
+
+                #update info for filepath for projections
+                self.model.current_region =  "low_stack" + f'{positioniter:03}'
+
                 try:
                     print("filepath : " + current_folder)
                     os.makedirs(current_folder)
@@ -603,6 +604,9 @@ class MultiScale_Microscope_Controller():
                     os.makedirs(current_folder)
                 except OSError as error:
                     print("File writing error")
+
+                # update info for filepath for projections
+                self.model.current_region = "high_stack_" + str(xpos_label) + "_" + str(ypos_label)
 
                 # start stackstreaming
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
@@ -687,8 +691,9 @@ class MultiScale_Microscope_Controller():
             t0 = time.perf_counter()
 
             numStr = str(timeiter).zfill(5)
-            timepoint = "t" + numStr
-            self.current_timelapse_filepath = os.path.join(experimentpath, timepoint)
+            self.model.current_timepointstring = "t" + numStr
+            self.current_timelapse_filepath = os.path.join(experimentpath, self.model.current_timepointstring)
+            self.model.projectionfilepath = os.path.join(experimentpath, "projections")
 
             self.view.runtab.timelapse_aq_progress.set(timeiter)
             self.view.runtab.timelapse_aq_progressindicator.config(text=str(timeiter+1) +" of " + str(self.view.runtab.timelapse_aq_nbTimepoints))

@@ -20,7 +20,7 @@ class Camera_parameters:
     HR_height_pixel = 2048
     LR_width_pixel = 5056
     LR_height_pixel = 2960
-    highres_line_digitization_time = 0.01026
+    highres_line_digitization_time = 0.0112
     lowres_line_digitization_time = 0.01026 #10.16us
 
 
