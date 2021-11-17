@@ -230,7 +230,7 @@ test_set_speed(lib, device_id, current_speed / 2)
 #test_wait_for_stop(lib, device_id, 100)
 test_status(lib, device_id)
 test_serial(lib, device_id)
-
+input()
 print("\nClosing")
 lib.close_device(byref(cast(device_id, POINTER(c_int))))
 print("Done")

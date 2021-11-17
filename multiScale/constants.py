@@ -48,6 +48,7 @@ class NI_board_parameters:
     laser594 = 5
     laser640 = 6
     voicecoil = 7
+    led = -1
 
 
     #constant values for laser power etc...
@@ -58,6 +59,8 @@ class NI_board_parameters:
     power_640_line = "Dev1/ao25"
     flip_mirror_line = "Dev1/ao26"
     mSPIM_mirror_line = "Dev1/ao29"
+    LED_line = "Dev1/ao30"
+
     mSPIM_mirror_voltage = 0.1
     minVol_constant = 0
     maxVol_constant = 5

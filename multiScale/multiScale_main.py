@@ -132,6 +132,7 @@ class MultiScale_Microscope_Controller():
         self.root.mainloop()
 
     def close(self):
+        self.model.LED_voltage.setconstantvoltage(0)
         self.model.close()
 
     def wait_forInput(self):
@@ -215,8 +216,8 @@ class MultiScale_Microscope_Controller():
         self.model.ASLM_to_Volt = setvoltage_second
 
         # display calculated voltages
-        self.view.advancedSettingstab.voltage_minIndicator.config(text=str(self.model.ASLM_from_Volt))
-        self.view.advancedSettingstab.voltage_maxIndicator.config(text=str(self.model.ASLM_to_Volt))
+        self.view.advancedSettingstab.voltage_minIndicator.config(text=str(round(self.model.ASLM_from_Volt,5)))
+        self.view.advancedSettingstab.voltage_maxIndicator.config(text=str(round(self.model.ASLM_to_Volt, 5)))
 
         self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()/1000))
 
@@ -456,17 +457,26 @@ class MultiScale_Microscope_Controller():
         """
         print("change filter to laser: " + laser)
         if laser == '488':
+            self.model.LED_voltage.setconstantvoltage(0)
             self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser488
         if laser == '552':
+            self.model.LED_voltage.setconstantvoltage(0)
             self.model.filterwheel.set_filter('572/20-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser552
         if laser == '594':
+            self.model.LED_voltage.setconstantvoltage(0)
             self.model.filterwheel.set_filter('615/20-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser594
         if laser == '640':
+            self.model.LED_voltage.setconstantvoltage(0)
             self.model.filterwheel.set_filter('676/37-25', wait_until_done=False)
             self.model.current_laser = NI_board_parameters.laser640
+        if laser =='LED':
+            self.model.filterwheel.set_filter('515-30-25', wait_until_done=False)
+            self.model.LED_voltage.setconstantvoltage(4)
+            self.model.current_laser = NI_board_parameters.led
+
 
     def updatefilename(self):
         """
@@ -573,7 +583,7 @@ class MultiScale_Microscope_Controller():
                     print("File writing error")
 
                 #start stackstreaming
-                which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(), self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
+                which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(), self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get(), self.view.runtab.stack_aq_LEDon.get()]
                 self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "low")
 
         ########-------------------------------------------------------------------------------------------------------
@@ -610,7 +620,9 @@ class MultiScale_Microscope_Controller():
 
                 # start stackstreaming
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
-                                      self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get()]
+                                  self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get(),
+                                  self.view.runtab.stack_aq_LEDon.get()]
+
 
                 if self.view.runtab.cam_highresMode.get()=="SPIM Mode":
                     self.model.stack_acquisition_master(current_folder, currentposition, which_channels, "highSPIM")
@@ -618,6 +630,7 @@ class MultiScale_Microscope_Controller():
                     self.model.stack_acquisition_master(current_folder, currentposition, which_channels, "highASLM")
 
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
+        self.model.LED_voltage.setconstantvoltage(0)
 
 
 

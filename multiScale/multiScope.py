@@ -225,6 +225,12 @@ class multiScopeModel:
             minVol=NI_board_parameters.minVol_constant,
             maxVol=NI_board_parameters.max_mSPIM_constant,
             verbose=True)
+        self.LED_voltage = ni.Analog_Out(
+            daq_type=NI_board_parameters.ao_type_constant,
+            line=NI_board_parameters.LED_line,
+            minVol=NI_board_parameters.minVol_constant,
+            maxVol=NI_board_parameters.maxVol_constant,
+            verbose=True)
         self.mSPIMmirror_voltage.setconstantvoltage(0.1)
         print("done with ao.")
         atexit.register(self.ao.close)
@@ -679,6 +685,23 @@ class multiScopeModel:
                 print("acquire high res SPIM")
                 self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath, "SPIM")
 
+        if whichlaser[4] == 1:
+            print("acquire LED")
+            current_filepath = os.path.join(current_folder, "1_CHLED_000000.tif")
+            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CHLED",
+                                                           self.current_timepointstring + ".tif")
+            if resolutionmode == "low":
+                self.acquire_stack_lowres(current_startposition, NI_board_parameters.led,
+                                          current_filepath)
+            if resolutionmode == "highASLM":
+                print("acquire high res ALSM")
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.led, current_filepath,
+                                           "ASLM")
+            if resolutionmode == "highSPIM":
+                print("acquire high res SPIM")
+                self.acquire_stack_highres(current_startposition, NI_board_parameters.led, current_filepath,
+                                           "SPIM")
+
 
     def prepare_acquisition(self, current_startposition, laser):
         """
@@ -688,6 +711,8 @@ class multiScopeModel:
             self.move_to_position(current_startposition)
         thread_stagemove = ct.ResultThread(target=movestage).start()
 
+        self.LED_voltage.setconstantvoltage(0)
+
         if laser == NI_board_parameters.laser488:
             self.filterwheel.set_filter('515-30-25', wait_until_done=False)
         if laser == NI_board_parameters.laser552:
@@ -696,6 +721,10 @@ class multiScopeModel:
             self.filterwheel.set_filter('615/20-25', wait_until_done=False)
         if laser == NI_board_parameters.laser640:
             self.filterwheel.set_filter('676/37-25', wait_until_done=False)
+        if laser == NI_board_parameters.led:
+            self.filterwheel.set_filter('515-30-25', wait_until_done=False)
+            self.LED_voltage.setconstantvoltage(4)
+
 
         self.update_bufferSize()
 

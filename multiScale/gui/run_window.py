@@ -42,6 +42,7 @@ class Run_Tab(tk.Frame):
         self.stack_aq_552on = tk.IntVar()
         self.stack_aq_594on = tk.IntVar()
         self.stack_aq_640on = tk.IntVar()
+        self.stack_aq_LEDon = tk.IntVar()
         self.stack_aq_displayON = tk.IntVar()
         self.stack_aq_lowResCameraOn = tk.IntVar()
         self.stack_aq_highResCameraOn = tk.IntVar()
@@ -214,6 +215,7 @@ class Run_Tab(tk.Frame):
         self.stack_aq_laserOn552 = tk.Checkbutton(stack_aquisition_settings, text ='552', variable=self.stack_aq_552on, onvalue=1, offvalue=0)
         self.stack_aq_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594on, onvalue=1, offvalue=0)
         self.stack_aq_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640on, onvalue=1, offvalue=0)
+        self.stack_aq_laserOnLED = tk.Checkbutton(stack_aquisition_settings, text ='LED', variable=self.stack_aq_LEDon, onvalue=1, offvalue=0)
 
         self.stack_aq_displayIm = tk.Checkbutton(stack_aquisition_settings, text ='Display Images during Stack Acquisition', variable=self.stack_aq_displayON, onvalue=1, offvalue=0)
 
@@ -249,6 +251,8 @@ class Run_Tab(tk.Frame):
         self.stack_aq_laserOn552.grid(row=2, column=2)
         self.stack_aq_laserOn594.grid(row=2, column=3)
         self.stack_aq_laserOn640.grid(row=2, column=4)
+        self.stack_aq_laserOnLED.grid(row=2, column=5)
+
         self.stack_aq_option_laserCycle.grid(row=3,column =1, columnspan=3,sticky = tk.W + tk.E)
 
         self.stack_aq_ckb_lowresCamera.grid(row=4, column=1, columnspan=2)
