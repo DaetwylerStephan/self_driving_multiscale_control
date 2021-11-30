@@ -96,6 +96,11 @@ def test_left(lib, device_id):
     result = lib.command_left(device_id)
     print("Result: " + repr(result))
 
+def test_right(lib, device_id):
+    print("\nMoving right")
+    result = lib.command_right(device_id)
+    print("Result: " + repr(result))
+
 def test_move(lib, device_id, distance, udistance):
     print("\nGoing to {0} steps, {1} microsteps".format(distance, udistance))
     result = lib.command_move(device_id, distance, udistance)
@@ -230,7 +235,25 @@ test_set_speed(lib, device_id, current_speed / 2)
 #test_wait_for_stop(lib, device_id, 100)
 test_status(lib, device_id)
 test_serial(lib, device_id)
+
+# first move
+test_right(lib, device_id)
+time.sleep(3)
+test_get_position(lib, device_id)
+# second move
+test_left(lib, device_id)
+time.sleep(3)
+test_get_position(lib, device_id)
 input()
+# first move
+test_right(lib, device_id)
+time.sleep(3)
+test_get_position(lib, device_id)
+# second move
+test_left(lib, device_id)
+time.sleep(3)
+test_get_position(lib, device_id)
+
 print("\nClosing")
 lib.close_device(byref(cast(device_id, POINTER(c_int))))
 print("Done")

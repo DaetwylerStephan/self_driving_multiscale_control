@@ -73,10 +73,14 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
 
-        self.view.runtab.laser488_percentage.trace_add("read", self.updateLaserParameters)
-        self.view.runtab.laser552_percentage.trace_add("read", self.updateLaserParameters)
-        self.view.runtab.laser594_percentage.trace_add("read", self.updateLaserParameters)
-        self.view.runtab.laser640_percentage.trace_add("read", self.updateLaserParameters)
+        self.view.runtab.laser488_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
+        self.view.runtab.laser552_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
+        self.view.runtab.laser594_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
+        self.view.runtab.laser640_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
+        self.view.runtab.laser488_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
+        self.view.runtab.laser552_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
+        self.view.runtab.laser594_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
+        self.view.runtab.laser640_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
         self.view.runtab.cam_lowresExposure.trace_add("write", self.updateExposureParameters)
         self.view.runtab.cam_highresExposure.trace_add("write", self.updateExposureParameters)
 
@@ -139,20 +143,31 @@ class MultiScale_Microscope_Controller():
         print("All 'snap' threads finished execution.")
         input('Hit enter to close napari...')
 
-    def updateLaserParameters(self, var, indx, mode):
+    def updateLowResLaserParameters(self, var, indx, mode):
         """
         update the laser power
         """
         # get laser power from GUI and construct laser power setting array
         # multiply with 5 here as the laser is modulated within 0 to 5 V
-        voltage488 = self.view.runtab.laser488_percentage.get() * 5 / 100.
-        voltage552 = self.view.runtab.laser552_percentage.get() * 5 / 100.
-        voltage594 = self.view.runtab.laser594_percentage.get() * 5 / 100.
-        voltage640 = self.view.runtab.laser640_percentage.get() * 5 / 100.
-        power_settings = [voltage488, voltage552, voltage594, voltage640]
+        voltage488_LR = self.view.runtab.laser488_percentage_LR.get() * 5 / 100.
+        voltage552_LR = self.view.runtab.laser552_percentage_LR.get() * 5 / 100.
+        voltage594_LR = self.view.runtab.laser594_percentage_LR.get() * 5 / 100.
+        voltage640_LR = self.view.runtab.laser640_percentage_LR.get() * 5 / 100.
+        power_settings_LR = [voltage488_LR, voltage552_LR, voltage594_LR, voltage640_LR]
 
         # change laser power
-        self.model.set_laserpower(power_settings)
+        self.model.lowres_laserpower=power_settings_LR
+
+    def updateHighResLaserParameters(self, var, indx, mode):
+        """
+        update the laser power
+        """
+        voltage488_HR = self.view.runtab.laser488_percentage_HR.get() * 5 / 100.
+        voltage552_HR = self.view.runtab.laser552_percentage_HR.get() * 5 / 100.
+        voltage594_HR = self.view.runtab.laser594_percentage_HR.get() * 5 / 100.
+        voltage640_HR = self.view.runtab.laser640_percentage_HR.get() * 5 / 100.
+        power_settings_HR = [voltage488_HR, voltage552_HR, voltage594_HR, voltage640_HR]
+        self.model.highres_laserpower=power_settings_HR
 
     def updateSlitParameters(self, var, indx, mode):
         # set the low resolution and high-resolution slit openings

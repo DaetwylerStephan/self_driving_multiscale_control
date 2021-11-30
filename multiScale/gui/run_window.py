@@ -26,10 +26,15 @@ class Run_Tab(tk.Frame):
         self.preview_autoIntensity = tk.IntVar()
 
         #laser settings
-        self.laser488_percentage = tk.IntVar()
-        self.laser552_percentage = tk.IntVar()
-        self.laser594_percentage = tk.IntVar()
-        self.laser640_percentage = tk.IntVar()
+        self.laser488_percentage_LR = tk.IntVar()
+        self.laser552_percentage_LR = tk.IntVar()
+        self.laser594_percentage_LR = tk.IntVar()
+        self.laser640_percentage_LR = tk.IntVar()
+
+        self.laser488_percentage_HR = tk.IntVar()
+        self.laser552_percentage_HR = tk.IntVar()
+        self.laser594_percentage_HR = tk.IntVar()
+        self.laser640_percentage_HR = tk.IntVar()
 
         #Camera settings
         self.cam_lowresExposure = tk.IntVar()
@@ -99,48 +104,64 @@ class Run_Tab(tk.Frame):
 
         ### ----------------------------laser settings -----------------------------------------------------------------
         # laser labels (positioned)
-        laser488_label = ttk.Label(laser_settings, text="488 nm:").grid(row=2, column=0)
-        laser552_label = ttk.Label(laser_settings, text="552 nm:").grid(row=4, column=0)
-        laser594_label = ttk.Label(laser_settings, text="594 nm:").grid(row=6, column=0)
-        laser640_label = ttk.Label(laser_settings, text="640 nm:").grid(row=8, column=0)
-
-        #laser output indication
-        self.laser488_output = tk.Label(laser_settings, text="0 mW")
-        self.laser552_output = tk.Label(laser_settings, text="0 mW")
-        self.laser594_output = tk.Label(laser_settings, text="0 mW")
-        self.laser640_output = tk.Label(laser_settings, text="0 mW")
+        laser488_label = ttk.Label(laser_settings, text="488 nm:").grid(row=3, column=0)
+        laser552_label = ttk.Label(laser_settings, text="552 nm:").grid(row=5, column=0)
+        laser594_label = ttk.Label(laser_settings, text="594 nm:").grid(row=7, column=0)
+        laser640_label = ttk.Label(laser_settings, text="640 nm:").grid(row=9, column=0)
+        lowres_label = ttk.Label(laser_settings, text="Low Resolution").grid(row=0, column=1, columnspan=3, sticky=tk.W)
+        highres_label = ttk.Label(laser_settings, text="High Resolution").grid(row=0, column=4, columnspan=3,sticky=tk.W)
 
         #laser percentage input
-        self.laser488_entry = tk.Entry(laser_settings, textvariable=self.laser488_percentage, width=3)
-        self.laser552_entry = tk.Entry(laser_settings, textvariable=self.laser552_percentage, width=3)
-        self.laser594_entry = tk.Entry(laser_settings, textvariable=self.laser594_percentage, width=3)
-        self.laser640_entry = tk.Entry(laser_settings, textvariable=self.laser640_percentage, width=3)
+        self.laser488_entry_LR = tk.Entry(laser_settings, textvariable=self.laser488_percentage_LR, width=3)
+        self.laser552_entry_LR = tk.Entry(laser_settings, textvariable=self.laser552_percentage_LR, width=3)
+        self.laser594_entry_LR = tk.Entry(laser_settings, textvariable=self.laser594_percentage_LR, width=3)
+        self.laser640_entry_LR = tk.Entry(laser_settings, textvariable=self.laser640_percentage_LR, width=3)
 
-        laser488_scale = tk.Scale(laser_settings, variable=self.laser488_percentage, from_=0, to=100, orient="horizontal")
-        laser552_scale = tk.Scale(laser_settings, variable=self.laser552_percentage, from_=0, to=100, orient="horizontal")
-        laser594_scale = tk.Scale(laser_settings, variable=self.laser594_percentage, from_=0, to=100, orient="horizontal")
-        laser640_scale = tk.Scale(laser_settings, variable=self.laser640_percentage, from_=0, to=100, orient="horizontal")
+        self.laser488_entry_HR = tk.Entry(laser_settings, textvariable=self.laser488_percentage_HR, width=3)
+        self.laser552_entry_HR = tk.Entry(laser_settings, textvariable=self.laser552_percentage_HR, width=3)
+        self.laser594_entry_HR = tk.Entry(laser_settings, textvariable=self.laser594_percentage_HR, width=3)
+        self.laser640_entry_HR = tk.Entry(laser_settings, textvariable=self.laser640_percentage_HR, width=3)
+
+        laser488_scale_LR = tk.Scale(laser_settings, variable=self.laser488_percentage_LR, from_=0, to=100, orient="horizontal", showvalue=False)
+        laser552_scale_LR = tk.Scale(laser_settings, variable=self.laser552_percentage_LR, from_=0, to=100, orient="horizontal", showvalue=False)
+        laser594_scale_LR = tk.Scale(laser_settings, variable=self.laser594_percentage_LR, from_=0, to=100, orient="horizontal", showvalue=False)
+        laser640_scale_LR = tk.Scale(laser_settings, variable=self.laser640_percentage_LR, from_=0, to=100, orient="horizontal", showvalue=False)
+
+        laser488_scale_HR = tk.Scale(laser_settings, variable=self.laser488_percentage_HR, from_=0, to=100, orient="horizontal", showvalue=False)
+        laser552_scale_HR = tk.Scale(laser_settings, variable=self.laser552_percentage_HR, from_=0, to=100, orient="horizontal", showvalue=False)
+        laser594_scale_HR = tk.Scale(laser_settings, variable=self.laser594_percentage_HR, from_=0, to=100, orient="horizontal", showvalue=False)
+        laser640_scale_HR = tk.Scale(laser_settings, variable=self.laser640_percentage_HR, from_=0, to=100, orient="horizontal", showvalue=False)
 
         #default values
-        self.laser488_percentage.set(20)
-        self.laser552_percentage.set(20)
-        self.laser594_percentage.set(20)
-        self.laser640_percentage.set(20)
+        self.laser488_percentage_LR.set(10)
+        self.laser552_percentage_LR.set(10)
+        self.laser594_percentage_LR.set(10)
+        self.laser640_percentage_LR.set(10)
+        self.laser488_percentage_HR.set(20)
+        self.laser552_percentage_HR.set(20)
+        self.laser594_percentage_HR.set(20)
+        self.laser640_percentage_HR.set(20)
 
         #laser widgets layout
-        self.laser488_entry.grid(row=3, column=3, sticky=tk.W + tk.E + tk.S)
-        self.laser552_entry.grid(row=5, column=3, sticky=tk.W + tk.E + tk.S)
-        self.laser594_entry.grid(row=7, column=3, sticky=tk.W + tk.E + tk.S)
-        self.laser640_entry.grid(row=9, column=3, sticky=tk.W + tk.E + tk.S)
-        self.laser488_output.grid(row=3, column=0, sticky=tk.W + tk.E)
-        self.laser552_output.grid(row=5, column=0, sticky=tk.W + tk.E)
-        self.laser594_output.grid(row=7, column=0, sticky=tk.W + tk.E)
-        self.laser640_output.grid(row=9, column=0, sticky=tk.W + tk.E)
-        laser488_scale.grid(row=2, column=2, rowspan =2, sticky=tk.W + tk.E)
-        laser552_scale.grid(row=4, column=2, rowspan =2, sticky=tk.W + tk.E)
-        laser594_scale.grid(row=6, column=2, rowspan =2, sticky=tk.W + tk.E)
-        laser640_scale.grid(row=8, column=2, rowspan =2, sticky=tk.W + tk.E)
+        self.laser488_entry_LR.grid(row=3, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser552_entry_LR.grid(row=5, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser594_entry_LR.grid(row=7, column=3, sticky=tk.W + tk.E + tk.S)
+        self.laser640_entry_LR.grid(row=9, column=3, sticky=tk.W + tk.E + tk.S)
 
+        laser488_scale_LR.grid(row=2, column=2, rowspan =2, sticky=tk.W + tk.E)
+        laser552_scale_LR.grid(row=4, column=2, rowspan =2, sticky=tk.W + tk.E)
+        laser594_scale_LR.grid(row=6, column=2, rowspan =2, sticky=tk.W + tk.E)
+        laser640_scale_LR.grid(row=8, column=2, rowspan =2, sticky=tk.W + tk.E)
+
+        self.laser488_entry_HR.grid(row=3, column=5, sticky=tk.W + tk.E + tk.S)
+        self.laser552_entry_HR.grid(row=5, column=5, sticky=tk.W + tk.E + tk.S)
+        self.laser594_entry_HR.grid(row=7, column=5, sticky=tk.W + tk.E + tk.S)
+        self.laser640_entry_HR.grid(row=9, column=5, sticky=tk.W + tk.E + tk.S)
+
+        laser488_scale_HR.grid(row=2, column=4, rowspan=2, sticky=tk.W + tk.E)
+        laser552_scale_HR.grid(row=4, column=4, rowspan=2, sticky=tk.W + tk.E)
+        laser594_scale_HR.grid(row=6, column=4, rowspan=2, sticky=tk.W + tk.E)
+        laser640_scale_HR.grid(row=8, column=4, rowspan=2, sticky=tk.W + tk.E)
 
         ### ----------------------------camera settings -----------------------------------------------------------------
         # camera labels (positioned)
@@ -177,8 +198,8 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo552 = tk.Button(preview_settings, text="552 nm", command= lambda : self.preview_filter_select(self.bt_changeTo552), bg="#a9ff00")
         self.bt_changeTo594 = tk.Button(preview_settings, text="594 nm", command=lambda : self.preview_filter_select(self.bt_changeTo594), bg="#ffd200")
         self.bt_changeTo640 = tk.Button(preview_settings, text="640 nm", command=lambda : self.preview_filter_select(self.bt_changeTo640), bg="#ff2100")
-        self.bt_changeTo_block = tk.Button(preview_settings, text="no filter", command=lambda : self.preview_filter_select(self.bt_changeTo_block))
-        self.bt_changeTo_trans = tk.Button(preview_settings, text="block", command=lambda : self.preview_filter_select(self.bt_changeTo_trans))
+        self.bt_changeTo_block = tk.Button(preview_settings, text="block", command=lambda : self.preview_filter_select(self.bt_changeTo_block))
+        self.bt_changeTo_trans = tk.Button(preview_settings, text="LED", command=lambda : self.preview_filter_select(self.bt_changeTo_trans))
         self.bt_preview_lowres = tk.Button(preview_settings, text="Low Res Preview")
         self.bt_preview_highres = tk.Button(preview_settings, text="High Res Preview")
         self.bt_preview_stop = tk.Button(preview_settings, text="Stop Preview")

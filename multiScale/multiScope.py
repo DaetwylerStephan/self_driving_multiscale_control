@@ -65,6 +65,9 @@ class multiScopeModel:
         self.current_region = "low_stack001"
 
         self.current_laser = NI_board_parameters.laser488
+        self.lowres_laserpower = [0,0,0,0]
+        self.highres_laserpower = [0,0,0,0]
+
         self.channelIndicator = "00"
         self.slitopening_lowres = 3700
         self.slitopening_highres= 4558
@@ -86,6 +89,7 @@ class multiScopeModel:
         self.updatebuffer_lowres_stacknb = 0
         self.high_res_memory_names = None
         self.low_res_memory_names = None
+
 
         self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
 
@@ -125,6 +129,7 @@ class multiScopeModel:
 
         #init acquisition array writing class
         self.get_acq_array = acq_arrays.acquisition_arrays(self)
+
 
         #initialize stages and stages in ResultThreads
         trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start() #~0.4s
@@ -282,7 +287,7 @@ class multiScopeModel:
         self.adjustableslit.slit_set_microstep_mode_256()
         self.adjustableslit.home_stage()
         print("slit homed")
-        self.adjustableslit.slit_set_speed(1000)
+        self.adjustableslit.slit_set_speed(800)
 
     def update_bufferSize(self):
         """
@@ -435,7 +440,9 @@ class multiScopeModel:
         """
         starts a custody thread to run a low resolution preview.
         """
+
         def preview_lowres_task(custody):
+
 
             self.num_frames = 0
             self.initial_time = time.perf_counter()
@@ -450,6 +457,7 @@ class multiScopeModel:
             ct.ResultThread(target=laser_preview).start()
 
             while self.continue_preview_lowres:
+                self.set_laserpower(self.lowres_laserpower)
                 self.lowres_camera.set_up_lowres_preview(self.exposure_time_LR)
 
                 custody.switch_from(None, to=self.lowres_camera)
@@ -499,6 +507,8 @@ class multiScopeModel:
             ct.ResultThread(target=laser_preview_highres).start()
 
             while self.continue_preview_highres:
+                self.set_laserpower(self.highres_laserpower)
+
                 self.highres_camera.set_up_highrespreview(self.exposure_time_HR)
                 self.num_frames += 1
                 custody.switch_from(None, to=self.highres_camera)
@@ -552,6 +562,8 @@ class multiScopeModel:
             self.initial_time = time.perf_counter()
 
             while self.continue_preview_highres:
+                #get/update latest laserpower
+                self.set_laserpower(self.highres_laserpower)
 
                 #calculate ALSM parameters
                 self.calculate_ASLMparameters(self.exposure_time_HR)
@@ -626,6 +638,15 @@ class multiScopeModel:
         :param whichlaser: which channels to image
         :return:
         """
+        #first get the right laser power
+        if resolutionmode == "low":
+            self.set_laserpower(self.lowres_laserpower)
+        if resolutionmode == "highASLM":
+            self.set_laserpower(self.highres_laserpower)
+        if resolutionmode == "highSPIM":
+            self.set_laserpower(self.highres_laserpower)
+
+
         if whichlaser[0]==1:
             print("acquire 488 laser")
             # filepath

@@ -8,11 +8,15 @@ try:
     from .run_window import Run_Tab
     from .stages_window import Stages_Tab
     from .advancedsettings_window import AdvancedSettings_Tab
+    from .smart_window import SmartMicroscopySettings_Tab
+
 except ImportError:
     from Welcome_window import Welcome_Tab
     from run_window import Run_Tab
     from stages_window import Stages_Tab
     from advancedsettings_window import AdvancedSettings_Tab
+    from smart_window import SmartMicroscopySettings_Tab
+
 
 
 
@@ -33,6 +37,7 @@ class MultiScope_MainGui(ttk.Notebook):
         #self.settingstab = Settings_Tab(self)
         self.stagessettingstab = Stages_Tab(self)
         self.advancedSettingstab = AdvancedSettings_Tab(self)
+        self.automatedMicroscopySettingstab = SmartMicroscopySettings_Tab(self)
 
         #add the individual sheets to the Notebook
         self.add(self.welcometab, text = "Welcome")
@@ -40,6 +45,7 @@ class MultiScope_MainGui(ttk.Notebook):
         self.add(self.stagessettingstab, text="Stages")
         self.add(self.runtab, text="Run")
         self.add(self.advancedSettingstab, text="Advanced Settings")
+        self.add(self.automatedMicroscopySettingstab, text="Smart Settings")
 
         #pack tge sheets
         self.pack(expand=1, fill='both')
