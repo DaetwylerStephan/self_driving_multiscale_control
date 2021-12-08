@@ -81,6 +81,7 @@ class Stages_Tab(tk.Frame):
         rotstage_scale = tk.Scale(generalstage_settings, variable=self.stage_rot_stepsize, from_=0, to=360,
                                   resolution=0.1, orient="horizontal")
         #default values
+        self.linear_stage_trans_stepsize.set(2.00)
         self.stage_trans_stepsize.set(2.000)
         self.stage_rot_stepsize.set(2.000)
 

@@ -82,7 +82,8 @@ class SLC_translationstage:
         # The MCS2 controller is able to find the reference position "on-the-fly".
         # See the MCS2 Programmer Guide for a description of the different modes.
 
-        for channel in range(self.no_of_channels):
+        channel_array=[2,0,1] #move the stage system first up to avoid the sample crashing
+        for channel in channel_array:
             print("MCS2 find reference on channel: {}.".format(channel))
 
             ctl.SetProperty_i32(self.d_handle, channel, ctl.Property.REFERENCING_OPTIONS, 0)

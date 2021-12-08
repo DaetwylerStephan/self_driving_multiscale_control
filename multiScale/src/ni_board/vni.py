@@ -135,6 +135,9 @@ class Analog_Out:
             self.voltages.shape[0])
         return None
 
+    def set_verbose(self,verbosevalue=False):
+        self.verbose=verbosevalue
+
     def play_voltages(
         self,
         voltages=None,

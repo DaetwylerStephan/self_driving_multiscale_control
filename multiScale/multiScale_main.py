@@ -328,6 +328,11 @@ class MultiScale_Microscope_Controller():
         Required:
         change mirror, set exposure time, start preview, set continue_preview_highres to True.
         '''
+
+        #end highres preview
+        self.model.continue_preview_highres = False
+        self.view.runtab.bt_preview_highres.config(relief="raised")
+
         if self.model.continue_preview_lowres == False:
 
             #change mirror position/slit position
@@ -340,7 +345,7 @@ class MultiScale_Microscope_Controller():
             #set button layout - sunken relief
             def set_button():
                 time.sleep(0.002)
-                self.view.runtab.preview_change(self.view.runtab.bt_preview_lowres)
+                self.view.runtab.bt_preview_lowres.config(relief="sunken")
             ct.ResultThread(target=set_button).start()
 
             #run preview with given parameters
@@ -353,6 +358,11 @@ class MultiScale_Microscope_Controller():
         Required:
         change mirror, set exposure time, start preview, set continue_preview_highres to True.
         '''
+
+        #end highres preview
+        self.model.continue_preview_lowres = False
+        self.view.runtab.bt_preview_lowres.config(relief="raised")
+
         if self.model.continue_preview_highres == False:
 
             # change mirror position/slit position

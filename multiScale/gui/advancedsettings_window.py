@@ -136,7 +136,7 @@ class AdvancedSettings_Tab(tk.Frame):
 
         interval_scale = tk.Scale(ASLM_settings, variable=self.ASLM_volt_interval, from_=0, to=100,
                                   resolution=0.1, orient="horizontal", showvalue=False)
-        voltagemiddle_scale = tk.Scale(ASLM_settings, variable=self.ASLM_volt_middle, from_=-50, to=50,
+        voltagemiddle_scale = tk.Scale(ASLM_settings, variable=self.ASLM_volt_middle, from_=-25, to=25,
                                   resolution=0.1, orient="horizontal", showvalue=False)
         #Voltage choice indicator
         self.voltage_minIndicator = tk.Label(ASLM_settings, text="0.003")

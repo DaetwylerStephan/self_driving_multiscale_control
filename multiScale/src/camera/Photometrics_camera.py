@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 import time
 import cv2
 import numpy as np
-import auxiliary_code.concurrency_tools as ct
 import gc
 
 class Photo_Camera:
@@ -43,14 +42,14 @@ class Photo_Camera:
         self.cam.reset_rois()
         self.cam.set_roi(startx, endx, starty, endy)
 
-    def take_snapshot(self, exposure):
-        frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
-        plt.imshow(frame, cmap="gray")
-        plt.show()
-
-    def record(self, out, exposure=20):
-        import numpy as np
-        out[:] = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
+    # def take_snapshot(self, exposure):
+    #     frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
+    #     plt.imshow(frame, cmap="gray")
+    #     plt.show()
+    #
+    # def record(self, out, exposure=20):
+    #     import numpy as np
+    #     out[:] = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
 
     def prepare_stack_acquisition(self, exposure_time=20):
         """Changes the settings of the low res camera to start stack acquisitions."""
@@ -81,6 +80,12 @@ class Photo_Camera:
     def get_camerabuffer(self):
         print(self.camerabuffer.shape)
         return self.camerabuffer
+
+    def init_previewbuffer(self, width, height):
+        self.previewbuffer = np.zeros([width, height], dtype="uint16")
+
+    def get_previewbuffer(self):
+        return self.previewbuffer
 
     def prepare_stack_acquisition_highres(self, exposure_time=20):
         """Changes the settings of the highres camera to start stack acquisitions."""
@@ -117,32 +122,32 @@ class Photo_Camera:
         self.cam.start_live(exp_time=exposure_time)
 
 
-    def run_stack_acquisition_buffer(self, nb_planes, buffer, maxproj_xy, maxproj_xz, maxproj_yz):
-        """Run a stack acquisition."""
-        framesReceived = 0
-        while framesReceived < nb_planes:
-            # time.sleep(0.001)
-
-            try:
-                fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-
-                def maxprojection_generation(framenb, bufferimage):
-                    maxproj_xy[:] = np.maximum(maxproj_xy, bufferimage)
-                    maxproj_xz[framenb, :] = np.max(bufferimage, axis=0)
-                    maxproj_yz[:, framenb] = np.max(bufferimage, axis=1)
-                    print(framenb, flush=True)
-
-                maxprojection_thread = ct.ResultThread(target=maxprojection_generation, args=(framesReceived, buffer[framesReceived, :, :])).start()
-
-                framesReceived += 1
-                print("{}:{}".format(framesReceived, fps), flush=True)
-
-
-            except Exception as e:
-                print(str(e))
-                break
-        self.cam.finish()
-        return
+    # def run_stack_acquisition_buffer(self, nb_planes, buffer, maxproj_xy, maxproj_xz, maxproj_yz):
+    #     """Run a stack acquisition."""
+    #     framesReceived = 0
+    #     while framesReceived < nb_planes:
+    #         # time.sleep(0.001)
+    #
+    #         try:
+    #             fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
+    #
+    #             def maxprojection_generation(framenb, bufferimage):
+    #                 maxproj_xy[:] = np.maximum(maxproj_xy, bufferimage)
+    #                 maxproj_xz[framenb, :] = np.max(bufferimage, axis=0)
+    #                 maxproj_yz[:, framenb] = np.max(bufferimage, axis=1)
+    #                 print(framenb, flush=True)
+    #
+    #             maxprojection_thread = ct.ResultThread(target=maxprojection_generation, args=(framesReceived, buffer[framesReceived, :, :])).start()
+    #
+    #             framesReceived += 1
+    #             print("{}:{}".format(framesReceived, fps), flush=True)
+    #
+    #
+    #         except Exception as e:
+    #             print(str(e))
+    #             break
+    #     self.cam.finish()
+    #     return
 
     # def run_stack_acquisition_buffer_fast(self, nb_planes, buffer):
     #     """Run a stack acquisition."""
@@ -181,10 +186,10 @@ class Photo_Camera:
                 frame = None
                 del frame
                 #gc.collect()
-                t1= t0-time.perf_counter()
+                #t1= t0-time.perf_counter()
                 #buffer[framesReceived,:,:] = np.zeros([2960, 5056],dtype='uint16')
                 framesReceived += 1
-                print(t1)
+                #print(t1)
                 #print("{}:{}".format(framesReceived, fps), flush=True)
 
             except Exception as e:
@@ -194,21 +199,21 @@ class Photo_Camera:
         self.cam.finish()
         return
 
-    def run_stack_acquisitionV2_preallocated(self, nb_planes):
-        """Run a stack acquisition."""
-        framesReceived = 0
-        while framesReceived < nb_planes:
-            # time.sleep(0.001)
-
-            try:
-                fps, frame_count = self.cam.poll_frame2(out=self.camerabuffer[framesReceived, :, :])
-                framesReceived += 1
-                print("{}:{}".format(framesReceived, fps), flush=True)
-            except Exception as e:
-                print(str(e))
-                break
-        self.cam.finish()
-        return
+    # def run_stack_acquisitionV2_preallocated(self, nb_planes):
+    #     """Run a stack acquisition."""
+    #     framesReceived = 0
+    #     while framesReceived < nb_planes:
+    #         # time.sleep(0.001)
+    #
+    #         try:
+    #             fps, frame_count = self.cam.poll_frame2(out=self.camerabuffer[framesReceived, :, :])
+    #             framesReceived += 1
+    #             print("{}:{}".format(framesReceived, fps), flush=True)
+    #         except Exception as e:
+    #             print(str(e))
+    #             break
+    #     self.cam.finish()
+    #     return
 
 
     # def run_stack_acquisition_buffer_fastOLD(self, nb_planes, buffer):
@@ -259,8 +264,15 @@ class Photo_Camera:
     def run_preview(self, out):
         frame, fps, frame_count = self.cam.poll_frame()
         out[:] = np.copy(frame['pixel_data'][:])
-        frame = None
-        del frame
+        # frame = None
+        # del frame
+
+
+    def acquire_preview_tobuffer(self):
+        frame, fps, frame_count = self.cam.poll_frame()
+        self.previewbuffer = np.copy(frame['pixel_data'][:])
+        # frame = None
+        # del frame
 
     def run_preview_ASLM(self, out):
         framesReceived = 0
@@ -285,8 +297,6 @@ if __name__ == '__main__':
     camera = Photo_Camera('PMUSBCam00')
     # camera = Photo_Camera('PMPCIECam00')
 
-    camera.take_snapshot(20)
     camera.getinfo()
     #camera.preview_live()
-    camera.take_snapshot(20)
     camera.close()
