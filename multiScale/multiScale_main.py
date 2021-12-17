@@ -183,8 +183,11 @@ class MultiScale_Microscope_Controller():
 
     def updateExposureParameters(self, var, indx, mode):
         # exposure time
-        self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
-        self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()  # set exposure time
+
+        if self.view.runtab.cam_lowresExposure.get()>5:
+            self.model.exposure_time_LR = self.view.runtab.cam_lowresExposure.get()
+        if self.view.runtab.cam_highresExposure.get()>5:
+            self.model.exposure_time_HR = self.view.runtab.cam_highresExposure.get()  # set exposure time
         print("updated exposure time")
 
     def update_stack_aq_parameters(self, var, indx, mode):
@@ -326,7 +329,7 @@ class MultiScale_Microscope_Controller():
         '''
         Runs the execution of a low resolution preview.
         Required:
-        change mirror, set exposure time, start preview, set continue_preview_highres to True.
+        change mirror, start preview, set continue_preview_highres to True.
         '''
 
         #end highres preview
