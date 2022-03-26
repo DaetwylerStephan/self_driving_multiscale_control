@@ -47,6 +47,7 @@ class NI_board_parameters:
     laser552 = 4
     laser594 = 5
     laser640 = 6
+    adjustmentfactor = 3 # to adjust bring 488,552,594,640 back to 0,1,2,3 in array element selection
     voicecoil = 7
     led = -1
 

@@ -94,8 +94,8 @@ class multiScopeModel:
         self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
 
         self.ASLM_acquisition_time = 0.3
-        self.ASLM_from_Volt = 0  # first voltage applied at remote mirror
-        self.ASLM_to_Volt = 1  # voltage applied at remote mirror at the end of sawtooth
+        self.ASLM_from_Volt = [0,0,0,0]  # first voltage applied at remote mirror
+        self.ASLM_to_Volt = [0,0,0,0]  # voltage applied at remote mirror at the end of sawtooth
         self.ASLM_currentVolt = 0  # current voltage applied to remote mirror
         self.ASLM_staticLowResVolt = 0  # default ASLM low res voltage
         self.ASLM_staticHighResVolt = 0  # default ASLM high res voltage
@@ -273,7 +273,7 @@ class multiScopeModel:
         stage_id = Stage_parameters.stage_id_rot
         self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
         # self.rotationstage.ManualMove()
-        print("done with XY stage.")
+        print("done with rot stage.")
         atexit.register(self.rotationstage.close)
 
     def _init_slit(self):

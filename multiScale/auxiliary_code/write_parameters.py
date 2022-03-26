@@ -30,6 +30,11 @@ class write_Params:
                 f.write('Laser power 640 lowres: ' + str(self.view.runtab.laser640_percentage_LR.get()) + "\n")
                 f.write('Laser power 640 highres: ' + str(self.view.runtab.laser640_percentage_HR.get()) + "\n")
 
+            f.write('---------------------------------------------\n')
+            f.write('exposure time settings\n')
+
+            f.write('Low res exposure time: ' + str(self.view.runtab.cam_lowresExposure.get()) + "\n")
+            f.write('High res exposure time: ' + str(self.view.runtab.cam_highresExposure.get()) + "\n")
 
             f.write('---------------------------------------------\n')
             f.write('low resolution stack positions\n')
@@ -62,4 +67,14 @@ class write_Params:
             else:
                 f.write("ASLM mode\n")
                 f.write('Volt interval (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_interval.get()) + "\n")
-                f.write('Volt center (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle.get()) + "\n")
+                f.write('Volt center @488 (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle488.get()) + "\n")
+                f.write('Volt center @552 (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle552.get()) + "\n")
+                f.write('Volt center @594 (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle594.get()) + "\n")
+                f.write('Volt center @640 (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle640.get()) + "\n")
+                f.write('Orientation: ' + str(self.view.advancedSettingstab.ASLM_voltageDirection.get()) + "\n")
+
+            f.write('\n---------------------------------------------\n')
+            f.write('time-lapse settings: ')
+
+            totaltime = self.view.runtab.timelapse_aq_timeinterval_min.get() * 60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
+            f.write('time interval: ' + str(totaltime) + "\n")

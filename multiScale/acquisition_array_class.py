@@ -44,12 +44,15 @@ class acquisition_arrays:
 
         basic_unit[self.model.ao.s2p(0.001): self.model.ao.s2p(0.002), NI_board_parameters.highres_camera] = 4.  # high-res camera
 
+        ASLM_from = self.model.ASLM_from_Volt[self.model.current_laser - NI_board_parameters.adjustmentfactor]
+        ASLM_to = self.model.ASLM_to_Volt[self.model.current_laser - NI_board_parameters.adjustmentfactor]
+
         sawtooth_array = np.zeros(totallength, np.dtype(np.float64))
-        sawtooth_array[:] = self.model.ASLM_from_Volt
+        sawtooth_array[:] = ASLM_from
         goinguppoints = self.model.ao.s2p(0.001 + self.model.ASLM_acquisition_time / 1000)
         goingdownpoints = self.model.ao.s2p(0.001 + self.model.ASLM_acquisition_time / 1000 + 0.02) - goinguppoints
-        sawtooth_array[0:goinguppoints] = np.linspace(self.model.ASLM_from_Volt, self.model.ASLM_to_Volt, goinguppoints)
-        sawtooth_array[goinguppoints:] = np.linspace(self.model.ASLM_to_Volt, self.model.ASLM_from_Volt, goingdownpoints)
+        sawtooth_array[0:goinguppoints] = np.linspace(ASLM_from, ASLM_to, goinguppoints)
+        sawtooth_array[goinguppoints:] = np.linspace(ASLM_to, ASLM_from, goingdownpoints)
 
         basic_unit[:, NI_board_parameters.voicecoil] = self.model.smooth_sawtooth(sawtooth_array,
                                                                                 window_len=self.model.ao.s2p(0.01))
@@ -135,14 +138,18 @@ class acquisition_arrays:
             self.model.ao.s2p(self.model.delay_cameratrigger):self.model.ao.s2p(self.model.delay_cameratrigger + self.model.ASLM_acquisition_time / 1000),
             current_laserline] = 4.  # laser
 
+
+        ASLM_from = self.model.ASLM_from_Volt[self.model.current_laser - NI_board_parameters.adjustmentfactor]
+        ASLM_to = self.model.ASLM_to_Volt[self.model.current_laser - NI_board_parameters.adjustmentfactor]
+
         # remote mirror voltage
         sawtooth_array = np.zeros(self.model.ao.s2p(minimal_trigger_timeinterval), np.dtype(np.float64))
-        sawtooth_array[:] = self.model.ASLM_from_Volt
+        sawtooth_array[:] = ASLM_from
         goinguppoints = self.model.ao.s2p(
             self.model.delay_cameratrigger + 0.001 + self.model.ASLM_delaybeforevoltagereturn + self.model.ASLM_acquisition_time / 1000)
         goingdownpoints = self.model.ao.s2p(minimal_trigger_timeinterval) - goinguppoints
-        sawtooth_array[0:goinguppoints] = np.linspace(self.model.ASLM_from_Volt, self.model.ASLM_to_Volt, goinguppoints)
-        sawtooth_array[goinguppoints:] = np.linspace(self.model.ASLM_to_Volt, self.model.ASLM_from_Volt, goingdownpoints)
+        sawtooth_array[0:goinguppoints] = np.linspace(ASLM_from, ASLM_to, goinguppoints)
+        sawtooth_array[goinguppoints:] = np.linspace(ASLM_to, ASLM_from, goingdownpoints)
 
         basic_unit[:, NI_board_parameters.voicecoil] = sawtooth_array  # remote mirror
 

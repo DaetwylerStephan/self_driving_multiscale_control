@@ -42,7 +42,7 @@ class MultiScale_Microscope_Controller():
 
         # Create scope object as model
         self.model = multiScopeModel()
-
+        print("model initiated")
         #create the gui as view
         all_tabs_mainGUI = ttk.Notebook(self.root)
         self.view = MultiScope_MainGui(all_tabs_mainGUI, self.model)
@@ -116,7 +116,11 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_SawToothOn.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_constantVoltageOn.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.ASLM_volt_interval.trace_add("write", self.update_ASLMParameters)
-        self.view.advancedSettingstab.ASLM_volt_middle.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_volt_middle488.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_volt_middle552.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_volt_middle594.trace_add("write", self.update_ASLMParameters)
+        self.view.advancedSettingstab.ASLM_volt_middle640.trace_add("write", self.update_ASLMParameters)
+
         self.view.advancedSettingstab.ASLM_voltageDirection.trace_add("write", self.update_ASLMParameters)
         self.view.advancedSettingstab.adv_settings_mSPIMvoltage.trace_add("write", self.update_mSPIMvoltage)
         self.view.advancedSettingstab.ASLM_scanWidth.trace_add("write", self.update_ASLMParameters)
@@ -209,7 +213,11 @@ class MultiScale_Microscope_Controller():
         #
         try:
             interval = self.view.advancedSettingstab.ASLM_volt_interval.get() / 1000
-            middle_range = self.view.advancedSettingstab.ASLM_volt_middle.get() / 1000
+            middle_range488 = self.view.advancedSettingstab.ASLM_volt_middle488.get() / 1000
+            middle_range552 = self.view.advancedSettingstab.ASLM_volt_middle552.get() / 1000
+            middle_range594 = self.view.advancedSettingstab.ASLM_volt_middle594.get() / 1000
+            middle_range640 = self.view.advancedSettingstab.ASLM_volt_middle640.get() / 1000
+            middle_range = [middle_range488, middle_range552, middle_range594, middle_range640]
             print(interval)
         except:
             interval = 0
@@ -219,24 +227,23 @@ class MultiScale_Microscope_Controller():
         setvoltage_first = 0
         setvoltage_second = 0
         if self.view.advancedSettingstab.ASLM_voltageDirection.get() == 'highTolow':
-            setvoltage_first = middle_range + interval / 2
-            setvoltage_second = middle_range - interval / 2
-            print(setvoltage_first)
+            setvoltage_first = [x + (interval / 2) for x in middle_range]
+            setvoltage_second = [x - (interval / 2) for x in middle_range]
         else:
-            setvoltage_first = middle_range - interval / 2
-            setvoltage_second = middle_range + interval / 2
+            setvoltage_first = [x - (interval / 2) for x in middle_range]
+            setvoltage_second = [x + (interval / 2) for x in middle_range]
 
         #check boundaries
-        setvoltage_first = min(maxVol, max(setvoltage_first, minVol))
-        setvoltage_second = min(maxVol, max(setvoltage_second, minVol))
+        setvoltage_first = np.minimum(maxVol, np.maximum(setvoltage_first, minVol))
+        setvoltage_second = np.minimum(maxVol, np.maximum(setvoltage_second, minVol))
 
         self.model.ASLM_from_Volt = setvoltage_first
         self.model.ASLM_to_Volt = setvoltage_second
-
         # display calculated voltages
-        self.view.advancedSettingstab.voltage_minIndicator.config(text=str(round(self.model.ASLM_from_Volt,5)))
-        self.view.advancedSettingstab.voltage_maxIndicator.config(text=str(round(self.model.ASLM_to_Volt, 5)))
-
+        #self.view.advancedSettingstab.voltage_minIndicator.config(text=str(round(self.model.ASLM_from_Volt,5)))
+        #self.view.advancedSettingstab.voltage_maxIndicator.config(text=str(round(self.model.ASLM_to_Volt, 5)))
+        print(self.model.ASLM_from_Volt)
+        print(self.model.ASLM_to_Volt)
         self.model.ASLM_currentVolt = min(maxVol, max(minVol, self.view.advancedSettingstab.ASLM_volt_current.get()/1000))
 
         # update the ASLM alignment settings
@@ -754,7 +761,7 @@ class MultiScale_Microscope_Controller():
             totaltime = self.view.runtab.timelapse_aq_timeinterval_min.get() * 60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
 
             remaining_waittime = 1
-            while remaining_waittime>0:
+            while (remaining_waittime>0) and (self.continuetimelapse == 0):
                 t1 = time.perf_counter() - t0
                 remaining_waittime = totaltime - t1
 
