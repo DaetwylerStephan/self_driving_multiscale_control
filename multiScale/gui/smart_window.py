@@ -18,3 +18,20 @@ class SmartMicroscopySettings_Tab(tk.Frame):
                               width=115,
                               fg="black", bg="grey")
         intro_text.grid(row=0, column=0, columnspan=5000, sticky=(tk.E))
+
+        #parameters
+        self.drift_correction_highres = tk.IntVar()
+        self.drift_correction_lowres = tk.IntVar()
+
+
+        # set the different label frames
+        drift_correction_settings = tk.LabelFrame(self, text="Drift Correction Option")
+        drift_correction_settings.grid(row=1, column=3, rowspan=2, sticky=tk.W + tk.E + tk.S + tk.N)
+
+        self.drift_highres_button = tk.Checkbutton(drift_correction_settings, text ='On High Resolution', variable=self.drift_correction_highres, onvalue=1, offvalue=0)
+        self.drift_lowres_button = tk.Checkbutton(drift_correction_settings, text ='On Low Resolution', variable=self.drift_correction_lowres, onvalue=1, offvalue=0)
+
+
+        #arrange
+        self.drift_highres_button.grid(row=2, column=3, sticky=tk.W)
+        self.drift_lowres_button.grid(row=3, column=3, sticky=tk.W)

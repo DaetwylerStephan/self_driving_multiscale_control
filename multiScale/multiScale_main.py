@@ -125,6 +125,8 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.adv_settings_mSPIMvoltage.trace_add("write", self.update_mSPIMvoltage)
         self.view.advancedSettingstab.ASLM_scanWidth.trace_add("write", self.update_ASLMParameters)
 
+        # smart settings tab
+
         #define some parameters
         self.current_laser = "488"
 
@@ -559,11 +561,23 @@ class MultiScale_Microscope_Controller():
         #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder
         if self.continuetimelapse != 0:
-            #generate file path
+
+            # generate file path
             nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
-            print("foldernumber:" + str(nbfiles_folder))
             newfolderind = nbfiles_folder + 1
-            experiment_name = "Experiment" + f'{newfolderind:04}'
+
+            # catch errors when deleting Experiment names before
+            def set_experiment_name(parentfolder, experimentnumber):
+                experiment_name = "Experiment" + f'{experimentnumber:04}'
+                filepath = os.path.join(parentfolder, experiment_name)
+                isExist = os.path.exists(filepath)
+
+                if isExist:
+                    experiment_name = set_experiment_name(parentfolder, experimentnumber + 1)
+
+                return experiment_name
+
+            experiment_name = set_experiment_name(self.parentfolder, newfolderind)
 
             #write acquisition parameters
             filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
@@ -711,12 +725,29 @@ class MultiScale_Microscope_Controller():
         ####----------set up file path
         # generate file path
         nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
-        print("foldernumber:" + str(nbfiles_folder))
         newfolderind = nbfiles_folder + 1
-        experiment_name = "Experiment" + f'{newfolderind:04}'
+
+        #catch errors when deleting Experiment names before
+        def set_experiment_name(parentfolder, experimentnumber):
+            experiment_name = "Experiment" + f'{experimentnumber:04}'
+            filepath = os.path.join(parentfolder, experiment_name)
+            isExist = os.path.exists(filepath)
+
+            if isExist:
+                experiment_name = set_experiment_name(parentfolder, experimentnumber+1)
+
+            return experiment_name
+
+        experiment_name = set_experiment_name(self.parentfolder, newfolderind)
 
         # write acquisition parameters
         filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
+
+        #check whether experiment folder already exists - if yes, change file
+
+
+
+
         try:
             print("filepath : " + filepath_write_acquisitionParameters)
             os.makedirs(filepath_write_acquisitionParameters)

@@ -350,9 +350,9 @@ class Run_Tab(tk.Frame):
         self.roi_heightEntry = tk.Entry(roi_settings, textvariable=self.roi_height, width=5)
 
         self.roi_startX.set(0)
-        self.roi_startY.set(0)
-        self.roi_width.set(5056)
-        self.roi_height.set(2960)
+        self.roi_startY.set(1024)
+        self.roi_width.set(2048)
+        self.roi_height.set(1024)
 
         #roi types
         roiTypes = ('Full Chip', '1024x1024', '512x512', '256x256', 'Custom')
