@@ -17,7 +17,7 @@ from constants import Camera_parameters
 from constants import NI_board_parameters
 from constants import FileSave_parameters
 from constants import ASLM_parameters
-
+from automated_microscopy.drift_correction import drift_correction
 
 class MultiScale_Microscope_Controller():
     """
@@ -33,8 +33,6 @@ class MultiScale_Microscope_Controller():
     #512x512 running - adjust
     #SPIM and ASLM - intensity changes: counts
     #timelapse saving - wrong!
-    #
-    #todo> startup guide. https://www.drivereasy.com/knowledge/fixed-ntkrnlmp-exe-blue-screen-error/
 
 
     def __init__(self):
@@ -49,6 +47,9 @@ class MultiScale_Microscope_Controller():
 
         #init param file writer class
         self.paramwriter = write_params.write_Params(self.view)
+
+        #init drift correction module
+        self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_savedPos_tree, self.view.stagessettingstab.stage_highres_savedPos_tree)
 
         #define here which buttons run which function in the multiScope model
         self.continuetimelapse = 1 #enable functionality to stop timelapse
@@ -635,6 +636,16 @@ class MultiScale_Microscope_Controller():
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(), self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get(), self.view.runtab.stack_aq_LEDon.get()]
                 self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "low")
 
+
+        #################-----------------------------------------------------------------------------------------------
+        #todo: Drift correction module for if you want to apply drift correction in time-lapse based on low resolution mode.
+        if self.continuetimelapse != 0:
+            #call here drift correction if based on low resolution imaging
+            if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
+                print("Calculate drift correction")
+                self.drift_correctionmodule.calculate_drift_lowRes_complete()
+
+
         ########-------------------------------------------------------------------------------------------------------
         # start high resolution stack acquisition
         #high resolution list
@@ -743,10 +754,20 @@ class MultiScale_Microscope_Controller():
         # write acquisition parameters
         filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
 
-        #check whether experiment folder already exists - if yes, change file
-
-
-
+        # initialize the buffers for drift correction if desired.
+        #todo: init it here
+        if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
+            drift_correction.init_imageBuffer(self.model.current_lowresROI_width,
+                                              self.model.current_lowresROI_height,
+                                              self.model.current_highresROI_height,
+                                              self.model.current_highresROI_width
+            )
+        if self.view.automatedMicroscopySettingstab.drift_correction_highres.get() == 1:
+            drift_correction.init_imageBuffer(self.model.current_lowresROI_width,
+                                              self.model.current_lowresROI_height,
+                                              self.model.current_highresROI_height,
+                                              self.model.current_highresROI_width
+                                              )
 
         try:
             print("filepath : " + filepath_write_acquisitionParameters)
