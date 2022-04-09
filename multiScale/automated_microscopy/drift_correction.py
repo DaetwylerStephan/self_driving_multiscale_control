@@ -2,6 +2,11 @@ import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from tifffile import imread, imwrite
+import os
+
+import sys
+sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
+from auxiliary_code.constants import Image_parameters
 
 from pystackreg import StackReg
 import pystackreg
@@ -46,11 +51,48 @@ class drift_correction:
         :return:
         '''
 
-    def calculate_drift_highRes(self):
+    def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step):
         '''
-        calculate drift based on low resolution images.
+        calculate drift based on high resolution images from previous timepoint
+        :param xyview:
+        :param xzview:
+        :param yzview:
+        :param previousimage: file path to previous time point image
         :return:
         '''
+
+        #load timepoint
+        isExist = os.path.exists(previousimage)
+        if not isExist:
+            print("Wanted to make drift correction to reference image that does not exist")
+            return #return if file does not exist - e.g. for first timepoint
+
+        ref = imread(previousimage)
+
+        ref_xy = ref[0:xyview.shape[0],0:xyview.shape[1]]
+        ref_yz = ref[0:xyview.shape[0],xyview.shape[1]:]
+        ref_xz = ref[xyview.shape[0]:, 0:xyview.shape[1]]
+
+        assert ref_xy.shape == xyview.shape
+        assert ref_yz.shape == yzview.shape
+        assert ref_xz.shape == xzview.shape
+
+        correctX1, correctY1 = self.register_image(ref_xy, xyview, 'translation')
+        correctZ1, correctY2 = self.register_image(ref_yz, yzview, 'translation')
+        correctX2, correctZ2 = self.register_image(ref_xz, xzview, 'translation')
+
+        print(correctX1, correctX2, correctY1, correctY2, correctZ1, correctZ2)
+
+        correctX = Image_parameters.xy_pixelsize_highres * (correctX1 + correctX2)/2.
+        correctY = Image_parameters.xy_pixelsize_highres * (correctY1 + correctY2)/2.
+        correctZ = z_step * (correctZ1 + correctZ2)/2.
+
+        print(correctX,correctY, correctZ)
+
+        return correctX, correctY, correctZ
+
+
+
 
     def calculate_drift_lowRes_complete(self):
         '''
@@ -88,14 +130,12 @@ class drift_correction:
             sr = StackReg(StackReg.RIGID_BODY)
         else:
             sr = StackReg(StackReg.TRANSLATION)
-
         reg = sr.register_transform(ref,mov)
-        print(sr.get_matrix())
         xshift = sr.get_matrix()[0,2]
         yshift = sr.get_matrix()[1,2]
-        print(xshift, yshift)
-        self.plot_registration(ref,reg)
-
+        #print(xshift, yshift)
+        #self.plot_registration(ref,reg)
+        return xshift, yshift
 
     def overlay_images(self, imgs, equalize=False, aggregator=np.mean):
 
@@ -151,9 +191,16 @@ if __name__ == '__main__':
     img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
     img0 = imread(img0name)
     img1 = imread(img1name)
-    img0_crop = img0[0:1024, 0:2048]
-    img1_crop = img1[0:1024, 0:2048]
-    #c.plot_registration(img0_crop, img1_crop)
-    c.register_image(img0_crop,img1_crop,"translation")
+    img0_cropXY = img0[0:1024, 0:2048]
+    img1_cropXY = img1[0:1024, 0:2048]
+    img0_cropXZ = img0[1024:, 0:2048]
+    img1_cropXZ = img1[1024:, 0:2048]
+    img0_cropYZ = img0[0:1024, 2048:]
+    img1_cropZY = img1[0:1024, 2048:]
+    # c.plot_registration(img0_cropXY, img1_cropXY)
+    # c.plot_registration(img0_cropXZ, img1_cropXZ)
+    # c.plot_registration(img0_cropYZ, img1_cropZY)
+    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3)
 
-    c.init_imageBuffer(300,300,300,300)
+    #c.register_image(img0_crop,img1_crop,"translation")
+

@@ -41,10 +41,10 @@ class write_Params:
 
             for iter_lowrespos in self.view.stagessettingstab.stage_savedPos_tree.get_children():
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][1]))
-                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][2]))
-                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][3]))
-                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][4]))
+                xpos = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][1])
+                ypos = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][2])
+                zpos = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][3])
+                angle = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][4])
                 current_startposition = [zpos, xpos, ypos, angle]
                 f.write(str(current_startposition) + "\n")
 
@@ -53,10 +53,10 @@ class write_Params:
 
             for iter_highrespos in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][1]))
-                ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][2]))
-                zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][3]))
-                angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][4]))
+                xpos = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][1])
+                ypos = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][2])
+                zpos = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][3])
+                angle = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][4])
                 current_startposition = [zpos, xpos, ypos, angle]
                 f.write(str(current_startposition) + "\n")
 

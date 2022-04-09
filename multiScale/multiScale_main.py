@@ -13,10 +13,10 @@ from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
 import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.write_parameters as write_params
-from constants import Camera_parameters
-from constants import NI_board_parameters
-from constants import FileSave_parameters
-from constants import ASLM_parameters
+from auxiliary_code.constants import Camera_parameters
+from auxiliary_code.constants import NI_board_parameters
+from auxiliary_code.constants import FileSave_parameters
+from auxiliary_code.constants import ASLM_parameters
 from automated_microscopy.drift_correction import drift_correction
 
 class MultiScale_Microscope_Controller():
@@ -791,7 +791,9 @@ class MultiScale_Microscope_Controller():
             t0 = time.perf_counter()
 
             numStr = str(timeiter).zfill(5)
+            pastStr = str(timeiter-1).zfill(5)
             self.model.current_timepointstring = "t" + numStr
+            self.model.past_timepointstring = "t" + pastStr
             self.current_timelapse_filepath = os.path.join(experimentpath, self.model.current_timepointstring)
             self.model.projectionfilepath = os.path.join(experimentpath, "projections")
 

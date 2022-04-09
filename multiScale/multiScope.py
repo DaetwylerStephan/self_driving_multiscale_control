@@ -18,11 +18,11 @@ import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
 import src.slit.slit_cmd as SlitControl
 
-from constants import FilterWheel_parameters
-from constants import Stage_parameters
-from constants import NI_board_parameters
-from constants import Camera_parameters
-from constants import ASLM_parameters
+from auxiliary_code.constants import FilterWheel_parameters
+from auxiliary_code.constants import Stage_parameters
+from auxiliary_code.constants import NI_board_parameters
+from auxiliary_code.constants import Camera_parameters
+from auxiliary_code.constants import ASLM_parameters
 from tifffile import imread, imwrite
 
 
@@ -63,6 +63,7 @@ class multiScopeModel:
         self.current_projectionfilepath = 'D:/acquisitions/testimage.tif'
         self.projectionfilepath = 'D:/acquisitions'
         self.current_timepointstring = "t00000"
+        self.past_timepointstring = "t00000"
         self.current_region = "low_stack001"
 
         self.current_laser = NI_board_parameters.laser488
@@ -665,6 +666,8 @@ class multiScopeModel:
             current_filepath = os.path.join(current_folder, "1_CH488_000000.tif")
             self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH488",
                                                            self.current_timepointstring + ".tif")
+            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH488",
+                                                           self.past_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
             if resolutionmode == "highASLM":
@@ -681,6 +684,8 @@ class multiScopeModel:
             current_filepath = os.path.join(current_folder, "1_CH552_000000.tif")
             self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH552",
                                                            self.current_timepointstring + ".tif")
+            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH552",
+                                                        self.past_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser552,
                                           current_filepath)
@@ -698,6 +703,8 @@ class multiScopeModel:
             current_filepath = os.path.join(current_folder, "1_CH594_000000.tif")
             self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH594",
                                                            self.current_timepointstring + ".tif")
+            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH594",
+                                                        self.past_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser594,
                                           current_filepath)
@@ -716,6 +723,8 @@ class multiScopeModel:
             current_filepath = os.path.join(current_folder, "1_CH640_000000.tif")
             self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH640",
                                                            self.current_timepointstring + ".tif")
+            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH640",
+                                                           self.past_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser640,
                                           current_filepath)
@@ -733,6 +742,8 @@ class multiScopeModel:
             current_filepath = os.path.join(current_folder, "1_CHLED_000000.tif")
             self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CHLED",
                                                            self.current_timepointstring + ".tif")
+            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CHLED",
+                                                        self.past_timepointstring + ".tif")
             if resolutionmode == "low":
                 self.acquire_stack_lowres(current_startposition, NI_board_parameters.led,
                                           current_filepath)
@@ -987,6 +998,9 @@ class multiScopeModel:
                     os.makedirs(os.path.dirname(filepathforprojection))
                 except:
                     print("folder not created")
+
+                ###drift-correction module here
+                #todo
 
                 try:
                     imwrite(filepathforprojection, all_proj)
