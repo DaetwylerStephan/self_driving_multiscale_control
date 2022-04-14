@@ -15,10 +15,11 @@ from matplotlib import pyplot as plt
 from skimage import transform, io, exposure
 
 class drift_correction:
-    def __init__(self, lowres_tree, highres_tree):
+    def __init__(self, lowres_tree, highres_tree, filepath="path.txt"):
         #init it
         self.lowres_tree = lowres_tree
         self.highres_tree = highres_tree
+        self.logfile = filepath
 
     def update_stagePosition(self):
         '''
@@ -83,14 +84,21 @@ class drift_correction:
 
         print(correctX1, correctX2, correctY1, correctY2, correctZ1, correctZ2)
 
-        correctX = Image_parameters.xy_pixelsize_highres * (correctX1 + correctX2)/2.
-        correctY = Image_parameters.xy_pixelsize_highres * (correctY1 + correctY2)/2.
-        correctZ = z_step * (correctZ1 + correctZ2)/2.
+        correctX_mm = (1/1000.) * Image_parameters.xy_pixelsize_highres_um * (correctX1 + correctX2)/2.
+        correctY_mm = (1/1000.) * Image_parameters.xy_pixelsize_highres_um * (correctY1 + correctY2)/2.
+        correctZ_mm = (1/1000.) * z_step * (correctZ1 + correctZ2)/2.
 
-        print(correctX,correctY, correctZ)
+        print(correctX_mm,correctY_mm, correctZ_mm)
 
-        return correctX, correctY, correctZ
+        return correctX_mm, correctY_mm, correctZ_mm
 
+    def writeCorrectionToFile(self, filepath, ):
+        '''
+        update log file to keep track of the position changes over time
+        :param filepath:
+        :return:
+        '''
+        print("update file")
 
 
 

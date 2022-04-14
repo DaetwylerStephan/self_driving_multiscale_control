@@ -23,6 +23,8 @@ from auxiliary_code.constants import Stage_parameters
 from auxiliary_code.constants import NI_board_parameters
 from auxiliary_code.constants import Camera_parameters
 from auxiliary_code.constants import ASLM_parameters
+from automated_microscopy.drift_correction import drift_correction
+
 from tifffile import imread, imwrite
 
 
@@ -57,6 +59,7 @@ class multiScopeModel:
         self.lowres_planespacing = 10000000
         self.highres_planespacing = 10000000
         self.displayImStack = 1
+        self.abortStackFlag = 0 #abort current stack acquisition if value is 1, otherwise 0
 
         # filepath variables for saving image and projections
         self.filepath = 'D:/acquisitions/testimage.tif'
@@ -74,8 +77,8 @@ class multiScopeModel:
         self.slitopening_lowres = 3700
         self.slitopening_highres = 4558
         self.autoscale_preview = 0
-        self.slow_velocity = 1
-        self.slow_acceleration = 1
+        self.slow_velocity = 0.1
+        self.slow_acceleration = 0.1
 
         self.current_lowresROI_width = Camera_parameters.LR_width_pixel
         self.current_lowresROI_height = Camera_parameters.LR_height_pixel
@@ -92,7 +95,7 @@ class multiScopeModel:
         self.high_res_memory_names = None
         self.low_res_memory_names = None
 
-        self.delay_cameratrigger = 0.001  # the time given for the stage to move to the new position
+        self.delay_cameratrigger = 0.004  # the time given for the stage to move to the new position
 
         self.ASLM_acquisition_time = 0.3
         self.ASLM_from_Volt = [0,0,0,0]  # first voltage applied at remote mirror
@@ -114,6 +117,9 @@ class multiScopeModel:
 
         # textlabels for GUI
         self.currentFPS = str(0)
+
+        # drift correction
+        self.driftcorrectionmodule = 0
 
         # initialize buffers
         self.update_bufferSize()
@@ -660,101 +666,34 @@ class multiScopeModel:
         if resolutionmode == "highSPIM":
             self.set_laserpower(self.highres_laserpower)
 
-        if whichlaser[0] == 1:
-            print("acquire 488 laser")
-            # filepath
-            current_filepath = os.path.join(current_folder, "1_CH488_000000.tif")
-            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH488",
-                                                           self.current_timepointstring + ".tif")
-            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH488",
-                                                           self.past_timepointstring + ".tif")
-            if resolutionmode == "low":
-                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser488, current_filepath)
-            if resolutionmode == "highASLM":
-                print("acquire high res ALSM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath,
-                                           "ASLM")
-            if resolutionmode == "highSPIM":
-                print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser488, current_filepath,
-                                           "SPIM")
+        filename_image = ["1_CH488_000000.tif", "1_CH552_000000.tif", "1_CH594_000000.tif", "1_CH640_000000.tif", "1_CHLED_000000.tif"]
+        channel_name = ["CH488", "CH552",  "CH594", "CH640",  "CHLED"]
+        laser_param = [NI_board_parameters.laser488,
+                       NI_board_parameters.laser552,
+                       NI_board_parameters.laser594,
+                       NI_board_parameters.laser640,
+                       NI_board_parameters.led]
 
-        if whichlaser[1] == 1:
-            print("acquire 552 laser")
-            current_filepath = os.path.join(current_folder, "1_CH552_000000.tif")
-            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH552",
-                                                           self.current_timepointstring + ".tif")
-            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH552",
-                                                        self.past_timepointstring + ".tif")
-            if resolutionmode == "low":
-                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser552,
-                                          current_filepath)
-            if resolutionmode == "highASLM":
-                print("acquire high res ALSM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath,
-                                           "ASLM")
-            if resolutionmode == "highSPIM":
-                print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser552, current_filepath,
-                                           "SPIM")
+        self.abortStackFlag = 0
 
-        if whichlaser[2] == 1:
-            print("acquire 594 laser")
-            current_filepath = os.path.join(current_folder, "1_CH594_000000.tif")
-            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH594",
-                                                           self.current_timepointstring + ".tif")
-            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH594",
-                                                        self.past_timepointstring + ".tif")
-            if resolutionmode == "low":
-                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser594,
-                                          current_filepath)
-            if resolutionmode == "highASLM":
-                print("acquire high res ALSM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath,
-                                           "ASLM")
+        for w_i in range(len(whichlaser)):
+            #if laser is selected do:
+            if whichlaser[w_i] == 1 and (self.abortStackFlag == 0):
+                print("acquire laser: " + channel_name[w_i])
+                current_filepath = os.path.join(current_folder, filename_image[w_i])
+                self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, channel_name[w_i],
+                                                  self.current_timepointstring + ".tif")
+                self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, channel_name[w_i],
+                                                            self.past_timepointstring + ".tif")
+                if resolutionmode == "low":
+                    self.acquire_stack_lowres(current_startposition, laser_param[w_i], current_filepath)
+                if resolutionmode == "highASLM":
+                    print("acquire high res ALSM")
+                    self.acquire_stack_highres(current_startposition, laser_param[w_i], current_filepath, "ASLM")
+                if resolutionmode == "highSPIM":
+                    print("acquire high res SPIM")
+                    self.acquire_stack_highres(current_startposition, laser_param[w_i], current_filepath, "SPIM")
 
-            if resolutionmode == "highSPIM":
-                print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser594, current_filepath,
-                                           "SPIM")
-
-        if whichlaser[3] == 1:
-            print("acquire 640 laser")
-            current_filepath = os.path.join(current_folder, "1_CH640_000000.tif")
-            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH640",
-                                                           self.current_timepointstring + ".tif")
-            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CH640",
-                                                           self.past_timepointstring + ".tif")
-            if resolutionmode == "low":
-                self.acquire_stack_lowres(current_startposition, NI_board_parameters.laser640,
-                                          current_filepath)
-            if resolutionmode == "highASLM":
-                print("acquire high res ALSM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath,
-                                           "ASLM")
-            if resolutionmode == "highSPIM":
-                print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.laser640, current_filepath,
-                                           "SPIM")
-
-        if whichlaser[4] == 1:
-            print("acquire LED")
-            current_filepath = os.path.join(current_folder, "1_CHLED_000000.tif")
-            self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CHLED",
-                                                           self.current_timepointstring + ".tif")
-            self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, "CHLED",
-                                                        self.past_timepointstring + ".tif")
-            if resolutionmode == "low":
-                self.acquire_stack_lowres(current_startposition, NI_board_parameters.led,
-                                          current_filepath)
-            if resolutionmode == "highASLM":
-                print("acquire high res ALSM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.led, current_filepath,
-                                           "ASLM")
-            if resolutionmode == "highSPIM":
-                print("acquire high res SPIM")
-                self.acquire_stack_highres(current_startposition, NI_board_parameters.led, current_filepath,
-                                           "SPIM")
 
     def prepare_acquisition(self, current_startposition, laser):
         """
@@ -1000,7 +939,8 @@ class multiScopeModel:
                     print("folder not created")
 
                 ###drift-correction module here
-                #todo
+                self.driftcorrectionmodule.calculate_drift_lowRes()
+
 
                 try:
                     imwrite(filepathforprojection, all_proj)

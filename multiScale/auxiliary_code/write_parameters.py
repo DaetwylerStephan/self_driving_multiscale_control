@@ -45,7 +45,7 @@ class write_Params:
                 ypos = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][2])
                 zpos = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][3])
                 angle = float(self.view.stagessettingstab.stage_savedPos_tree.item(iter_lowrespos)['values'][4])
-                current_startposition = [zpos, xpos, ypos, angle]
+                current_startposition = [xpos, ypos, zpos, angle]
                 f.write(str(current_startposition) + "\n")
 
             f.write('\n---------------------------------------------\n')
@@ -57,7 +57,7 @@ class write_Params:
                 ypos = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][2])
                 zpos = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][3])
                 angle = float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(iter_highrespos)['values'][4])
-                current_startposition = [zpos, xpos, ypos, angle]
+                current_startposition = [xpos, ypos, zpos, angle]
                 f.write(str(current_startposition) + "\n")
 
             f.write('\n---------------------------------------------\n')

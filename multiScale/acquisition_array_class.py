@@ -1,6 +1,6 @@
 import numpy as np
-from constants import NI_board_parameters
-from constants import Camera_parameters
+from auxiliary_code.constants import NI_board_parameters
+from auxiliary_code.constants import Camera_parameters
 
 class acquisition_arrays:
     def __init__(self, model):

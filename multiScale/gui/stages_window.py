@@ -40,8 +40,8 @@ class Stages_Tab(tk.Frame):
         self.stage_savePositionList = [(1,0,0,0,0)]
         self.stage_oldPositionList = [(1,0,0,0,0)]
         self.stage_highres_PositionList = [(1, 0, 0, 0, 0)]
-        self.stage_highres_savePositionList = [(1, 0, 0, 0, 0)]
-        self.stage_highres_oldPositionList = [(1, 0, 0, 0, 0)]
+        self.stage_highres_savePositionList = [(1, 0, 0, 0, 0, 0)]
+        self.stage_highres_oldPositionList = [(1, 0, 0, 0, 0, 0)]
         self.stage_mosaic_upDown = 2
         self.stage_mosaic_lateral = 2
         self.stage_last_key = tk.StringVar()
@@ -65,7 +65,7 @@ class Stages_Tab(tk.Frame):
         movetoposition.grid(row=3, column=0, rowspan=17, sticky=tk.W + tk.E + tk.S + tk.N)
         mosaic_settings.grid(row=20, column=0, sticky=tk.W + tk.E + tk.S + tk.N)
         saved_lowRes_positions.grid(row=1, column=1, rowspan=10, sticky=tk.W + tk.E + tk.S + tk.N)
-        saved_highres_positions.grid(row=12, column=1, rowspan=10, sticky=tk.W + tk.E + tk.S + tk.N)
+        saved_highres_positions.grid(row=12, column=1, rowspan=10, columnspan=2000, sticky=tk.W + tk.E + tk.S + tk.N)
 
         ### ----------------------------general stage settings -----------------------------------------------------------------
         # stage labels (positioned)
@@ -209,7 +209,7 @@ class Stages_Tab(tk.Frame):
         # Add content using (where index is the position/row of the treeview)
         # iid is the item index (used to access a specific element in the treeview)
         # you can set iid to be equal to the index
-        tuples = [(1, 0,0,0,0)]
+        tuples = [(1,0,0,0,0)]
         index = iid = 1
         for row in tuples:
             self.stage_savedPos_tree.insert("", 1, iid='item1', values=row)
@@ -237,7 +237,7 @@ class Stages_Tab(tk.Frame):
         self.stage_highres_Revert_bt = tk.Button(saved_highres_positions, text="Revert", command=lambda: self.reverthighresList())
         self.stage_highres_addPos_index_entry = tk.Entry(saved_highres_positions, textvariable=self.stage_currenthighresPosindex,
                                                  width=4)
-        self.stage_highres_savedPos_tree = ttk.Treeview(saved_highres_positions, columns=("Position", "X", "Y", "Z", "Phi"),
+        self.stage_highres_savedPos_tree = ttk.Treeview(saved_highres_positions, columns=("Position", "X", "Y", "Z", "Phi", "Label"),
                                                 show="headings", height=9)
 
         ybarSrolling = tk.Scrollbar(saved_highres_positions, orient=tk.VERTICAL,
@@ -249,29 +249,32 @@ class Stages_Tab(tk.Frame):
         self.stage_highres_savedPos_tree.heading("Y", text="Y")
         self.stage_highres_savedPos_tree.heading("Z", text="Z")
         self.stage_highres_savedPos_tree.heading("Phi", text="Angle")
+        self.stage_highres_savedPos_tree.heading("Label", text="Label")
+
         self.stage_highres_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
         self.stage_highres_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
         self.stage_highres_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
         self.stage_highres_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
-        self.stage_highres_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
+        self.stage_highres_savedPos_tree.column("Phi", minwidth=0, width=80, stretch="NO", anchor="center")
+        self.stage_highres_savedPos_tree.column("Label", minwidth=0, width=55, stretch="NO", anchor="center")
 
         # Add content using (where index is the position/row of the treeview)
         # iid is the item index (used to access a specific element in the treeview)
         # you can set iid to be equal to the index
-        tuples = [(1, 0, 0, 0, 0)]
+        tuples_high = [(1, 0, 0, 0, 0, 1)]
         index = iid = 1
-        for row in tuples:
+        for row in tuples_high:
             self.stage_highres_savedPos_tree.insert("", 1, iid='item1', values=row)
             index = iid = index + 1
 
         # saved position layout
         self.stage_highres_addPos_bt.grid(row=0, column=2, sticky=tk.W)
         self.stage_highres_addPos_index_entry.grid(row=0, column=1, sticky=tk.W)
-        self.stage_highres_deletePos_bt.grid(row=0,column=3,sticky = tk.W)
+        self.stage_highres_deletePos_bt.grid(row=0,column=3,sticky=tk.W)
         self.stage_highres_savePos_bt.grid(row=0, column=4, sticky=tk.W)
         self.stage_highres_loadPos_bt.grid(row=0, column=5, sticky=tk.W)
         self.stage_highres_Revert_bt.grid(row=0, column=6, sticky=tk.W)
-        self.stage_highres_savedPos_tree.grid(row=2, column=0, columnspan=400)
+        self.stage_highres_savedPos_tree.grid(row=2, column=0, columnspan=500)
     #-------functions---------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -382,7 +385,7 @@ class Stages_Tab(tk.Frame):
         self.stage_highres_oldPositionList = self.stage_highres_PositionList.copy()
 
         #new position to add or update
-        newentry = (self.stage_currenthighresPosindex.get(), self.stage_moveto_lateral.get(), self.stage_moveto_updown.get(), self.stage_moveto_axial.get(), self.stage_moveto_angle.get())
+        newentry = (self.stage_currenthighresPosindex.get(), self.stage_moveto_lateral.get(), self.stage_moveto_updown.get(), self.stage_moveto_axial.get(), self.stage_moveto_angle.get(), self.stage_currenthighresPosindex.get())
 
         #check if element is already there
         modified =0

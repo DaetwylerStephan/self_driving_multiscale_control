@@ -50,6 +50,7 @@ class MultiScale_Microscope_Controller():
 
         #init drift correction module
         self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_savedPos_tree, self.view.stagessettingstab.stage_highres_savedPos_tree)
+        self.model.driftcorrectionmodule = self.drift_correctionmodule
 
         #define here which buttons run which function in the multiScope model
         self.continuetimelapse = 1 #enable functionality to stop timelapse
@@ -71,6 +72,7 @@ class MultiScale_Microscope_Controller():
 
 
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
+        self.view.runtab.stack_aq_bt_abort_stack.bind("<Button>", self.abort_stack)
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
 
@@ -542,7 +544,15 @@ class MultiScale_Microscope_Controller():
         """
         start a stack acquisition thread
         """
+        self.model.abortStackFlag = 0
         ct.ResultThread(target=self.acquire_stack_task).start()
+
+    def abort_stack(self, event):
+        """
+        set flag to abort stack
+        """
+        self.model.abortStackFlag = 1
+
 
     def acquire_stack_task(self):
         """
@@ -663,12 +673,11 @@ class MultiScale_Microscope_Controller():
                 currentposition = [zpos, xpos, ypos, angle]
                 print(currentposition)
 
-                #define highresolution stack file path label by corner positions.
-                xpos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])*1000)
-                ypos_label = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2])*1000)
+                #define highresolution stack file path label by label position in file tree (can be updated e.g. if you have automatic detection during timelapse)
+                pos_label = int(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][5])
 
                 # filepath
-                current_folder = os.path.join(stackfilepath, "high_stack_" + str(xpos_label) + "_" + str(ypos_label))
+                current_folder = os.path.join(stackfilepath, "high_stack_" + f'{pos_label:03}')
                 try:
                     print("filepath : " + current_folder)
                     os.makedirs(current_folder)
@@ -676,7 +685,7 @@ class MultiScale_Microscope_Controller():
                     print("File writing error")
 
                 # update info for filepath for projections
-                self.model.current_region = "high_stack_" + str(xpos_label) + "_" + str(ypos_label)
+                self.model.current_region = "high_stack_" + f'{pos_label:03}'
 
                 # start stackstreaming
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
@@ -754,20 +763,6 @@ class MultiScale_Microscope_Controller():
         # write acquisition parameters
         filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
 
-        # initialize the buffers for drift correction if desired.
-        #todo: init it here
-        if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
-            drift_correction.init_imageBuffer(self.model.current_lowresROI_width,
-                                              self.model.current_lowresROI_height,
-                                              self.model.current_highresROI_height,
-                                              self.model.current_highresROI_width
-            )
-        if self.view.automatedMicroscopySettingstab.drift_correction_highres.get() == 1:
-            drift_correction.init_imageBuffer(self.model.current_lowresROI_width,
-                                              self.model.current_lowresROI_height,
-                                              self.model.current_highresROI_height,
-                                              self.model.current_highresROI_width
-                                              )
 
         try:
             print("filepath : " + filepath_write_acquisitionParameters)

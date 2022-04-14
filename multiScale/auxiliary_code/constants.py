@@ -24,8 +24,8 @@ class Camera_parameters:
     lowres_line_digitization_time = 0.01026 #10.16us
 
 class Image_parameters:
-    xy_pixelsize_lowres =  0.3825
-    xy_pixelsize_highres = 0.117
+    xy_pixelsize_lowres_um =  0.3825
+    xy_pixelsize_highres_um = 0.117
 
 class FileSave_parameters:
     parentdir = "D:/multiScope_Data/"

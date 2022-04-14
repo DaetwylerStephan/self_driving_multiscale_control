@@ -97,9 +97,9 @@ class AdvancedSettings_Tab(tk.Frame):
         self.stage_acceleration_entry = tk.Entry(stack_aq_settings, textvariable=self.stack_aq_stage_acceleration, width=10)
 
         # set defaults
-        self.stack_aq_camera_delay.set(1)
-        self.stack_aq_stage_velocity.set(1)
-        self.stack_aq_stage_acceleration.set(1)
+        self.stack_aq_camera_delay.set(4)
+        self.stack_aq_stage_velocity.set(0.1)
+        self.stack_aq_stage_acceleration.set(0.1)
 
         # layout
         self.delay_camera_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
