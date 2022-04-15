@@ -64,7 +64,8 @@ class multiScopeModel:
         # filepath variables for saving image and projections
         self.filepath = 'D:/acquisitions/testimage.tif'
         self.current_projectionfilepath = 'D:/acquisitions/testimage.tif'
-        self.projectionfilepath = 'D:/acquisitions'
+        self.current_positionfilepath = 'D:/acquisitions/testimage.txt'
+        self.experimentfilepath = 'D:/acquisitions'
         self.current_timepointstring = "t00000"
         self.past_timepointstring = "t00000"
         self.current_region = "low_stack001"
@@ -674,17 +675,22 @@ class multiScopeModel:
                        NI_board_parameters.laser640,
                        NI_board_parameters.led]
 
-        self.abortStackFlag = 0
+        # save current position to file for later reproducibility
+        self.current_positionfilepath = os.path.join(self.experimentfilepath, "positions", self.current_region + ".txt")
+        self.save_currentpositionToFile(self.current_positionfilepath, current_startposition)
 
         for w_i in range(len(whichlaser)):
             #if laser is selected do:
             if whichlaser[w_i] == 1 and (self.abortStackFlag == 0):
                 print("acquire laser: " + channel_name[w_i])
+                #generate filepaths for projections and drift correction
                 current_filepath = os.path.join(current_folder, filename_image[w_i])
-                self.current_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, channel_name[w_i],
+                self.current_projectionfilepath = os.path.join(self.experimentfilepath, "projections", self.current_region, channel_name[w_i],
                                                   self.current_timepointstring + ".tif")
-                self.past_projectionfilepath = os.path.join(self.projectionfilepath, self.current_region, channel_name[w_i],
+                self.past_projectionfilepath = os.path.join(self.experimentfilepath, "projections", self.current_region, channel_name[w_i],
                                                             self.past_timepointstring + ".tif")
+
+                #select resolution level and start stack acquisition
                 if resolutionmode == "low":
                     self.acquire_stack_lowres(current_startposition, laser_param[w_i], current_filepath)
                 if resolutionmode == "highASLM":
@@ -694,6 +700,26 @@ class multiScopeModel:
                     print("acquire high res SPIM")
                     self.acquire_stack_highres(current_startposition, laser_param[w_i], current_filepath, "SPIM")
 
+    def save_currentpositionToFile(self, filepath, current_startposition):
+        '''
+        saves current position to file/append it
+        :param filepath:
+        :return:
+        '''
+        # make positions folder if it does not exist to write file
+        try:
+            os.makedirs(os.path.dirname(filepath))
+        except:
+            print("folder not created")
+
+        str_positionarray = str(current_startposition)
+
+        # append current position to text file
+        with open(filepath, 'a') as f:
+            f.write(self.current_timepointstring)
+            f.write(': ')
+            f.writelines(str_positionarray)
+            f.writelines('\n')
 
     def prepare_acquisition(self, current_startposition, laser):
         """

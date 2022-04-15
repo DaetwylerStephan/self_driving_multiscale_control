@@ -549,7 +549,7 @@ class MultiScale_Microscope_Controller():
 
     def abort_stack(self, event):
         """
-        set flag to abort stack
+        set flag to abort stack acquisition
         """
         self.model.abortStackFlag = 1
 
@@ -565,6 +565,9 @@ class MultiScale_Microscope_Controller():
         #stop all potential previews
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
+
+        #overwrite abortStackFlag if pressed before
+        self.model.abortStackFlag = 0
 
         #some parameters.
         self.model.displayImStack = self.view.runtab.stack_aq_displayON.get() #whether to display images during stack acq or not
@@ -608,7 +611,7 @@ class MultiScale_Microscope_Controller():
             #set timepoint = 0 to be consistent with time-lapse acquisitions
             self.model.current_timepointstring = "t00000"
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
-            self.model.projectionfilepath = os.path.join(self.parentfolder, experiment_name, "projections")
+            self.model.experimentfilepath = os.path.join(self.parentfolder, experiment_name)
             print(stackfilepath)
         else:
             stackfilepath = self.current_timelapse_filepath
@@ -790,7 +793,7 @@ class MultiScale_Microscope_Controller():
             self.model.current_timepointstring = "t" + numStr
             self.model.past_timepointstring = "t" + pastStr
             self.current_timelapse_filepath = os.path.join(experimentpath, self.model.current_timepointstring)
-            self.model.projectionfilepath = os.path.join(experimentpath, "projections")
+            self.model.experimentfilepath = experimentpath
 
             self.view.runtab.timelapse_aq_progress.set(timeiter)
             self.view.runtab.timelapse_aq_progressindicator.config(text=str(timeiter+1) +" of " + str(self.view.runtab.timelapse_aq_nbTimepoints))

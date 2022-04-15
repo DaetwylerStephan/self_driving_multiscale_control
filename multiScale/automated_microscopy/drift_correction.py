@@ -92,16 +92,6 @@ class drift_correction:
 
         return correctX_mm, correctY_mm, correctZ_mm
 
-    def writeCorrectionToFile(self, filepath, ):
-        '''
-        update log file to keep track of the position changes over time
-        :param filepath:
-        :return:
-        '''
-        print("update file")
-
-
-
     def calculate_drift_lowRes_complete(self):
         '''
         checks if drift correction is complete for all regions.
@@ -169,6 +159,9 @@ class drift_correction:
         return imgs
 
 
+
+
+
 if __name__ == '__main__':
 
     #define trees as in GUI
@@ -208,7 +201,11 @@ if __name__ == '__main__':
     # c.plot_registration(img0_cropXY, img1_cropXY)
     # c.plot_registration(img0_cropXZ, img1_cropXZ)
     # c.plot_registration(img0_cropYZ, img1_cropZY)
-    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3)
+
+    #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3)
 
     #c.register_image(img0_crop,img1_crop,"translation")
 
+    testwrite = "D://test/drift_correctionTest/CH488/t00000.txt"
+    current_startposition = [0,0,0,0,0]
+    c.save_currentpositionToFile(testwrite, current_startposition)
