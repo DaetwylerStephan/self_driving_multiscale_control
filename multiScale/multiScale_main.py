@@ -613,6 +613,10 @@ class MultiScale_Microscope_Controller():
             stackfilepath = os.path.join(self.parentfolder, experiment_name, "t00000")
             self.model.experimentfilepath = os.path.join(self.parentfolder, experiment_name)
             print(stackfilepath)
+
+            #no need for drift correction if single stack is acquired
+            self.model.drift_correctionOnHighRes = 0  # parameter whether high res drift correction is enabled
+            self.model.drift_correctionOnLowRes = 0  # parameter whether low res drift correction is enabled
         else:
             stackfilepath = self.current_timelapse_filepath
 
@@ -674,6 +678,7 @@ class MultiScale_Microscope_Controller():
                 zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3])* 1000000000)
                 angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4]) * 1000000)
                 currentposition = [zpos, xpos, ypos, angle]
+                self.model.current_treeviewitem = line
                 print(currentposition)
 
                 #define highresolution stack file path label by label position in file tree (can be updated e.g. if you have automatic detection during timelapse)
@@ -782,6 +787,15 @@ class MultiScale_Microscope_Controller():
 
         # set timepoint = 0 to be consistent with time-lapse acquisitions
         experimentpath = os.path.join(self.parentfolder, experiment_name)
+
+        #determine whether drift correction is active; and on which channel
+        self.model.drift_correctionOnHighRes = self.view.automatedMicroscopySettingstab.drift_correction_highres.get()  # parameter whether high res drift correction is enabled
+        self.model.drift_correctionOnLowRes = self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()  # parameter whether low res drift correction is enabled
+        self.model.drift_which_channels = [self.view.automatedMicroscopySettingstab.driftcorrection_488.get(),
+                                self.view.automatedMicroscopySettingstab.driftcorrection_552.get(),
+                                self.view.automatedMicroscopySettingstab.driftcorrection_594.get(),
+                                self.view.automatedMicroscopySettingstab.driftcorrection_640.get(),
+                                self.view.automatedMicroscopySettingstab.driftcorrection_LED.get()]
 
 
         ###run timelapse

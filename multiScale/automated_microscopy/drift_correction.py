@@ -52,7 +52,7 @@ class drift_correction:
         :return:
         '''
 
-    def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step):
+    def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step, treeviewitem):
         '''
         calculate drift based on high resolution images from previous timepoint
         :param xyview:
@@ -88,9 +88,23 @@ class drift_correction:
         correctY_mm = (1/1000.) * Image_parameters.xy_pixelsize_highres_um * (correctY1 + correctY2)/2.
         correctZ_mm = (1/1000.) * z_step * (correctZ1 + correctZ2)/2.
 
+        correctionarray = [0, -correctX_mm, -correctY_mm, -correctZ_mm, 0, 0]
         print(correctX_mm,correctY_mm, correctZ_mm)
 
-        return correctX_mm, correctY_mm, correctZ_mm
+        # print(self.highres_tree.item(treeviewitem)['values'])
+        x = np.array(self.highres_tree.item(treeviewitem)['values'])
+        y = np.array(correctionarray)
+        newposition = x + y
+        # print(newposition)
+
+        self.highres_tree.item(treeviewitem, values=(float(newposition[0]), newposition[1], newposition[2], newposition[3], newposition[4], int(newposition[5])))
+        tree_values1 = self.highres_tree.item(treeviewitem)['values']
+        print(tree_values1)
+        # zpos = int(float(self.highres_tree.item(treeviewitem)['values'][3]) * 1000000000)
+        # print(zpos)
+        # return correctX_mm, correctY_mm, correctZ_mm
+
+
 
     def calculate_drift_lowRes_complete(self):
         '''
@@ -166,22 +180,26 @@ if __name__ == '__main__':
 
     #define trees as in GUI
     root = tk.Tk()
-    stage_highres_savedPos_tree = ttk.Treeview(root, columns=("Position", "X", "Y", "Z", "Phi"),
+    stage_highres_savedPos_tree = ttk.Treeview(root, columns=("Position", "X", "Y", "Z", "Phi", "Label"),
                                                show="headings", height=9)
     stage_highres_savedPos_tree.heading("Position", text="Position")
     stage_highres_savedPos_tree.heading("X", text="X")
     stage_highres_savedPos_tree.heading("Y", text="Y")
     stage_highres_savedPos_tree.heading("Z", text="Z")
     stage_highres_savedPos_tree.heading("Phi", text="Angle")
+    stage_highres_savedPos_tree.heading("Label", text="Label")
+
     stage_highres_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
     stage_highres_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
     stage_highres_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
     stage_highres_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
     stage_highres_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
-    tuples = [(1, 0, 0, 0, 0)]
+    stage_highres_savedPos_tree.column("Label", minwidth=0, width=100, stretch="NO", anchor="center")
+
+    tuples = [(1, 0, 0, 0, 0, 0)]
     index = iid = 1
     for row in tuples:
-        stage_highres_savedPos_tree.insert("", 1, iid='item1', values=row)
+        stage_highres_savedPos_tree.insert("", index=1, iid=1, values=row)
         index = iid = index + 1
 
     #init class
@@ -202,10 +220,7 @@ if __name__ == '__main__':
     # c.plot_registration(img0_cropXZ, img1_cropXZ)
     # c.plot_registration(img0_cropYZ, img1_cropZY)
 
-    #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3)
+    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 1)
 
     #c.register_image(img0_crop,img1_crop,"translation")
 
-    testwrite = "D://test/drift_correctionTest/CH488/t00000.txt"
-    current_startposition = [0,0,0,0,0]
-    c.save_currentpositionToFile(testwrite, current_startposition)

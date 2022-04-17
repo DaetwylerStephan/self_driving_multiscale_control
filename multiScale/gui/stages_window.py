@@ -39,7 +39,7 @@ class Stages_Tab(tk.Frame):
         self.stage_PositionList = [(1,0,0,0,0)]
         self.stage_savePositionList = [(1,0,0,0,0)]
         self.stage_oldPositionList = [(1,0,0,0,0)]
-        self.stage_highres_PositionList = [(1, 0, 0, 0, 0)]
+        self.stage_highres_PositionList = [(1, 0, 0, 0, 0, 1)]
         self.stage_highres_savePositionList = [(1, 0, 0, 0, 0, 0)]
         self.stage_highres_oldPositionList = [(1, 0, 0, 0, 0, 0)]
         self.stage_mosaic_upDown = 2
@@ -412,7 +412,7 @@ class Stages_Tab(tk.Frame):
         iter =0
         for listelement in positionlist:
             iter=iter+1
-            newitem = 'item%i' % iter
+            newitem =iter+1
             tree.insert("", index=iter, iid=newitem, values=listelement)
 
     def makeMosaic(self, camera):

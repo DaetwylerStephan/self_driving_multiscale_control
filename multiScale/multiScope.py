@@ -38,14 +38,6 @@ class multiScopeModel:
         """
         self.unfinished_tasks = queue.Queue()
 
-        # self.data_buffers = [
-        #     ct.SharedNDArray(shape=(2960, 5056), dtype='uint16')
-        #     for i in range(2)]
-        # self.data_buffer_queue = queue.Queue()
-        # for i in range(len(self.data_buffers)):
-        #     self.data_buffer_queue.put(i)
-        # print("Displaying", self.data_buffers[0].shape,
-        #       self.data_buffers[0].dtype, 'images.')
         self.num_frames = 0
         self.initial_time = time.perf_counter()
 
@@ -120,11 +112,17 @@ class multiScopeModel:
         self.currentFPS = str(0)
 
         # drift correction
-        self.driftcorrectionmodule = 0
+        self.driftcorrectionmodule = 0 #place holder for obtaining drift correction class from controller
+        self.drift_correctionOnHighRes = 0 #parameter whether high res drift correction is enabled
+        self.drift_correctionOnLowRes = 0 #parameter whether low res drift correction is enabled
+        self.drift_which_channels = [0,0,0,0,0] #array on which channels drift correction is run
+        self.perform_driftcorrectionOnChannel = 0 #flag whether for current stack, drift correction should be performed
+        self.current_treeviewitem = 'item0'
 
         # initialize buffers
         self.update_bufferSize()
 
+        #initialize buffer queue so that there are two buffers - so that one can be used for acquisition and one for processing
         self.high_res_buffers_queue = queue.Queue()
         self.low_res_buffers_queue = queue.Queue()
         for i in range(2):
@@ -689,6 +687,10 @@ class multiScopeModel:
                                                   self.current_timepointstring + ".tif")
                 self.past_projectionfilepath = os.path.join(self.experimentfilepath, "projections", self.current_region, channel_name[w_i],
                                                             self.past_timepointstring + ".tif")
+                if self.drift_which_channels[w_i]==1:
+                    self.perform_driftcorrectionOnChannel = 1
+                else:
+                    self.perform_driftcorrectionOnChannel = 0
 
                 #select resolution level and start stack acquisition
                 if resolutionmode == "low":
@@ -702,7 +704,7 @@ class multiScopeModel:
 
     def save_currentpositionToFile(self, filepath, current_startposition):
         '''
-        saves current position to file/append it
+        saves current position to file/append it, called by stack_acquisition_master
         :param filepath:
         :return:
         '''
@@ -936,12 +938,14 @@ class multiScopeModel:
 
             savethread = ct.ResultThread(target=saveimage_highresSPIM).start()
 
-            if self.displayImStack == 1:
-                self.display.show_stack(self.high_res_buffers[current_bufferiter])
 
             def calculate_projection_highres():
                 # calculate projections
                 filepathforprojection = self.current_projectionfilepath  # assign now as filepath is updated for next stack acquired
+                pastfilepathforprojection = self.past_projectionfilepath
+                current_region_item = self.current_treeviewitem
+
+
                 t0 = time.perf_counter()
                 maxproj_xy = np.max(self.high_res_buffers[current_bufferiter], axis=0)
                 maxproj_xz = np.max(self.high_res_buffers[current_bufferiter], axis=1)
@@ -955,7 +959,8 @@ class multiScopeModel:
                                      self.current_highresROI_width + self.stack_nbplanes_highres], dtype="uint16")
                 all_proj[0:self.current_highresROI_height, 0:self.current_highresROI_width] = maxproj_xy
                 all_proj[self.current_highresROI_height:, 0:self.current_highresROI_width] = maxproj_xz
-                all_proj[0:self.current_highresROI_height, self.current_highresROI_width:] = np.transpose(maxproj_yz)
+                maxproj_yzTransposed = np.transpose(maxproj_yz)
+                all_proj[0:self.current_highresROI_height, self.current_highresROI_width:] = maxproj_yzTransposed
 
                 self.display.show_maxproj(all_proj)
 
@@ -965,13 +970,25 @@ class multiScopeModel:
                     print("folder not created")
 
                 ###drift-correction module here
-                self.driftcorrectionmodule.calculate_drift_lowRes()
+                if self.perform_driftcorrectionOnChannel == 1:
+                    if self.drift_correctionOnHighRes ==1:
+                        current_region_iter = self.current_region.split('stack')[1]
+                        self.driftcorrectionmodule.calculate_drift_highRes(maxproj_xy,
+                                                                           maxproj_xz,
+                                                                           maxproj_yzTransposed,
+                                                                           pastfilepathforprojection,
+                                                                           self.highres_planespacing,
+                                                                           current_region_item
+                                                                           )
 
 
                 try:
                     imwrite(filepathforprojection, all_proj)
                 except:
                     print("couldn't save projection image")
+
+                if self.displayImStack == 1:
+                    self.display.show_stack(self.high_res_buffers[current_bufferiter])
 
             projection_thread2 = ct.ResultThread(target=calculate_projection_highres).start()
 
