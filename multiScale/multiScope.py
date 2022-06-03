@@ -683,10 +683,23 @@ class multiScopeModel:
                 print("acquire laser: " + channel_name[w_i])
                 #generate filepaths for projections and drift correction
                 current_filepath = os.path.join(current_folder, filename_image[w_i])
-                self.current_projectionfilepath = os.path.join(self.experimentfilepath, "projections", self.current_region, channel_name[w_i],
+
+                self.current_projectionfilepath_three = os.path.join(self.experimentfilepath, "projections", "three", self.current_region, channel_name[w_i],
                                                   self.current_timepointstring + ".tif")
-                self.past_projectionfilepath = os.path.join(self.experimentfilepath, "projections", self.current_region, channel_name[w_i],
+                self.current_projectionfilepath_XY = os.path.join(self.experimentfilepath, "projections", "XY",
+                                                               self.current_region, channel_name[w_i],
+                                                               self.current_timepointstring + ".tif")
+                self.current_projectionfilepath_XZ = os.path.join(self.experimentfilepath, "projections", "XZ",
+                                                               self.current_region, channel_name[w_i],
+                                                               self.current_timepointstring + ".tif")
+                self.current_projectionfilepath_YZ = os.path.join(self.experimentfilepath, "projections", "YZ",
+                                                               self.current_region, channel_name[w_i],
+                                                               self.current_timepointstring + ".tif")
+                self.past_projectionfilepath = os.path.join(self.experimentfilepath, "projections", "three", self.current_region, channel_name[w_i],
                                                             self.past_timepointstring + ".tif")
+
+
+                #set flag for drift correction on channel (high-res drift correction)
                 if self.drift_which_channels[w_i]==1:
                     self.perform_driftcorrectionOnChannel = 1
                 else:
@@ -817,7 +830,11 @@ class multiScopeModel:
 
             def calculate_projection():
                 # calculate projections
-                filepathforprojection = self.current_projectionfilepath  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_three = self.current_projectionfilepath_three  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XY = self.current_projectionfilepath_XY  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XZ = self.current_projectionfilepath_XZ  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_YZ = self.current_projectionfilepath_YZ  # assign now as filepath is updated for next stack acquired
+
                 t0 = time.perf_counter()
                 maxproj_xy = np.max(self.low_res_buffers[current_bufferiter], axis=0)
                 maxproj_xz = np.max(self.low_res_buffers[current_bufferiter], axis=1)
@@ -835,15 +852,22 @@ class multiScopeModel:
                 all_proj[0:self.current_lowresROI_height, self.current_lowresROI_width:] = np.transpose(maxproj_yz)
 
                 self.display.show_maxproj(all_proj)
+
                 try:
-                    os.makedirs(os.path.dirname(filepathforprojection))
+                    os.makedirs(os.path.dirname(filepathforprojection_three))
+                    os.makedirs(os.path.dirname(filepathforprojection_XY))
+                    os.makedirs(os.path.dirname(filepathforprojection_XZ))
+                    os.makedirs(os.path.dirname(filepathforprojection_YZ))
                 except:
                     print("folder not created")
 
                 try:
-                    imwrite(filepathforprojection, all_proj)
+                    imwrite(filepathforprojection_three, all_proj)
+                    imwrite(filepathforprojection_XY, maxproj_xy.astype("uint16"))
+                    imwrite(filepathforprojection_XZ, maxproj_xz.astype("uint16"))
+                    imwrite(filepathforprojection_YZ, np.transpose(maxproj_yz.astype("uint16")))
                 except:
-                    print("couldn't save projection image:" + filepathforprojection)
+                    print("couldn't save projection image:" + filepathforprojection_three)
 
             projection_thread = ct.ResultThread(target=calculate_projection).start()
 
@@ -941,7 +965,10 @@ class multiScopeModel:
 
             def calculate_projection_highres():
                 # calculate projections
-                filepathforprojection = self.current_projectionfilepath  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_three = self.current_projectionfilepath_three  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XY = self.current_projectionfilepath_XY  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XZ = self.current_projectionfilepath_XZ  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_YZ = self.current_projectionfilepath_YZ  # assign now as filepath is updated for next stack acquired
                 pastfilepathforprojection = self.past_projectionfilepath
                 current_region_item = self.current_treeviewitem
 
@@ -965,7 +992,10 @@ class multiScopeModel:
                 self.display.show_maxproj(all_proj)
 
                 try:
-                    os.makedirs(os.path.dirname(filepathforprojection))
+                    os.makedirs(os.path.dirname(filepathforprojection_three))
+                    os.makedirs(os.path.dirname(filepathforprojection_XY))
+                    os.makedirs(os.path.dirname(filepathforprojection_XZ))
+                    os.makedirs(os.path.dirname(filepathforprojection_YZ))
                 except:
                     print("folder not created")
 
@@ -977,13 +1007,14 @@ class multiScopeModel:
                                                                            maxproj_xz,
                                                                            maxproj_yzTransposed,
                                                                            pastfilepathforprojection,
-                                                                           self.highres_planespacing,
+                                                                           (self.highres_planespacing/1000000),
                                                                            current_region_item
                                                                            )
-
-
                 try:
-                    imwrite(filepathforprojection, all_proj)
+                    imwrite(filepathforprojection_three, all_proj)
+                    imwrite(filepathforprojection_XY, maxproj_xy.astype("uint16"))
+                    imwrite(filepathforprojection_XZ, maxproj_xz.astype("uint16"))
+                    imwrite(filepathforprojection_YZ, np.transpose(maxproj_yz.astype("uint16")))
                 except:
                     print("couldn't save projection image")
 

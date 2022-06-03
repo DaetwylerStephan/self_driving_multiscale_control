@@ -258,10 +258,10 @@ class Run_Tab(tk.Frame):
 
         #plane spacing
         self.stack_aq_entry_plane_spacing_lowres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing_lowres)
-        self.stack_aq_plane_spacing_lowres.set(10)
+        self.stack_aq_plane_spacing_lowres.set(3.5)
         self.stack_aq_entry_plane_spacing_highres = tk.Entry(stack_aquisition_settings,
                                                      textvariable=self.stack_aq_plane_spacing_highres)
-        self.stack_aq_plane_spacing_highres.set(10)
+        self.stack_aq_plane_spacing_highres.set(0.3)
 
         #run buttons
         self.stack_aq_bt_run_stack = tk.Button(stack_aquisition_settings, text="Acquire Stack")
