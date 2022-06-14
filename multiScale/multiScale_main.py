@@ -49,7 +49,7 @@ class MultiScale_Microscope_Controller():
         self.paramwriter = write_params.write_Params(self.view)
 
         #init drift correction module
-        self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_savedPos_tree, self.view.stagessettingstab.stage_highres_savedPos_tree)
+        self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_PositionList, self.view.stagessettingstab.stage_highres_PositionList)
         self.model.driftcorrectionmodule = self.drift_correctionmodule
 
         #define here which buttons run which function in the multiScope model
@@ -451,34 +451,34 @@ class MultiScale_Microscope_Controller():
 
         if self.view.stagessettingstab.move_to_specific_pos_resolution.get() == "on":
             print("move:")
-            for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
-                savedpos = int(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][0])
+            for line in range(len(self.view.stagessettingstab.stage_PositionList)):
+                savedpos = int(self.view.stagessettingstab.stage_PositionList[line][0])
                 if savedpos == position:
                     #set positions in the moving panel:
-                    self.view.stagessettingstab.stage_moveto_lateral.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1])
-                    self.view.stagessettingstab.stage_moveto_updown.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2])
-                    self.view.stagessettingstab.stage_moveto_axial.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3])
-                    self.view.stagessettingstab.stage_moveto_angle.set(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4])
+                    self.view.stagessettingstab.stage_moveto_lateral.set(self.view.stagessettingstab.stage_PositionList[line][1])
+                    self.view.stagessettingstab.stage_moveto_updown.set(self.view.stagessettingstab.stage_PositionList[line][2])
+                    self.view.stagessettingstab.stage_moveto_axial.set(self.view.stagessettingstab.stage_PositionList[line][3])
+                    self.view.stagessettingstab.stage_moveto_angle.set(self.view.stagessettingstab.stage_PositionList[line][4])
                     #move to these positions:
-                    xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1]) * 1000000000)
-                    ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2]) * 1000000000)
-                    zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3]) * 1000000000)
-                    angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4]) * 1000000)
+                    xpos = int(float(self.view.stagessettingstab.stage_PositionList[line][1]) * 1000000000)
+                    ypos = int(float(self.view.stagessettingstab.stage_PositionList[line][2]) * 1000000000)
+                    zpos = int(float(self.view.stagessettingstab.stage_PositionList[line][3]) * 1000000000)
+                    angle = int(float(self.view.stagessettingstab.stage_PositionList[line][4]) * 1000000)
                     current_position = [zpos, xpos, ypos, angle]
                     self.model.move_to_position(current_position)
         else:
-            for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
-                savedpos = int(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][0])
+            for line in range(len(self.view.stagessettingstab.stage_highres_PositionList)):
+                savedpos = int(self.view.stagessettingstab.stage_highres_PositionList[line][0])
                 if savedpos == position:
-                    self.view.stagessettingstab.stage_moveto_lateral.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1])
-                    self.view.stagessettingstab.stage_moveto_updown.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2])
-                    self.view.stagessettingstab.stage_moveto_axial.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3])
-                    self.view.stagessettingstab.stage_moveto_angle.set(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4])
+                    self.view.stagessettingstab.stage_moveto_lateral.set(self.view.stagessettingstab.stage_highres_PositionList[line][1])
+                    self.view.stagessettingstab.stage_moveto_updown.set(self.view.stagessettingstab.stage_highres_PositionList[line][2])
+                    self.view.stagessettingstab.stage_moveto_axial.set(self.view.stagessettingstab.stage_highres_PositionList[line][3])
+                    self.view.stagessettingstab.stage_moveto_angle.set(self.view.stagessettingstab.stage_highres_PositionList[line][4])
 
-                    xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1]) * 1000000000)
-                    ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2]) * 1000000000)
-                    zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3]) * 1000000000)
-                    angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4]) * 1000000)
+                    xpos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][1]) * 1000000000)
+                    ypos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][2]) * 1000000000)
+                    zpos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][3]) * 1000000000)
+                    angle = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][4]) * 1000000)
                     current_position = [zpos, xpos, ypos, angle]
                     self.model.move_to_position(current_position)
 
@@ -627,12 +627,12 @@ class MultiScale_Microscope_Controller():
             self.model.changeHRtoLR()
             print("acquiring low res stack")
             positioniter = -1
-            for line in self.view.stagessettingstab.stage_savedPos_tree.get_children():
+            for line in range(len(self.view.stagessettingstab.stage_PositionList)):
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][1]) * 1000000000)
-                ypos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][2])* 1000000000)
-                zpos = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][3])* 1000000000)
-                angle = int(float(self.view.stagessettingstab.stage_savedPos_tree.item(line)['values'][4]) * 1000000)
+                xpos = int(float(self.view.stagessettingstab.stage_PositionList[line][1]) * 1000000000)
+                ypos = int(float(self.view.stagessettingstab.stage_PositionList[line][2])* 1000000000)
+                zpos = int(float(self.view.stagessettingstab.stage_PositionList[line][3])* 1000000000)
+                angle = int(float(self.view.stagessettingstab.stage_PositionList[line][4]) * 1000000)
                 current_startposition = [zpos, xpos, ypos, angle]
                 print(current_startposition)
                 positioniter = positioniter + 1
@@ -660,7 +660,11 @@ class MultiScale_Microscope_Controller():
             #call here drift correction if based on low resolution imaging
             if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
                 print("Calculate drift correction")
-                self.drift_correctionmodule.calculate_drift_lowRes_complete()
+
+                for line in self.view.stagessettingstab.stage_highres_PositionList:
+                    lowresline = self.drift_correctionmodule.find_closestLowResTile(line)
+
+
 
 
         ########-------------------------------------------------------------------------------------------------------
@@ -671,18 +675,18 @@ class MultiScale_Microscope_Controller():
             self.model.changeLRtoHR()
 
             print("acquiring high res stack")
-            for line in self.view.stagessettingstab.stage_highres_savedPos_tree.get_children():
+            for line in range(len(self.view.stagessettingstab.stage_highres_PositionList)):
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][1]) * 1000000000)
-                ypos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][2])* 1000000000)
-                zpos = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][3])* 1000000000)
-                angle = int(float(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][4]) * 1000000)
+                xpos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][1]) * 1000000000)
+                ypos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][2])* 1000000000)
+                zpos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][3])* 1000000000)
+                angle = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][4]) * 1000000)
                 currentposition = [zpos, xpos, ypos, angle]
                 self.model.current_treeviewitem = line
                 print(currentposition)
 
-                #define highresolution stack file path label by label position in file tree (can be updated e.g. if you have automatic detection during timelapse)
-                pos_label = int(self.view.stagessettingstab.stage_highres_savedPos_tree.item(line)['values'][5])
+                #define highresolution stack file path label by label position in file position tree (can be updated e.g. if you have automatic detection during timelapse)
+                pos_label = int(self.view.stagessettingstab.stage_highres_PositionList[line][5])
 
                 # filepath
                 current_folder = os.path.join(stackfilepath, "high_stack_" + f'{pos_label:03}')

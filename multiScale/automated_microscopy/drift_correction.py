@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tifffile import imread, imwrite
 import os
+import copy
 
 import sys
 sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
@@ -26,24 +27,6 @@ class drift_correction:
         update stage position
         :return:
         '''
-
-    def init_imageBuffer(self, lowres_x, lowres_y, highres_x, highres_y):
-        '''
-        init image buffer
-        :return:
-        '''
-
-        for line in self.highres_tree.get_children():
-            xpos = int(
-                float(self.highres_tree.item(line)['values'][1]) * 1000000000)
-            ypos = int(
-                float(self.highres_tree.item(line)['values'][2]) * 1000000000)
-            zpos = int(
-                float(self.highres_tree.item(line)['values'][3]) * 1000000000)
-            angle = int(
-                float(self.highres_tree.item(line)['values'][4]) * 1000000)
-            currentposition = [zpos, xpos, ypos, angle]
-            print(currentposition)
 
 
     def calculate_drift_lowRes(self):
@@ -111,7 +94,39 @@ class drift_correction:
         # print(zpos)
         # return correctX_mm, correctY_mm, correctZ_mm
 
+    def find_closestLowResTile(self, line):
+        '''
+        find corresponding low resolution stack to high-res region.
+        :return: the corresponding file name of the low resolution stack which is closest to the high res stack.
+        '''
 
+        xpos = int(float(self.highres_tree.item(line)['values'][1]))
+        ypos = int(float(self.highres_tree.item(line)['values'][2]))
+        zpos = int(float(self.highres_tree.item(line)['values'][3]))
+        angle = int(float(self.highres_tree.item(line)['values'][4]))
+        highrespoint =  np.array((xpos,ypos,zpos))
+
+        positioniter = -1
+        dist = -1
+
+        for lowresline in self.lowres_tree.get_children():
+            positioniter = positioniter + 1
+            # get current position from list
+            xposLow = int(float(self.lowres_tree.item(line)['values'][1]))
+            yposLow = int(float(self.lowres_tree.item(line)['values'][2]))
+            zposLow = int(float(self.lowres_tree.item(line)['values'][3]))
+            angleLow = int(float(self.lowres_tree.item(line)['values'][4]))
+            lowrespoint = np.array((xposLow, yposLow, zposLow))
+
+            if angle==angleLow:
+                dist_current = np.linalg.norm(highrespoint - lowrespoint)
+                if dist == -1:
+                    dist = dist_current
+                if dist > dist_current:
+                    dist = dist_current
+                    pos_label_line = "low_stack" + f'{positioniter:03}'
+
+        return pos_label_line
 
     def calculate_drift_lowRes_complete(self, previousimage):
         '''
@@ -195,30 +210,42 @@ if __name__ == '__main__':
 
     #define trees as in GUI
     root = tk.Tk()
-    stage_highres_savedPos_tree = ttk.Treeview(root, columns=("Position", "X", "Y", "Z", "Phi", "Label"),
-                                               show="headings", height=9)
-    stage_highres_savedPos_tree.heading("Position", text="Position")
-    stage_highres_savedPos_tree.heading("X", text="X")
-    stage_highres_savedPos_tree.heading("Y", text="Y")
-    stage_highres_savedPos_tree.heading("Z", text="Z")
-    stage_highres_savedPos_tree.heading("Phi", text="Angle")
-    stage_highres_savedPos_tree.heading("Label", text="Label")
 
-    stage_highres_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
-    stage_highres_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
-    stage_highres_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
-    stage_highres_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
-    stage_highres_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
-    stage_highres_savedPos_tree.column("Label", minwidth=0, width=100, stretch="NO", anchor="center")
+    def gettree():
+        stage_highres_savedPos_tree = ttk.Treeview(root, columns=("Position", "X", "Y", "Z", "Phi", "Label"),
+                                                   show="headings", height=9)
+        stage_highres_savedPos_tree.heading("Position", text="Position")
+        stage_highres_savedPos_tree.heading("X", text="X")
+        stage_highres_savedPos_tree.heading("Y", text="Y")
+        stage_highres_savedPos_tree.heading("Z", text="Z")
+        stage_highres_savedPos_tree.heading("Phi", text="Angle")
+        stage_highres_savedPos_tree.heading("Label", text="Label")
 
+        stage_highres_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
+        stage_highres_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
+        stage_highres_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
+        stage_highres_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
+        stage_highres_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
+        stage_highres_savedPos_tree.column("Label", minwidth=0, width=100, stretch="NO", anchor="center")
+
+
+
+        return stage_highres_savedPos_tree
+
+    stage_highres_savedPos_tree = gettree()
     tuples = [(1, 0, 0, 0, 0, 0)]
     index = iid = 1
     for row in tuples:
         stage_highres_savedPos_tree.insert("", index=1, iid=1, values=row)
         index = iid = index + 1
 
+    stage_lowres_tree = gettree()
+    tuples2 = [(1, 1, 1, 1, 0, 1)]
+    for row in tuples2:
+        stage_lowres_tree.insert("", index=1, iid=1, values=row)
+        index = iid = index + 1
     #init class
-    c = drift_correction(stage_highres_savedPos_tree, stage_highres_savedPos_tree)
+    c = drift_correction(stage_lowres_tree, stage_highres_savedPos_tree)
 
     #load sample images
     #img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
@@ -247,7 +274,7 @@ if __name__ == '__main__':
     # c.plot_registration(img0_cropYZ, img1_cropZY)
 
     #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 1)
-    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, img0name, 0.3, 1)
-
+    #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, img0name, 0.3, 1)
+    c.find_closestLowResTile(0)
     #c.register_image(img0_crop,img1_crop,"translation")
 

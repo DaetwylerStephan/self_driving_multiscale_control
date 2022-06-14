@@ -117,7 +117,7 @@ class multiScopeModel:
         self.drift_correctionOnLowRes = 0 #parameter whether low res drift correction is enabled
         self.drift_which_channels = [0,0,0,0,0] #array on which channels drift correction is run
         self.perform_driftcorrectionOnChannel = 0 #flag whether for current stack, drift correction should be performed
-        self.current_treeviewitem = 'item0'
+        self.current_treeviewitem = 0 #todo previously 'item0'
 
         # initialize buffers
         self.update_bufferSize()
