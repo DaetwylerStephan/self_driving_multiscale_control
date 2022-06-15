@@ -16,10 +16,10 @@ from matplotlib import pyplot as plt
 from skimage import transform, io, exposure
 
 class drift_correction:
-    def __init__(self, lowres_tree, highres_tree, filepath="path.txt"):
+    def __init__(self, lowres_PosList, highres_PosList, filepath="path.txt"):
         #init it
-        self.lowres_tree = lowres_tree
-        self.highres_tree = highres_tree
+        self.lowres_positionList = lowres_PosList
+        self.highres_positionList = highres_PosList
         self.logfile = filepath
 
     def update_stagePosition(self):
@@ -35,13 +35,15 @@ class drift_correction:
         :return:
         '''
 
-    def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step, treeviewitem):
+    def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step, PosNumber):
         '''
-        calculate drift based on high resolution images from previous timepoint, and update tree
+        calculate drift based on high resolution images from previous timepoint, and update position list
         :param xyview:
         :param xzview:
         :param yzview:
         :param previousimage: file path to previous time point image
+        :param z_step:
+        :param PosNumber: the entry list of the position
         :return:
         '''
 
@@ -74,54 +76,45 @@ class drift_correction:
         correctionarray = [0, correctX_mm, correctY_mm, correctZ_mm, 0, 0]
         print(correctX_mm,correctY_mm, correctZ_mm)
 
-        # print(self.highres_tree.item(treeviewitem)['values'])
-        x = np.array([np.float(self.highres_tree.item(treeviewitem)['values'][0]),
-                      np.float(self.highres_tree.item(treeviewitem)['values'][1]),
-                      np.float(self.highres_tree.item(treeviewitem)['values'][2]),
-                      np.float(self.highres_tree.item(treeviewitem)['values'][3]),
-                      np.float(self.highres_tree.item(treeviewitem)['values'][4]),
-                      np.float(self.highres_tree.item(treeviewitem)['values'][5])])
+        x = self.highres_positionList[PosNumber]
         y = np.array(correctionarray).astype(np.float)
         print("x:" + str(x))
         print("y:" + str(y))
         newposition = x + y
         print(newposition)
 
-        self.highres_tree.item(treeviewitem, values=(float(newposition[0]), newposition[1], newposition[2], newposition[3], newposition[4], int(newposition[5])))
-        tree_values1 = self.highres_tree.item(treeviewitem)['values']
-        print(tree_values1)
-        # zpos = int(float(self.highres_tree.item(treeviewitem)['values'][3]) * 1000000000)
-        # print(zpos)
-        # return correctX_mm, correctY_mm, correctZ_mm
+        self.highres_positionList[PosNumber] = newposition
 
-    def find_closestLowResTile(self, line):
+        print(self.highres_positionList[PosNumber])
+
+
+    def find_closestLowResTile(self, PosNumber):
         '''
         find corresponding low resolution stack to high-res region.
         :return: the corresponding file name of the low resolution stack which is closest to the high res stack.
         '''
 
-        xpos = int(float(self.highres_tree.item(line)['values'][1]))
-        ypos = int(float(self.highres_tree.item(line)['values'][2]))
-        zpos = int(float(self.highres_tree.item(line)['values'][3]))
-        angle = int(float(self.highres_tree.item(line)['values'][4]))
-        highrespoint =  np.array((xpos,ypos,zpos))
+        highrespoint = np.array(self.highres_positionList[PosNumber][1:4])
+        angle = int(float(self.highres_positionList[PosNumber][4]))
+        print(angle)
 
         positioniter = -1
         dist = -1
 
-        for lowresline in self.lowres_tree.get_children():
+        for lowresline in range(len(self.lowres_positionList)):
             positioniter = positioniter + 1
             # get current position from list
-            xposLow = int(float(self.lowres_tree.item(line)['values'][1]))
-            yposLow = int(float(self.lowres_tree.item(line)['values'][2]))
-            zposLow = int(float(self.lowres_tree.item(line)['values'][3]))
-            angleLow = int(float(self.lowres_tree.item(line)['values'][4]))
-            lowrespoint = np.array((xposLow, yposLow, zposLow))
+
+            angleLow = int(float(self.lowres_positionList[lowresline][4]))
+            lowrespoint = np.array(self.lowres_positionList[lowresline][1:4])
+            print(angleLow)
 
             if angle==angleLow:
                 dist_current = np.linalg.norm(highrespoint - lowrespoint)
+                print(dist_current)
                 if dist == -1:
                     dist = dist_current
+                    pos_label_line = "low_stack" + f'{positioniter:03}'
                 if dist > dist_current:
                     dist = dist_current
                     pos_label_line = "low_stack" + f'{positioniter:03}'
@@ -208,70 +201,36 @@ class drift_correction:
 
 if __name__ == '__main__':
 
-    #define trees as in GUI
-    root = tk.Tk()
-
-    def gettree():
-        stage_highres_savedPos_tree = ttk.Treeview(root, columns=("Position", "X", "Y", "Z", "Phi", "Label"),
-                                                   show="headings", height=9)
-        stage_highres_savedPos_tree.heading("Position", text="Position")
-        stage_highres_savedPos_tree.heading("X", text="X")
-        stage_highres_savedPos_tree.heading("Y", text="Y")
-        stage_highres_savedPos_tree.heading("Z", text="Z")
-        stage_highres_savedPos_tree.heading("Phi", text="Angle")
-        stage_highres_savedPos_tree.heading("Label", text="Label")
-
-        stage_highres_savedPos_tree.column("Position", minwidth=0, width=55, stretch="NO", anchor="center")
-        stage_highres_savedPos_tree.column("X", minwidth=0, width=100, stretch="NO", anchor="center")
-        stage_highres_savedPos_tree.column("Y", minwidth=0, width=100, stretch="NO", anchor="center")
-        stage_highres_savedPos_tree.column("Z", minwidth=0, width=100, stretch="NO", anchor="center")
-        stage_highres_savedPos_tree.column("Phi", minwidth=0, width=100, stretch="NO", anchor="center")
-        stage_highres_savedPos_tree.column("Label", minwidth=0, width=100, stretch="NO", anchor="center")
-
-
-
-        return stage_highres_savedPos_tree
-
-    stage_highres_savedPos_tree = gettree()
-    tuples = [(1, 0, 0, 0, 0, 0)]
-    index = iid = 1
-    for row in tuples:
-        stage_highres_savedPos_tree.insert("", index=1, iid=1, values=row)
-        index = iid = index + 1
-
-    stage_lowres_tree = gettree()
-    tuples2 = [(1, 1, 1, 1, 0, 1)]
-    for row in tuples2:
-        stage_lowres_tree.insert("", index=1, iid=1, values=row)
-        index = iid = index + 1
+    stage_PositionList = [(1, 0.5, 0.6, 0.7, 0)]
+    stage_highres_PositionList = [(1, 0.5, 0.6, 0.7, 0, 1)]
     #init class
-    c = drift_correction(stage_lowres_tree, stage_highres_savedPos_tree)
+    c = drift_correction(stage_PositionList, stage_highres_PositionList)
 
     #load sample images
     #img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
     #img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
-    img0name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00000.tif"
-    img1name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00001.tif"
-
-    img0 = imread(img0name)
-    img1 = imread(img1name)
-    # img0_cropXY = img0[0:1024, 0:2048]
-    # img1_cropXY = img1[0:1024, 0:2048]
-    # img0_cropXZ = img0[1024:, 0:2048]
-    # img1_cropXZ = img1[1024:, 0:2048]
-    # img0_cropYZ = img0[0:1024, 2048:]
-    # img1_cropZY = img1[0:1024, 2048:]
-
-    img0_cropXY = img0[0:2048, 0:2048]
-    img1_cropXY = img1[0:2048, 0:2048]
-    img0_cropXZ = img0[2048:, 0:2048]
-    img1_cropXZ = img1[2048:, 0:2048]
-    img0_cropYZ = img0[0:2048, 2048:]
-    img1_cropZY = img1[0:2048, 2048:]
-
-    # c.plot_registration(img0_cropXY, img1_cropXY)
-    # c.plot_registration(img0_cropXZ, img1_cropXZ)
-    # c.plot_registration(img0_cropYZ, img1_cropZY)
+    # img0name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00000.tif"
+    # img1name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00001.tif"
+    #
+    # img0 = imread(img0name)
+    # img1 = imread(img1name)
+    # # img0_cropXY = img0[0:1024, 0:2048]
+    # # img1_cropXY = img1[0:1024, 0:2048]
+    # # img0_cropXZ = img0[1024:, 0:2048]
+    # # img1_cropXZ = img1[1024:, 0:2048]
+    # # img0_cropYZ = img0[0:1024, 2048:]
+    # # img1_cropZY = img1[0:1024, 2048:]
+    #
+    # img0_cropXY = img0[0:2048, 0:2048]
+    # img1_cropXY = img1[0:2048, 0:2048]
+    # img0_cropXZ = img0[2048:, 0:2048]
+    # img1_cropXZ = img1[2048:, 0:2048]
+    # img0_cropYZ = img0[0:2048, 2048:]
+    # img1_cropZY = img1[0:2048, 2048:]
+    #
+    # # c.plot_registration(img0_cropXY, img1_cropXY)
+    # # c.plot_registration(img0_cropXZ, img1_cropXZ)
+    # # c.plot_registration(img0_cropYZ, img1_cropZY)
 
     #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 1)
     #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, img0name, 0.3, 1)
