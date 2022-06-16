@@ -17,6 +17,7 @@ import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
 import src.slit.slit_cmd as SlitControl
+import src.voicecoil.voice_coil as Voice_Coil
 
 from auxiliary_code.constants import FilterWheel_parameters
 from auxiliary_code.constants import Stage_parameters
@@ -166,6 +167,20 @@ class multiScopeModel:
         print(self.lowres_camera_ROI)
         # self.lowres_camera.take_snapshot(20)
         print("done with camera.")
+
+    def _init_voicecoil(self):
+        """
+        Initialize the voice coil
+        :return: initialized voice coil
+        """
+        print("Initializing voice coil ..")
+
+        self.voice_coil = Voice_Coil.VoiceCoil(verbose=True)
+        self.voice_coil.send_command('k0\r')  # Turn off servo
+        time.sleep(1)
+        self.voice_coil.send_command('k1\r')  # Engage servo
+        time.sleep(1)
+        self.voice_coil.send_command('d\r')  # Engage servo
 
     def _init_highres_camera(self):
         """

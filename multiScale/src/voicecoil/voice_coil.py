@@ -145,13 +145,14 @@ class VoiceCoil:
                 self.close_connection()
             else:
                 # Send command to device
-                self.serial.write(msg.encode('utf-8'))
+                encodedmsg = msg.encode('utf-8')
+                self.serial.write(encodedmsg)
 
                 # Read data sent from device
-                data = self.serial.read(9999)
+                data = self.serial.read(20000)
                 if len(data) > 0:
                     print("Data received: " + data.decode())
-                time.sleep(self.timeout)
+                time.sleep(self.timeout+1)
 
         except serial.SerialException:
             raise UserWarning('Error in communicating with Voice Coil via COMPORT', self.comport)
@@ -167,9 +168,10 @@ if __name__ == "__main__":
     vc = VoiceCoil(verbose=True)
     vc.send_command('k0\r')  # Turn off servo
     time.sleep(1)
-    vc.send_command('k1\r')  # Engage servo
-    time.sleep(5)
+    # vc.send_command('k1\r')  # Engage servo
+    # time.sleep(1)
     vc.send_command('d\r')  # Engage servo
-    time.sleep(5)
+    time.sleep(1)
     vc.send_command('k0\r')  # Engage servo
+    time.sleep(1)
     vc.send_command('close')  # Engage servo

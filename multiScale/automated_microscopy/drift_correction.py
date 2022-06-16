@@ -78,14 +78,13 @@ class drift_correction:
 
         x = self.highres_positionList[PosNumber]
         y = np.array(correctionarray).astype(np.float)
-        print("x:" + str(x))
-        print("y:" + str(y))
+        #print("y:" + str(y))
         newposition = x + y
-        print(newposition)
-
+        #print(newposition)
+        print("position list: " + str(self.highres_positionList))
         self.highres_positionList[PosNumber] = newposition
 
-        print(self.highres_positionList[PosNumber])
+        print("position list updated: " + str(self.highres_positionList[PosNumber]))
 
 
     def find_closestLowResTile(self, PosNumber):
@@ -96,29 +95,23 @@ class drift_correction:
 
         highrespoint = np.array(self.highres_positionList[PosNumber][1:4])
         angle = int(float(self.highres_positionList[PosNumber][4]))
-        print(angle)
 
         positioniter = -1
         dist = -1
-
         for lowresline in range(len(self.lowres_positionList)):
             positioniter = positioniter + 1
             # get current position from list
 
             angleLow = int(float(self.lowres_positionList[lowresline][4]))
             lowrespoint = np.array(self.lowres_positionList[lowresline][1:4])
-            print(angleLow)
-
             if angle==angleLow:
                 dist_current = np.linalg.norm(highrespoint - lowrespoint)
-                print(dist_current)
                 if dist == -1:
                     dist = dist_current
                     pos_label_line = "low_stack" + f'{positioniter:03}'
                 if dist > dist_current:
                     dist = dist_current
                     pos_label_line = "low_stack" + f'{positioniter:03}'
-
         return pos_label_line
 
     def calculate_drift_lowRes_complete(self, previousimage):
@@ -201,25 +194,25 @@ class drift_correction:
 
 if __name__ == '__main__':
 
-    stage_PositionList = [(1, 0.5, 0.6, 0.7, 0)]
+    stage_PositionList = [ (1,3,3.4,3,0), (2, 0.5, 0.6, 0.7, 0),(2, 0.5, 0.6, 0.7, 4), (2, 0.5, 0.4, 0.7, 0)]
     stage_highres_PositionList = [(1, 0.5, 0.6, 0.7, 0, 1)]
     #init class
     c = drift_correction(stage_PositionList, stage_highres_PositionList)
 
     #load sample images
-    #img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
-    #img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
+    img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
+    img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
     # img0name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00000.tif"
     # img1name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00001.tif"
     #
-    # img0 = imread(img0name)
-    # img1 = imread(img1name)
-    # # img0_cropXY = img0[0:1024, 0:2048]
-    # # img1_cropXY = img1[0:1024, 0:2048]
-    # # img0_cropXZ = img0[1024:, 0:2048]
-    # # img1_cropXZ = img1[1024:, 0:2048]
-    # # img0_cropYZ = img0[0:1024, 2048:]
-    # # img1_cropZY = img1[0:1024, 2048:]
+    img0 = imread(img0name)
+    img1 = imread(img1name)
+    img0_cropXY = img0[0:1024, 0:2048]
+    img1_cropXY = img1[0:1024, 0:2048]
+    img0_cropXZ = img0[1024:, 0:2048]
+    img1_cropXZ = img1[1024:, 0:2048]
+    img0_cropYZ = img0[0:1024, 2048:]
+    img1_cropZY = img1[0:1024, 2048:]
     #
     # img0_cropXY = img0[0:2048, 0:2048]
     # img1_cropXY = img1[0:2048, 0:2048]
@@ -228,12 +221,16 @@ if __name__ == '__main__':
     # img0_cropYZ = img0[0:2048, 2048:]
     # img1_cropZY = img1[0:2048, 2048:]
     #
-    # # c.plot_registration(img0_cropXY, img1_cropXY)
-    # # c.plot_registration(img0_cropXZ, img1_cropXZ)
-    # # c.plot_registration(img0_cropYZ, img1_cropZY)
+    # c.plot_registration(img0_cropXY, img1_cropXY)
+    # c.plot_registration(img0_cropXZ, img1_cropXZ)
+    # c.plot_registration(img0_cropYZ, img1_cropZY)
 
-    #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 1)
+    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 0)
+    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 0)
+    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 0)
+    c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 0)
     #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, img0name, 0.3, 1)
-    c.find_closestLowResTile(0)
+    pos = c.find_closestLowResTile(0)
+    print(pos)
     #c.register_image(img0_crop,img1_crop,"translation")
 
