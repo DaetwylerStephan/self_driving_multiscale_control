@@ -49,7 +49,13 @@ class MultiScale_Microscope_Controller():
         self.paramwriter = write_params.write_Params(self.view)
 
         #init drift correction module
-        self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_PositionList, self.view.stagessettingstab.stage_highres_PositionList)
+        self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_PositionList,
+                                                       self.view.stagessettingstab.stage_highres_PositionList,
+                                                       self.model.lowres_planespacing,
+                                                       self.model.highres_planespacing,
+                                                       self.model.current_highresROI_height,
+                                                       self.model.current_highresROI_width)
+
         self.model.driftcorrectionmodule = self.drift_correctionmodule
 
         #define here which buttons run which function in the multiScope model

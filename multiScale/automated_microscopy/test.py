@@ -13,7 +13,17 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
     imstack1 = imread(filename)
     print(imstack1.shape)
     print(imstack1.dtype)
-    subarray = imstack1[:,1400:2000,1500:1900]
+
+
+
+    subarray = imstack1[60:62,1400:2000,1500:1900]
+    t2 = time.perf_counter()
+    for i in range(subarray.shape[0]):
+        print(i)
+        subarray[i] = np.flipud(subarray[i])
+    t3 = time.perf_counter() - t2
+    print("time stack flip" + str(t3))
+
     print(subarray.shape)
     maxproj_xy = np.max(subarray, axis=0)
     t1 = time.perf_counter() - t0
@@ -29,7 +39,7 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
     store = imread(filename, aszarr=True)
     z = zarr.open(store, mode='a')
     print(z[0].shape)
-    subarray_zarr = copy.deepcopy(z[:, 1400:2000,1500:1900])
+    subarray_zarr = copy.deepcopy(z[60:62, 1400:2000,1500:1900])
     maxproj_xy2 = np.max(subarray_zarr, axis=0)
     t1 = time.perf_counter() - t0
     print("time: " + str(t1))

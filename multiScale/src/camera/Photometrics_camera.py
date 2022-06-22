@@ -171,8 +171,13 @@ class Photo_Camera:
     #             break
     #     self.cam.finish()
 
-    def run_stack_acquisition_buffer_fast(self, nb_planes, buffer):
-        """Run a stack acquisition."""
+    def run_stack_acquisition_buffer_fast(self, nb_planes, buffer, flipimage=False):
+        """
+        Run a stack acquisition.
+        :param nb_planes: how many planes to acquire
+        :param buffer: the buffer to save the acquired planes to
+        :param flipimage - if TRUE flip image
+        """
         framesReceived = 0
         while framesReceived < nb_planes:
             # time.sleep(0.001)
@@ -180,8 +185,12 @@ class Photo_Camera:
             try:
                 frame, fps, frame_count = self.cam.poll_frame(timeout_ms=10000)
                 #fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-                t0 = time.perf_counter()
-                buffer[framesReceived, :, :] = np.copy(frame['pixel_data'][:])
+                #t0 = time.perf_counter()
+                if flipimage==True:
+                    buffer[framesReceived, :, :] = np.flipud(np.copy(frame['pixel_data'][:]))
+                else:
+                    buffer[framesReceived, :, :] = np.copy(frame['pixel_data'][:])
+
                 #frame['pixel_data'][:] = None
                 frame = None
                 del frame
@@ -261,9 +270,13 @@ class Photo_Camera:
 
         self.cam.start_live(exp_time=exposure)
 
-    def run_preview(self, out):
+    def run_preview(self, out, flipimage=False):
         frame, fps, frame_count = self.cam.poll_frame()
-        out[:] = np.copy(frame['pixel_data'][:])
+        if flipimage==False:
+            out[:] = np.copy(frame['pixel_data'][:])
+        else:
+            out[:] = np.flipud(np.copy(frame['pixel_data'][:]))
+
         # frame = None
         # del frame
 
@@ -279,7 +292,7 @@ class Photo_Camera:
         while framesReceived < 1:
             try:
                 frame, fps, frame_count = self.cam.poll_frame()
-                out[:] = np.copy(frame['pixel_data'][:])
+                out[:] = np.flipud(np.copy(frame['pixel_data'][:]))
                 framesReceived += 1
                 print("{}:{}".format(framesReceived, fps))
             except Exception as e:

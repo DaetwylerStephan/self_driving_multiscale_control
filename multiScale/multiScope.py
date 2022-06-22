@@ -542,7 +542,7 @@ class multiScopeModel:
                 self.highres_camera.set_up_highrespreview(self.exposure_time_HR)
                 self.num_frames += 1
                 custody.switch_from(None, to=self.highres_camera)
-                self.highres_camera.run_preview(out=self.high_res_buffer)
+                self.highres_camera.run_preview(out=self.high_res_buffer, flipimage=True)
 
                 # display acquired image
                 custody.switch_from(self.highres_camera, to=self.display)
@@ -952,7 +952,7 @@ class multiScopeModel:
 
             def start_camera_streamHighResSPIM():
                 self.highres_camera.run_stack_acquisition_buffer_fast(self.stack_nbplanes_highres,
-                                                                      self.high_res_buffers[current_bufferiter])
+                                                                      self.high_res_buffers[current_bufferiter], flipimage=True)
                 return
 
             start_highrescamera_stream_thread = ct.ResultThread(target=start_camera_streamHighResSPIM).start()
