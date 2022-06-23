@@ -1,5 +1,7 @@
 import numpy as np
 from tifffile import imread, imwrite
+from matplotlib import pyplot as plt
+import copy
 
 class images_InMemory_class:
     def __init__(self):
@@ -73,7 +75,7 @@ class images_InMemory_class:
         for iter in range(len(imagelist)):
             if imagelist[iter][0] == PosNumber:
                 found_image = 1
-                temporaryimage = np.copy(imagelist[iter][1]) #copy so that it is not overwritten
+                temporaryimage = copy.deepcopy(imagelist[iter][1]) #copy so that it is not overwritten
                 imagelist[iter] = (PosNumber, np.copy(image))
 
                 #update previous time point list
@@ -87,17 +89,88 @@ class images_InMemory_class:
         if found_image == 0:
             self.addNewImage(strcurrentlist, PosNumber, image)
 
+    def image_retrieval(self, whichlist, PosNumber):
+        """
+        get an image from a list
+        :param whichlist: which list to retrieve image - options: "current_lowRes_Proj", "previous_lowresProj",
+                          "current_highRes_Proj", "previous_highRes_Proj", "transmission_ImageList"
+        :param PosNumber: what is the Position Number (PosNumber) associated with the image
+        :return: image, or if image is not found returns 0
+        """
+        if whichlist == "current_lowRes_Proj":
+            try:
+                returnimage = self.currentTP_lowResMaxProjection[PosNumber][1]
+            except:
+                returnimage = 0
+        if whichlist == "previous_lowresProj":
+            try:
+                returnimage = self.previousTP_lowResMaxProjection[PosNumber][1]
+            except:
+                returnimage = 0
+        if whichlist == "current_highRes_Proj":
+            try:
+                returnimage = self.currentTP_highResMaxprojection[PosNumber][1]
+            except:
+                returnimage = 0
+        if whichlist == "previous_highRes_Proj":
+            try:
+                returnimage = self.previousTP_highResMaxProjection[PosNumber][1]
+            except:
+                returnimage = 0
+        if whichlist == "transmission_ImageList":
+            try:
+                returnimage = self.driftcorrection_transmissionImageList[PosNumber][1]
+            except:
+                returnimage = 0
+        return returnimage
 
 if __name__ == '__main__':
+
     #load some images to assign and replace images.
     image_deposit = images_InMemory_class()
     img_lowrestrans_name = "D://test/drift_correctionTest/transmission/lowres_transmission.tif"
     img_lowrestrans = imread(img_lowrestrans_name)
-    image_deposit.replaceImage("current_lowRes_Proj", 0, img_lowrestrans)
-    print("next2")
-    image_deposit.replaceImage("current_lowRes_Proj", 0, img_lowrestrans)
-    print("next3")
+    img_crop_name = "D://test/drift_correctionTest/transmission/lowres_transmission_ROI.tif"
+    img_crop = imread(img_crop_name)
+    img_3 = "D://test/drift_correctionTest/transmission/lowres_transmission_found.tif"
+    img_3 = imread(img_3)
 
     image_deposit.replaceImage("current_lowRes_Proj", 0, img_lowrestrans)
+    image_deposit.replaceImage("current_lowRes_Proj", 1, img_3)
+    image_deposit.replaceImage("current_lowRes_Proj", 2, img_lowrestrans)
+
+    im1 = image_deposit.image_retrieval("current_lowRes_Proj", 1)
+    im2 = image_deposit.image_retrieval("previous_lowresProj", 1)
+
+    f, ax = plt.subplots(3, 1, figsize=(18, 40))
+    ax[0].imshow(img_lowrestrans, cmap='gray')
+    ax[1].imshow(im1, cmap='gray')
+    plt.show(block='False')
+
+    image_deposit.replaceImage("current_lowRes_Proj", 0, img_crop)
+    image_deposit.replaceImage("current_lowRes_Proj", 1, img_crop)
+    image_deposit.replaceImage("current_lowRes_Proj", 2, img_crop)
+
+    im1 = image_deposit.image_retrieval("current_lowRes_Proj", 1)
+    im2 = image_deposit.image_retrieval("previous_lowresProj", 1)
+    print("next3")
+
+    f, ax = plt.subplots(3, 1, figsize=(18, 40))
+    ax[0].imshow(img_lowrestrans, cmap='gray')
+    ax[1].imshow(im1, cmap='gray')
+    ax[2].imshow(im2, cmap='gray')
+    plt.show(block='False')
+
+    image_deposit.replaceImage("current_lowRes_Proj", 0, img_lowrestrans)
+    image_deposit.replaceImage("current_lowRes_Proj", 1, img_3)
+    image_deposit.replaceImage("current_lowRes_Proj", 2, img_lowrestrans)
+    im1 = image_deposit.image_retrieval("current_lowRes_Proj", 1)
+    im2 = image_deposit.image_retrieval("previous_lowresProj", 1)
+
+    f, ax = plt.subplots(3, 1, figsize=(18, 40))
+    ax[0].imshow(img_lowrestrans, cmap='gray')
+    ax[1].imshow(im1, cmap='gray')
+    ax[2].imshow(im2, cmap='gray')
+    plt.show(block='False')
 
 
