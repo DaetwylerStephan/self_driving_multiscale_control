@@ -190,6 +190,19 @@ class drift_correction:
 
             else:
                 # if not first time, take previous image and find corresponding image in translation image with template matching
+                print("perform matching on transmission image")
+
+                #retrieve corresponding high res image and its position in the imagelist for later update
+                past_corresponding_image = []
+                imagelistindex = 0
+                for iter in range(len(self.imagelist)):
+                    if self.imagelist[iter][0]==PosNumber:
+                        past_corresponding_image = self.imagelist[iter][1]
+                        imagelistindex = iter
+
+                #perform template matching with current image.
+                stacknumber = self.find_closestLowResTile(PosNumber, return_number=True)
+
 
         #
         elif mode=="fluorescence":

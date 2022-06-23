@@ -121,7 +121,7 @@ class automated_templateMatching:
             cv2.imshow('Detected', img_rgb_sc)
             cv2.waitKey(0)
 
-            cv2.imwrite('D://test/test_templatematching/template_result3.tif', img_rgb_sc)
+
 
 if __name__ == '__main__':
 
