@@ -61,8 +61,6 @@ class automated_templateMatching:
 
     def scaling_templateMatching(self, searchimage_sc, template_sc, scaling_factor, showimage=False):
         '''
-
-
         :param template: highres image which we want to find in the low-res / big image
         :param searchimage: the big image, in which we want to find the template
         :param scaling_factor: scaling of the highres image (template) to match image dimensions of low res image
@@ -74,7 +72,8 @@ class automated_templateMatching:
         template_sc.astype(np.uint32)
         searchimage_sc.astype(np.uint32)
 
-        # template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+        # template_sc = cv2.cvtColor(template_sc, cv2.COLOR_BGR2GRAY)
+        # searchimage_sc = cv2.cvtColor(searchimage_sc, cv2.COLOR_BGR2GRAY)
 
         #resize highres image to fit dimensions of low res image - in our case
         template_resized = imutils.resize(template_sc, width=int(template_sc.shape[1] * scaling_factor))
@@ -90,7 +89,7 @@ class automated_templateMatching:
             # of the ratio of the resizing
             resized = imutils.resize(template_resized, width=int(template_resized.shape[1] * scale))
             r = resized.shape[1] / float(template_resized.shape[1])
-            print(r)
+            #print(r)
             # if the resized image is smaller than the template, then break
             # from the loop
             if searchimage_sc.shape[0] < tH or searchimage_sc.shape[1] < tW:
@@ -98,6 +97,9 @@ class automated_templateMatching:
 
             # matching to find the template in the image
             #edged = cv2.Canny(resized, 50, 200)
+            searchimage_sc = searchimage_sc.astype("float32")
+            resized = resized.astype("float32")
+
             res = cv2.matchTemplate(searchimage_sc, resized, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(res)
             # if we have found a new maximum correlation value, then update
@@ -105,12 +107,12 @@ class automated_templateMatching:
             if maxVal > maxvalue:
                 found = (maxVal, maxLoc, r)
                 maxvalue = maxVal
-                print("-----new value:------")
-                print(maxvalue)
+                #print("-----new value:------")
+                #print(maxvalue)
 
         # Store the coordinates of matched area in a numpy array
         loc = found[1]
-        print(loc)
+        print("new location: " + str(loc))
         if showimage==True:
             # Draw a rectangle around the matched region.
             print(tH, tW)

@@ -1,15 +1,13 @@
 import numpy as np
-import tkinter as tk
-from tkinter import ttk
 from tifffile import imread, imwrite
 import os
 import cv2
-
 import copy
-
 import sys
 sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
 from auxiliary_code.constants import Image_parameters
+from image_deposit import images_InMemory_class
+from template_matching import automated_templateMatching
 
 from pystackreg import StackReg
 import pystackreg
@@ -18,7 +16,7 @@ from matplotlib import pyplot as plt
 from skimage import transform, io, exposure
 
 class drift_correction:
-    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_x, highresShape_y, filepath="path.txt"):
+    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_x, highresShape_y, imageRepoLists, filepath="path.txt"):
         """
         :param lowres_PosList: the list of position of the low resolution imaging
         :param highres_PosList: the list of position of the high resolution imaging
@@ -38,7 +36,9 @@ class drift_correction:
         self.highres_zspacing = highres_zspacing
         self.highres_x = highresShape_x
         self.highres_y = highresShape_y
-        self.imagelist = []
+        self.ImageRepo = imageRepoLists
+
+        self.templatematching = automated_templateMatching()
 
     def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step, PosNumber):
         '''
@@ -129,7 +129,7 @@ class drift_correction:
         else:
             return positionnumber
 
-    def calculate_drift_lowRes_complete(self, previousimage, PosNumber, mode='fluorescence', firsttimepoint=False):
+    def calculate_drift_lowRes_complete(self, PosNumber, mode='fluorescence', firsttimepoint=False):
         '''
         calculates drift correction based on low res view.
         :param previousimage: to which previous image are you correcting to?
@@ -147,10 +147,14 @@ class drift_correction:
         #an image of the region to follow. This image is saved in the image list
         if mode=="transmission":
             print('Use transmission image for drift correction')
-            #find the right tile
+
+            # retrieve corresponding high res image
+            image_transmission = self.ImageRepo.image_retrieval("current_transmissionImage", PosNumber)
+            print(image_transmission.shape)
 
             #establish the position of the first tile.
-            if firsttimepoint == True:
+            if image_transmission.shape[0] < 2:
+                print('Establish first corresponding transmission image')
                 #find corresponding low resolution tile to high resolution image and get coordinates.
                 lowstacknumber = self.find_closestLowResTile(PosNumber, return_number=True)
                 coordinates_lowres = np.asarray(self.lowres_positionList[lowstacknumber][1:5])
@@ -161,47 +165,54 @@ class drift_correction:
                 coordinate_difference[lateralId] = coordinate_difference[lateralId] * self.scalingfactor
                 coordinate_difference[UpDownID] = coordinate_difference[UpDownID] * self.scalingfactor
 
-                #get low resolution image #todo how to do this in image acquisition?
-                img_lowrestrans_name = "D://test/drift_correctionTest/transmission/lowres_transmission.tif"
-                img_lowrestrans = imread(img_lowrestrans_name)
-                print(img_lowrestrans.shape)
-
+                #get low resolution image
+                img_lowrestrans = self.ImageRepo.image_retrieval("current_lowRes_Proj", lowstacknumber)
+                print("img_lowrestrans.shape:" + str(img_lowrestrans.shape))
                 #get central pixel for low resolution stack
-                loc = (img_lowrestrans.shape[0]/2, img_lowrestrans.shape[1]/2)
+                loc = (int(img_lowrestrans.shape[0]/2), int(img_lowrestrans.shape[1]/2))
 
                 #highres size in lowres:
                 pixel_w_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_x)
                 pixel_h_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_y)
 
+                #calculate displacement
+                loc = (int(loc[0]+ coordinate_difference[lateralId]-pixel_w_highresInLowres/2), int(loc[1] + coordinate_difference[UpDownID]-pixel_h_highresInLowres/2))
 
+                print("first location" + str(loc))
                 #retrieve region in lowres view of highres view
                 corresponding_lowres_view = img_lowrestrans[loc[0]:(loc[0]+pixel_w_highresInLowres), loc[1]:(loc[1]+pixel_h_highresInLowres)]
+                print("corr" + str(corresponding_lowres_view.shape))
 
                 #assign the image to the image list
-                self.imagelist.append((PosNumber, corresponding_lowres_view))
+                print("length0:" + str(len(self.ImageRepo.current_transmissionImageList)))
 
+                self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(corresponding_lowres_view))
+                print("length1:" + str(len(self.ImageRepo.current_transmissionImageList)))
+                print("listcontent0: " + str(self.ImageRepo.current_transmissionImageList[0][0]))
+                print("listcontent1: " + str(self.ImageRepo.current_transmissionImageList[0][1]))
+
+                testim = self.ImageRepo.image_retrieval("current_transmissionImage", PosNumber)
+                print("testim " +str(PosNumber) + ":" + str(testim.shape))
                 #cv2.imwrite('D://test//drift_correctionTest/transmission/lowres_transmission_ROI.tif', corresponding_lowres_view)
 
                 # Show the final image with the matched area.
                 # visualization
-                # loc = (int(loc[0]+ coordinate_difference[lateralId]-pixel_w_highresInLowres/2), int(loc[1] + coordinate_difference[UpDownID]-pixel_h_highresInLowres/2))
                 # img_rgb_sc = cv2.rectangle(img_lowrestrans, (loc[1], loc[0]), (loc[1] + pixel_w_highresInLowres, loc[0] + pixel_h_highresInLowres), (0, 255, 255), 2)
                 # cv2.imwrite('D://test//drift_correctionTest/transmission/lowres_transmission_found.tif', img_rgb_sc)
-
             else:
                 # if not first time, take previous image and find corresponding image in translation image with template matching
                 print("perform matching on transmission image")
 
-                #retrieve corresponding high res image and its position in the imagelist for later update
-                past_corresponding_image = []
-                imagelistindex = 0
-                for iter in range(len(self.imagelist)):
-                    if self.imagelist[iter][0]==PosNumber:
-                        past_corresponding_image = self.imagelist[iter][1]
-                        imagelistindex = iter
-
-                #perform template matching with current image.
+                #get corresponding low res stack
                 stacknumber = self.find_closestLowResTile(PosNumber, return_number=True)
+                lowresstackimage = self.ImageRepo.image_retrieval("current_lowRes_Proj", stacknumber)
+
+                f, ax = plt.subplots(2, 1, figsize=(18, 40))
+                ax[0].imshow(lowresstackimage, cmap='gray')
+                ax[1].imshow(image_transmission, cmap='gray')
+                plt.show(block='False')
+
+                self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
 
 
         #
@@ -210,13 +221,7 @@ class drift_correction:
         else:
             print("Use fluorescence image for drift correction")
 
-        # load timepoint
-        isExist = os.path.exists(previousimage)
-        if not isExist:
-            print("Wanted to make drift correction to reference image that does not exist")
-            return  # return if file does not exist - e.g. for first timepoint
 
-        ref = imread(previousimage)
 
     def transmission_make_selectedfirstmax(self, lowstackname, PosNumber):
         '''
@@ -298,30 +303,51 @@ class drift_correction:
 
 if __name__ == '__main__':
 
+    #set test positions
     stage_PositionList = [ (1,1.13718, -24.69498, -1.0845, 0.0,0), (2, 0.5, 0.6, 0.7, 0),(2, 0.5, 0.6, 0.7, 4), (2, 0.5, 0.4, 0.7, 0)]
     stage_highres_PositionList = [(1, 1.2441, -24.69498, -1.00431, 0.0, 1), (2, 1.2441, -25.25631, -0.89739, 0.0, 2)]
 
-    #init class
-    c = drift_correction(stage_PositionList, stage_highres_PositionList, 0.0035, 0.0003, 2048, 2048)
-    print("highresPoslist " + str(c.highres_positionList))
-    #test images
-    img_lowrestrans_name = "D://test/drift_correctionTest/transmission/lowres_transmission.tif"
-    img_lowrestrans = imread(img_lowrestrans_name)
+    #load test images
+    img_lowres_t0000 = "D://test/drift_correctionTest/transmission_timeseries/lowres_transmission_t0000.tif"
+    img_lowres_t0001 = "D://test/drift_correctionTest/transmission_timeseries/lowres_transmission100pixel_t0001.tif"
+    img_lowres_t0002 = "D://test/drift_correctionTest/transmission_timeseries/lowres_transmission200pixel_t0002.tif"
+    img_lowrestrans = imread(img_lowres_t0000)
+    img_lowres_t_t0000 = imread(img_lowres_t0000)
+    img_lowres_t_t0001 = imread(img_lowres_t0001)
+    img_lowres_t_t0002 = imread(img_lowres_t0002)
+
+    #initialize image repository class and drift correction class
+    imagerepoclass = images_InMemory_class()
+    c = drift_correction(stage_PositionList, stage_highres_PositionList, 0.0035, 0.0003, 2048, 2048, imagerepoclass)
+
+    #first acquisition
+    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
+    returnvalue = c.ImageRepo.image_retrieval("current_lowRes_Proj", 0)
+    print("testoutside:" + str(returnvalue.shape))
+    c.calculate_drift_lowRes_complete(1, mode='transmission')
+
+    #second acquisition
+    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
+    c.calculate_drift_lowRes_complete(1, mode='transmission')
+
+    # #third acquisition
+    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0002)
+    c.calculate_drift_lowRes_complete(1, mode='transmission')
 
     #load sample images
-    img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
-    img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
-    # img0name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00000.tif"
-    # img1name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00001.tif"
-    #
-    img0 = imread(img0name)
-    img1 = imread(img1name)
-    img0_cropXY = img0[0:1024, 0:2048]
-    img1_cropXY = img1[0:1024, 0:2048]
-    img0_cropXZ = img0[1024:, 0:2048]
-    img1_cropXZ = img1[1024:, 0:2048]
-    img0_cropYZ = img0[0:1024, 2048:]
-    img1_cropZY = img1[0:1024, 2048:]
+    # img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
+    # img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
+    # # img0name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00000.tif"
+    # # img1name ="D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00001.tif"
+    # #
+    # img0 = imread(img0name)
+    # img1 = imread(img1name)
+    # img0_cropXY = img0[0:1024, 0:2048]
+    # img1_cropXY = img1[0:1024, 0:2048]
+    # img0_cropXZ = img0[1024:, 0:2048]
+    # img1_cropXZ = img1[1024:, 0:2048]
+    # img0_cropYZ = img0[0:1024, 2048:]
+    # img1_cropZY = img1[0:1024, 2048:]
     #
     # img0_cropXY = img0[0:2048, 0:2048]
     # img1_cropXY = img1[0:2048, 0:2048]
@@ -339,9 +365,17 @@ if __name__ == '__main__':
     # c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 0)
     # c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, "D://test/drift_correctionTest/CH488/t00000.tif", 0.3, 0)
     # #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, img0name, 0.3, 1)
-    pos = c.find_closestLowResTile(0)
-    print(pos)
 
-    c.calculate_drift_lowRes_complete("D://test/drift_correctionTest/CH488/t00000.tif", 0, mode='transmission', firsttimepoint=True)
+
+
+    # pos = c.find_closestLowResTile(0)
+    # print(pos)
+    #
+    # img_lowrestrans_name = "D://test/drift_correctionTest/transmission/lowres_transmission.tif"
+    # img_lowres = imread(img_lowrestrans_name)
+    # print(img_lowres.shape)
+    # imagerepoclass.replaceImage("current_lowRes_Proj", 0, img_lowres)
+    #
+    # c.calculate_drift_lowRes_complete("D://test/drift_correctionTest/CH488/t00000.tif", 0, mode='transmission', firsttimepoint=True)
     #c.register_image(img0_crop,img1_crop,"translation")
 
