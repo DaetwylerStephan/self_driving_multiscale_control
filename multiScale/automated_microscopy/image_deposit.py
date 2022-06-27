@@ -109,38 +109,37 @@ class images_InMemory_class:
         :return: image, or if image is not found returns an array with value zero: np.array([0]) for easy checking
         """
         if whichlist == "current_lowRes_Proj":
-            try:
-                returnimage = self.currentTP_lowResMaxProjection[PosNumber][1]
-            except:
-                returnimage = np.array([0])
+            returnimage = self._image_retrievalSupport(self.currentTP_lowResMaxProjection, PosNumber)
         if whichlist == "previous_lowresProj":
-            try:
-                returnimage = self.previousTP_lowResMaxProjection[PosNumber][1]
-            except:
-                returnimage = np.array([0])
+            returnimage = self._image_retrievalSupport(self.previousTP_lowResMaxProjection, PosNumber)
         if whichlist == "current_highRes_Proj":
-            try:
-                returnimage = self.currentTP_highResMaxprojection[PosNumber][1]
-            except:
-                returnimage = np.array([0])
+            returnimage = self._image_retrievalSupport(self.currentTP_highResMaxprojection, PosNumber)
         if whichlist == "previous_highRes_Proj":
-            try:
-                returnimage = self.previousTP_highResMaxProjection[PosNumber][1]
-            except:
-                returnimage = np.array([0])
+            returnimage = self._image_retrievalSupport(self.previousTP_highResMaxProjection, PosNumber)
         if whichlist == "current_transmissionImage":
-            try:
-                print("get transmission image")
-                #todo - you need to search for the position Number!!! for loop over the entries...
-                returnimage = self.current_transmissionImageList[PosNumber][1]
-            except:
-                returnimage = np.array([0])
+            returnimage = self._image_retrievalSupport(self.current_transmissionImageList, PosNumber)
         if whichlist == "previous_transmissionImage":
-            try:
-                returnimage = self.previous_transmissionImageList[PosNumber][1]
-            except:
-                returnimage = np.array([0])
+            returnimage = self._image_retrievalSupport(self.previous_transmissionImageList, PosNumber)
+
         return returnimage
+
+    def _image_retrievalSupport(self, currentlist, PosNumber):
+        """
+        support function for function image_retrieval, searches a list for the right PosNumber element.
+        :param currentlist: list to search for PosNumber
+        :param PosNumber: Indicator number of the saved image
+        :return: image saved at the specific location - or an array with element 0
+        """
+        found_image = 0
+        for iter in range(len(currentlist)):
+            if currentlist[iter][0] == PosNumber:
+                returnimage_2 = currentlist[iter][1]
+                found_image = 1
+        if found_image == 0:
+            returnimage_2 = np.array([0])
+
+        return returnimage_2
+
 
 if __name__ == '__main__':
 
