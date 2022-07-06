@@ -14,12 +14,11 @@ class automated_templateMatching:
     def simple_templateMatching(self, searchimage, template, scaling_factor, showimage=False):
         '''
 
-
         :param template: highres image which we want to find in the low-res / big image
         :param searchimage: the big image, in which we want to find the template
         :param scaling_factor: scaling of the highres image (template) to match image dimensions of low res image
         :param showimage: show image when executing template matching
-        :return:
+        :return:(row_number, column_number) of the max value
         '''
 
         #convert image to unit32 file type for OpenCV template matching algorithm
@@ -42,22 +41,40 @@ class automated_templateMatching:
         print(maxLoc)
         print(maxVal)
 
-        # Specify a threshold
-        threshold = 0.53035
-        # Store the coordinates of matched area in a numpy array
-        loc = np.where(res >= threshold)
+        # # Specify a threshold
+        # threshold = 0.53035
+        # # Store the coordinates of matched area in a numpy array
+        # loc = np.where(res >= threshold)
+        #
+        # if showimage==True:
+        #     # Draw a rectangle around the matched region.
+        #     for pt in zip(*loc[::-1]):
+        #         img_rgb = cv2.rectangle(searchimage, pt, (pt[0] + tW, pt[1] + tH), (0, 255, 255), 2)
+        #
+        #     # Show the final image with the matched area.
+        #     img_rgb = cv2.resize(img_rgb, (1011, 592))
+        #     cv2.imshow('Detected', img_rgb)
+        #     cv2.waitKey(0)
+        #
+        #     cv2.imwrite('D://test/test_templatematching/template_result3.tif', img_rgb)
 
-        if showimage==True:
+        loc = found[1]
+        print("new location: " + str(loc))
+        if showimage == True:
             # Draw a rectangle around the matched region.
-            for pt in zip(*loc[::-1]):
-                img_rgb = cv2.rectangle(searchimage, pt, (pt[0] + tW, pt[1] + tH), (0, 255, 255), 2)
+            print(tH, tW)
+            img_rgb_sc = cv2.rectangle(searchimage, loc, (loc[0] + tW, loc[1] + tH), (0, 255, 255), 2)
 
             # Show the final image with the matched area.
-            img_rgb = cv2.resize(img_rgb, (1011, 592))
-            cv2.imshow('Detected', img_rgb)
+            img_rgb_sc = cv2.resize(searchimage, (1011, 592))
+            cv2.imshow('Detected', img_rgb_sc)
             cv2.waitKey(0)
 
-            cv2.imwrite('D://test/test_templatematching/template_result3.tif', img_rgb)
+        # cv2 has a different numbering than np array
+        row_number = loc[1]
+        column_number = loc[0]
+        return (row_number, column_number)
+
 
     def scaling_templateMatching(self, searchimage_sc, template_sc, scaling_factor, showimage=False):
         '''
@@ -122,6 +139,12 @@ class automated_templateMatching:
             img_rgb_sc = cv2.resize(searchimage_sc, (1011, 592))
             cv2.imshow('Detected', img_rgb_sc)
             cv2.waitKey(0)
+
+        #cv2 has a different numbering than np array
+        row_number = loc[1]
+        column_number = loc[0]
+
+        return (row_number, column_number)
 
 
 

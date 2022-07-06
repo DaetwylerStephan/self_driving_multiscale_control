@@ -277,8 +277,6 @@ class MultiScale_Microscope_Controller():
 
         :return:
         '''
-
-
         #which ROI selected
         if self.view.runtab.roi_whichresolution.get()=='on': #low-resolution
             if self.model.continue_preview_lowres == False:
