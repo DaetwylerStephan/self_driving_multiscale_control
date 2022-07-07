@@ -5,10 +5,9 @@ import os
 import atexit
 import threading
 import numpy as np
-
 from multiprocessing import shared_memory
-import auxiliary_code.concurrency_tools as ct
-import auxiliary_code.napari_in_subprocess as napari
+from tifffile import imread, imwrite
+
 import acquisition_array_class as acq_arrays
 
 import src.camera.Photometrics_camera as Photometricscamera
@@ -19,23 +18,23 @@ import src.filter_wheel.ludlcontrol as FilterWheel
 import src.slit.slit_cmd as SlitControl
 import src.voicecoil.voice_coil as Voice_Coil
 
+import auxiliary_code.concurrency_tools as ct
+import auxiliary_code.napari_in_subprocess as napari
 from auxiliary_code.constants import FilterWheel_parameters
 from auxiliary_code.constants import Stage_parameters
 from auxiliary_code.constants import NI_board_parameters
 from auxiliary_code.constants import Camera_parameters
 from auxiliary_code.constants import ASLM_parameters
+
 from automated_microscopy.drift_correction import drift_correction
-
-from tifffile import imread, imwrite
-
+from automated_microscopy.image_deposit import images_InMemory_class
 
 class multiScopeModel:
     def __init__(
             self
     ):
         """
-        We use bytes_per_buffer to specify the shared_memory_sizes for the
-        child processes.
+        The main model class of the multi-scale microscope.
         """
         self.unfinished_tasks = queue.Queue()
 
@@ -107,18 +106,20 @@ class multiScopeModel:
                                        dtype='uint16')
         self.high_res_buffer = ct.SharedNDArray(
             shape=(Camera_parameters.HR_height_pixel, Camera_parameters.HR_width_pixel), dtype='uint16')
+        self.low_res_buffer.fill(0)  # fill to initialize
         self.high_res_buffer.fill(0)  # fill to initialize
 
         # textlabels for GUI
         self.currentFPS = str(0)
 
         # drift correction
+        self.ImageRepo = images_InMemory_class() #place holder for obtaining drift correction class from controller
         self.driftcorrectionmodule = 0 #place holder for obtaining drift correction class from controller
         self.drift_correctionOnHighRes = 0 #parameter whether high res drift correction is enabled
         self.drift_correctionOnLowRes = 0 #parameter whether low res drift correction is enabled
         self.drift_which_channels = [0,0,0,0,0] #array on which channels drift correction is run
         self.perform_driftcorrectionOnChannel = 0 #flag whether for current stack, drift correction should be performed
-        self.current_treeviewitem = 0 #todo previously 'item0'
+        self.current_PosNumber = 0 #todo previously 'item0'
 
         # initialize buffers
         self.update_bufferSize()
@@ -156,6 +157,9 @@ class multiScopeModel:
 
         print('Finished initializing multiScope')
 
+#######################################################################################################################
+# Next come the initialization functions for hardware, and smart microscopy tools
+#######################################################################################################################
     def _init_lowres_camera(self):
         """
         Initialize low resolution camera
@@ -168,20 +172,6 @@ class multiScopeModel:
         # self.lowres_camera.take_snapshot(20)
         print("done with camera.")
 
-    def _init_voicecoil(self):
-        """
-        Initialize the voice coil
-        :return: initialized voice coil
-        """
-        print("Initializing voice coil ..")
-
-        self.voice_coil = Voice_Coil.VoiceCoil(verbose=True)
-        self.voice_coil.send_command('k0\r')  # Turn off servo
-        time.sleep(1)
-        self.voice_coil.send_command('k1\r')  # Engage servo
-        time.sleep(1)
-        self.voice_coil.send_command('d\r')  # Engage servo
-
     def _init_highres_camera(self):
         """
         Initialize low resolution camera
@@ -193,6 +183,19 @@ class multiScopeModel:
         print(self.highres_camera_ROI)
         # self.lowres_camera.take_snapshot(20)
         print("done with camera.")
+
+    def _init_voicecoil(self):
+        """
+        Initialize the voice coil
+        :return: initialized voice coil
+        """
+        print("Initializing voice coil ..")
+        self.voice_coil = Voice_Coil.VoiceCoil(verbose=True)
+        self.voice_coil.send_command('k0\r')  # Turn off servo
+        time.sleep(1)
+        self.voice_coil.send_command('k1\r')  # Engage servo
+        time.sleep(1)
+        self.voice_coil.send_command('d\r')  # Engage servo
 
     def _init_display(self):
         print("Initializing display...")
@@ -309,6 +312,39 @@ class multiScopeModel:
         print("slit homed")
         self.adjustableslit.slit_set_speed(800)
 
+#######################################################################################################################
+# Next come the functions at the end of a microscopy session - closing functions
+#######################################################################################################################
+    def close(self):
+        """
+        Close all opened channels, camera etc
+                """
+        self.finish_all_tasks()
+        self.lowres_camera.close()
+        self.highres_camera.close()
+        self.ao.close()
+        self.rotationstage.close()
+        self.XYZ_stage.close()
+        self.adjustableslit.slit_closing()
+        self.display.close()  # more work needed here
+        print('Closed multiScope')
+
+    def finish_all_tasks(self):
+        collected_tasks = []
+        while True:
+            try:
+                th = self.unfinished_tasks.get_nowait()
+            except queue.Empty:
+                break
+            th.join()
+            collected_tasks.append(th)
+        return collected_tasks
+
+#######################################################################################################################
+# functions to control buffers and hardware run from GUI: update_bufferSize, set_laserpower, check_movementboundaries,
+# move_to_position, move_adjustableslit, changeLRtoHR, changeHRtoLR
+#######################################################################################################################
+
     def update_bufferSize(self):
         """
         This handles the size of the buffers during acquisitions.
@@ -371,31 +407,6 @@ class multiScopeModel:
             print("low res buffer updated")
             self.low_res_memory_names = [self.high_res_buffers[i].shared_memory.name for i in range(2)]
 
-    def close(self):
-        """
-        Close all opened channels, camera etc
-                """
-        self.finish_all_tasks()
-        self.lowres_camera.close()
-        self.highres_camera.close()
-        self.ao.close()
-        self.rotationstage.close()
-        self.XYZ_stage.close()
-        self.adjustableslit.slit_closing()
-        self.display.close()  # more work needed here
-        print('Closed multiScope')
-
-    def finish_all_tasks(self):
-        collected_tasks = []
-        while True:
-            try:
-                th = self.unfinished_tasks.get_nowait()
-            except queue.Empty:
-                break
-            th.join()
-            collected_tasks.append(th)
-        return collected_tasks
-
     def set_laserpower(self, powersettings):
         self.ao_laser488_power.setconstantvoltage(powersettings[0])
         self.ao_laser552_power.setconstantvoltage(powersettings[1])
@@ -453,7 +464,9 @@ class multiScopeModel:
         self.flipMirrorPosition_power.setconstantvoltage(0)
         self.move_adjustableslit(self.slitopening_lowres, 1)
 
-    ### ---------------------------below here are the preview functions -----------------------------------------------
+#######################################################################################################################
+# Next come the run preview functions (low and highres preview)
+#######################################################################################################################
 
     def preview_lowres(self):
         """
@@ -661,9 +674,11 @@ class multiScopeModel:
         th.start()
         return th
 
-    ### ---------------------------below here are the stack acquisition functions --------------------------------
+#######################################################################################################################
+# below here are the stack acquisition functions
+#######################################################################################################################
 
-    def stack_acquisition_master(self, current_folder, current_startposition, whichlaser, resolutionmode):
+    def stack_acquisition_master(self, current_folder, current_position, whichlaser, resolutionmode):
         """
         Master to start stack acquisitions of different channels and resolution modes. Decides which stack acquisition method to call
         :param current_folder: folder to save the acquired data
@@ -672,6 +687,15 @@ class multiScopeModel:
         :param whichlaser: which channels to image
         :return:
         """
+        #get current start position
+        # get current position from list
+        xpos = int(float(current_position[1]) * 1000000000)
+        ypos = int(float(current_position[2]) * 1000000000)
+        zpos = int(float(current_position[3]) * 1000000000)
+        angle = int(float(current_position[4]) * 1000000)
+        current_startposition = [zpos, xpos, ypos, angle]
+        print(current_startposition)
+
         # first get the right laser power
         if resolutionmode == "low":
             self.set_laserpower(self.lowres_laserpower)
@@ -828,6 +852,7 @@ class multiScopeModel:
 
             stream_thread.get_result()
             start_camera_streamfast_thread.get_result()
+            write_voltages_thread.get_result()
 
             custody.switch_from(self.lowres_camera, to=self.display)
 
@@ -843,18 +868,24 @@ class multiScopeModel:
             if self.displayImStack == 1:
                 self.display.show_stack(self.low_res_buffers[current_bufferiter])
 
-            def calculate_projection():
+            def calculate_projection_and_drift():
                 # calculate projections
                 filepathforprojection_three = self.current_projectionfilepath_three  # assign now as filepath is updated for next stack acquired
                 filepathforprojection_XY = self.current_projectionfilepath_XY  # assign now as filepath is updated for next stack acquired
                 filepathforprojection_XZ = self.current_projectionfilepath_XZ  # assign now as filepath is updated for next stack acquired
                 filepathforprojection_YZ = self.current_projectionfilepath_YZ  # assign now as filepath is updated for next stack acquired
+                posnumber_lowres = self.current_PosNumber
+
+                bufferindex = current_bufferiter
 
                 t0 = time.perf_counter()
-                maxproj_xy = np.max(self.low_res_buffers[current_bufferiter], axis=0)
-                maxproj_xz = np.max(self.low_res_buffers[current_bufferiter], axis=1)
-                maxproj_yz = np.max(self.low_res_buffers[current_bufferiter], axis=2)
+                maxproj_xy = np.max(self.low_res_buffers[bufferindex], axis=0)
+                maxproj_xz = np.max(self.low_res_buffers[bufferindex], axis=1)
+                maxproj_yz = np.max(self.low_res_buffers[bufferindex], axis=2)
                 t1 = time.perf_counter() - t0
+
+                #add max projection to ImageRepo #todo- check for channel to add.
+                self.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
 
                 print("time: " + str(t1))
 
@@ -884,7 +915,8 @@ class multiScopeModel:
                 except:
                     print("couldn't save projection image:" + filepathforprojection_three)
 
-            projection_thread = ct.ResultThread(target=calculate_projection).start()
+
+            projection_thread = ct.ResultThread(target=calculate_projection_and_drift).start()
 
             custody.switch_from(self.display, to=None)
             # savethread.get_result()
@@ -985,7 +1017,7 @@ class multiScopeModel:
                 filepathforprojection_XZ = self.current_projectionfilepath_XZ  # assign now as filepath is updated for next stack acquired
                 filepathforprojection_YZ = self.current_projectionfilepath_YZ  # assign now as filepath is updated for next stack acquired
                 pastfilepathforprojection = self.past_projectionfilepath
-                current_region_item = self.current_treeviewitem
+                current_region_item = self.current_PosNumber
 
 
                 t0 = time.perf_counter()

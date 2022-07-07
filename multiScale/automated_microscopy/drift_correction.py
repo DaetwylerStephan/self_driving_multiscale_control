@@ -105,7 +105,8 @@ class drift_correction:
             lowresnb_current = self.find_closestLowResTile(highresline, return_number=True)
             print(lowresnb_current)
             if lowresnb_current == LowResPosNumber:
-                list_highresregions.append((highresline))
+                highresPosNb = self.highres_positionList[highresline][5] #get unique ID from highres position
+                list_highresregions.append((highresPosNb))
 
         return list_highresregions
 

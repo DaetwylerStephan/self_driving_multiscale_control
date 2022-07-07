@@ -18,6 +18,7 @@ from auxiliary_code.constants import NI_board_parameters
 from auxiliary_code.constants import FileSave_parameters
 from auxiliary_code.constants import ASLM_parameters
 from automated_microscopy.drift_correction import drift_correction
+from automated_microscopy.image_deposit import images_InMemory_class
 
 class MultiScale_Microscope_Controller():
     """
@@ -41,6 +42,7 @@ class MultiScale_Microscope_Controller():
         # Create scope object as model
         self.model = multiScopeModel()
         print("model initiated")
+
         #create the gui as view
         all_tabs_mainGUI = ttk.Notebook(self.root)
         self.view = MultiScope_MainGui(all_tabs_mainGUI, self.model)
@@ -49,13 +51,15 @@ class MultiScale_Microscope_Controller():
         self.paramwriter = write_params.write_Params(self.view)
 
         #init drift correction module
+        self.ImageRepo = images_InMemory_class()
+        self.model.ImageRepo = self.ImageRepo
         self.drift_correctionmodule = drift_correction(self.view.stagessettingstab.stage_PositionList,
                                                        self.view.stagessettingstab.stage_highres_PositionList,
                                                        self.model.lowres_planespacing,
                                                        self.model.highres_planespacing,
                                                        self.model.current_highresROI_height,
-                                                       self.model.current_highresROI_width)
-
+                                                       self.model.current_highresROI_width,
+                                                       self.ImageRepo)
         self.model.driftcorrectionmodule = self.drift_correctionmodule
 
         #define here which buttons run which function in the multiScope model
@@ -633,13 +637,9 @@ class MultiScale_Microscope_Controller():
             positioniter = -1
             for line in range(len(self.view.stagessettingstab.stage_PositionList)):
                 #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_PositionList[line][1]) * 1000000000)
-                ypos = int(float(self.view.stagessettingstab.stage_PositionList[line][2])* 1000000000)
-                zpos = int(float(self.view.stagessettingstab.stage_PositionList[line][3])* 1000000000)
-                angle = int(float(self.view.stagessettingstab.stage_PositionList[line][4]) * 1000000)
-                current_startposition = [zpos, xpos, ypos, angle]
-                print(current_startposition)
+                current_startposition = self.view.stagessettingstab.stage_PositionList[line]
                 positioniter = positioniter + 1
+                self.model.current_PosNumber = positioniter
 
                 # filepath
                 current_folder = os.path.join(stackfilepath, "low_stack" + f'{positioniter:03}')
@@ -669,8 +669,6 @@ class MultiScale_Microscope_Controller():
                     lowresline = self.drift_correctionmodule.find_closestLowResTile(line)
 
 
-
-
         ########-------------------------------------------------------------------------------------------------------
         # start high resolution stack acquisition
         #high resolution list
@@ -680,17 +678,13 @@ class MultiScale_Microscope_Controller():
 
             print("acquiring high res stack")
             for line in range(len(self.view.stagessettingstab.stage_highres_PositionList)):
-                #get current position from list
-                xpos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][1]) * 1000000000)
-                ypos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][2])* 1000000000)
-                zpos = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][3])* 1000000000)
-                angle = int(float(self.view.stagessettingstab.stage_highres_PositionList[line][4]) * 1000000)
-                currentposition = [zpos, xpos, ypos, angle]
-                self.model.current_treeviewitem = line
-                print(currentposition)
+                #get position
+                currentposition = self.view.stagessettingstab.stage_highres_PositionList[line]
 
-                #define highresolution stack file path label by label position in file position tree (can be updated e.g. if you have automatic detection during timelapse)
+                #define highresolution stack file path label by label position in file position tree
+                #(can be updated e.g. if you have automatic detection during timelapse)
                 pos_label = int(self.view.stagessettingstab.stage_highres_PositionList[line][5])
+                self.model.current_PosNumber = pos_label
 
                 # filepath
                 current_folder = os.path.join(stackfilepath, "high_stack_" + f'{pos_label:03}')
@@ -707,7 +701,6 @@ class MultiScale_Microscope_Controller():
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
                                   self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get(),
                                   self.view.runtab.stack_aq_LEDon.get()]
-
 
                 if self.view.runtab.cam_highresMode.get()=="SPIM Mode":
                     self.model.stack_acquisition_master(current_folder, currentposition, which_channels, "highSPIM")
