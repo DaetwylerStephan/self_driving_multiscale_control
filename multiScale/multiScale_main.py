@@ -59,6 +59,7 @@ class MultiScale_Microscope_Controller():
                                                        self.model.highres_planespacing,
                                                        self.model.current_highresROI_height,
                                                        self.model.current_highresROI_width,
+                                                       self.model.current_timepointstring,
                                                        self.ImageRepo)
         self.model.driftcorrectionmodule = self.drift_correctionmodule
 
@@ -69,6 +70,7 @@ class MultiScale_Microscope_Controller():
         # connect all the buttons that start a functionality like preview, stack acquisition, etc.
         # connect all the buttons that you want to dynamically change, e.g. during preview
 
+        #preview buttons
         self.view.runtab.bt_preview_lowres.bind("<ButtonRelease>", self.run_lowrespreview)
         self.view.runtab.bt_preview_highres.bind("<ButtonRelease>", self.run_highrespreview)
         self.view.runtab.bt_preview_stop.bind("<Button>", self.run_stop_preview)
@@ -80,12 +82,19 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.bt_changeTo_trans.bind("<Button>", lambda event: self.changefilter(event, 'LED'))
         self.view.runtab.preview_autoIntensity.trace_add("write", self.updatepreview)
 
-
+        #stack run buttons
         self.view.runtab.stack_aq_bt_run_stack.bind("<Button>", self.acquire_stack)
         self.view.runtab.stack_aq_bt_abort_stack.bind("<Button>", self.abort_stack)
+        self.view.runtab.stack_aq_numberOfPlanes_highres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_numberOfPlanes_lowres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_plane_spacing_lowres.trace_add("write", self.update_stack_aq_parameters)
+        self.view.runtab.stack_aq_plane_spacing_highres.trace_add("write", self.update_stack_aq_parameters)
+
+        #timelapse run buttons
         self.view.runtab.timelapse_aq_bt_run_timelapse.bind("<Button>", self.acquire_timelapse)
         self.view.runtab.timelapse_aq_bt_abort_timelapse.bind("<Button>", self.abort_timelapse)
 
+        #laser settings sliders
         self.view.runtab.laser488_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
         self.view.runtab.laser552_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
         self.view.runtab.laser594_percentage_LR.trace_add("read", self.updateLowResLaserParameters)
@@ -94,17 +103,13 @@ class MultiScale_Microscope_Controller():
         self.view.runtab.laser552_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
         self.view.runtab.laser594_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
         self.view.runtab.laser640_percentage_HR.trace_add("read", self.updateHighResLaserParameters)
+
+        #camera settings
         self.view.runtab.cam_lowresExposure.trace_add("write", self.updateExposureParameters)
         self.view.runtab.cam_highresExposure.trace_add("write", self.updateExposureParameters)
 
-        self.view.runtab.stack_aq_numberOfPlanes_highres.trace_add("write", self.update_stack_aq_parameters)
-        self.view.runtab.stack_aq_numberOfPlanes_lowres.trace_add("write", self.update_stack_aq_parameters)
-        self.view.runtab.stack_aq_plane_spacing_lowres.trace_add("write", self.update_stack_aq_parameters)
-        self.view.runtab.stack_aq_plane_spacing_highres.trace_add("write", self.update_stack_aq_parameters)
-
+        #roi settings
         self.view.runtab.roi_applybutton.bind("<Button>", self.changeROI)
-
-
 
         #stage settings tab
         self.view.stagessettingstab.stage_moveto_axial.trace_add("write", self.movestage)
@@ -139,6 +144,13 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_scanWidth.trace_add("write", self.update_ASLMParameters)
 
         # smart settings tab
+        self.view.automatedMicroscopySettingstab.drift_correction_highres.trace_add("write", self.updateDriftCorrectionSettings)
+        self.view.automatedMicroscopySettingstab.drift_correction_lowres.trace_add("write", self.updateDriftCorrectionSettings)
+        self.view.automatedMicroscopySettingstab.driftcorrection_488.trace_add("write", self.updateDriftCorrectionSettings)
+        self.view.automatedMicroscopySettingstab.driftcorrection_552.trace_add("write", self.updateDriftCorrectionSettings)
+        self.view.automatedMicroscopySettingstab.driftcorrection_594.trace_add("write", self.updateDriftCorrectionSettings)
+        self.view.automatedMicroscopySettingstab.driftcorrection_640.trace_add("write", self.updateDriftCorrectionSettings)
+        self.view.automatedMicroscopySettingstab.driftcorrection_LED.trace_add("write", self.updateDriftCorrectionSettings)
 
         #define some parameters
         self.current_laser = "488"
@@ -157,10 +169,6 @@ class MultiScale_Microscope_Controller():
     def close(self):
         self.model.LED_voltage.setconstantvoltage(0)
         self.model.close()
-
-    def wait_forInput(self):
-        print("All 'snap' threads finished execution.")
-        input('Hit enter to close napari...')
 
     def updateLowResLaserParameters(self, var, indx, mode):
         """
@@ -267,6 +275,27 @@ class MultiScale_Microscope_Controller():
 
         #update scanwidth
         self.model.ASLM_scanWidth = self.view.advancedSettingstab.ASLM_scanWidth.get()
+
+    def updateDriftCorrectionSettings(self, var, indx, mode):
+        '''
+        update settings of the drift correction
+        :return: settings updated in model
+        '''
+        #determine whether drift correction is active; and on which channel
+        print("drift correction settings updated")
+        self.model.drift_correctionOnHighRes = self.view.automatedMicroscopySettingstab.drift_correction_highres.get()  # parameter whether high res drift correction is enabled
+        self.model.drift_correctionOnLowRes = self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()  # parameter whether low res drift correction is enabled
+        self.model.drift_which_channels = [self.view.automatedMicroscopySettingstab.driftcorrection_488.get(),
+                                           self.view.automatedMicroscopySettingstab.driftcorrection_552.get(),
+                                           self.view.automatedMicroscopySettingstab.driftcorrection_594.get(),
+                                           self.view.automatedMicroscopySettingstab.driftcorrection_640.get(),
+                                           self.view.automatedMicroscopySettingstab.driftcorrection_LED.get()]
+
+        if self.view.automatedMicroscopySettingstab.driftcorrection_LED.get()==1:
+            self.model.drift_transmission = 1
+        else:
+            self.model.drift_transmission = 0
+
 
     def updateGUItext(self):
         '''
@@ -788,16 +817,6 @@ class MultiScale_Microscope_Controller():
 
         # set timepoint = 0 to be consistent with time-lapse acquisitions
         experimentpath = os.path.join(self.parentfolder, experiment_name)
-
-        #determine whether drift correction is active; and on which channel
-        self.model.drift_correctionOnHighRes = self.view.automatedMicroscopySettingstab.drift_correction_highres.get()  # parameter whether high res drift correction is enabled
-        self.model.drift_correctionOnLowRes = self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()  # parameter whether low res drift correction is enabled
-        self.model.drift_which_channels = [self.view.automatedMicroscopySettingstab.driftcorrection_488.get(),
-                                self.view.automatedMicroscopySettingstab.driftcorrection_552.get(),
-                                self.view.automatedMicroscopySettingstab.driftcorrection_594.get(),
-                                self.view.automatedMicroscopySettingstab.driftcorrection_640.get(),
-                                self.view.automatedMicroscopySettingstab.driftcorrection_LED.get()]
-
 
         ###run timelapse
         for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints):

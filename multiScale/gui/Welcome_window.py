@@ -81,17 +81,17 @@ class Welcome_Tab(tk.Frame):
         # filepath labels (positioned)
         freediskspace_label = ttk.Label(filepath_settings, text="Free disk space (D:\\):").grid(row=1, column=0, sticky=tk.W)
         freedisksize_label = ttk.Label(filepath_settings, text=str(freedisksize) + "GB").grid(row=1, column=4, sticky=tk.W)
-        filepath_label = ttk.Label(filepath_settings, text="Filepath: ").grid(row=4, column=0, sticky=tk.W)
+        #filepath_label = ttk.Label(filepath_settings, text="Filepath: ").grid(row=4, column=0, sticky=tk.W)
 
         #widgets
         free_diskspace_bar = ttk.Progressbar(filepath_settings, variable=useddisksize, maximum=totaldisksize)
-        self.filepath_entry = tk.Entry(filepath_settings, textvariable=self.filepath_string, width=50)
-        self.filepath_choosefolder = tk.Button(filepath_settings, text="Choose folder", command=self.choose_directory)
+        #self.filepath_entry = tk.Entry(filepath_settings, textvariable=self.filepath_string, width=50)
+        #self.filepath_choosefolder = tk.Button(filepath_settings, text="Choose folder", command=self.choose_directory)
 
         #filepath widgets layout
         free_diskspace_bar.grid(row=1, column=1, columnspan=3, sticky=(tk.W))
-        self.filepath_entry.grid(row=4, column=1, columnspan=100, sticky=(tk.W))
-        self.filepath_choosefolder.grid(row=5, column=0, sticky=(tk.W+tk.E))
+        #self.filepath_entry.grid(row=4, column=1, columnspan=100, sticky=(tk.W))
+        #self.filepath_choosefolder.grid(row=5, column=0, sticky=(tk.W+tk.E))
 
     def getwelcome_parameters(self):
         """

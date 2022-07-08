@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 from skimage import transform, io, exposure
 
 class drift_correction:
-    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_x, highresShape_y, imageRepoLists, filepath="path.txt"):
+    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_x, highresShape_y, timepoint, imageRepoLists, debugfilepath="path.txt"):
         """
         :param lowres_PosList: the list of position of the low resolution imaging
         :param highres_PosList: the list of position of the high resolution imaging
@@ -29,7 +29,6 @@ class drift_correction:
         #init it
         self.lowres_positionList = lowres_PosList
         self.highres_positionList = highres_PosList
-        self.logfile = filepath
         self.scalingfactor = 11.11 / 4.25 *1000 #scalingfactor for how much one mm is in pixel on low res view
         self.scalingfactorLowToHighres = 11.11 / 55.55 * 6.5 / 4.25 #scalingfactor for high/low res camera views
         self.lowres_zspacing = lowres_zspacing
@@ -38,6 +37,13 @@ class drift_correction:
         self.highres_y = highresShape_y
         self.ImageRepo = imageRepoLists
         self.increase_crop_size = 1 #in transmission image - increase crop size of image for better template matching
+        self.currenttimepoint = timepoint
+        #check for filepath - if provided, enter debug mode to save temporary images to debug folder
+        if debugfilepath =="path.txt":
+            self.debugmode = False
+        else:
+            self.debugmode = True
+        self.logfolder = debugfilepath
 
         self.templatematching = automated_templateMatching()
 
@@ -214,14 +220,14 @@ class drift_correction:
                 #assign the image to the image list
                 self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(corresponding_lowres_view))
 
-                testim = self.ImageRepo.image_retrieval("current_transmissionImage", PosNumber)
-                print("testim " +str(PosNumber) + ":" + str(testim.shape))
-                #cv2.imwrite('D://test//drift_correctionTest/transmission/lowres_transmission_ROI.tif', corresponding_lowres_view)
+                # debug mode - save image
+                if self.debugmode==True:
+                    #generate filenames
+                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint)
+                    #save files
+                    #img_rgb_sc = cv2.rectangle(img_lowrestrans, (loc[1], loc[0]), (loc[1] + pixel_w_highresInLowres, loc[0] + pixel_h_highresInLowres), (0, 255, 255), 2)
+                    cv2.imwrite(file_maxproj, corresponding_lowres_view)
 
-                # Show the final image with the matched area.
-                # visualization
-                # img_rgb_sc = cv2.rectangle(img_lowrestrans, (loc[1], loc[0]), (loc[1] + pixel_w_highresInLowres, loc[0] + pixel_h_highresInLowres), (0, 255, 255), 2)
-                # cv2.imwrite('D://test//drift_correctionTest/transmission/lowres_transmission_found.tif', img_rgb_sc)
                 return (coordinate_difference[lateralId]/self.scalingfactor,coordinate_difference[UpDownID]/self.scalingfactor, loc[0], loc[1])
             else:
                 # if not first time, take previous image and find corresponding image in translation image with template matching
@@ -246,6 +252,14 @@ class drift_correction:
 
                 # assign the image to the image list
                 self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
+
+                # debug mode - save image
+                if self.debugmode == True:
+                    # generate filenames
+                    file_maxproj = os.path.join(self.logfolder,
+                                                "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint)
+                    # save files
+                    cv2.imwrite(file_maxproj, current_crop_image)
 
                 #calculate the physical position of where to image highres stack
                 #1.calculate middle position
@@ -274,18 +288,51 @@ class drift_correction:
         if mode == "transmission":
 
             # retrieve corresponding high res image
-            lowres_axial_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
+            lowres_axial1_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
 
             # if return zero array, safe the image as first tile in the list.
-            if lowres_axial_transmission.shape[0] < 2:
+            if lowres_axial1_transmission.shape[0] < 2:
+
                 self.ImageRepo.replaceImage("current_transmissionAxial1Image", PosNumber, copy.deepcopy(image1))
+                if not image2 == None:
+                    self.ImageRepo.replaceImage("current_transmissionAxial2Image", PosNumber, copy.deepcopy(image2))
+
+                # debug mode - save image
+                if self.debugmode == True:
+                    # generate filenames
+                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint)
+                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint)
+
+                    # save files
+                    cv2.imwrite(file_axial1, image1)
+                    if not image2 == None:
+                        cv2.imwrite(file_axial2, image2)
+
             else:
                 # get corresponding low res stack
-                correctX1, correctY1 = self.register_image(lowres_axial_transmission, image1, 'translation')
-                print(correctX1, correctY1)
+                correctX, correctY = self.register_image(lowres_axial1_transmission, image1, 'translation')
+                print(correctX, correctY)
                 if not image2==None:
-                    correctX2, correctY2 = self.register_image(lowres_axial_transmission, image2, 'translation')
+                    lowres_axial2_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
+                    correctX2, correctY2 = self.register_image(lowres_axial2_transmission, image2, 'translation')
+
                     print(correctX2, correctY2)
+                    correctX = (correctX + correctX2)/2
+                    correctY = (correctY + correctY2)/2
+
+                # debug mode - save image
+                if self.debugmode == True:
+                    # generate filenames
+                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint)
+                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint)
+
+                    # save files
+                    cv2.imwrite(file_axial1, image1)
+                    if not image2 == None:
+                        cv2.imwrite(file_axial2, image2)
+
+                correctionFactor = self.lowres_zspacing*correctX
+                return (correctionFactor)
 
 
     def register_image(self, ref, mov, mode):

@@ -51,9 +51,9 @@ class SmartMicroscopySettings_Tab(tk.Frame):
         #arrange
         self.drift_highres_button.grid(row=2, column=3, sticky=tk.W)
         self.drift_lowres_button.grid(row=3, column=3, sticky=tk.W)
-
-        self.drift_On488.grid(row=4, column=3)
-        self.drift_On552.grid(row=5, column=3)
-        self.drift_On594.grid(row=6, column=3)
-        self.drift_On640.grid(row=7, column=3)
-        self.drift_OnLED.grid(row=8, column=3)
+        ttk.Label(drift_correction_settings, text="Which channel to correct:").grid(row=4, column=3, sticky=tk.W)
+        self.drift_On488.grid(row=7, column=3)
+        self.drift_On552.grid(row=8, column=3)
+        self.drift_On594.grid(row=9, column=3)
+        self.drift_On640.grid(row=10, column=3)
+        self.drift_OnLED.grid(row=11, column=3)

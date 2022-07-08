@@ -738,7 +738,7 @@ class multiScopeModel:
                                                             self.past_timepointstring + ".tif")
 
 
-                #set flag for drift correction on channel (high-res drift correction)
+                #set flag for drift correction on channel (high-res drift correction) - take info from GUI
                 if self.drift_which_channels[w_i]==1:
                     self.perform_driftcorrectionOnChannel = 1
                 else:
@@ -884,8 +884,20 @@ class multiScopeModel:
                 maxproj_yz = np.max(self.low_res_buffers[bufferindex], axis=2)
                 t1 = time.perf_counter() - t0
 
-                #add max projection to ImageRepo #todo- check for channel to add.
-                self.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
+                if self.perform_driftcorrectionOnChannel == 1:
+                    if self.drift_correctionOnLowRes == 1:
+                        # add max projection to ImageRepo
+                        if self.model.drift_transmission ==1:
+                            self.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
+                            highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(self.current_PosNumber)
+                            for iter in highreslistID:
+                                (mm_difference1, mm_difference2, row_number, column_number) = self.driftcorrectionmodule.calculate_Lateral_drift(iter, mode='fluorescence')
+                                self.low_res_buffers[bufferindex][]
+                        else:
+                            self.ImageRepo.replaceImage("current_transmissionImage", posnumber_lowres, maxproj_xy)
+                            highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(self.current_PosNumber)
+                            for iter in highreslistID:
+                                (mm_difference1, mm_difference2, row_number, column_number) = self.driftcorrectionmodule.calculate_Lateral_drift(iter, mode='transmission')
 
                 print("time: " + str(t1))
 
