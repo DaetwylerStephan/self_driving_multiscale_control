@@ -27,14 +27,7 @@ class MultiScale_Microscope_Controller():
     """
 
     #todo: check that stage values - e.g. with plane spacing, plane number don't expand beyond the possible travel range
-    #todo: ROI selection tool - in napari
     #todo: move to selected region in high resolution.
-
-    #todo: pixel width to 60 pixel
-    #512x512 running - adjust
-    #SPIM and ASLM - intensity changes: counts
-    #timelapse saving - wrong!
-
 
     def __init__(self):
         self.root = tk.Tk()
@@ -60,7 +53,8 @@ class MultiScale_Microscope_Controller():
                                                        self.model.current_highresROI_height,
                                                        self.model.current_highresROI_width,
                                                        self.model.current_timepointstring,
-                                                       self.ImageRepo)
+                                                       self.ImageRepo,
+                                                       debugfilepath="D://test/drift_correctionTest/transmission_microscopeoutput_result")
         self.model.driftcorrectionmodule = self.drift_correctionmodule
 
         #define here which buttons run which function in the multiScope model
@@ -609,6 +603,11 @@ class MultiScale_Microscope_Controller():
         #some parameters.
         self.model.displayImStack = self.view.runtab.stack_aq_displayON.get() #whether to display images during stack acq or not
 
+        #set driftcorrection settings - set completed array back to zero and update position lists in module
+        self.model.driftcorrectionmodule.completed=np.zeros(len(self.view.stagessettingstab.stage_highres_PositionList))
+        self.model.driftcorrectionmodule.highres_positionList = self.view.stagessettingstab.stage_highres_PositionList
+        self.model.driftcorrectionmodule.lowres_positionList = self.view.stagessettingstab.stage_PositionList
+
         #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder
         if self.continuetimelapse != 0:
@@ -660,21 +659,24 @@ class MultiScale_Microscope_Controller():
         ########-------------------------------------------------------------------------------------------------------
         #start low resolution stack acquisition
         if self.view.runtab.stack_aq_lowResCameraOn.get():
+            print("acquiring low res stack")
+
             # change mirror position/slit position
             self.model.changeHRtoLR()
-            print("acquiring low res stack")
+
+            #iterate over all positions in the low res Position list
             positioniter = -1
             for line in range(len(self.view.stagessettingstab.stage_PositionList)):
                 #get current position from list
                 current_startposition = self.view.stagessettingstab.stage_PositionList[line]
                 positioniter = positioniter + 1
-                self.model.current_PosNumber = positioniter
 
                 # filepath
                 current_folder = os.path.join(stackfilepath, "low_stack" + f'{positioniter:03}')
 
-                #update info for filepath for projections
+                #update info for filepath for projections and drift correction
                 self.model.current_region =  "low_stack" + f'{positioniter:03}'
+                self.model.current_PosNumber = positioniter
 
                 try:
                     print("filepath : " + current_folder)
@@ -688,14 +690,17 @@ class MultiScale_Microscope_Controller():
 
 
         #################-----------------------------------------------------------------------------------------------
-        #todo: Drift correction module for if you want to apply drift correction in time-lapse based on low resolution mode.
+        #wait for all drift correction positions to be calculated before proceeding to high resolution imaging
         if self.continuetimelapse != 0:
             #call here drift correction if based on low resolution imaging
             if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
-                print("Calculate drift correction")
 
-                for line in self.view.stagessettingstab.stage_highres_PositionList:
-                    lowresline = self.drift_correctionmodule.find_closestLowResTile(line)
+                print("Wait until drift correction is calculated")
+                while np.sum(self.model.driftcorrectionmodule.completed) != len(self.model.driftcorrectionmodule.completed):
+                    time.sleep(0.05)
+
+                #update stage position list by taking latest list from driftcorrectionmodule
+                self.view.stagessettingstab.stage_highres_PositionList = self.model.driftcorrectionmodule.highres_positionList
 
 
         ########-------------------------------------------------------------------------------------------------------
@@ -713,7 +718,6 @@ class MultiScale_Microscope_Controller():
                 #define highresolution stack file path label by label position in file position tree
                 #(can be updated e.g. if you have automatic detection during timelapse)
                 pos_label = int(self.view.stagessettingstab.stage_highres_PositionList[line][5])
-                self.model.current_PosNumber = pos_label
 
                 # filepath
                 current_folder = os.path.join(stackfilepath, "high_stack_" + f'{pos_label:03}')
@@ -723,8 +727,9 @@ class MultiScale_Microscope_Controller():
                 except OSError as error:
                     print("File writing error")
 
-                # update info for filepath for projections
+                # update info for filepath for projections and drift correction
                 self.model.current_region = "high_stack_" + f'{pos_label:03}'
+                self.model.current_PosNumber = pos_label
 
                 # start stackstreaming
                 which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
@@ -738,8 +743,6 @@ class MultiScale_Microscope_Controller():
 
         self.view.runtab.stack_aq_bt_run_stack.config(relief="raised")
         self.model.LED_voltage.setconstantvoltage(0)
-
-
 
 
     def acquire_timelapse(self, event):
@@ -776,7 +779,7 @@ class MultiScale_Microscope_Controller():
 
     def run_timelapse(self):
         """
-        thread that controls time-lapse, started from function acquire_timelapse(self, event):
+        thread that controls time-lapse, started from function acquire_timelapse, which is called from GUI(self, event):
         """
 
         self.view.update()
@@ -785,7 +788,7 @@ class MultiScale_Microscope_Controller():
         nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
         newfolderind = nbfiles_folder + 1
 
-        #catch errors when deleting Experiment names before
+        # generate experiment name - the recursive loop is required to catch errors when deleting Experiment names before
         def set_experiment_name(parentfolder, experimentnumber):
             experiment_name = "Experiment" + f'{experimentnumber:04}'
             filepath = os.path.join(parentfolder, experiment_name)
@@ -797,38 +800,37 @@ class MultiScale_Microscope_Controller():
             return experiment_name
 
         experiment_name = set_experiment_name(self.parentfolder, newfolderind)
+        experimentpath = os.path.join(self.parentfolder, experiment_name)
 
-        # write acquisition parameters
+        # generate filepath and folder for writing acquisition parameters
         filepath_write_acquisitionParameters = os.path.join(self.parentfolder, experiment_name)
-
-
         try:
             print("filepath : " + filepath_write_acquisitionParameters)
             os.makedirs(filepath_write_acquisitionParameters)
         except OSError as error:
             print("File writing error")
 
-        # write parameters in a thread
+        # write acquisition parameters in a thread
         def write_paramconfigtimelapse():
             self.paramwriter.write_to_textfile(
                 os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
             print("parameters saved")
         ct.ResultThread(target=write_paramconfigtimelapse).start()
 
-        # set timepoint = 0 to be consistent with time-lapse acquisitions
-        experimentpath = os.path.join(self.parentfolder, experiment_name)
 
-        ###run timelapse
+        ###run timelapse, starting at timepoint 0
         for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints):
             t0 = time.perf_counter()
 
+            #generate timepoint strings
             numStr = str(timeiter).zfill(5)
             pastStr = str(timeiter-1).zfill(5)
             self.model.current_timepointstring = "t" + numStr
             self.model.past_timepointstring = "t" + pastStr
             self.current_timelapse_filepath = os.path.join(experimentpath, self.model.current_timepointstring)
-            self.model.experimentfilepath = experimentpath
+            self.model.experimentfilepath = experimentpath #for projection
 
+            #update GUI about timelapse progress
             self.view.runtab.timelapse_aq_progress.set(timeiter)
             self.view.runtab.timelapse_aq_progressindicator.config(text=str(timeiter+1) +" of " + str(self.view.runtab.timelapse_aq_nbTimepoints))
 
@@ -839,10 +841,11 @@ class MultiScale_Microscope_Controller():
             if self.continuetimelapse == 1:
                 break  # Break while loop when stop = 1
 
+            #start stack acquisition and wait for it to finish before continuing with next stack acquisition
             stackacquisitionthread = ct.ResultThread(target=self.acquire_stack_task).start()
             stackacquisitionthread.get_result()
 
-            #calculate the time until next stack acquisition starts
+            #calculate the time until next stack acquisition starts and wait for the time counter to progress
             t1 = time.perf_counter() - t0
             totaltime = self.view.runtab.timelapse_aq_timeinterval_min.get() * 60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
 

@@ -16,14 +16,14 @@ from matplotlib import pyplot as plt
 from skimage import transform, io, exposure
 
 class drift_correction:
-    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_x, highresShape_y, timepoint, imageRepoLists, debugfilepath="path.txt"):
+    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_width, highresShape_height, timepoint, imageRepoLists, debugfilepath="path.txt"):
         """
         :param lowres_PosList: the list of position of the low resolution imaging
         :param highres_PosList: the list of position of the high resolution imaging
         :param lowres_zspacing: the plane spacing of the low resolution stacks
         :param highres_zspacing: the plane spacing of the high resolution stacks
-        :param highres_x: image size in x of highres image
-        :param highres_y: image size in y of highres image
+        :param highresShape_width: width of image, convention: np.array(height, width) and cv2.function(width, height)
+        :param highresShape_height: height of image (lowres max 5092 / highres max 2048)
         :param filepath: (optional) filepath to logging the drift correction
         """
         #init it
@@ -33,8 +33,9 @@ class drift_correction:
         self.scalingfactorLowToHighres = 11.11 / 55.55 * 6.5 / 4.25 #scalingfactor for high/low res camera views
         self.lowres_zspacing = lowres_zspacing
         self.highres_zspacing = highres_zspacing
-        self.highres_x = highresShape_x
-        self.highres_y = highresShape_y
+        self.highres_width = highresShape_width
+        self.highres_height = highresShape_height
+        self.completed = np.zeros(2) # an array to indicate whether the drift correction was completed.
         self.ImageRepo = imageRepoLists
         self.increase_crop_size = 1 #in transmission image - increase crop size of image for better template matching
         self.currenttimepoint = timepoint
@@ -42,6 +43,10 @@ class drift_correction:
         if debugfilepath =="path.txt":
             self.debugmode = False
         else:
+            try:
+                os.makedirs(debugfilepath)
+            except:
+                pass
             self.debugmode = True
         self.logfolder = debugfilepath
 
@@ -206,15 +211,15 @@ class drift_correction:
                 loc = (int(img_lowrestrans.shape[0]/2), int(img_lowrestrans.shape[1]/2))
 
                 #highres size in lowres:
-                pixel_w_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_x * self.increase_crop_size)
-                pixel_h_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_y * self.increase_crop_size)
+                pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)
+                pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
 
                 #calculate displacement
-                loc = (int(loc[0]+ coordinate_difference[lateralId]-pixel_w_highresInLowres/2), int(loc[1] + coordinate_difference[UpDownID]-pixel_h_highresInLowres/2))
+                loc = (int(loc[0]+ coordinate_difference[lateralId]-pixel_height_highresInLowres/2), int(loc[1] + coordinate_difference[UpDownID]-pixel_width_highresInLowres/2))
 
                 print("first location" + str(loc))
                 #retrieve region in lowres view of highres view
-                corresponding_lowres_view = img_lowrestrans[loc[0]:(loc[0]+pixel_w_highresInLowres), loc[1]:(loc[1]+pixel_h_highresInLowres)]
+                corresponding_lowres_view = img_lowrestrans[loc[0]:(loc[0]+pixel_height_highresInLowres), loc[1]:(loc[1]+pixel_width_highresInLowres)]
                 print("corr" + str(corresponding_lowres_view.shape))
 
                 #assign the image to the image list
@@ -223,7 +228,7 @@ class drift_correction:
                 # debug mode - save image
                 if self.debugmode==True:
                     #generate filenames
-                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint)
+                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint + ".tif")
                     #save files
                     #img_rgb_sc = cv2.rectangle(img_lowrestrans, (loc[1], loc[0]), (loc[1] + pixel_w_highresInLowres, loc[0] + pixel_h_highresInLowres), (0, 255, 255), 2)
                     cv2.imwrite(file_maxproj, corresponding_lowres_view)
@@ -246,9 +251,9 @@ class drift_correction:
                 (row_number, column_number) = self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
 
                 #update image in "current_transmissionImage" list
-                pixel_w_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_x * self.increase_crop_size)
-                pixel_h_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_y * self.increase_crop_size)
-                current_crop_image = lowresstackimage[row_number:(row_number+pixel_h_highresInLowres), column_number:(column_number+pixel_w_highresInLowres)]
+                pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)
+                pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
+                current_crop_image = lowresstackimage[row_number:(row_number+pixel_height_highresInLowres), column_number:(column_number+pixel_width_highresInLowres)]
 
                 # assign the image to the image list
                 self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
@@ -256,16 +261,15 @@ class drift_correction:
                 # debug mode - save image
                 if self.debugmode == True:
                     # generate filenames
-                    file_maxproj = os.path.join(self.logfolder,
-                                                "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint)
+                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint + ".tif")
                     # save files
                     cv2.imwrite(file_maxproj, current_crop_image)
 
                 #calculate the physical position of where to image highres stack
                 #1.calculate middle position
                 center_pixel = (int(lowresstackimage.shape[0]/2), int(lowresstackimage.shape[1]/2))
-                row_number_middle = row_number + pixel_w_highresInLowres/2
-                column_number_middle = column_number + pixel_h_highresInLowres/2
+                row_number_middle = row_number + pixel_height_highresInLowres/2
+                column_number_middle = column_number + pixel_width_highresInLowres/2
                 mm_difference = ((row_number_middle - center_pixel[0])/self.scalingfactor, (column_number_middle - center_pixel[1])/self.scalingfactor)
                 return (mm_difference[0], mm_difference[1], row_number, column_number)
 
@@ -323,8 +327,8 @@ class drift_correction:
                 # debug mode - save image
                 if self.debugmode == True:
                     # generate filenames
-                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint)
-                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint)
+                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
+                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
 
                     # save files
                     cv2.imwrite(file_axial1, image1)
@@ -334,6 +338,13 @@ class drift_correction:
                 correctionFactor = self.lowres_zspacing*correctX
                 return (correctionFactor)
 
+    def indicate_driftcorrectionCompleted(self, PosNumber):
+        """
+        :param PosNumber:
+        :return: update completed array
+        """
+        index = self._find_Index_of_PosNumber(PosNumber)
+        self.completed[index]=1
 
     def register_image(self, ref, mov, mode):
         """
@@ -419,11 +430,19 @@ if __name__ == '__main__':
     img_lowres_t_t0001 = imread(img_lowres_t0001)
     img_lowres_t_t0002 = imread(img_lowres_t0002)
 
-
+    currenttime = "t00000"
 
     #initialize image repository class and drift correction class
     imagerepoclass = images_InMemory_class()
-    c = drift_correction(stage_PositionList, stage_highres_PositionList, 0.0035, 0.0003, 2048, 2048, imagerepoclass)
+    c = drift_correction(stage_PositionList,
+                         stage_highres_PositionList,
+                         0.0035,
+                         0.0003,
+                         2048,
+                         2048,
+                         currenttime,
+                         imagerepoclass,
+                         debugfilepath="D://test/drift_correctionTest/transmission_timeseries_result")
 
     list = c.find_corresponsingHighResTiles(1)
     print(list)
@@ -437,6 +456,7 @@ if __name__ == '__main__':
     tmpimag1 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
 
     #second acquisition
+    c.currenttimepoint = "t00001"
     c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
     #c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
     lat_drift2 = c.calculate_Lateral_drift(2, mode='transmission')
@@ -444,6 +464,7 @@ if __name__ == '__main__':
     tmpimag2 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
 
     # #third acquisition
+    c.currenttimepoint = "t00002"
     c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0002)
     lat_drift3 = c.calculate_Lateral_drift(2, mode='transmission')
     print(lat_drift3)

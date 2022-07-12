@@ -14,8 +14,6 @@ if __name__ == '__main__': #needed for threading of napari in subprocess
     print(imstack1.shape)
     print(imstack1.dtype)
 
-
-
     subarray = imstack1[60:62,1400:2000,1500:1900]
     t2 = time.perf_counter()
     for i in range(subarray.shape[0]):
