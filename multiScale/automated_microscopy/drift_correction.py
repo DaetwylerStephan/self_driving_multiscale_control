@@ -171,7 +171,7 @@ class drift_correction:
         calculates lateral drift correction based on low res view.
         :param PosNumber: which entry of the highres list with ID=PosNumber are you trying to correct?
         :param mode: what drift correction are you running? e.g. on transmission image or fluorescence image
-        :return: (mm_correction lateral, mm_correction_updown, rownumber, columnnumber)
+        :return: (mm_correction lateral, mm_correction_updown, rownumber, columnnumber, crop_height, crop_width)
         '''
 
         lateralId = 0
@@ -271,7 +271,7 @@ class drift_correction:
                 row_number_middle = row_number + pixel_height_highresInLowres/2
                 column_number_middle = column_number + pixel_width_highresInLowres/2
                 mm_difference = ((row_number_middle - center_pixel[0])/self.scalingfactor, (column_number_middle - center_pixel[1])/self.scalingfactor)
-                return (mm_difference[0], mm_difference[1], row_number, column_number)
+                return (mm_difference[0], mm_difference[1], row_number, column_number, pixel_height_highresInLowres, pixel_width_highresInLowres)
 
         #
         elif mode=="fluorescence":
