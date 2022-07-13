@@ -171,7 +171,7 @@ class drift_correction:
         calculates lateral drift correction based on low res view.
         :param PosNumber: which entry of the highres list with ID=PosNumber are you trying to correct?
         :param mode: what drift correction are you running? e.g. on transmission image or fluorescence image
-        :return: (mm_correction lateral, mm_correction_updown, rownumber, columnnumber, crop_height, crop_width)
+        :return: (rownumber, columnnumber, crop_height, crop_width) - the position of the newly found view in the max projection
         '''
 
         lateralId = 0
@@ -180,7 +180,8 @@ class drift_correction:
 
         #transmission is different as there is no 1-to-1 correspondance between lowres and highres view. Therefore, one needs to first establish
         #an image of the region to follow. This image is saved in the image list
-        if mode=="transmission":
+        #if mode=="transmission":
+        if 1==1:
             print('Use transmission image for drift correction')
 
             # retrieve corresponding high res image
@@ -233,7 +234,7 @@ class drift_correction:
                     #img_rgb_sc = cv2.rectangle(img_lowrestrans, (loc[1], loc[0]), (loc[1] + pixel_w_highresInLowres, loc[0] + pixel_h_highresInLowres), (0, 255, 255), 2)
                     cv2.imwrite(file_maxproj, corresponding_lowres_view)
 
-                return (coordinate_difference[lateralId]/self.scalingfactor,coordinate_difference[UpDownID]/self.scalingfactor, loc[0], loc[1])
+                return (loc[0], loc[1], pixel_height_highresInLowres, pixel_width_highresInLowres)
             else:
                 # if not first time, take previous image and find corresponding image in translation image with template matching
                 print("perform matching on transmission image")
@@ -241,11 +242,6 @@ class drift_correction:
                 #get corresponding low res stack
                 stacknumber = self.find_closestLowResTile(PosNumber, return_number=True)
                 lowresstackimage = self.ImageRepo.image_retrieval("current_lowRes_Proj", stacknumber)
-
-                # f, ax = plt.subplots(2, 1, figsize=(18, 40))
-                # ax[0].imshow(lowresstackimage, cmap='gray')
-                # ax[1].imshow(image_transmission, cmap='gray')
-                # plt.show(block='False')
 
                 #perform template matching
                 (row_number, column_number) = self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
@@ -271,13 +267,21 @@ class drift_correction:
                 row_number_middle = row_number + pixel_height_highresInLowres/2
                 column_number_middle = column_number + pixel_width_highresInLowres/2
                 mm_difference = ((row_number_middle - center_pixel[0])/self.scalingfactor, (column_number_middle - center_pixel[1])/self.scalingfactor)
-                return (mm_difference[0], mm_difference[1], row_number, column_number, pixel_height_highresInLowres, pixel_width_highresInLowres)
+                print("lateraldrift corr" + str(PosNumber) + ": " + str(mm_difference))
 
-        #
-        elif mode=="fluorescence":
-            print("Use fluorescence image for drift correction")
-        else:
-            print("Use fluorescence image for drift correction")
+                #update position in highpositionlist
+                oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
+                correctionarray = [0, mm_difference[0], mm_difference[1], 0, 0, 0]
+                newposition = oldposition + correctionarray
+
+                self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
+
+                return (row_number, column_number, pixel_height_highresInLowres, pixel_width_highresInLowres)
+
+        # elif mode=="fluorescence":
+        #     print("Use fluorescence image for drift correction")
+        # else:
+        #     print("Use fluorescence image for drift correction")
 
 
     def calculate_axialdrift(self, PosNumber, image1, image2=None, mode='fluorescence'):
@@ -289,8 +293,8 @@ class drift_correction:
         :return:
         '''
 
-        if mode == "transmission":
-
+        #if mode == "transmission":
+        if 1==1:
             # retrieve corresponding high res image
             lowres_axial1_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
 
@@ -336,6 +340,14 @@ class drift_correction:
                         cv2.imwrite(file_axial2, image2)
 
                 correctionFactor = self.lowres_zspacing*correctX
+
+                #update position in highresposition list
+                oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
+                correctionarray = [0, 0, 0, correctionFactor, 0, 0]
+                newposition = oldposition + correctionarray
+                self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
+
+                print("axial drift correction:" + str(correctionFactor))
                 return (correctionFactor)
 
     def indicate_driftcorrectionCompleted(self, PosNumber):
