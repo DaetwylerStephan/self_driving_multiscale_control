@@ -436,7 +436,11 @@ class multiScopeModel:
         return array
 
     def move_to_position(self, positionlist):
-        print(str(positionlist[0:3]))
+        """
+        move to specified position according to positionlist
+        :param positionlist: list of positions in format, e.g. [44280000, -2000000000, -2587870000]
+        :return:
+        """
         positionlistInt = np.array(positionlist, dtype=np.int64)
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
         self.rotationstage.moveToAngle(positionlist[3])
@@ -870,13 +874,13 @@ class multiScopeModel:
 
             def calculate_projection_and_drift():
                 # calculate projections
-                filepathforprojection_three = self.current_projectionfilepath_three  # assign now as filepath is updated for next stack acquired
-                filepathforprojection_XY = self.current_projectionfilepath_XY  # assign now as filepath is updated for next stack acquired
-                filepathforprojection_XZ = self.current_projectionfilepath_XZ  # assign now as filepath is updated for next stack acquired
-                filepathforprojection_YZ = self.current_projectionfilepath_YZ  # assign now as filepath is updated for next stack acquired
-                posnumber_lowres = self.current_PosNumber
-
-                bufferindex = current_bufferiter
+                filepathforprojection_three = copy.deepcopy(self.current_projectionfilepath_three)  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XY = copy.deepcopy(self.current_projectionfilepath_XY)  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XZ = copy.deepcopy(self.current_projectionfilepath_XZ)  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_YZ = copy.deepcopy(self.current_projectionfilepath_YZ)  # assign now as filepath is updated for next stack acquired
+                posnumber_lowres = copy.deepcopy(self.current_PosNumber)
+                bufferindex = copy.deepcopy(current_bufferiter)
+                driftcorr_OnChannel = copy.deepcopy(self.perform_driftcorrectionOnChannel)
 
                 t0 = time.perf_counter()
                 maxproj_xy = np.max(self.low_res_buffers[bufferindex], axis=0)
@@ -914,7 +918,7 @@ class multiScopeModel:
 
                 #perform drift correction on low res images
                 t0 = time.perf_counter()
-                if self.perform_driftcorrectionOnChannel == 1:
+                if driftcorr_OnChannel == 1:
                     if self.drift_correctionOnLowRes == 1:
                         #set current parameters
                         #high&low position list are updated when stack acquisition is started in multiScale_main to not override previous calculation for other position
@@ -924,25 +928,25 @@ class multiScopeModel:
                         self.driftcorrectionmodule.highres_height = self.current_highresROI_height
                         self.driftcorrectionmodule.highres_width = self.current_highresROI_width
 
+                        self.driftcorrectionmodule.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
+                        highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(posnumber_lowres)
+                        print("highreslist to do drift correction on: " + str(highreslistID))
                         # add max projection to ImageRepo
                         if self.drift_transmission == 0:
-                            self.driftcorrectionmodule.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
-                            highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(self.current_PosNumber)
-                            for iter in highreslistID:
-                                (row_number, column_number, crop_height, crop_width) = self.driftcorrectionmodule.calculate_Lateral_drift(iter, mode='fluorescence')
-                                image1 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width],axis=1)
-                                image2 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width],axis=2)
-                                self.driftcorrectionmodule.calculate_axialdrift(self.current_PosNumber, image1, image2=image2, mode='fluorescence')
-                                self.driftcorrectionmodule.indicate_driftcorrectionCompleted(self.current_PosNumber)
+                            currentmode = 'fluorescene'
                         else:
-                            self.driftcorrectionmodule.ImageRepo.replaceImage("current_transmissionImage", posnumber_lowres, maxproj_xy)
-                            highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(self.current_PosNumber)
-                            for iter in highreslistID:
-                                (row_number, column_number, crop_height,crop_width) = self.driftcorrectionmodule.calculate_Lateral_drift(iter, mode='transmission')
-                                image1 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number + crop_height, column_number:column_number + crop_width], axis=1)
-                                image2 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number + crop_height, column_number:column_number + crop_width], axis=2)
-                                self.driftcorrectionmodule.calculate_axialdrift(self.current_PosNumber, image1, image2=image2, mode='transmission')
-                                self.driftcorrectionmodule.indicate_driftcorrectionCompleted(self.current_PosNumber)
+                            currentmode = 'transmission'
+
+                        for iter in highreslistID:
+                            print("---------------------------------------------------------------------------")
+                            print("drift correction on " + str(iter))
+                            (row_number, column_number, crop_height, crop_width) = self.driftcorrectionmodule.calculate_Lateral_drift(iter, mode=currentmode)
+                            image1 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width], axis=1)
+                            image2 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width], axis=2)
+                            self.driftcorrectionmodule.calculate_axialdrift(iter, image1, image2, mode=currentmode)
+                            self.driftcorrectionmodule.indicate_driftcorrectionCompleted(iter)
+
+
                 t1 = time.perf_counter() - t0
                 print("drift correction time: " + str(t1))
 
@@ -1042,18 +1046,22 @@ class multiScopeModel:
 
             def calculate_projection_highres():
                 # calculate projections
-                filepathforprojection_three = self.current_projectionfilepath_three  # assign now as filepath is updated for next stack acquired
-                filepathforprojection_XY = self.current_projectionfilepath_XY  # assign now as filepath is updated for next stack acquired
-                filepathforprojection_XZ = self.current_projectionfilepath_XZ  # assign now as filepath is updated for next stack acquired
-                filepathforprojection_YZ = self.current_projectionfilepath_YZ  # assign now as filepath is updated for next stack acquired
-                pastfilepathforprojection = self.past_projectionfilepath
-                current_region_item = self.current_PosNumber
+
+                #todo - list all parameters here that change from stack to stack to avoid racing conditions....
+                filepathforprojection_three = copy.deepcopy(self.current_projectionfilepath_three)  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XY = copy.deepcopy(self.current_projectionfilepath_XY)  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_XZ = copy.deepcopy(self.current_projectionfilepath_XZ)  # assign now as filepath is updated for next stack acquired
+                filepathforprojection_YZ = copy.deepcopy(self.current_projectionfilepath_YZ)  # assign now as filepath is updated for next stack acquired
+                pastfilepathforprojection = copy.deepcopy(self.past_projectionfilepath)
+                current_region_item = copy.deepcopy(self.current_PosNumber)
+                current_buffernumber = copy.deepcopy(self.current_buffernumber)
+                driftcorr_OnChannel = copy.deepcopy(self.perform_driftcorrectionOnChannel)
 
 
                 t0 = time.perf_counter()
-                maxproj_xy = np.max(self.high_res_buffers[current_bufferiter], axis=0)
-                maxproj_xz = np.max(self.high_res_buffers[current_bufferiter], axis=1)
-                maxproj_yz = np.max(self.high_res_buffers[current_bufferiter], axis=2)
+                maxproj_xy = np.max(self.high_res_buffers[current_buffernumber], axis=0)
+                maxproj_xz = np.max(self.high_res_buffers[current_buffernumber], axis=1)
+                maxproj_yz = np.max(self.high_res_buffers[current_buffernumber], axis=2)
                 t1 = time.perf_counter() - t0
 
                 print("time: " + str(t1))
@@ -1076,17 +1084,6 @@ class multiScopeModel:
                 except:
                     print("folder not created")
 
-                ###drift-correction module here
-                if self.perform_driftcorrectionOnChannel == 1:
-                    if self.drift_correctionOnHighRes ==1:
-                        current_region_iter = self.current_region.split('stack')[1]
-                        self.driftcorrectionmodule.calculate_drift_highRes(maxproj_xy,
-                                                                           maxproj_xz,
-                                                                           maxproj_yzTransposed,
-                                                                           pastfilepathforprojection,
-                                                                           (self.highres_planespacing/1000000),
-                                                                           current_region_item
-                                                                           )
                 try:
                     imwrite(filepathforprojection_three, all_proj)
                     imwrite(filepathforprojection_XY, maxproj_xy.astype("uint16"))
@@ -1097,6 +1094,19 @@ class multiScopeModel:
 
                 if self.displayImStack == 1:
                     self.display.show_stack(self.high_res_buffers[current_bufferiter])
+
+                ###drift-correction module here for high res driftcorrection
+                if driftcorr_OnChannel == 1:
+                    if self.drift_correctionOnHighRes ==1:
+                        current_region_iter = self.current_region.split('stack')[1]
+                        self.driftcorrectionmodule.calculate_drift_highRes(maxproj_xy,
+                                                                           maxproj_xz,
+                                                                           maxproj_yzTransposed,
+                                                                           pastfilepathforprojection,
+                                                                           (self.highres_planespacing/1000000),
+                                                                           current_region_item
+                                                                           )
+
 
             projection_thread2 = ct.ResultThread(target=calculate_projection_highres).start()
 

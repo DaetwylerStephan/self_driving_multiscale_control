@@ -23,6 +23,12 @@ class images_InMemory_class:
         self.current_transmissionAxial2ImageList = []
         self.previous_transmissionAxial2ImageList = []
 
+    def reset(self):
+        """
+        resets class to default value (without any images saved).
+        """
+        self.__init__()
+
 
     def addNewImage(self, whichlist, PosNumber, image):
         """

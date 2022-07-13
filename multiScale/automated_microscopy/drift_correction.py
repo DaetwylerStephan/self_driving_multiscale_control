@@ -6,8 +6,8 @@ import copy
 import sys
 sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
 from auxiliary_code.constants import Image_parameters
-from image_deposit import images_InMemory_class
-from template_matching import automated_templateMatching
+from automated_microscopy.template_matching import automated_templateMatching
+from automated_microscopy.image_deposit import images_InMemory_class
 
 from pystackreg import StackReg
 import pystackreg
@@ -271,7 +271,7 @@ class drift_correction:
 
                 #update position in highpositionlist
                 oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
-                correctionarray = [0, mm_difference[0], mm_difference[1], 0, 0, 0]
+                correctionarray = np.array([0, mm_difference[0], mm_difference[1], 0, 0, 0]).astype(float)
                 newposition = oldposition + correctionarray
 
                 self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
@@ -284,7 +284,7 @@ class drift_correction:
         #     print("Use fluorescence image for drift correction")
 
 
-    def calculate_axialdrift(self, PosNumber, image1, image2=None, mode='fluorescence'):
+    def calculate_axialdrift(self, PosNumber, image1, image2, mode='fluorescence'):
         '''
         calculates axial drift correction based on low res view.
         :param image of axial max projection around laterally corrected position.
@@ -300,33 +300,9 @@ class drift_correction:
 
             # if return zero array, safe the image as first tile in the list.
             if lowres_axial1_transmission.shape[0] < 2:
-
+                print("Establish axis images for transmission")
                 self.ImageRepo.replaceImage("current_transmissionAxial1Image", PosNumber, copy.deepcopy(image1))
-                if not image2 == None:
-                    self.ImageRepo.replaceImage("current_transmissionAxial2Image", PosNumber, copy.deepcopy(image2))
-
-                # debug mode - save image
-                if self.debugmode == True:
-                    # generate filenames
-                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint)
-                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint)
-
-                    # save files
-                    cv2.imwrite(file_axial1, image1)
-                    if not image2 == None:
-                        cv2.imwrite(file_axial2, image2)
-
-            else:
-                # get corresponding low res stack
-                correctX, correctY = self.register_image(lowres_axial1_transmission, image1, 'translation')
-                print(correctX, correctY)
-                if not image2==None:
-                    lowres_axial2_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
-                    correctX2, correctY2 = self.register_image(lowres_axial2_transmission, image2, 'translation')
-
-                    print(correctX2, correctY2)
-                    correctX = (correctX + correctX2)/2
-                    correctY = (correctY + correctY2)/2
+                self.ImageRepo.replaceImage("current_transmissionAxial2Image", PosNumber, copy.deepcopy(image2))
 
                 # debug mode - save image
                 if self.debugmode == True:
@@ -336,14 +312,38 @@ class drift_correction:
 
                     # save files
                     cv2.imwrite(file_axial1, image1)
-                    if not image2 == None:
-                        cv2.imwrite(file_axial2, image2)
+                    cv2.imwrite(file_axial2, image2)
 
-                correctionFactor = self.lowres_zspacing*correctX
+            else:
+                print("Calculate axial drift for transmission")
+
+                # get corresponding low res stack
+                correctX, correctY = self.register_image(lowres_axial1_transmission, image1, 'translation')
+                print(correctX, correctY)
+
+                lowres_axial2_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
+                correctX2, correctY2 = self.register_image(lowres_axial2_transmission, image2, 'translation')
+
+                print(correctX2, correctY2)
+                correctX = (correctX + correctX2)/2
+                correctY = (correctY + correctY2)/2
+
+                # debug mode - save image
+                if self.debugmode == True:
+                    # generate filenames
+                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
+                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
+
+                    # save files
+                    cv2.imwrite(file_axial1, image1)
+                    cv2.imwrite(file_axial2, image2)
+
+                #divide by 1000000000 as these are the stage units in pm to mm conversion for the position list
+                correctionFactor = self.lowres_zspacing/1000000000*correctX
 
                 #update position in highresposition list
                 oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
-                correctionarray = [0, 0, 0, correctionFactor, 0, 0]
+                correctionarray = np.asarray([0, 0, 0, correctionFactor, 0, 0]).astype(float)
                 newposition = oldposition + correctionarray
                 self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
 

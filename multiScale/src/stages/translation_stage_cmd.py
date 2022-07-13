@@ -390,7 +390,6 @@ class SLC_translationstage:
 
     def moveToPosition(self, position_list):
         r_id = [0] * 9
-        print(r_id)
         t_handle = ctl.OpenCommandGroup(self.d_handle, ctl.CmdGroupTriggerMode.DIRECT)
 
         r_id[0] = ctl.RequestWriteProperty_i32(self.d_handle, 0, ctl.Property.AMPLIFIER_ENABLED,

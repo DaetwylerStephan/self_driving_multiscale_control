@@ -691,7 +691,7 @@ class MultiScale_Microscope_Controller():
 
         #################-----------------------------------------------------------------------------------------------
         #wait for all drift correction positions to be calculated before proceeding to high resolution imaging
-        if self.continuetimelapse != 0:
+        if self.continuetimelapse == 0:
             #call here drift correction if based on low resolution imaging
             if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
 
@@ -782,8 +782,6 @@ class MultiScale_Microscope_Controller():
         thread that controls time-lapse, started from function acquire_timelapse, which is called from GUI(self, event):
         """
 
-        self.view.update()
-        ####----------set up file path
         # generate file path
         nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
         newfolderind = nbfiles_folder + 1
@@ -817,6 +815,8 @@ class MultiScale_Microscope_Controller():
             print("parameters saved")
         ct.ResultThread(target=write_paramconfigtimelapse).start()
 
+        #driftcorrection - reinitalize image repository so that not old images are used for comparison
+        self.model.driftcorrectionmodule.ImageRepo.reset()
 
         ###run timelapse, starting at timepoint 0
         for timeiter in range(0, self.view.runtab.timelapse_aq_nbTimepoints):
