@@ -7,6 +7,7 @@ import threading
 import numpy as np
 from multiprocessing import shared_memory
 from tifffile import imread, imwrite
+import copy
 
 import acquisition_array_class as acq_arrays
 
@@ -1054,14 +1055,14 @@ class multiScopeModel:
                 filepathforprojection_YZ = copy.deepcopy(self.current_projectionfilepath_YZ)  # assign now as filepath is updated for next stack acquired
                 pastfilepathforprojection = copy.deepcopy(self.past_projectionfilepath)
                 current_region_item = copy.deepcopy(self.current_PosNumber)
-                current_buffernumber = copy.deepcopy(self.current_buffernumber)
+                bufferindex = copy.deepcopy(current_bufferiter)
                 driftcorr_OnChannel = copy.deepcopy(self.perform_driftcorrectionOnChannel)
 
 
                 t0 = time.perf_counter()
-                maxproj_xy = np.max(self.high_res_buffers[current_buffernumber], axis=0)
-                maxproj_xz = np.max(self.high_res_buffers[current_buffernumber], axis=1)
-                maxproj_yz = np.max(self.high_res_buffers[current_buffernumber], axis=2)
+                maxproj_xy = np.max(self.high_res_buffers[bufferindex], axis=0)
+                maxproj_xz = np.max(self.high_res_buffers[bufferindex], axis=1)
+                maxproj_yz = np.max(self.high_res_buffers[bufferindex], axis=2)
                 t1 = time.perf_counter() - t0
 
                 print("time: " + str(t1))

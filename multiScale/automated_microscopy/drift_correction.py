@@ -257,7 +257,7 @@ class drift_correction:
                 # debug mode - save image
                 if self.debugmode == True:
                     # generate filenames
-                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint + ".tif")
+                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(int(PosNumber)) + self.currenttimepoint + ".tif")
                     # save files
                     cv2.imwrite(file_maxproj, current_crop_image)
 
@@ -307,8 +307,8 @@ class drift_correction:
                 # debug mode - save image
                 if self.debugmode == True:
                     # generate filenames
-                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
-                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
+                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(int(PosNumber)) + self.currenttimepoint + ".tif")
+                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(int(PosNumber)) + self.currenttimepoint + ".tif")
 
                     # save files
                     cv2.imwrite(file_axial1, image1)
@@ -318,34 +318,39 @@ class drift_correction:
                 print("Calculate axial drift for transmission")
 
                 # get corresponding low res stack
-                correctX, correctY = self.register_image(lowres_axial1_transmission, image1, 'translation')
-                print(correctX, correctY)
+                correctX1, correctZ1 = self.register_image(lowres_axial1_transmission, image1, 'translation')
+                print(correctX1, correctZ1)
 
-                lowres_axial2_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial1Image", PosNumber)
-                correctX2, correctY2 = self.register_image(lowres_axial2_transmission, image2, 'translation')
+                lowres_axial2_transmission = self.ImageRepo.image_retrieval("current_transmissionAxial2Image", PosNumber)
+                correctY2, correctZ2 = self.register_image(lowres_axial2_transmission, image2, 'translation')
 
-                print(correctX2, correctY2)
-                correctX = (correctX + correctX2)/2
-                correctY = (correctY + correctY2)/2
+                print(correctY2, correctZ2)
+                correctZ = (correctZ1 + correctZ2)/2
+
+                #we are interested only in the
 
                 # debug mode - save image
                 if self.debugmode == True:
                     # generate filenames
-                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
-                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(PosNumber) + self.currenttimepoint + ".tif")
+                    file_axial1 = os.path.join(self.logfolder, "transmission_axial1proj_" + str(int(PosNumber)) + self.currenttimepoint + ".tif")
+                    file_axial2 = os.path.join(self.logfolder, "transmission_axial2proj_" + str(int(PosNumber)) + self.currenttimepoint + ".tif")
 
                     # save files
                     cv2.imwrite(file_axial1, image1)
                     cv2.imwrite(file_axial2, image2)
 
                 #divide by 1000000000 as these are the stage units in pm to mm conversion for the position list
-                correctionFactor = self.lowres_zspacing/1000000000*correctX
+                correctionFactor = self.lowres_zspacing/1000000000*correctZ
 
                 #update position in highresposition list
                 oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
                 correctionarray = np.asarray([0, 0, 0, correctionFactor, 0, 0]).astype(float)
                 newposition = oldposition + correctionarray
                 self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
+
+                #Update image repository
+                self.ImageRepo.replaceImage("current_transmissionAxial1Image", PosNumber, copy.deepcopy(image1))
+                self.ImageRepo.replaceImage("current_transmissionAxial2Image", PosNumber, copy.deepcopy(image2))
 
                 print("axial drift correction:" + str(correctionFactor))
                 return (correctionFactor)
@@ -448,8 +453,8 @@ if __name__ == '__main__':
     imagerepoclass = images_InMemory_class()
     c = drift_correction(stage_PositionList,
                          stage_highres_PositionList,
-                         0.0035,
-                         0.0003,
+                         3.5 * 1000000,
+                         0.3 * 1000000,
                          2048,
                          2048,
                          currenttime,
@@ -461,33 +466,59 @@ if __name__ == '__main__':
     test = c._find_Index_of_PosNumber(1)
     print(test)
 
-    #first acquisition
-    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
-    lat_drift1 = c.calculate_Lateral_drift(2, mode='transmission')
-    print(lat_drift1)
-    tmpimag1 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+    image_first_axial1 = "D://test/drift_correctionTest/output1/axial1/transmission_axial1proj_1t00000.tif"
+    image_first_axial2 = "D://test/drift_correctionTest/output1/axial2/transmission_axial2proj_1t00000.tif"
+    img_first_axial1 = imread(image_first_axial1)
+    img_first_axial2 = imread(image_first_axial2)
 
-    #second acquisition
-    c.currenttimepoint = "t00001"
-    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
-    #c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
-    lat_drift2 = c.calculate_Lateral_drift(2, mode='transmission')
-    print(lat_drift2)
-    tmpimag2 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
 
-    # #third acquisition
-    c.currenttimepoint = "t00002"
-    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0002)
-    lat_drift3 = c.calculate_Lateral_drift(2, mode='transmission')
-    print(lat_drift3)
-    tmpimag3 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+    image_old_axial1 = "D://test/drift_correctionTest/output1/axial1/transmission_axial1proj_1.0t00039.tif"
+    image_new_axial1 = "D://test/drift_correctionTest/output1/axial1/transmission_axial1proj_1.0t00040.tif"
+    image_old_axial2 = "D://test/drift_correctionTest/output1/axial2/transmission_axial2proj_1.0t00039.tif"
+    image_new_axial2 = "D://test/drift_correctionTest/output1/axial2/transmission_axial2proj_1.0t00040.tif"
+    img_old_axial1 = imread(image_old_axial1)
+    img_new_axial1 = imread(image_new_axial1)
+    img_old_axial2 = imread(image_old_axial2)
+    img_new_axial2 = imread(image_new_axial2)
 
-    f2, ax2 = plt.subplots(3, 1, figsize=(18, 40))
-    ax2[0].imshow(tmpimag1, cmap='gray')
-    ax2[1].imshow(tmpimag2, cmap='gray')
-    ax2[2].imshow(tmpimag3, cmap='gray')
-    plt.show(block='False')
 
+    c.ImageRepo.replaceImage("current_transmissionAxial1Image",1, img_first_axial1)
+    c.ImageRepo.replaceImage("current_transmissionAxial2Image",1, img_first_axial2)
+    c.calculate_axialdrift(1, img_new_axial1, img_new_axial2, mode='transmission')
+
+
+
+    # ---------------------------------------------------------------------------------------------------
+    #test: lateral drift
+
+    # #first acquisition
+    # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
+    # lat_drift1 = c.calculate_Lateral_drift(2, mode='transmission')
+    # print(lat_drift1)
+    # tmpimag1 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+    #
+    # #second acquisition
+    # c.currenttimepoint = "t00001"
+    # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
+    # #c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
+    # lat_drift2 = c.calculate_Lateral_drift(2, mode='transmission')
+    # print(lat_drift2)
+    # tmpimag2 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+    #
+    # # #third acquisition
+    # c.currenttimepoint = "t00002"
+    # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0002)
+    # lat_drift3 = c.calculate_Lateral_drift(2, mode='transmission')
+    # print(lat_drift3)
+    # tmpimag3 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+    #
+    # f2, ax2 = plt.subplots(3, 1, figsize=(18, 40))
+    # ax2[0].imshow(tmpimag1, cmap='gray')
+    # ax2[1].imshow(tmpimag2, cmap='gray')
+    # ax2[2].imshow(tmpimag3, cmap='gray')
+    # plt.show(block='False')
+
+    #---------------------------------------------------------------------------------------------------
     #load sample images
     # img0name = "D://test/drift_correctionTest/CH488/t00000.tif"
     # img1name = "D://test/drift_correctionTest/CH488/t00001.tif"
