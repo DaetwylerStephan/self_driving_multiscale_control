@@ -251,15 +251,7 @@ class drift_correction:
                 pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
                 current_crop_image = lowresstackimage[row_number:(row_number+pixel_height_highresInLowres), column_number:(column_number+pixel_width_highresInLowres)]
 
-                # assign the image to the image list
-                self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
 
-                # debug mode - save image
-                if self.debugmode == True:
-                    # generate filenames
-                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(int(PosNumber)) + self.currenttimepoint + ".tif")
-                    # save files
-                    cv2.imwrite(file_maxproj, current_crop_image)
 
                 #calculate the physical position of where to image highres stack
                 #1.calculate middle position
@@ -270,11 +262,23 @@ class drift_correction:
                 print("lateraldrift corr" + str(PosNumber) + ": " + str(mm_difference))
 
                 #update position in highpositionlist
-                oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
+                #oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
+                lowresposition = self.lowres_positionList[stacknumber]
                 correctionarray = np.array([0, mm_difference[0], mm_difference[1], 0, 0, 0]).astype(float)
-                newposition = oldposition + correctionarray
+                newposition = lowresposition + correctionarray
 
                 self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
+
+                # assign the image to the image list
+                self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
+
+                # debug mode - save image
+                if self.debugmode == True:
+                    # generate filenames
+                    file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(
+                        int(PosNumber)) + self.currenttimepoint + ".tif")
+                    # save files
+                    cv2.imwrite(file_maxproj, current_crop_image)
 
                 return (row_number, column_number, pixel_height_highresInLowres, pixel_width_highresInLowres)
 

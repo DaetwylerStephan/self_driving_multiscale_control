@@ -144,6 +144,15 @@ class AdvancedSettings_Tab(tk.Frame):
         self.voltagemiddle_entry594 = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_middle594, width=6)
         self.voltagemiddle_entry640 = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_middle640, width=6)
 
+        self.voltagemiddle_entry488plus = tk.Button(ASLM_settings, text="+", command=lambda : self.change_voltage(self.ASLM_volt_middle488, 1))
+        self.voltagemiddle_entry488minus = tk.Button(ASLM_settings, text="-", command=lambda : self.change_voltage(self.ASLM_volt_middle488, -1))
+        self.voltagemiddle_entry552plus = tk.Button(ASLM_settings, text="+",command=lambda: self.change_voltage(self.ASLM_volt_middle552, 1))
+        self.voltagemiddle_entry552minus = tk.Button(ASLM_settings, text="-",command=lambda: self.change_voltage(self.ASLM_volt_middle552, -1))
+        self.voltagemiddle_entry594plus = tk.Button(ASLM_settings, text="+", command=lambda: self.change_voltage(self.ASLM_volt_middle594, 1))
+        self.voltagemiddle_entry594minus = tk.Button(ASLM_settings, text="-",command=lambda: self.change_voltage(self.ASLM_volt_middle594, -1))
+        self.voltagemiddle_entry640plus = tk.Button(ASLM_settings, text="+", command=lambda: self.change_voltage(self.ASLM_volt_middle640, 1))
+        self.voltagemiddle_entry640minus = tk.Button(ASLM_settings, text="-",command=lambda: self.change_voltage(self.ASLM_volt_middle640, -1))
+
         self.voltagecurrent_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_current, width=6)
         self.voltageLowRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_lowRes_static, width=6)
         self.voltageHighRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_highRes_static, width=6)
@@ -189,10 +198,22 @@ class AdvancedSettings_Tab(tk.Frame):
         self.scanWidth_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
         self.voltageinterval_entry.grid(row=4, column=1, sticky=tk.W + tk.E + tk.S)
         interval_scale.grid(row=4, column=2, sticky=tk.W + tk.E + tk.S)
+
         self.voltagemiddle_entry488.grid(row=10, column=1, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry488plus.grid(row=10, column=3, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry488minus.grid(row=10, column=4, sticky=tk.W + tk.E + tk.S)
+
         self.voltagemiddle_entry552.grid(row=11, column=1, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry552plus.grid(row=11, column=3, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry552minus.grid(row=11, column=4, sticky=tk.W + tk.E + tk.S)
+
         self.voltagemiddle_entry594.grid(row=12, column=1, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry594plus.grid(row=12, column=3, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry594minus.grid(row=12, column=4, sticky=tk.W + tk.E + tk.S)
+
         self.voltagemiddle_entry640.grid(row=13, column=1, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry640plus.grid(row=13, column=3, sticky=tk.W + tk.E + tk.S)
+        self.voltagemiddle_entry640minus.grid(row=13, column=4, sticky=tk.W + tk.E + tk.S)
 
         voltagemiddle_scale488.grid(row=10, column=2, sticky=tk.W + tk.E + tk.S)
         voltagemiddle_scale552.grid(row=11, column=2, sticky=tk.W + tk.E + tk.S)
@@ -210,3 +231,7 @@ class AdvancedSettings_Tab(tk.Frame):
 
     def print_values(self):
         print("test")
+
+    def change_voltage(self, voltage, factor):
+        new_voltage = round(voltage.get() + 0.1* factor,4)
+        voltage.set(new_voltage)
