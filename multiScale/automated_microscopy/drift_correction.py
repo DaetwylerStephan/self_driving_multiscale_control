@@ -124,7 +124,7 @@ class drift_correction:
     def _find_Index_of_PosNumber(self, PosNumber):
         index = 0
         for iter in range(len(self.highres_positionList)):
-            if self.highres_positionList[iter][0] == PosNumber:
+            if self.highres_positionList[iter][5] == PosNumber:
                 index = iter
 
         return index
@@ -227,7 +227,7 @@ class drift_correction:
                 self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(corresponding_lowres_view))
 
                 # debug mode - save image
-                if self.debugmode==True:
+                if self.debugmode == True:
                     #generate filenames
                     file_maxproj = os.path.join(self.logfolder, "transmission_maxproj_" + str(PosNumber) + self.currenttimepoint + ".tif")
                     #save files
@@ -242,6 +242,7 @@ class drift_correction:
                 #get corresponding low res stack
                 stacknumber = self.find_closestLowResTile(PosNumber, return_number=True)
                 lowresstackimage = self.ImageRepo.image_retrieval("current_lowRes_Proj", stacknumber)
+                currenthighresPosindex = copy.deepcopy(self._find_Index_of_PosNumber(PosNumber))
 
                 #perform template matching
                 (row_number, column_number) = self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
@@ -256,6 +257,12 @@ class drift_correction:
                 #calculate the physical position of where to image highres stack
                 #1.calculate middle position
                 center_pixel = (int(lowresstackimage.shape[0]/2), int(lowresstackimage.shape[1]/2))
+                print("center: " + str(center_pixel))
+                print("pixel height: " + str(pixel_height_highresInLowres))
+                print("pixel width" + str(pixel_width_highresInLowres))
+                print("row " + str(row_number) + " column_number: " + str(column_number))
+                print("scaling factor" + str(self.scalingfactor))
+                print("lowrespos" + str(self.lowres_positionList[stacknumber]))
                 row_number_middle = row_number + pixel_height_highresInLowres/2
                 column_number_middle = column_number + pixel_width_highresInLowres/2
                 mm_difference = ((row_number_middle - center_pixel[0])/self.scalingfactor, (column_number_middle - center_pixel[1])/self.scalingfactor)
@@ -263,11 +270,14 @@ class drift_correction:
 
                 #update position in highpositionlist
                 #oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
-                lowresposition = self.lowres_positionList[stacknumber]
-                correctionarray = np.array([0, mm_difference[0], mm_difference[1], 0, 0, 0]).astype(float)
+                lowresposition = np.append(copy.deepcopy(self.lowres_positionList[stacknumber]), copy.deepcopy(PosNumber))
+                correctionarray = np.array([0, mm_difference[0], -mm_difference[1], 0, 0, 0]).astype(float)
                 newposition = lowresposition + correctionarray
+                newposition[0] = copy.deepcopy(int(self.highres_positionList[currenthighresPosindex][0]))
 
-                self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)] = newposition
+                print("before update: " + str(self.highres_positionList[currenthighresPosindex]))
+                self.highres_positionList[currenthighresPosindex] = copy.deepcopy(newposition)
+                print("after update: " + str(self.highres_positionList[currenthighresPosindex]))
 
                 # assign the image to the image list
                 self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
@@ -366,6 +376,14 @@ class drift_correction:
         """
         index = self._find_Index_of_PosNumber(PosNumber)
         self.completed[index]=1
+        # print("xxxxxxxxxxxxxxxxxx")
+        # print(PosNumber)
+        # print(index)
+        # print(str(self.completed))
+        # print(len(self.completed))
+        # print(np.sum(self.completed))
+        # print("xxxxxxxxxxxxxxxxxx")
+
 
     def register_image(self, ref, mov, mode):
         """
@@ -439,7 +457,7 @@ class drift_correction:
 if __name__ == '__main__':
 
     #set test positions
-    stage_PositionList = [ (1,1.13718, -24.69498, -1.0845, 0.0,0), (2, 0.5, 0.6, 0.7, 0),(3, 0.5, 0.6, 0.7, 4), (4, 0.5, 0.4, 0.7, 0)]
+    stage_PositionList = [ (1,1.13718, -24.69498, -1.0845, 0.0), (2, 0.5, 0.6, 0.7,4),(3, 0.5, 0.6, 0.7,0), (4, 0.5, 0.4, 0.7,0)]
     stage_highres_PositionList = [(1, 1.2441, -24.69498, -1.00431, 0.0, 1), (2, 1.2441, -25.25631, -0.89739, 0.0, 2)]
 
     #load test images
@@ -495,20 +513,20 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------------------------
     #test: lateral drift
 
-    # #first acquisition
-    # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
-    # lat_drift1 = c.calculate_Lateral_drift(2, mode='transmission')
-    # print(lat_drift1)
-    # tmpimag1 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
-    #
-    # #second acquisition
-    # c.currenttimepoint = "t00001"
-    # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
-    # #c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
-    # lat_drift2 = c.calculate_Lateral_drift(2, mode='transmission')
-    # print(lat_drift2)
-    # tmpimag2 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
-    #
+    #first acquisition
+    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
+    lat_drift1 = c.calculate_Lateral_drift(2, mode='transmission')
+    print(lat_drift1)
+    tmpimag1 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+
+    #second acquisition
+    c.currenttimepoint = "t00001"
+    c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
+    #c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
+    lat_drift2 = c.calculate_Lateral_drift(2, mode='transmission')
+    print(lat_drift2)
+    tmpimag2 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
+
     # # #third acquisition
     # c.currenttimepoint = "t00002"
     # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0002)
