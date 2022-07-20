@@ -171,7 +171,7 @@ class SLC_translationstage:
 
                 if event.type == ctl.EventType.MOVEMENT_FINISHED:
                     if (event.i32 == ctl.ErrorCode.NONE):
-                        print("MCS2 movement finished, channel: ", event.idx)
+                        #print("MCS2 movement finished, channel: ", event.idx)
                         iter = iter+1
                         if(nb_channels == iter):
                             done=True
@@ -268,7 +268,8 @@ class SLC_translationstage:
                     t_handle = ctl.EventParameter.PARAM_HANDLE(event.i32)
                     result_code = ctl.EventParameter.PARAM_RESULT(event.i32)
                     if result_code == ctl.ErrorCode.NONE:
-                        print("MCS2 command group triggered, handle: {}".format(t_handle))
+                        pass
+                        #print("MCS2 command group triggered, handle: {}".format(t_handle))
                     else:
                         # The command group failed -> the reason may be found in the result code.
                         # To determine which command caused the error, read the individual results of the command

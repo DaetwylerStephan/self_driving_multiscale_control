@@ -271,12 +271,14 @@ class drift_correction:
                 #update position in highpositionlist
                 #oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]
                 lowresposition = np.append(copy.deepcopy(self.lowres_positionList[stacknumber]), copy.deepcopy(PosNumber))
-                correctionarray = np.array([0, mm_difference[0], -mm_difference[1], 0, 0, 0]).astype(float)
+                correctionarray = np.array([0, -mm_difference[0], -mm_difference[1], 0, 0, 0]).astype(float)
                 newposition = lowresposition + correctionarray
                 newposition[0] = copy.deepcopy(int(self.highres_positionList[currenthighresPosindex][0]))
+                axialposition = copy.deepcopy(self.highres_positionList[currenthighresPosindex][3]) #you don't want to overwrite the axial position
 
                 print("before update: " + str(self.highres_positionList[currenthighresPosindex]))
                 self.highres_positionList[currenthighresPosindex] = copy.deepcopy(newposition)
+                self.highres_positionList[currenthighresPosindex][3] = axialposition
                 print("after update: " + str(self.highres_positionList[currenthighresPosindex]))
 
                 # assign the image to the image list
