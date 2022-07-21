@@ -17,17 +17,21 @@ class write_Params:
 
             f.write('---------------------------------------------\n')
             f.write('Laser power\n')
-            if self.view.runtab.stack_aq_488on.get() ==1:
+            if self.view.runtab.stack_aq_488onLowRes.get() ==1:
                 f.write('Laser power 488 lowres: ' + str(self.view.runtab.laser488_percentage_LR.get()) + "\n")
+            if self.view.runtab.stack_aq_488onHighRes.get() == 1:
                 f.write('Laser power 488 highres: ' + str(self.view.runtab.laser488_percentage_HR.get()) + "\n")
-            if self.view.runtab.stack_aq_552on.get() == 1:
+            if self.view.runtab.stack_aq_552onLowRes.get() == 1:
                 f.write('Laser power 552 lowres: ' + str(self.view.runtab.laser552_percentage_LR.get()) + "\n")
+            if self.view.runtab.stack_aq_552onHighRes.get() == 1:
                 f.write('Laser power 552 highres: ' + str(self.view.runtab.laser552_percentage_HR.get()) + "\n")
-            if self.view.runtab.stack_aq_594on.get() ==1:
+            if self.view.runtab.stack_aq_594onLowRes.get() ==1:
                 f.write('Laser power 594 lowres: ' + str(self.view.runtab.laser594_percentage_LR.get()) + "\n")
+            if self.view.runtab.stack_aq_594onHighRes.get() ==1:
                 f.write('Laser power 594 highres: ' + str(self.view.runtab.laser594_percentage_HR.get()) + "\n")
-            if self.view.runtab.stack_aq_640on.get() ==1:
+            if self.view.runtab.stack_aq_640onLowRes.get() ==1:
                 f.write('Laser power 640 lowres: ' + str(self.view.runtab.laser640_percentage_LR.get()) + "\n")
+            if self.view.runtab.stack_aq_640onHighRes.get() == 1:
                 f.write('Laser power 640 highres: ' + str(self.view.runtab.laser640_percentage_HR.get()) + "\n")
 
             f.write('---------------------------------------------\n')
