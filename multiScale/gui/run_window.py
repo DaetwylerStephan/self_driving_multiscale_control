@@ -43,11 +43,16 @@ class Run_Tab(tk.Frame):
 
         #stack acquisition parameters
         self.stack_aq_progress = tk.DoubleVar()
-        self.stack_aq_488on = tk.IntVar()
-        self.stack_aq_552on = tk.IntVar()
-        self.stack_aq_594on = tk.IntVar()
-        self.stack_aq_640on = tk.IntVar()
-        self.stack_aq_LEDon = tk.IntVar()
+        self.stack_aq_488onLowRes = tk.IntVar()
+        self.stack_aq_552onLowRes = tk.IntVar()
+        self.stack_aq_594onLowRes = tk.IntVar()
+        self.stack_aq_640onLowRes = tk.IntVar()
+        self.stack_aq_LEDonLowRes = tk.IntVar()
+        self.stack_aq_488onHighRes = tk.IntVar()
+        self.stack_aq_552onHighRes = tk.IntVar()
+        self.stack_aq_594onHighRes = tk.IntVar()
+        self.stack_aq_640onHighRes = tk.IntVar()
+        self.stack_aq_LEDonHighRes = tk.IntVar()
         self.stack_aq_displayON = tk.IntVar()
         self.stack_aq_lowResCameraOn = tk.IntVar()
         self.stack_aq_highResCameraOn = tk.IntVar()
@@ -221,22 +226,28 @@ class Run_Tab(tk.Frame):
 
         ### ----------------------------stack acquisition buttons ------------------------------------------------------
         #stack aquisition labels (positioned)
-        laseron_label = ttk.Label(stack_aquisition_settings, text="Laser On:").grid(row=2, column=0)
+        laseron_label_LowRes = ttk.Label(stack_aquisition_settings, text="Laser On LowRes:").grid(row=2, column=0)
+        laseron_label_HighRes= ttk.Label(stack_aquisition_settings, text="Laser On HighRes:").grid(row = 3, column = 0)
         numberOfPlanes_label_lowres= ttk.Label(stack_aquisition_settings, text="Number of planes (lowres):").grid(row = 6, column = 0)
         numberOfPlanes_label_highres= ttk.Label(stack_aquisition_settings, text="Number of planes (highres):").grid(row = 7, column = 0)
         plane_spacing_label_lowres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (um, lowres):").grid(row = 10, column = 0)
         plane_spacing_label_highres= ttk.Label(stack_aquisition_settings, text="Spacing of planes (um, highres):").grid(row = 11, column = 0)
-        laser_cyclemode_label= ttk.Label(stack_aquisition_settings, text="Laser Cycle Mode:").grid(row = 3, column = 0)
         cameraOn_label= ttk.Label(stack_aquisition_settings, text="Camera On:").grid(row = 4, column = 0)
 
 
         #stack aquisition settings......................................................................................
         #choice of laser
-        self.stack_aq_laserOn488 = tk.Checkbutton(stack_aquisition_settings, text ='488', variable=self.stack_aq_488on, onvalue=1, offvalue=0)
-        self.stack_aq_laserOn552 = tk.Checkbutton(stack_aquisition_settings, text ='552', variable=self.stack_aq_552on, onvalue=1, offvalue=0)
-        self.stack_aq_laserOn594 = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594on, onvalue=1, offvalue=0)
-        self.stack_aq_laserOn640 = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640on, onvalue=1, offvalue=0)
-        self.stack_aq_laserOnLED = tk.Checkbutton(stack_aquisition_settings, text ='LED', variable=self.stack_aq_LEDon, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn488Low = tk.Checkbutton(stack_aquisition_settings, text ='488', variable=self.stack_aq_488onLowRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn552Low = tk.Checkbutton(stack_aquisition_settings, text ='552', variable=self.stack_aq_552onLowRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn594Low = tk.Checkbutton(stack_aquisition_settings, text ='594', variable=self.stack_aq_594onLowRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn640Low = tk.Checkbutton(stack_aquisition_settings, text ='640', variable=self.stack_aq_640onLowRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOnLEDLow = tk.Checkbutton(stack_aquisition_settings, text ='LED', variable=self.stack_aq_LEDonLowRes, onvalue=1, offvalue=0)
+
+        self.stack_aq_laserOn488High = tk.Checkbutton(stack_aquisition_settings, text='488', variable=self.stack_aq_488onHighRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn552High = tk.Checkbutton(stack_aquisition_settings, text='552', variable=self.stack_aq_552onHighRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn594High = tk.Checkbutton(stack_aquisition_settings, text='594', variable=self.stack_aq_594onHighRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOn640High = tk.Checkbutton(stack_aquisition_settings, text='640', variable=self.stack_aq_640onHighRes, onvalue=1, offvalue=0)
+        self.stack_aq_laserOnLEDHigh = tk.Checkbutton(stack_aquisition_settings, text='LED', variable=self.stack_aq_LEDonHighRes, onvalue=1, offvalue=0)
 
         self.stack_aq_displayIm = tk.Checkbutton(stack_aquisition_settings, text ='Display Images during Stack Acquisition', variable=self.stack_aq_displayON, onvalue=1, offvalue=0)
 
@@ -246,9 +257,9 @@ class Run_Tab(tk.Frame):
         self.stack_aq_ckb_highresCamera = tk.Checkbutton(stack_aquisition_settings, text ='High Res Camera', variable=self.stack_aq_highResCameraOn, onvalue=1, offvalue=0)
 
         #laser cycle
-        laserCycles = ('Change filter/stack', 'Change filter/plane')
-        self.stack_aq_option_laserCycle = tk.OptionMenu(stack_aquisition_settings, self.stack_acq_laserCycleMode, *laserCycles)
-        self.stack_acq_laserCycleMode.set(laserCycles[0])
+        # laserCycles = ('Change filter/stack', 'Change filter/plane')
+        # self.stack_aq_option_laserCycle = tk.OptionMenu(stack_aquisition_settings, self.stack_acq_laserCycleMode, *laserCycles)
+        # self.stack_acq_laserCycleMode.set(laserCycles[0])
 
         #number of planes
         self.stack_aq_entry_numberOfPlanes_lowres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes_lowres)
@@ -268,16 +279,22 @@ class Run_Tab(tk.Frame):
         self.stack_aq_bt_abort_stack = tk.Button(stack_aquisition_settings, text="Abort Stack")
 
         #stack aquisition layout (labels positioned above)..............................................................
-        self.stack_aq_laserOn488.grid(row =2, column=1)
-        self.stack_aq_laserOn552.grid(row=2, column=2)
-        self.stack_aq_laserOn594.grid(row=2, column=3)
-        self.stack_aq_laserOn640.grid(row=2, column=4)
-        self.stack_aq_laserOnLED.grid(row=2, column=5)
+        self.stack_aq_laserOn488Low.grid(row =2, column=1, sticky = tk.W)
+        self.stack_aq_laserOn552Low.grid(row=2, column=2, sticky = tk.W)
+        self.stack_aq_laserOn594Low.grid(row=2, column=3, sticky = tk.W)
+        self.stack_aq_laserOn640Low.grid(row=2, column=4, sticky = tk.W)
+        self.stack_aq_laserOnLEDLow.grid(row=2, column=5, sticky = tk.W)
 
-        self.stack_aq_option_laserCycle.grid(row=3,column =1, columnspan=3,sticky = tk.W + tk.E)
+        self.stack_aq_laserOn488High.grid(row=3, column=1, sticky = tk.W)
+        self.stack_aq_laserOn552High.grid(row=3, column=2, sticky = tk.W)
+        self.stack_aq_laserOn594High.grid(row=3, column=3, sticky = tk.W)
+        self.stack_aq_laserOn640High.grid(row=3, column=4, sticky = tk.W)
+        self.stack_aq_laserOnLEDHigh.grid(row=3, column=5, sticky = tk.W)
 
-        self.stack_aq_ckb_lowresCamera.grid(row=4, column=1, columnspan=2)
-        self.stack_aq_ckb_highresCamera.grid(row=4, column=3, columnspan=2)
+        #self.stack_aq_option_laserCycle.grid(row=3,column =1, columnspan=3,sticky = tk.W + tk.E)
+
+        self.stack_aq_ckb_lowresCamera.grid(row=4, column=1, columnspan=2, sticky = tk.W)
+        self.stack_aq_ckb_highresCamera.grid(row=4, column=3, columnspan=2, sticky = tk.W)
         self.stack_aq_displayIm.grid(row=5, column=1, columnspan=4)
         self.stack_aq_entry_numberOfPlanes_lowres.grid(row =6, column=1, columnspan=3, sticky = tk.W + tk.E)
         self.stack_aq_entry_numberOfPlanes_highres.grid(row =7, column=1, columnspan=3, sticky = tk.W + tk.E)

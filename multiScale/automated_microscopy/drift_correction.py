@@ -37,7 +37,7 @@ class drift_correction:
         self.highres_height = highresShape_height
         self.completed = np.zeros(2) # an array to indicate whether the drift correction was completed.
         self.ImageRepo = imageRepoLists
-        self.increase_crop_size = 1 #in transmission image - increase crop size of image for better template matching
+        self.increase_crop_size = 1.5 #in transmission image - increase crop size of image for better template matching
         self.currenttimepoint = timepoint
         #check for filepath - if provided, enter debug mode to save temporary images to debug folder
         if debugfilepath =="path.txt":

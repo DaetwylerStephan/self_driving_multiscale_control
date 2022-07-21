@@ -685,7 +685,9 @@ class MultiScale_Microscope_Controller():
                     print("File writing error")
 
                 #start stackstreaming
-                which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(), self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get(), self.view.runtab.stack_aq_LEDon.get()]
+                which_channels = [self.view.runtab.stack_aq_488onLowRes.get(), self.view.runtab.stack_aq_552onLowRes.get(),
+                                  self.view.runtab.stack_aq_594onLowRes.get(), self.view.runtab.stack_aq_640onLowRes.get(),
+                                  self.view.runtab.stack_aq_LEDonLowRes.get()]
                 self.model.stack_acquisition_master(current_folder, current_startposition, which_channels, "low")
 
 
@@ -732,9 +734,9 @@ class MultiScale_Microscope_Controller():
                 self.model.current_PosNumber = pos_label
 
                 # start stackstreaming
-                which_channels = [self.view.runtab.stack_aq_488on.get(), self.view.runtab.stack_aq_552on.get(),
-                                  self.view.runtab.stack_aq_594on.get(), self.view.runtab.stack_aq_640on.get(),
-                                  self.view.runtab.stack_aq_LEDon.get()]
+                which_channels = [self.view.runtab.stack_aq_488onHighRes.get(), self.view.runtab.stack_aq_552onHighRes.get(),
+                                  self.view.runtab.stack_aq_594onHighRes.get(), self.view.runtab.stack_aq_640onHighRes.get(),
+                                  self.view.runtab.stack_aq_LEDonHighRes.get()]
 
                 if self.view.runtab.cam_highresMode.get()=="SPIM Mode":
                     self.model.stack_acquisition_master(current_folder, currentposition, which_channels, "highSPIM")

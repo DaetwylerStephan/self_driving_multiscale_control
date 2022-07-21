@@ -920,7 +920,10 @@ class multiScopeModel:
                 #perform drift correction on low res images
                 t0 = time.perf_counter()
                 if driftcorr_OnChannel == 1:
+                    print("perform drift correction...")
                     if self.drift_correctionOnLowRes == 1:
+                        print("perform drift correction on LowRes...")
+
                         #set current parameters
                         #high&low position list are updated when stack acquisition is started in multiScale_main to not override previous calculation for other position
                         self.driftcorrectionmodule.currenttimepoint = self.current_timepointstring
