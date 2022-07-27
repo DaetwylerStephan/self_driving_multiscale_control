@@ -933,8 +933,9 @@ class multiScopeModel:
                         self.driftcorrectionmodule.highres_width = self.current_highresROI_width
 
                         self.driftcorrectionmodule.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
+
                         highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(posnumber_lowres)
-                        print("highreslist to do drift correction on: " + str(highreslistID))
+                        print("highreslist to do drift correction on: " + str(highreslistID) + " of " + str(posnumber_lowres))
                         # add max projection to ImageRepo
                         if self.drift_transmission == 0:
                             currentmode = 'fluorescene'
@@ -943,7 +944,7 @@ class multiScopeModel:
 
                         for iter in highreslistID:
                             print("---------------------------------------------------------------------------")
-                            print("drift correction on " + str(iter))
+                            print("drift correction on " + str(iter) + " and posnumber lowres" + str(posnumber_lowres) + " and " + filepathforprojection_three)
                             (row_number, column_number, crop_height, crop_width) = self.driftcorrectionmodule.calculate_Lateral_drift(copy.deepcopy(iter), mode=currentmode)
                             image1 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width], axis=1)
                             image2 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width], axis=2)
@@ -965,8 +966,7 @@ class multiScopeModel:
         current_bufferiter = self.low_res_buffers_queue.get()  # get current buffer iter
         self.low_res_buffers_queue.put(current_bufferiter)  # add number to end of queue
 
-        acquire_thread = ct.CustodyThread(
-            target=acquire_task, first_resource=self.lowres_camera).start()
+        acquire_thread = ct.CustodyThread(target=acquire_task, first_resource=self.lowres_camera).start()
         acquire_thread.get_result()
 
     def acquire_stack_highres(self, current_startposition, current_laserline, filepath, modality):

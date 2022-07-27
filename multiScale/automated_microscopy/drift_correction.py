@@ -4,6 +4,8 @@ import os
 import cv2
 import copy
 import sys
+import threading
+
 sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
 from auxiliary_code.constants import Image_parameters
 from automated_microscopy.template_matching import automated_templateMatching
@@ -51,6 +53,10 @@ class drift_correction:
         self.logfolder = debugfilepath
 
         self.templatematching = automated_templateMatching()
+
+        self.Lock = threading.Lock()
+        self.Lock_2 = threading.Lock()
+
 
     def calculate_drift_highRes(self, xyview, xzview, yzview, previousimage, z_step, PosNumber):
         '''
@@ -111,6 +117,7 @@ class drift_correction:
         :return: list of all highres stacks PosNumbers which are assigned to low resolution stack.
         '''
 
+        self.Lock.acquire()
         list_highresregions = []
         for highresline in range(len(self.highres_positionList)):
             lowresnb_current = self.find_closestLowResTile(highresline, return_number=True)
@@ -118,15 +125,16 @@ class drift_correction:
             if lowresnb_current == LowResPosNumber:
                 highresPosNb = self.highres_positionList[highresline][5] #get unique ID from highres position
                 list_highresregions.append((highresPosNb))
-
+        self.Lock.release()
         return list_highresregions
 
     def _find_Index_of_PosNumber(self, PosNumber):
+        self.Lock_2.acquire()
         index = 0
         for iter in range(len(self.highres_positionList)):
             if self.highres_positionList[iter][5] == PosNumber:
                 index = iter
-
+        self.Lock_2.release()
         return index
 
     def find_closestLowResTile(self, PosNumber, return_number=False):
@@ -166,7 +174,7 @@ class drift_correction:
         else:
             return positionnumber
 
-    def calculate_Lateral_drift(self, PosNumber, mode='fluorescence'):
+    def calculate_Lateral_drift(self, PosNumberID, mode='fluorescence'):
         '''
         calculates lateral drift correction based on low res view.
         :param PosNumber: which entry of the highres list with ID=PosNumber are you trying to correct?
@@ -177,6 +185,7 @@ class drift_correction:
         lateralId = 0
         UpDownID = 1
         AxialID = 2
+        PosNumber = copy.deepcopy(PosNumberID)
 
         #transmission is different as there is no 1-to-1 correspondance between lowres and highres view. Therefore, one needs to first establish
         #an image of the region to follow. This image is saved in the image list
@@ -192,7 +201,7 @@ class drift_correction:
                 print('Establish first corresponding transmission image')
 
                 #find corresponding low resolution tile to high resolution image and get coordinates.
-                lowstacknumber = self.find_closestLowResTile(PosNumber, return_number=True)
+                lowstacknumber = copy.deepcopy(self.find_closestLowResTile(PosNumber, return_number=True))
                 coordinates_lowres = np.asarray(self.lowres_positionList[lowstacknumber][1:5])
                 coordinates_highres = np.asarray(self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)][1:5])
 

@@ -7,7 +7,7 @@ import numpy as np
 import datetime as dt
 import os
 import glob
-
+import copy
 
 from gui.main_window import MultiScope_MainGui
 from multiScope import multiScopeModel
@@ -605,8 +605,8 @@ class MultiScale_Microscope_Controller():
 
         #set driftcorrection settings - set completed array back to zero and update position lists in module
         self.model.driftcorrectionmodule.completed=np.zeros(len(self.view.stagessettingstab.stage_highres_PositionList))
-        self.model.driftcorrectionmodule.highres_positionList = self.view.stagessettingstab.stage_highres_PositionList
-        self.model.driftcorrectionmodule.lowres_positionList = self.view.stagessettingstab.stage_PositionList
+        self.model.driftcorrectionmodule.highres_positionList = copy.deepcopy(self.view.stagessettingstab.stage_highres_PositionList)
+        self.model.driftcorrectionmodule.lowres_positionList = copy.deepcopy(self.view.stagessettingstab.stage_PositionList)
 
         #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder
