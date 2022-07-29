@@ -120,7 +120,8 @@ class drift_correction:
         self.Lock.acquire()
         list_highresregions = []
         for highresline in range(len(self.highres_positionList)):
-            lowresnb_current = self.find_closestLowResTile(highresline, return_number=True)
+            posnumberhighres = self.highres_positionList[iter][5]
+            lowresnb_current = self.find_closestLowResTile(posnumberhighres, return_number=True)
             print(lowresnb_current)
             if lowresnb_current == LowResPosNumber:
                 highresPosNb = self.highres_positionList[highresline][5] #get unique ID from highres position
@@ -130,7 +131,7 @@ class drift_correction:
 
     def _find_Index_of_PosNumber(self, PosNumber):
         self.Lock_2.acquire()
-        index = 0
+        index = -1
         for iter in range(len(self.highres_positionList)):
             if self.highres_positionList[iter][5] == PosNumber:
                 index = iter
@@ -254,7 +255,9 @@ class drift_correction:
                 currenthighresPosindex = copy.deepcopy(self._find_Index_of_PosNumber(PosNumber))
 
                 #perform template matching
-                (row_number, column_number) = self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
+                #(row_number, column_number) = self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
+                (row_number, column_number) = self.templatematching.scaling_templateMatching_multiprocessing(lowresstackimage, image_transmission, 1)
+
 
                 #update image in "current_transmissionImage" list
                 pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)

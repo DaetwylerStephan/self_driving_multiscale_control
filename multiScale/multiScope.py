@@ -88,6 +88,7 @@ class multiScopeModel:
         self.updatebuffer_lowres_stacknb = 0
         self.high_res_memory_names = None
         self.low_res_memory_names = None
+        self.lowresbuffernumber = 3
 
         self.delay_cameratrigger = 0.004  # the time given for the stage to move to the new position
 
@@ -130,6 +131,7 @@ class multiScopeModel:
         self.low_res_buffers_queue = queue.Queue()
         for i in range(2):
             self.high_res_buffers_queue.put(i)
+        for i in range(self.lowresbuffernumber):
             self.low_res_buffers_queue.put(i)
 
         # start initializing all hardware component here by calling the initialization from a ResultThread
@@ -388,8 +390,8 @@ class multiScopeModel:
             if self.low_res_memory_names != None:
                 print("Delete previous shared memory arrays")
                 try:
-                    shared_memory.SharedMemory(name=self.low_res_memory_names[0]).unlink()
-                    shared_memory.SharedMemory(name=self.low_res_memory_names[1]).unlink()
+                    for i in range(self.lowresbuffernumber):
+                        shared_memory.SharedMemory(name=self.low_res_memory_names[i]).unlink()
                 except FileNotFoundError:
                     pass  # This is the error we expected if the memory was unlinked.
 
@@ -397,16 +399,16 @@ class multiScopeModel:
                 ct.SharedNDArray(
                     shape=(self.stack_nbplanes_lowres, self.current_lowresROI_height, self.current_lowresROI_width),
                     dtype='uint16')
-                for i in range(2)]
+                for i in range(self.lowresbuffernumber)]
 
-            self.low_res_buffers[0].fill(0)
-            self.low_res_buffers[1].fill(0)
+            for i in range(self.lowresbuffernumber):
+                self.low_res_buffers[i].fill(0)
 
             self.updatebuffer_lowres_width = self.current_lowresROI_width
             self.updatebuffer_lowres_height = self.current_lowresROI_height
             self.updatebuffer_lowres_stacknb = self.stack_nbplanes_lowres
             print("low res buffer updated")
-            self.low_res_memory_names = [self.high_res_buffers[i].shared_memory.name for i in range(2)]
+            self.low_res_memory_names = [self.low_res_buffers[i].shared_memory.name for i in range(self.lowresbuffernumber)]
 
     def set_laserpower(self, powersettings):
         self.ao_laser488_power.setconstantvoltage(powersettings[0])
@@ -810,7 +812,7 @@ class multiScopeModel:
 
     def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
         def acquire_task(custody):
-
+            print("new low res stack acquisition started...")
             custody.switch_from(None, to=self.lowres_camera)
 
             # prepare acquisition by moving filter wheel and stage, and set buffer size
@@ -933,7 +935,7 @@ class multiScopeModel:
                         self.driftcorrectionmodule.highres_width = self.current_highresROI_width
 
                         self.driftcorrectionmodule.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
-
+                        print("image replaced")
                         highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(posnumber_lowres)
                         print("highreslist to do drift correction on: " + str(highreslistID) + " of " + str(posnumber_lowres))
                         # add max projection to ImageRepo
