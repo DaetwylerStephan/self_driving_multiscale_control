@@ -372,7 +372,7 @@ class Run_Tab(tk.Frame):
         self.roi_height.set(1024)
 
         #roi types
-        roiTypes = ('Full Chip', '1024x1024', '512x512', '256x256', 'Custom')
+        roiTypes = ('Full Chip', '1024x1024', '512x512', '256x256', 'Usual', 'Custom')
         self.roi_option_type = tk.OptionMenu(roi_settings, self.roi_ac_settings_type,
                                                         *roiTypes)
         self.roi_ac_settings_type.set(roiTypes[0])

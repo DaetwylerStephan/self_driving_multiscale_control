@@ -38,18 +38,18 @@ class Photo_Camera:
     def get_imageroi(self):
         return self.cam.shape()
 
-    def set_imageroi(self, startx, endx, starty, endy):
+    def set_imageroi(self, s1, p1, w, h):
+        """
+        s2 = s1 + w - 1
+        p2 = p1 + h - 1
+        :param s1:
+        :param p1:
+        :param w:
+        :param h:
+        :return:
+        """
         self.cam.reset_rois()
-        self.cam.set_roi(startx, endx, starty, endy)
-
-    # def take_snapshot(self, exposure):
-    #     frame = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
-    #     plt.imshow(frame, cmap="gray")
-    #     plt.show()
-    #
-    # def record(self, out, exposure=20):
-    #     import numpy as np
-    #     out[:] = self.cam.get_frame(exp_time=exposure).reshape(self.cam.sensor_size[::-1])
+        self.cam.set_roi(s1, p1, w, h)
 
     def prepare_stack_acquisition(self, exposure_time=20):
         """Changes the settings of the low res camera to start stack acquisitions."""
@@ -149,28 +149,6 @@ class Photo_Camera:
     #     self.cam.finish()
     #     return
 
-    # def run_stack_acquisition_buffer_fast(self, nb_planes, buffer):
-    #     """Run a stack acquisition."""
-    #     framesReceived = 0
-    #     while framesReceived < nb_planes:
-    #         # time.sleep(0.001)
-    #
-    #         try:
-    #             #fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-    #             frame, fps, frame_count = self.cam.poll_frame()
-    #
-    #             framesReceived += 1
-    #             print("{}:{}".format(framesReceived, fps), flush=True)
-    #
-    #             buffer[framesReceived, :, :] = np.copy(frame['pixel_data'])
-    #             frame = None
-    #             del frame
-    #
-    #         except Exception as e:
-    #             print(str(e))
-    #             break
-    #     self.cam.finish()
-
     def run_stack_acquisition_buffer_fast(self, nb_planes, buffer, flipimage=False):
         """
         Run a stack acquisition.
@@ -207,42 +185,6 @@ class Photo_Camera:
 
         self.cam.finish()
         return
-
-    # def run_stack_acquisitionV2_preallocated(self, nb_planes):
-    #     """Run a stack acquisition."""
-    #     framesReceived = 0
-    #     while framesReceived < nb_planes:
-    #         # time.sleep(0.001)
-    #
-    #         try:
-    #             fps, frame_count = self.cam.poll_frame2(out=self.camerabuffer[framesReceived, :, :])
-    #             framesReceived += 1
-    #             print("{}:{}".format(framesReceived, fps), flush=True)
-    #         except Exception as e:
-    #             print(str(e))
-    #             break
-    #     self.cam.finish()
-    #     return
-
-
-    # def run_stack_acquisition_buffer_fastOLD(self, nb_planes, buffer):
-    #     """Run a stack acquisition."""
-    #     framesReceived = 0
-    #     while framesReceived < nb_planes:
-    #         # time.sleep(0.001)
-    #
-    #         try:
-    #             fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])
-    #             # buffer[framesReceived,:,:] = np.zeros([2960, 5056],dtype='uint16')
-    #             framesReceived += 1
-    #             # print("{}:{}".format(framesReceived, fps), flush=True)
-    #
-    #         except Exception as e:
-    #             print(str(e))
-    #             break
-    #
-    #     self.cam.finish()
-    #     return
 
     def run_stack_acquisition_buffer_pull(self):
         """Run a stack acquisition."""

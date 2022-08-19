@@ -120,7 +120,7 @@ class drift_correction:
         self.Lock.acquire()
         list_highresregions = []
         for highresline in range(len(self.highres_positionList)):
-            posnumberhighres = self.highres_positionList[iter][5]
+            posnumberhighres = self.highres_positionList[highresline][5]
             lowresnb_current = self.find_closestLowResTile(posnumberhighres, return_number=True)
             print(lowresnb_current)
             if lowresnb_current == LowResPosNumber:

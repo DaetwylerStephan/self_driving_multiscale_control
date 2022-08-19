@@ -210,7 +210,6 @@ class automated_templateMatching:
             # Draw a rectangle around the matched region.
             print(tH, tW)
             img_rgb_sc = cv2.rectangle(searchimage_sc, loc, (loc[0] + tW, loc[1] + tH), (0, 255, 255), 2)
-
             # Show the final image with the matched area.
             img_rgb_sc = cv2.resize(searchimage_sc, (1011, 592))
             cv2.imshow('Detected', img_rgb_sc)
@@ -250,24 +249,28 @@ if __name__ == '__main__':
     template_matchClass = automated_templateMatching()
 
     # Load the template image
-    template = cv2.imread('D://test/test_templatematching/template.tif')
-    templateHighres = cv2.imread('D://test/test_templatematching/template3.tif')
+    ##template = cv2.imread('D://test/test_templatematching/template.tif')
+    ##templateHighres = cv2.imread('D://test/test_templatematching/template3.tif')
+    templateHighres = cv2.imread('D://multiScope_Data/20220729_Daetwyler_Xenograft/Experiment0001/projections/XY/high_stack_002/CH552/t00000.tif')
+    templateHighres = cv2.imread('Z://Danuser_lab/Fiolka/LabMembers/Stephan/multiscale_data/tracking_examples/20220727_Daetwyler_Nuclei/Experiment0005/projections/XY/high_stack_001/CH488/t00000.tif')
 
     # Load the search image
-    img_gray = cv2.imread('D://test/test_templatematching/searchImage3.tif')
+    #img_gray = cv2.imread('D://test/test_templatematching/searchImage3.tif')
+    img_gray = cv2.imread('D://multiScope_Data/20220729_Daetwyler_Xenograft/Experiment0001/projections/XY/low_stack005/CH552/t00000.tif')
+    img_gray = cv2.imread('Z://Danuser_lab/Fiolka/LabMembers/Stephan/multiscale_data/tracking_examples/20220727_Daetwyler_Nuclei/Experiment0005/projections/XY/low_stack000/CH488/t00000.tif')
 
     scaling_factor = 11.11 / 55.55 * 6.5 / 4.25
 
     #template_matchClass.simple_templateMatching(copy.deepcopy(img_gray), copy.deepcopy(templateHighres), scaling_factor, showimage=True)
-    print("-------------scaled version--------------")
-    t0 = time.perf_counter()
-    template_matchClass.scaling_templateMatching(copy.deepcopy(img_gray), copy.deepcopy(templateHighres), scaling_factor, showimage=False)
-    t1 = time.perf_counter() - t0
-    print("time: " + str(t1))
+    # print("-------------scaled version--------------")
+    # t0 = time.perf_counter()
+    # template_matchClass.scaling_templateMatching(copy.deepcopy(img_gray), copy.deepcopy(templateHighres), scaling_factor, showimage=False)
+    # t1 = time.perf_counter() - t0
+    # print("time: " + str(t1))
 
     print("-------------mp scaled version--------------")
     t0 = time.perf_counter()
     template_matchClass.scaling_templateMatching_multiprocessing(copy.deepcopy(img_gray), copy.deepcopy(templateHighres),
-                                                 scaling_factor, showimage=False)
+                                                 scaling_factor, showimage=True)
     t1 = time.perf_counter() - t0
     print("time: " + str(t1))
