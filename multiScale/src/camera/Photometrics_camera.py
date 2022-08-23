@@ -32,9 +32,6 @@ class Photo_Camera:
     def getinfo(self):
         print(self.cam.trigger_table)
 
-    # def getimagesize(self):
-    #     self.cam.roi
-
     def get_imageroi(self):
         return self.cam.shape()
 
@@ -219,15 +216,10 @@ class Photo_Camera:
         else:
             out[:] = np.flipud(np.copy(frame['pixel_data'][:]))
 
-        # frame = None
-        # del frame
-
 
     def acquire_preview_tobuffer(self):
         frame, fps, frame_count = self.cam.poll_frame()
         self.previewbuffer = np.copy(frame['pixel_data'][:])
-        # frame = None
-        # del frame
 
     def run_preview_ASLM(self, out):
         framesReceived = 0
@@ -253,5 +245,4 @@ if __name__ == '__main__':
     # camera = Photo_Camera('PMPCIECam00')
 
     camera.getinfo()
-    #camera.preview_live()
     camera.close()

@@ -18,7 +18,16 @@ from matplotlib import pyplot as plt
 from skimage import transform, io, exposure
 
 class drift_correction:
-    def __init__(self, lowres_PosList, highres_PosList, lowres_zspacing, highres_zspacing, highresShape_width, highresShape_height, timepoint, imageRepoLists, debugfilepath="path.txt"):
+    def __init__(self,
+                 lowres_PosList,
+                 highres_PosList,
+                 lowres_zspacing,
+                 highres_zspacing,
+                 highresShape_width,
+                 highresShape_height,
+                 timepoint,
+                 imageRepoLists,
+                 debugfilepath="path.txt"):
         """
         :param lowres_PosList: the list of position of the low resolution imaging
         :param highres_PosList: the list of position of the high resolution imaging
@@ -28,6 +37,7 @@ class drift_correction:
         :param highresShape_height: height of image (lowres max 5092 / highres max 2048)
         :param filepath: (optional) filepath to logging the drift correction
         """
+
         #init it
         self.lowres_positionList = lowres_PosList
         self.highres_positionList = highres_PosList
@@ -41,6 +51,7 @@ class drift_correction:
         self.ImageRepo = imageRepoLists
         self.increase_crop_size = 1.5 #in transmission image - increase crop size of image for better template matching
         self.currenttimepoint = timepoint
+
         #check for filepath - if provided, enter debug mode to save temporary images to debug folder
         if debugfilepath =="path.txt":
             self.debugmode = False
@@ -185,7 +196,6 @@ class drift_correction:
 
         lateralId = 0
         UpDownID = 1
-        AxialID = 2
         PosNumber = copy.deepcopy(PosNumberID)
 
         #transmission is different as there is no 1-to-1 correspondance between lowres and highres view. Therefore, one needs to first establish
@@ -206,29 +216,12 @@ class drift_correction:
                 coordinates_lowres = np.asarray(self.lowres_positionList[lowstacknumber][1:5])
                 coordinates_highres = np.asarray(self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)][1:5])
 
-
-
-                #caclulate coordinate differences and scale them from mm to pixel values.
-                coordinate_difference = coordinates_lowres - coordinates_highres
-                coordinate_difference[lateralId] = coordinate_difference[lateralId] * self.scalingfactor
-                coordinate_difference[UpDownID] = coordinate_difference[UpDownID] * self.scalingfactor
-
-                print("coordinate diff" + str(coordinate_difference))
-
-                #get low resolution image
+                # get low resolution image
                 img_lowrestrans = self.ImageRepo.image_retrieval("current_lowRes_Proj", lowstacknumber)
 
-                #get central pixel for low resolution stack
-                loc = (int(img_lowrestrans.shape[0]/2), int(img_lowrestrans.shape[1]/2))
+                #calulate pixel coordinates from physical stage coordinates
+                loc, pixel_width_highresInLowres, pixel_height_highresInLowres = self.calculate_pixelcoord_from_physicalcoordinates(coordinates_lowres, coordinates_highres, img_lowrestrans.shape)
 
-                #highres size in lowres:
-                pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)
-                pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
-
-                #calculate displacement
-                loc = (int(loc[0]+ coordinate_difference[lateralId]-pixel_height_highresInLowres/2), int(loc[1] + coordinate_difference[UpDownID]-pixel_width_highresInLowres/2))
-
-                print("first location" + str(loc))
                 #retrieve region in lowres view of highres view
                 corresponding_lowres_view = img_lowrestrans[loc[0]:(loc[0]+pixel_height_highresInLowres), loc[1]:(loc[1]+pixel_width_highresInLowres)]
                 print("corr" + str(corresponding_lowres_view.shape))
@@ -255,15 +248,13 @@ class drift_correction:
                 currenthighresPosindex = copy.deepcopy(self._find_Index_of_PosNumber(PosNumber))
 
                 #perform template matching
-                #(row_number, column_number) = self.templatematching.scaling_templateMatching(lowresstackimage, image_transmission, 1)
                 (row_number, column_number) = self.templatematching.scaling_templateMatching_multiprocessing(lowresstackimage, image_transmission, 1)
-
 
                 #update image in "current_transmissionImage" list
                 pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)
                 pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
                 current_crop_image = lowresstackimage[row_number:(row_number+pixel_height_highresInLowres), column_number:(column_number+pixel_width_highresInLowres)]
-
+                self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
 
 
                 #calculate the physical position of where to image highres stack
@@ -293,8 +284,7 @@ class drift_correction:
                 self.highres_positionList[currenthighresPosindex][3] = axialposition
                 print("after update: " + str(self.highres_positionList[currenthighresPosindex]))
 
-                # assign the image to the image list
-                self.ImageRepo.replaceImage("current_transmissionImage", PosNumber, copy.deepcopy(current_crop_image))
+
 
                 # debug mode - save image
                 if self.debugmode == True:
@@ -311,6 +301,37 @@ class drift_correction:
         # else:
         #     print("Use fluorescence image for drift correction")
 
+    def calculate_pixelcoord_from_physicalcoordinates(self, coordinates_lowres, coordinates_highres, lowresshape):
+        """
+        calulate pixel coordinates from physical stage coordinates
+        :param coordinates_lowres, stage coordinates of lowres image
+        :param coordinates_highres, stage coordinates of highres image
+        :return:
+        """
+        lateralId = 0
+        UpDownID = 1
+
+        # caclulate coordinate differences and scale them from mm to pixel values.
+        coordinate_difference = coordinates_lowres - coordinates_highres
+        coordinate_difference[lateralId] = coordinate_difference[lateralId] * self.scalingfactor
+        coordinate_difference[UpDownID] = coordinate_difference[UpDownID] * self.scalingfactor
+
+        print("coordinate diff" + str(coordinate_difference))
+
+        # get central pixel for low resolution stack
+        loc = (int(lowresshape[0] / 2), int(lowresshape[1] / 2))
+
+        # highres size in lowres:
+        pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)
+        pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
+
+        # calculate displacement
+        loc = (int(loc[0] + coordinate_difference[lateralId] - pixel_height_highresInLowres / 2),
+               int(loc[1] + coordinate_difference[UpDownID] - pixel_width_highresInLowres / 2))
+
+        print("first location" + str(loc))
+
+        return loc, pixel_width_highresInLowres, pixel_height_highresInLowres
 
     def calculate_axialdrift(self, PosNumber, image1, image2, mode='fluorescence'):
         '''

@@ -251,13 +251,15 @@ if __name__ == '__main__':
     # Load the template image
     ##template = cv2.imread('D://test/test_templatematching/template.tif')
     ##templateHighres = cv2.imread('D://test/test_templatematching/template3.tif')
-    templateHighres = cv2.imread('D://multiScope_Data/20220729_Daetwyler_Xenograft/Experiment0001/projections/XY/high_stack_002/CH552/t00000.tif')
-    templateHighres = cv2.imread('Z://Danuser_lab/Fiolka/LabMembers/Stephan/multiscale_data/tracking_examples/20220727_Daetwyler_Nuclei/Experiment0005/projections/XY/high_stack_001/CH488/t00000.tif')
+    #templateHighres = cv2.imread('D://multiScope_Data/20220729_Daetwyler_Xenograft/Experiment0001/projections/XY/high_stack_002/CH552/t00000.tif')
+    #templateHighres = cv2.imread('Z://Danuser_lab/Fiolka/LabMembers/Stephan/multiscale_data/tracking_examples/20220727_Daetwyler_Nuclei/Experiment0005/projections/XY/high_stack_001/CH488/t00000.tif')
+    templateHighres = cv2.imread('D://multiScope_Data/20220820_Daetwyler_Xenograft/Experiment0002/projections/XY/high_stack_001/CH594/t00000.tif')
 
     # Load the search image
     #img_gray = cv2.imread('D://test/test_templatematching/searchImage3.tif')
-    img_gray = cv2.imread('D://multiScope_Data/20220729_Daetwyler_Xenograft/Experiment0001/projections/XY/low_stack005/CH552/t00000.tif')
-    img_gray = cv2.imread('Z://Danuser_lab/Fiolka/LabMembers/Stephan/multiscale_data/tracking_examples/20220727_Daetwyler_Nuclei/Experiment0005/projections/XY/low_stack000/CH488/t00000.tif')
+    #img_gray = cv2.imread('D://multiScope_Data/20220729_Daetwyler_Xenograft/Experiment0001/projections/XY/low_stack005/CH552/t00000.tif')
+    #img_gray = cv2.imread('Z://Danuser_lab/Fiolka/LabMembers/Stephan/multiscale_data/tracking_examples/20220727_Daetwyler_Nuclei/Experiment0005/projections/XY/low_stack000/CH488/t00000.tif')
+    img_gray = cv2.imread('D://multiScope_Data/20220820_Daetwyler_Xenograft/Experiment0002/projections/XY/low_stack000/CH594/t00000.tif')
 
     scaling_factor = 11.11 / 55.55 * 6.5 / 4.25
 

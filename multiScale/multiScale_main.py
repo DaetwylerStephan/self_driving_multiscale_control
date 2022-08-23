@@ -324,8 +324,8 @@ class MultiScale_Microscope_Controller():
                     starty = int(Camera_parameters.LR_height_pixel/2)-256
                     self.model.lowres_camera.set_imageroi(startx, starty, 512, 512)
                 if self.view.runtab.roi_ac_settings_type.get() == 'Usual':
-                    self.model.current_lowresROI_height = 4500
-                    self.model.current_lowresROI_width = 2960
+                    self.model.current_lowresROI_height = Camera_parameters.LR_height_pixel
+                    self.model.current_lowresROI_width = 4500
                     self.model.lowres_camera.set_imageroi(278, 0, 4500, Camera_parameters.LR_height_pixel)
                 if self.view.runtab.roi_ac_settings_type.get() == '256x256':
                     self.model.current_lowresROI_height = 256
