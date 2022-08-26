@@ -933,6 +933,9 @@ class multiScopeModel:
                         self.driftcorrectionmodule.highres_zspacing = self.highres_planespacing
                         self.driftcorrectionmodule.highres_height = self.current_highresROI_height
                         self.driftcorrectionmodule.highres_width = self.current_highresROI_width
+                        self.driftcorrectionmodule.lowres_height = self.current_lowresROI_height
+                        self.driftcorrectionmodule.lowres_width = self.current_lowresROI_width
+
 
                         self.driftcorrectionmodule.ImageRepo.replaceImage("current_lowRes_Proj", posnumber_lowres, maxproj_xy)
                         print("image replaced")

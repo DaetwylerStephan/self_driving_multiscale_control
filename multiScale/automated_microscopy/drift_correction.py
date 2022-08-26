@@ -35,6 +35,8 @@ class drift_correction:
         :param highres_zspacing: the plane spacing of the high resolution stacks
         :param highresShape_width: width of image, convention: np.array(height, width) and cv2.function(width, height)
         :param highresShape_height: height of image (lowres max 5092 / highres max 2048)
+        :param lowresShape_width: width of image, convention: np.array(height, width) and cv2.function(width, height)
+        :param lowresShape_height: height of low res image (lowres max 5092 / highres max 2048)
         :param filepath: (optional) filepath to logging the drift correction
         """
 
@@ -43,6 +45,8 @@ class drift_correction:
         self.highres_positionList = highres_PosList
         self.scalingfactor = 11.11 / 4.25 *1000 #scalingfactor for how much one mm is in pixel on low res view
         self.scalingfactorLowToHighres = 11.11 / 55.55 * 6.5 / 4.25 #scalingfactor for high/low res camera views
+        self.calibration_height = 130 #pixel difference height between center of camera field of low res and high res
+        self.calibration_width = 159 #pixel difference width between center of camera field of low res and high res
         self.lowres_zspacing = lowres_zspacing
         self.highres_zspacing = highres_zspacing
         self.highres_width = highresShape_width
@@ -259,7 +263,8 @@ class drift_correction:
 
                 #calculate the physical position of where to image highres stack
                 #1.calculate middle position
-                center_pixel = (int(lowresstackimage.shape[0]/2), int(lowresstackimage.shape[1]/2))
+                center_pixel = (int(lowresstackimage.shape[0]/2) + self.calibration_width, int(lowresstackimage.shape[1]/2) - self.calibration_height)
+
                 print("center: " + str(center_pixel))
                 print("pixel height: " + str(pixel_height_highresInLowres))
                 print("pixel width" + str(pixel_width_highresInLowres))
@@ -296,10 +301,6 @@ class drift_correction:
 
                 return (row_number, column_number, pixel_height_highresInLowres, pixel_width_highresInLowres)
 
-        # elif mode=="fluorescence":
-        #     print("Use fluorescence image for drift correction")
-        # else:
-        #     print("Use fluorescence image for drift correction")
 
     def calculate_pixelcoord_from_physicalcoordinates(self, coordinates_lowres, coordinates_highres, lowresshape):
         """
@@ -318,16 +319,18 @@ class drift_correction:
 
         print("coordinate diff" + str(coordinate_difference))
 
-        # get central pixel for low resolution stack
-        loc = (int(lowresshape[0] / 2), int(lowresshape[1] / 2))
-
+        # get central pixel for low resolution stack with calibration
+        loc = (int(lowresshape[0] / 2 + self.calibration_width), int(lowresshape[1] / 2 - self.calibration_height) )
+        print("loc " + str(loc))
         # highres size in lowres:
         pixel_width_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_width * self.increase_crop_size)
         pixel_height_highresInLowres = int(self.scalingfactorLowToHighres * self.highres_height * self.increase_crop_size)
 
+
+
         # calculate displacement
         loc = (int(loc[0] + coordinate_difference[lateralId] - pixel_height_highresInLowres / 2),
-               int(loc[1] + coordinate_difference[UpDownID] - pixel_width_highresInLowres / 2))
+               int(loc[1] + coordinate_difference[UpDownID] - pixel_width_highresInLowres / 2 ))
 
         print("first location" + str(loc))
 
@@ -411,14 +414,6 @@ class drift_correction:
         """
         index = self._find_Index_of_PosNumber(PosNumber)
         self.completed[index]=1
-        # print("xxxxxxxxxxxxxxxxxx")
-        # print(PosNumber)
-        # print(index)
-        # print(str(self.completed))
-        # print(len(self.completed))
-        # print(np.sum(self.completed))
-        # print("xxxxxxxxxxxxxxxxxx")
-
 
     def register_image(self, ref, mov, mode):
         """
@@ -435,8 +430,7 @@ class drift_correction:
         reg = sr.register_transform(ref,mov)
         xshift = sr.get_matrix()[0,2]
         yshift = sr.get_matrix()[1,2]
-        #print(xshift, yshift)
-        #self.plot_registration(ref,reg)
+
         return xshift, yshift
 
     def plot_registration(self, ref, mov):

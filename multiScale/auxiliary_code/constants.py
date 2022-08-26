@@ -22,6 +22,8 @@ class Camera_parameters:
     LR_height_pixel = 2960
     highres_line_digitization_time = 0.0112
     lowres_line_digitization_time = 0.01026 #10.16us
+    low_to_highres_calibration_width = 159
+    low_to_highres_calibration_height = 130
 
 class Image_parameters:
     xy_pixelsize_lowres_um =  0.3825
