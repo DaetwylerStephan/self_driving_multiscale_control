@@ -6,7 +6,7 @@ class write_Params:
         self.view = view
 
 
-    def write_to_textfile(self, filePath):
+    def write_to_textfile(self, filePath, roilowres, roihighres):
         with open(filePath, 'w') as f:
             f.write('Experiment parameters of ' + filePath + "\n")
             f.write('---------------------------------------------\n')
@@ -14,6 +14,11 @@ class write_Params:
             f.write('Plane spacing highres: ' + str(self.view.runtab.stack_aq_plane_spacing_highres.get()) + "\n")
             f.write('Nb of planes lowres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_lowres.get()) + "\n")
             f.write('Nb of planes highres: ' + str(self.view.runtab.stack_aq_numberOfPlanes_highres.get()) + "\n")
+
+            f.write('---------------------------------------------\n')
+            f.write('ROI settings\n')
+            f.write('roi lowres: ' + str(roilowres) + "\n")
+            f.write('roi highres: ' + str(roihighres) + "\n")
 
             f.write('---------------------------------------------\n')
             f.write('Laser power\n')
@@ -76,6 +81,7 @@ class write_Params:
                 f.write('Volt center @594 (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle594.get()) + "\n")
                 f.write('Volt center @640 (mV): ' + str(self.view.advancedSettingstab.ASLM_volt_middle640.get()) + "\n")
                 f.write('Orientation: ' + str(self.view.advancedSettingstab.ASLM_voltageDirection.get()) + "\n")
+                f.write('Scan width: ' + str(self.view.advancedSettingstab.ASLM_scanWidth.get()) + "\n")
 
             f.write('\n---------------------------------------------\n')
             f.write('time-lapse settings: ')

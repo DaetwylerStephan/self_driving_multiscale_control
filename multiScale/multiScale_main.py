@@ -328,11 +328,11 @@ class MultiScale_Microscope_Controller():
                     lowresstarty = int(Camera_parameters.LR_height_pixel/2)-256
                     self.model.lowres_camera.set_imageroi(lowresstartx,lowresstarty, 512, 512)
                 if self.view.runtab.roi_ac_settings_type.get() == 'Usual':
-                    self.model.current_lowresROI_height = Camera_parameters.LR_height_pixel
-                    self.model.current_lowresROI_width = 4500
-                    lowresstartx = 278
+                    self.model.current_lowresROI_height = 2960
+                    self.model.current_lowresROI_width = 3816
+                    lowresstartx = 620
                     lowresstarty = 0
-                    self.model.lowres_camera.set_imageroi(lowresstartx,Camera_parameters.LR_height_pixel, 4500, Camera_parameters.LR_height_pixel)
+                    self.model.lowres_camera.set_imageroi(620,0, 3816, 2960)
                 if self.view.runtab.roi_ac_settings_type.get() == '256x256':
                     self.model.current_lowresROI_height = 256
                     self.model.current_lowresROI_width = 256
@@ -665,8 +665,11 @@ class MultiScale_Microscope_Controller():
 
             #write parameters in a thread
             def write_paramconfig():
+                lowresroi = [self.model.current_lowresROI_width, self.model.current_lowresROI_height]
+                highresroi = [self.model.current_highresROI_width, self.model.current_highresROI_height]
                 self.paramwriter.write_to_textfile(
-                    os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
+                    os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'), lowresroi,
+                    highresroi)
                 print("parameters saved")
             ct.ResultThread(target=write_paramconfig).start()
 
@@ -840,7 +843,9 @@ class MultiScale_Microscope_Controller():
 
         # write acquisition parameters in a thread
         def write_paramconfigtimelapse():
-            self.paramwriter.write_to_textfile(os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'))
+            lowresroi = [self.model.current_lowresROI_width, self.model.current_lowresROI_height]
+            highresroi = [self.model.current_highresROI_width, self.model.current_highresROI_height]
+            self.paramwriter.write_to_textfile(os.path.join(filepath_write_acquisitionParameters, 'Experiment_settings.txt'),lowresroi, highresroi)
             print("parameters saved")
         ct.ResultThread(target=write_paramconfigtimelapse).start()
 

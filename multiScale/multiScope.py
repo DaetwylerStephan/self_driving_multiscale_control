@@ -152,11 +152,18 @@ class multiScopeModel:
 
         # wait for all started initialization threads before continuing (by calling thread join)
         lowres_camera_init.get_result()
+        print('Successfully initialized lowres camera')
         highres_camera_init.get_result()
+        print('Successfully initialized highres camera')
         filterwheel_init.get_result()
+        print('Successfully initialized filter wheel')
         trans_stage_init.get_result()
+        print('Successfully initialized stage')
         rot_stage_init.get_result()
+        print('Successfully initialized rot stage')
         slit_init.get_result()
+        print('Successfully initialized slit')
+
 
         print('Finished initializing multiScope')
 
