@@ -223,6 +223,7 @@ class Photo_Camera:
 
     def run_preview_ASLM(self, out):
         framesReceived = 0
+        print("in run_preview_ASLM: framesReceived started")
         while framesReceived < 1:
             try:
                 frame, fps, frame_count = self.cam.poll_frame()

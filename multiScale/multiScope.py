@@ -607,8 +607,8 @@ class multiScopeModel:
         """
         linedelay = Camera_parameters.highres_line_digitization_time
         nbrows = self.current_highresROI_height
-        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + nbrows / self.ASLM_scanWidth)))
-        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure) / (nbrows * linedelay))) - 1
+        self.ASLM_lineExposure = int(np.ceil(desired_exposuretime / (1 + (1+nbrows) / self.ASLM_scanWidth)))
+        self.ASLM_line_delay = int(np.ceil((desired_exposuretime - self.ASLM_lineExposure) / ((nbrows+1) * linedelay))) - 1
         self.ASLM_acquisition_time = (self.ASLM_line_delay + 1) * nbrows * linedelay + self.ASLM_lineExposure + (
                     self.ASLM_line_delay + 1) * linedelay
 
