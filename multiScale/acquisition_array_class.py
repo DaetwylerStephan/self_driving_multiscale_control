@@ -3,6 +3,10 @@ from auxiliary_code.constants import NI_board_parameters
 from auxiliary_code.constants import Camera_parameters
 
 class acquisition_arrays:
+    """
+    generate the voltage curves needed for the acquisitions on the NI board
+    returns the arrays.
+    """
     def __init__(self, model):
         self.model = model
 
