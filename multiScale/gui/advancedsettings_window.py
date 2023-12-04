@@ -182,8 +182,8 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_voltageDirection.set(ASLM_voltage_run[1])
 
         # set defaults
-        self.ASLM_scanWidth.set(60)
-        self.ASLM_volt_interval.set(60)
+        self.ASLM_scanWidth.set(80)
+        self.ASLM_volt_interval.set(42.5)
         self.ASLM_volt_middle488.set(0)
         self.ASLM_volt_middle552.set(0)
         self.ASLM_volt_middle594.set(0)
