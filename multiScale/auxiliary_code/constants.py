@@ -1,3 +1,12 @@
+class microscope_configuration:
+    #lowres_camera = 'Photometrics_lowres'
+    #highres_camera = 'Photometrics_highres'
+    #filterwheel = 'Ludl_filterwheel'
+
+    lowres_camera = 'Synthetic_camera'
+    highres_camera = 'Synthetic_camera'
+    filterwheel = 'Synthetic_Filterwheel'
+
 class FilterWheel_parameters:
     avail_filters = {'515-30-25': 1,
                '572/20-25': 2,
@@ -71,12 +80,3 @@ class NI_board_parameters:
     maxVol_constant = 5
     max_mSPIM_constant = 2
 
-
-# class SharedMemory_allocation:
-#     # Acquisition:
-#     vol_per_buffer = 1
-#     num_data_buffers = 2  # increase for multiprocessing
-#     num_snap = 1  # interbuffer time limited by ao play
-#     images_per_buffer = 1
-#     bytes_per_data_buffer = images_per_buffer * 6000 * 4000 * 2
-#     bytes_per_preview_buffer = bytes_per_data_buffer * 3

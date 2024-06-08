@@ -115,9 +115,9 @@ class MultiScale_Microscope_Controller():
         self.view.stagessettingstab.move_to_specificPosition_Button.bind("<Button>", self.movestageToPosition)
 
         #advanced settings tab
-        self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
-        self.view.advancedSettingstab.slit_lowres.trace_add("write", self.updateSlitParameters)
-        self.view.advancedSettingstab.slit_highres.trace_add("write", self.updateSlitParameters)
+        #self.view.advancedSettingstab.slit_currentsetting.trace_add("write", self.slit_opening_move)
+        #self.view.advancedSettingstab.slit_lowres.trace_add("write", self.updateSlitParameters)
+        #self.view.advancedSettingstab.slit_highres.trace_add("write", self.updateSlitParameters)
 
         self.view.advancedSettingstab.stack_aq_stage_velocity.trace_add("write", self.update_stack_aq_parameters)
         self.view.advancedSettingstab.stack_aq_stage_acceleration.trace_add("write", self.update_stack_aq_parameters)
@@ -190,10 +190,10 @@ class MultiScale_Microscope_Controller():
         power_settings_HR = [voltage488_HR, voltage552_HR, voltage594_HR, voltage640_HR]
         self.model.highres_laserpower=power_settings_HR
 
-    def updateSlitParameters(self, var, indx, mode):
-        # set the low resolution and high-resolution slit openings
-        self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
-        self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
+    # def updateSlitParameters(self, var, indx, mode):
+    #     # set the low resolution and high-resolution slit openings
+    #     self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
+    #     self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
 
     def update_mSPIMvoltage(self, var, indx, mode):
         # set the voltage for the mSPIM mirror
@@ -539,13 +539,13 @@ class MultiScale_Microscope_Controller():
                     current_position = [zpos, xpos, ypos, angle]
                     self.model.move_to_position(current_position)
 
-    def slit_opening_move(self, var,indx, mode):
-        """
-        changes the slit opening
-        """
-        currentslitopening = self.view.advancedSettingstab.slit_currentsetting.get()
-        self.model.move_adjustableslit(currentslitopening)
-        self.view.advancedSettingstab.slit_currentsetting.set(currentslitopening)
+    # def slit_opening_move(self, var,indx, mode):
+    #     """
+    #     changes the slit opening
+    #     """
+    #     currentslitopening = self.view.advancedSettingstab.slit_currentsetting.get()
+    #     self.model.move_adjustableslit(currentslitopening)
+    #     self.view.advancedSettingstab.slit_currentsetting.set(currentslitopening)
 
 
     def changefilter(self, event, laser):

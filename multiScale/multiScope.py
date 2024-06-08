@@ -12,10 +12,14 @@ import copy
 import acquisition_array_class as acq_arrays
 
 import src.camera.Photometrics_camera as Photometricscamera
+import src.camera.Synthetic_camera as Synthetic_camera
+
 import src.ni_board.vni as ni
 import src.stages.rotation_stage_cmd as RotStage
 import src.stages.translation_stage_cmd as TransStage
 import src.filter_wheel.ludlcontrol as FilterWheel
+import src.filter_wheel.Synthetic_Filterwheel as Synthetic_FilterWheel
+
 import src.slit.slit_cmd as SlitControl
 import src.voicecoil.voice_coil as Voice_Coil
 
@@ -26,6 +30,8 @@ from auxiliary_code.constants import Stage_parameters
 from auxiliary_code.constants import NI_board_parameters
 from auxiliary_code.constants import Camera_parameters
 from auxiliary_code.constants import ASLM_parameters
+from auxiliary_code.constants import microscope_configuration
+
 
 from automated_microscopy.drift_correction import drift_correction
 from automated_microscopy.image_deposit import images_InMemory_class
@@ -146,7 +152,7 @@ class multiScopeModel:
         trans_stage_init = ct.ResultThread(target=self._init_XYZ_stage).start()  # ~0.4s
         rot_stage_init = ct.ResultThread(target=self._init_rotation_stage).start()
         filterwheel_init = ct.ResultThread(target=self._init_filterwheel).start()  # ~5.3s
-        slit_init = ct.ResultThread(target=self._init_slit).start()  #
+        #slit_init = ct.ResultThread(target=self._init_slit).start()  #
 
         self._init_ao()  # ~0.2s
 
@@ -161,8 +167,8 @@ class multiScopeModel:
         print('Successfully initialized stage')
         rot_stage_init.get_result()
         print('Successfully initialized rot stage')
-        slit_init.get_result()
-        print('Successfully initialized slit')
+        #slit_init.get_result()
+        #print('Successfully initialized slit')
 
 
         print('Finished initializing multiScope')
@@ -175,37 +181,40 @@ class multiScopeModel:
         Initialize low resolution camera
         """
         print("Initializing low resolution camera ..")
-        # place the Photometrics class as object into an Object in Subprocess
-        self.lowres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMPCIECam00')
-        self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
-        print(self.lowres_camera_ROI)
-        # self.lowres_camera.take_snapshot(20)
-        print("done with camera.")
+
+        if microscope_configuration.lowres_camera == 'Photometrics_lowres':
+            # place the Photometrics class as object into an Object in Subprocess
+            self.lowres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMPCIECam00')
+            self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
+            print(self.lowres_camera_ROI)
+            # self.lowres_camera.take_snapshot(20)
+            print("done with camera.")
+
+        else:
+            # place the Photometrics class as object into an Object in Subprocess
+            self.lowres_camera = ct.ObjectInSubprocess(Synthetic_camera.Synthetic_Photo_Camera, 'lowres_synthetic')
+            self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
+            print(self.lowres_camera_ROI)
+            print("done with camera.")
 
     def _init_highres_camera(self):
         """
         Initialize low resolution camera
         """
-        print("Initializing high resolution camera..")
-        # place the Photometrics class as object into an Object in Subprocess
-        self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
-        self.highres_camera_ROI = self.highres_camera.get_imageroi()
-        print(self.highres_camera_ROI)
-        # self.lowres_camera.take_snapshot(20)
-        print("done with camera.")
-
-    def _init_voicecoil(self):
-        """
-        Initialize the voice coil
-        :return: initialized voice coil
-        """
-        print("Initializing voice coil ..")
-        self.voice_coil = Voice_Coil.VoiceCoil(verbose=True)
-        self.voice_coil.send_command('k0\r')  # Turn off servo
-        time.sleep(1)
-        self.voice_coil.send_command('k1\r')  # Engage servo
-        time.sleep(1)
-        self.voice_coil.send_command('d\r')  # Engage servo
+        if microscope_configuration.lowres_camera == 'Photometrics_highres':
+            print("Initializing high resolution camera..")
+            # place the Photometrics class as object into an Object in Subprocess
+            self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
+            self.highres_camera_ROI = self.highres_camera.get_imageroi()
+            print(self.highres_camera_ROI)
+            # self.lowres_camera.take_snapshot(20)
+            print("done with camera.")
+        else:
+            # place the Photometrics class as object into an Object in Subprocess
+            self.highres_camera = ct.ObjectInSubprocess(Synthetic_camera.Synthetic_Photo_Camera, 'highres_synthetic')
+            self.highres_camera_ROI = self.highres_camera.get_imageroi()
+            print(self.highres_camera_ROI)
+            print("done with camera.")
 
     def _init_display(self):
         print("Initializing display...")
@@ -277,16 +286,24 @@ class multiScopeModel:
         """
         Initialize filterwheel
         """
-        ComPort = FilterWheel_parameters.comport
-        self.filters = FilterWheel_parameters.avail_filters
+        if microscope_configuration.filterwheel == 'Ludl_filterwheel':
+            ComPort = FilterWheel_parameters.comport
+            self.filters = FilterWheel_parameters.avail_filters
 
-        print("Initializing filter wheel...", end=' ')
-        self.filterwheel = FilterWheel.LudlFilterwheel(ComPort, self.filters)
-        self.filterwheel.set_filter('515-30-25', wait_until_done=False)
-        self.filterwheel.set_filter('572/20-25', wait_until_done=False)
-        self.filterwheel.set_filter('615/20-25', wait_until_done=False)
-        self.filterwheel.set_filter('676/37-25', wait_until_done=False)
-        print("done with filterwheel.")
+            print("Initializing filter wheel...", end=' ')
+            self.filterwheel = FilterWheel.LudlFilterwheel(ComPort, self.filters)
+            self.filterwheel.set_filter('515-30-25', wait_until_done=False)
+            self.filterwheel.set_filter('572/20-25', wait_until_done=False)
+            self.filterwheel.set_filter('615/20-25', wait_until_done=False)
+            self.filterwheel.set_filter('676/37-25', wait_until_done=False)
+            print("done with Ludl filterwheel.")
+        else:
+            ComPort = FilterWheel_parameters.comport
+            self.filters = FilterWheel_parameters.avail_filters
+            print("Initializing filter wheel...", end=' ')
+            self.filterwheel = Synthetic_FilterWheel.Synthetic_Filterwheel(ComPort, self.filters)
+
+
 
     def _init_XYZ_stage(self):
         """
@@ -335,7 +352,7 @@ class multiScopeModel:
         self.ao.close()
         self.rotationstage.close()
         self.XYZ_stage.close()
-        self.adjustableslit.slit_closing()
+        #self.adjustableslit.slit_closing()
         self.display.close()  # more work needed here
         print('Closed multiScope')
 
@@ -455,28 +472,28 @@ class multiScopeModel:
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
         self.rotationstage.moveToAngle(positionlist[3])
 
-    def move_adjustableslit(self, slitopening, wait=0):
-        """
-        :param slitopening: move to this slitopening;
-        :param if wait==1 - wait for slit move to finish before continuing
-        """
-        self.adjustableslit.slit_move(int(slitopening), 0)
-        if wait == 1:
-            self.adjustableslit.slit_wait_for_stop(100)
+    # def move_adjustableslit(self, slitopening, wait=0):
+    #     """
+    #     :param slitopening: move to this slitopening;
+    #     :param if wait==1 - wait for slit move to finish before continuing
+    #     """
+    #     self.adjustableslit.slit_move(int(slitopening), 0)
+    #     if wait == 1:
+    #         self.adjustableslit.slit_wait_for_stop(100)
 
     def changeLRtoHR(self):
         """
         change from low resolution to high resolution acquisition settings
         """
-        self.flipMirrorPosition_power.setconstantvoltage(3)
-        self.move_adjustableslit(self.slitopening_highres, 1)
+        self.flipMirrorPosition_power.setconstantvoltage(0)
+        #self.move_adjustableslit(self.slitopening_highres, 1)
 
     def changeHRtoLR(self):
         """
         change from high resolution to low resolution acquisition settings
         """
-        self.flipMirrorPosition_power.setconstantvoltage(0)
-        self.move_adjustableslit(self.slitopening_lowres, 1)
+        self.flipMirrorPosition_power.setconstantvoltage(3)
+        #self.move_adjustableslit(self.slitopening_lowres, 1)
 
 #######################################################################################################################
 # Next come the run preview functions (low and highres preview)

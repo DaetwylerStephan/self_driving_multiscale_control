@@ -52,39 +52,39 @@ class AdvancedSettings_Tab(tk.Frame):
         ### ----------------------------label frames-----------------------------------------------------------------
 
         #set the different label frames
-        slit_settings = tk.LabelFrame(self, text="Slit Settings")
+        #slit_settings = tk.LabelFrame(self, text="Slit Settings")
         stack_aq_settings = tk.LabelFrame(self, text="Stack Acquisition Settings")
         ASLM_settings = tk.LabelFrame(self, text="ASLM Settings")
         mSPIM_settings = tk.LabelFrame(self, text="mSPIM Settings")
 
         # overall positioning of label frames
-        slit_settings.grid(row=2, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
+        #slit_settings.grid(row=2, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
         stack_aq_settings.grid(row=4, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
-        ASLM_settings.grid(row=2, column=1, sticky = tk.W + tk.E+tk.S+tk.N)
+        ASLM_settings.grid(row=2, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
         mSPIM_settings.grid(row=6, column=0, sticky = tk.W + tk.E+tk.S+tk.N)
 
         ### ----------------------------slit settings -----------------------------------------------------------------
-        # slit labels (positioned)
-        slit_opening_label = ttk.Label(slit_settings, text="Slit opening:").grid(row=2, column=0)
-        slit_opening_label2 = ttk.Label(slit_settings, text="current:").grid(row=3, column=0)
-        slit_lowres_label = ttk.Label(slit_settings, text="Low Res:").grid(row=4, column=0)
-        slit_highres_label = ttk.Label(slit_settings, text="High Res:").grid(row=4, column=3)
-
-        self.slit_opening_entry = tk.Entry(slit_settings, textvariable=self.slit_currentsetting, width=6)
-        self.slit_lowres_entry = tk.Entry(slit_settings, textvariable=self.slit_lowres, width=6)
-        self.slit_highres_entry = tk.Entry(slit_settings, textvariable=self.slit_highres, width=6)
-
-        slit_scale = tk.Scale(slit_settings, variable=self.slit_currentsetting, from_=0, to=4558, orient="horizontal")
-
-        # set defaults
-        self.slit_lowres.set(3700)
-        self.slit_highres.set(4558)
-
-        # slit settings layout
-        slit_scale.grid(row=2, column=1, rowspan=2, columnspan=4, sticky=tk.W + tk.E)
-        self.slit_opening_entry.grid(row=3, column=5, sticky=tk.W + tk.E + tk.S)
-        self.slit_lowres_entry.grid(row=4, column=1, columnspan=2, sticky=tk.W + tk.E + tk.S)
-        self.slit_highres_entry.grid(row=4, column=4, columnspan=2, sticky=tk.W + tk.E + tk.S)
+        # # slit labels (positioned)
+        # slit_opening_label = ttk.Label(slit_settings, text="Slit opening:").grid(row=2, column=0)
+        # slit_opening_label2 = ttk.Label(slit_settings, text="current:").grid(row=3, column=0)
+        # slit_lowres_label = ttk.Label(slit_settings, text="Low Res:").grid(row=4, column=0)
+        # slit_highres_label = ttk.Label(slit_settings, text="High Res:").grid(row=4, column=3)
+        #
+        # self.slit_opening_entry = tk.Entry(slit_settings, textvariable=self.slit_currentsetting, width=6)
+        # self.slit_lowres_entry = tk.Entry(slit_settings, textvariable=self.slit_lowres, width=6)
+        # self.slit_highres_entry = tk.Entry(slit_settings, textvariable=self.slit_highres, width=6)
+        #
+        # slit_scale = tk.Scale(slit_settings, variable=self.slit_currentsetting, from_=0, to=4558, orient="horizontal")
+        #
+        # # set defaults
+        # self.slit_lowres.set(3700)
+        # self.slit_highres.set(4558)
+        #
+        # # slit settings layout
+        # slit_scale.grid(row=2, column=1, rowspan=2, columnspan=4, sticky=tk.W + tk.E)
+        # self.slit_opening_entry.grid(row=3, column=5, sticky=tk.W + tk.E + tk.S)
+        # self.slit_lowres_entry.grid(row=4, column=1, columnspan=2, sticky=tk.W + tk.E + tk.S)
+        # self.slit_highres_entry.grid(row=4, column=4, columnspan=2, sticky=tk.W + tk.E + tk.S)
 
         ### ----------------------------stack acquisition settings -----------------------------------------------------------------
         # slit labels (positioned)
@@ -179,7 +179,7 @@ class AdvancedSettings_Tab(tk.Frame):
         ASLM_voltage_run = ('highTolow', 'lowToHigh')
         self.ASLM_runOptionsMenu_Voltage = tk.OptionMenu(ASLM_settings, self.ASLM_voltageDirection,
                                                  *ASLM_voltage_run)
-        self.ASLM_voltageDirection.set(ASLM_voltage_run[1])
+        self.ASLM_voltageDirection.set(ASLM_voltage_run[0])
 
         # set defaults
         self.ASLM_scanWidth.set(80)
