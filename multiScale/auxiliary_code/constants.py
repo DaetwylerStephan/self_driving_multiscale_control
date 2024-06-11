@@ -2,10 +2,17 @@ class microscope_configuration:
     #lowres_camera = 'Photometrics_lowres'
     #highres_camera = 'Photometrics_highres'
     #filterwheel = 'Ludl_filterwheel'
+    #ni_board = 'NI_Board'
+    #rotationstage = 'Smaract_RotationStage'
+    #translationstage = 'Smaract_TranslationStage'
 
     lowres_camera = 'Synthetic_camera'
     highres_camera = 'Synthetic_camera'
     filterwheel = 'Synthetic_Filterwheel'
+    rotationstage = 'Synthetic_RotationStage'
+    translationstage = 'Synthetic_TranslationStage'
+
+    ni_board = 'Synthetic_niBoard'
 
 class FilterWheel_parameters:
     avail_filters = {'515-30-25': 1,

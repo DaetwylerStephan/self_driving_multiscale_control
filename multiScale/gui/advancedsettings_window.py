@@ -106,18 +106,18 @@ class AdvancedSettings_Tab(tk.Frame):
         self.stage_velocity_entry.grid(row=4, column=1, sticky=tk.W + tk.E + tk.S)
         self.stage_acceleration_entry.grid(row=6, column=1, sticky=tk.W + tk.E + tk.S)
 
-        ### ----------------------------mSPIM settings -----------------------------------------------------------------
-        # slit labels (positioned)
-        mSPIM_voltage_label = ttk.Label(mSPIM_settings, text="voltage @resonant galvo:").grid(
-            row=2, column=0)
-
-        self.mSPIM_voltage_entry = tk.Entry(mSPIM_settings, textvariable=self.adv_settings_mSPIMvoltage, width=4)
-
-        # set defaults
-        self.adv_settings_mSPIMvoltage.set(0.1)
-
-        # layout
-        self.mSPIM_voltage_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
+        # ### ----------------------------mSPIM settings -----------------------------------------------------------------
+        # # slit labels (positioned)
+        # mSPIM_voltage_label = ttk.Label(mSPIM_settings, text="voltage @resonant galvo:").grid(
+        #     row=2, column=0)
+        #
+        # self.mSPIM_voltage_entry = tk.Entry(mSPIM_settings, textvariable=self.adv_settings_mSPIMvoltage, width=4)
+        #
+        # # set defaults
+        # self.adv_settings_mSPIMvoltage.set(0.1)
+        #
+        # # layout
+        # self.mSPIM_voltage_entry.grid(row=2, column=1, sticky=tk.W + tk.E + tk.S)
 
         ### ----------------------------ASLM settings -----------------------------------------------------------------
         # ASLM labels (positioned)

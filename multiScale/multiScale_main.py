@@ -134,7 +134,7 @@ class MultiScale_Microscope_Controller():
         self.view.advancedSettingstab.ASLM_volt_middle640.trace_add("write", self.update_ASLMParameters)
 
         self.view.advancedSettingstab.ASLM_voltageDirection.trace_add("write", self.update_ASLMParameters)
-        self.view.advancedSettingstab.adv_settings_mSPIMvoltage.trace_add("write", self.update_mSPIMvoltage)
+        #self.view.advancedSettingstab.adv_settings_mSPIMvoltage.trace_add("write", self.update_mSPIMvoltage)
         self.view.advancedSettingstab.ASLM_scanWidth.trace_add("write", self.update_ASLMParameters)
 
         # smart settings tab
@@ -195,12 +195,12 @@ class MultiScale_Microscope_Controller():
     #     self.model.slitopening_lowres = self.view.advancedSettingstab.slit_lowres.get()
     #     self.model.slitopening_highres = self.view.advancedSettingstab.slit_highres.get()
 
-    def update_mSPIMvoltage(self, var, indx, mode):
-        # set the voltage for the mSPIM mirror
-        voltage = self.view.advancedSettingstab.adv_settings_mSPIMvoltage.get()
-        print(voltage)
-        if voltage > 0 and voltage < NI_board_parameters.max_mSPIM_constant:
-            self.model.mSPIMmirror_voltage.setconstantvoltage(voltage)
+    # def update_mSPIMvoltage(self, var, indx, mode):
+    #     # set the voltage for the mSPIM mirror
+    #     voltage = self.view.advancedSettingstab.adv_settings_mSPIMvoltage.get()
+    #     print(voltage)
+    #     if voltage > 0 and voltage < NI_board_parameters.max_mSPIM_constant:
+    #         self.model.mSPIMmirror_voltage.setconstantvoltage(voltage)
 
     def updateExposureParameters(self, var, indx, mode):
         # exposure time

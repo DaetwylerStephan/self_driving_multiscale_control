@@ -15,13 +15,18 @@ import src.camera.Photometrics_camera as Photometricscamera
 import src.camera.Synthetic_camera as Synthetic_camera
 
 import src.ni_board.vni as ni
+import src.ni_board.ni_synthetic as synthetic_ni
+
 import src.stages.rotation_stage_cmd as RotStage
+import src.stages.synthetic_rotation_stage as Synthetic_RotStage
+
 import src.stages.translation_stage_cmd as TransStage
+import src.stages.synthetic_translation_stage as Synthetic_TransStage
+
 import src.filter_wheel.ludlcontrol as FilterWheel
 import src.filter_wheel.Synthetic_Filterwheel as Synthetic_FilterWheel
 
 import src.slit.slit_cmd as SlitControl
-import src.voicecoil.voice_coil as Voice_Coil
 
 import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.napari_in_subprocess as napari
@@ -228,59 +233,94 @@ class multiScopeModel:
         Initialize National Instruments card 6378 as device 1, Dev1
         """
         print("Initializing ao card...", end=' ')
-
-        self.ao = ni.Analog_Out(
-            num_channels=NI_board_parameters.ao_nchannels,
-            rate=NI_board_parameters.rate,
-            daq_type=NI_board_parameters.ao_type,
-            line=NI_board_parameters.line_selection,
-            verbose=True)
-
-        self.ao_laser488_power = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.power_488_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.maxVol_constant,
-            verbose=True)
-        self.ao_laser552_power = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.power_552_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.maxVol_constant,
-            verbose=True)
-        self.ao_laser594_power = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.power_594_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.maxVol_constant,
-            verbose=True)
-        self.ao_laser640_power = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.power_640_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.maxVol_constant,
-            verbose=True)
-        self.flipMirrorPosition_power = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.flip_mirror_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.maxVol_constant,
-            verbose=True)
-        self.mSPIMmirror_voltage = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.mSPIM_mirror_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.max_mSPIM_constant,
-            verbose=True)
-        self.LED_voltage = ni.Analog_Out(
-            daq_type=NI_board_parameters.ao_type_constant,
-            line=NI_board_parameters.LED_line,
-            minVol=NI_board_parameters.minVol_constant,
-            maxVol=NI_board_parameters.maxVol_constant,
-            verbose=True)
-        self.mSPIMmirror_voltage.setconstantvoltage(0.1)
-        print("done with ao.")
-        atexit.register(self.ao.close)
+        if microscope_configuration.lowres_camera == 'NI_Board':
+            self.ao = ni.Analog_Out(
+                num_channels=NI_board_parameters.ao_nchannels,
+                rate=NI_board_parameters.rate,
+                daq_type=NI_board_parameters.ao_type,
+                line=NI_board_parameters.line_selection,
+                verbose=True)
+            self.ao_laser488_power = ni.Analog_Out(
+                daq_type=NI_board_parameters.ao_type_constant,
+                line=NI_board_parameters.power_488_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.ao_laser552_power = ni.Analog_Out(
+                daq_type=NI_board_parameters.ao_type_constant,
+                line=NI_board_parameters.power_552_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.ao_laser594_power = ni.Analog_Out(
+                daq_type=NI_board_parameters.ao_type_constant,
+                line=NI_board_parameters.power_594_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.ao_laser640_power = ni.Analog_Out(
+                daq_type=NI_board_parameters.ao_type_constant,
+                line=NI_board_parameters.power_640_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.flipMirrorPosition_power = ni.Analog_Out(
+                daq_type=NI_board_parameters.ao_type_constant,
+                line=NI_board_parameters.flip_mirror_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.LED_voltage = ni.Analog_Out(
+                daq_type=NI_board_parameters.ao_type_constant,
+                line=NI_board_parameters.LED_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            print("done with ao.")
+            atexit.register(self.ao.close)
+        else:
+            self.ao = synthetic_ni.Analog_Out(
+                num_channels=NI_board_parameters.ao_nchannels,
+                rate=NI_board_parameters.rate,
+                daq_type= 'synthetic',
+                line=NI_board_parameters.line_selection,
+                verbose=True)
+            self.ao_laser488_power = synthetic_ni.Analog_Out(
+                daq_type='synthetic_constant',
+                line=NI_board_parameters.power_488_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.ao_laser552_power = synthetic_ni.Analog_Out(
+                daq_type='synthetic_constant',
+                line=NI_board_parameters.power_552_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.ao_laser594_power = synthetic_ni.Analog_Out(
+                daq_type='synthetic_constant',
+                line=NI_board_parameters.power_594_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.ao_laser640_power = synthetic_ni.Analog_Out(
+                daq_type='synthetic_constant',
+                line=NI_board_parameters.power_640_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.flipMirrorPosition_power = synthetic_ni.Analog_Out(
+                daq_type='synthetic_constant',
+                line=NI_board_parameters.flip_mirror_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
+            self.LED_voltage = synthetic_ni.Analog_Out(
+                daq_type='synthetic_constant',
+                line=NI_board_parameters.LED_line,
+                minVol=NI_board_parameters.minVol_constant,
+                maxVol=NI_board_parameters.maxVol_constant,
+                verbose=True)
 
     def _init_filterwheel(self):
         """
@@ -309,10 +349,15 @@ class multiScopeModel:
         """
         Initialize translation stage
         """
-        print("Initializing XYZ stage usb:sn:MCS2-00001795...")
-        stage_id = Stage_parameters.stage_id_XYZ
-        self.XYZ_stage = TransStage.SLC_translationstage(stage_id)
-        self.XYZ_stage.findReference()
+        if microscope_configuration.rotationstage == 'Smaract_TranslationStage':
+            print("Initializing XYZ stage usb:sn:MCS2-00001795...")
+            stage_id = Stage_parameters.stage_id_XYZ
+            self.XYZ_stage = TransStage.SLC_translationstage(stage_id)
+            self.XYZ_stage.findReference()
+        else:
+            print("Initializing synthetic stage ")
+            self.XYZ_stage = Synthetic_TransStage.Synthetic_translationstage()
+            self.XYZ_stage.findReference()
         print("done with XYZ stage.")
         atexit.register(self.XYZ_stage.close)
 
@@ -321,23 +366,26 @@ class multiScopeModel:
         Initialize rotation stage
         """
         print("Initializing rotation stage...")
-        stage_id = Stage_parameters.stage_id_rot
-        self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
-        # self.rotationstage.ManualMove()
+        if microscope_configuration.rotationstage == 'Smaract_RotationStage':
+            stage_id = Stage_parameters.stage_id_rot
+            self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
+        else:
+            stage_id = Stage_parameters.stage_id_rot
+            self.rotationstage = Synthetic_RotStage.Synthetic_rotationstage(stage_id)
         print("done with rot stage.")
         atexit.register(self.rotationstage.close)
 
-    def _init_slit(self):
-        """
-        Initialize motorized slit
-        """
-        self.adjustableslit = SlitControl.slit_ximc_control()
-        self.adjustableslit.slit_info()
-        self.adjustableslit.slit_status()
-        self.adjustableslit.slit_set_microstep_mode_256()
-        self.adjustableslit.home_stage()
-        print("slit homed")
-        self.adjustableslit.slit_set_speed(800)
+    # def _init_slit(self):
+    #     """
+    #     Initialize motorized slit
+    #     """
+    #     self.adjustableslit = SlitControl.slit_ximc_control()
+    #     self.adjustableslit.slit_info()
+    #     self.adjustableslit.slit_status()
+    #     self.adjustableslit.slit_set_microstep_mode_256()
+    #     self.adjustableslit.home_stage()
+    #     print("slit homed")
+    #     self.adjustableslit.slit_set_speed(800)
 
 #######################################################################################################################
 # Next come the functions at the end of a microscopy session - closing functions
