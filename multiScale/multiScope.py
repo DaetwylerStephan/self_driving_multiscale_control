@@ -206,7 +206,7 @@ class multiScopeModel:
         """
         Initialize low resolution camera
         """
-        if microscope_configuration.lowres_camera == 'Photometrics_highres':
+        if microscope_configuration.highres_camera == 'Photometrics_highres':
             print("Initializing high resolution camera..")
             # place the Photometrics class as object into an Object in Subprocess
             self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
@@ -233,7 +233,7 @@ class multiScopeModel:
         Initialize National Instruments card 6378 as device 1, Dev1
         """
         print("Initializing ao card...", end=' ')
-        if microscope_configuration.lowres_camera == 'NI_Board':
+        if microscope_configuration.ni_board == 'NI_Board':
             self.ao = ni.Analog_Out(
                 num_channels=NI_board_parameters.ao_nchannels,
                 rate=NI_board_parameters.rate,
@@ -349,7 +349,7 @@ class multiScopeModel:
         """
         Initialize translation stage
         """
-        if microscope_configuration.rotationstage == 'Smaract_TranslationStage':
+        if microscope_configuration.translationstage == 'Smaract_TranslationStage':
             print("Initializing XYZ stage usb:sn:MCS2-00001795...")
             stage_id = Stage_parameters.stage_id_XYZ
             self.XYZ_stage = TransStage.SLC_translationstage(stage_id)
