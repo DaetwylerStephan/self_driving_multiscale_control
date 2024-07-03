@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.filter_wheel.ludlcontrol &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.filter_wheel.ludlcontrol</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.filter_wheel.ludlcontrol</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">serial</span> <span class="k">as</span> <span class="nn">Serial</span>
+<span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">Io</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="LudlFilterwheel"><a class="viewcode-back" href="../../../src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel">[docs]</a><span class="k">class</span> <span class="nc">LudlFilterwheel</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Class to control a 6-position Ludl filterwheel</span>
+
+<span class="sd">    Needs a dictionary which combines filter designations and position IDs</span>
+<span class="sd">    in the form:</span>
+
+<span class="sd">    filters = {&#39;405-488-647-Tripleblock&#39; : 0,</span>
+<span class="sd">           &#39;405-488-561-640-Quadrupleblock&#39;: 1,</span>
+<span class="sd">           &#39;464 482-35&#39;: 2,</span>
+<span class="sd">           &#39;508 520-35&#39;: 3,</span>
+<span class="sd">           &#39;515LP&#39;:4,</span>
+<span class="sd">           &#39;529 542-27&#39;:5,</span>
+<span class="sd">           &#39;561LP&#39;:6,</span>
+<span class="sd">           &#39;594LP&#39;:7,</span>
+<span class="sd">           &#39;Empty-Alignment&#39;:8,}</span>
+
+<span class="sd">    If there are tuples instead of integers as values, the</span>
+<span class="sd">    filterwheel is assumed to be a double wheel.</span>
+
+<span class="sd">    I.e.: &#39;508 520-35&#39;: (2,3)</span>
+
+<span class="sd">    adapted from ludl filter wheel control by Fabian Voigt</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">COMport</span><span class="p">,</span> <span class="n">filterdict</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Initializing Ludl Filter Wheel&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">COMport</span> <span class="o">=</span> <span class="n">COMport</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baudrate</span> <span class="o">=</span> <span class="n">baudrate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterdict</span> <span class="o">=</span> <span class="n">filterdict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">double_wheel</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Delay in s for the wait until done function &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_done_delay</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the first entry of the filterdict has a tuple</span>
+<span class="sd">        as value, it is assumed that it is a double-filterwheel</span>
+<span class="sd">        to change the serial commands accordingly.</span>
+
+<span class="sd">        TODO: This doesn&#39;t check that the tuple has length 2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_item_in_filterdict</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filterdict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filterdict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">first_item_in_filterdict</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">double_wheel</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LudlFilterwheel.close"><a class="viewcode-back" href="../../../src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Close the filter wheel</span>
+<span class="sd">        &#39;&#39;&#39;</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_if_filter_in_filterdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Checks if the filter designation (string) given as argument</span>
+<span class="sd">        exists in the filterdict</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterdict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Filter designation not in the configuration&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LudlFilterwheel.set_filter"><a class="viewcode-back" href="../../../src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter">[docs]</a>    <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">wait_until_done</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Moves filter using the pyserial command set.</span>
+
+<span class="sd">        No checks are done whether the movement is completed or</span>
+<span class="sd">        finished in time.</span>
+
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_if_filter_in_filterdict</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ser</span> <span class="o">=</span> <span class="n">Serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMport</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">baudrate</span><span class="p">,</span>
+                                     <span class="n">parity</span><span class="o">=</span><span class="n">Serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+                                     <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                     <span class="n">xonxoff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">stopbits</span><span class="o">=</span><span class="n">Serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sio</span> <span class="o">=</span> <span class="n">Io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">Io</span><span class="o">.</span><span class="n">BufferedRWPair</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="p">))</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check for double or single wheel</span>
+
+<span class="sd">            TODO: A bit of repeating code in here. Might be better to</span>
+<span class="sd">            spin the create and send commands off.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">double_wheel</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot; Single wheel code &quot;&quot;&quot;</span>
+                <span class="c1"># Get the filter position from the filterdict:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filternumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterdict</span><span class="p">[</span><span class="nb">filter</span><span class="p">]</span>
+                <span class="c1"># Rotat is the Ludl high-level command for moving a filter wheel</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ludlstring</span> <span class="o">=</span> <span class="s1">&#39;Rotat S M &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filternumber</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sio</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ludlstring</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sio</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">wait_until_done</span><span class="p">:</span>
+<span class="w">                    </span><span class="sd">&#39;&#39;&#39; Wait a certain number of seconds. This is a hack</span>
+
+<span class="sd">                    Testing with :</span>
+<span class="sd">                    self.sio.write(str(&#39;Rdstat S&#39;))</span>
+<span class="sd">                    self.sio.flush()</span>
+<span class="sd">                    print(&#39;First:&#39;, self.sio.readline(10))</span>
+<span class="sd">                    time.sleep(0.1)</span>
+<span class="sd">                    self.sio.write(str(&#39;Rdstat S&#39;))</span>
+<span class="sd">                    self.sio.flush()</span>
+<span class="sd">                    print(&#39;Second: &#39;, self.sio.readline(10))</span>
+
+<span class="sd">                    yielded very unstable results, sometimes &quot;:N -3&quot;, sometimes</span>
+<span class="sd">                    &quot;:A&quot; - and blocking &amp; crashing the connection</span>
+<span class="sd">                    &#39;&#39;&#39;</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_until_done_delay</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot; Double wheel code &quot;&quot;&quot;</span>
+                <span class="c1"># Get the filter position tuple from the filterdict:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filternumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterdict</span><span class="p">[</span><span class="nb">filter</span><span class="p">]</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot; Write command for the primary wheel &quot;&quot;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ludlstring0</span> <span class="o">=</span> <span class="s1">&#39;Rotat S M &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filternumber</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sio</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ludlstring0</span><span class="p">))</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot; Write command for the auxillary wheel &quot;&quot;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ludlstring1</span> <span class="o">=</span> <span class="s1">&#39;Rotat S A &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filternumber</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sio</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ludlstring1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sio</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">wait_until_done</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_until_done_delay</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Filter </span><span class="si">{</span><span class="nb">filter</span><span class="si">}</span><span class="s1"> not found in configuration.&#39;</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1">##test here code of this class</span>
+    <span class="n">ComPort</span> <span class="o">=</span> <span class="s1">&#39;COM6&#39;</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;515-30-25&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+               <span class="s1">&#39;572/20-25&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+               <span class="s1">&#39;615/20-25&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+               <span class="s1">&#39;676/37-25&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+               <span class="s1">&#39;transmission&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+               <span class="s1">&#39;block&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+               <span class="p">}</span>
+    <span class="n">filterwheel_test</span> <span class="o">=</span> <span class="n">LudlFilterwheel</span><span class="p">(</span><span class="n">ComPort</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
+    <span class="n">filterwheel_test</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="s1">&#39;515-30-25&#39;</span><span class="p">,</span> <span class="n">wait_until_done</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">filterwheel_test</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="s1">&#39;572/20-25&#39;</span><span class="p">,</span> <span class="n">wait_until_done</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">filterwheel_test</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="s1">&#39;615/20-25&#39;</span><span class="p">,</span> <span class="n">wait_until_done</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">filterwheel_test</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="s1">&#39;676/37-25&#39;</span><span class="p">,</span> <span class="n">wait_until_done</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

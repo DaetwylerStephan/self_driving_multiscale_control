@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.stages.translation_stage_cmd &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.stages.translation_stage_cmd</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.stages.translation_stage_cmd</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">translation_stage_cmd.py</span>
+<span class="sd">========================================</span>
+<span class="sd">Script containing all functions to initialize and operate the translation stages from Smaract</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Thread</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.smaract</span> <span class="kn">import</span> <span class="n">ctl</span> <span class="k">as</span> <span class="n">ctl</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">smaract.ctl</span> <span class="k">as</span> <span class="nn">ctl</span>
+
+
+
+<div class="viewcode-block" id="SLC_translationstage"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage">[docs]</a><span class="k">class</span> <span class="nc">SLC_translationstage</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locator</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize translation stage parameters, and print out some parameters for debugging</span>
+<span class="sd">        Input: locator address of the translation stage, e.g. usb:sn:MCS2-00001795</span>
+<span class="sd">        Output: an initialized and connected stage.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locator</span> <span class="o">=</span> <span class="n">locator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_of_channels</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Read the version of the library</span>
+        <span class="c1"># Note: this is the only function that does not require the library to be initialized.</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetFullVersionString</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SmarActCTL library version: &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_lib_compatibility</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Open the MCS2 device</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locator</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 opened </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locator</span><span class="p">))</span>
+
+            <span class="n">serial</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_s</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">DEVICE_SERIAL_NUMBER</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Device Serial Number: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">serial</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Passing an error code to &quot;GetResultInfo&quot; returns a human readable string</span>
+            <span class="c1"># specifying the error.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">, error: </span><span class="si">{}</span><span class="s2"> (0x</span><span class="si">{:04X}</span><span class="s2">) in line: </span><span class="si">{}</span><span class="s2">.&quot;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">),</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                      <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">)))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error: </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> in line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">ex</span><span class="p">),</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">)))</span>
+            <span class="k">raise</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_of_channels</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">NUMBER_OF_CHANNELS</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 number of channels: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_of_channels</span><span class="p">))</span>
+
+        <span class="c1">#initialize stream events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+
+
+
+<div class="viewcode-block" id="SLC_translationstage.assert_lib_compatibility"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.assert_lib_compatibility">[docs]</a>    <span class="k">def</span> <span class="nf">assert_lib_compatibility</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that the major version numbers of the Python API and the</span>
+<span class="sd">        loaded shared SmarAct library are the same to avoid errors due to</span>
+<span class="sd">        incompatibilities.</span>
+<span class="sd">        Raises a RuntimeError if the major version numbers are different.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vapi</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">api_version</span>
+        <span class="n">vlib</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetFullVersionString</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">vapi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">vlib</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Incompatible SmarActCTL python api and library version.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SLC_translationstage.findReference"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.findReference">[docs]</a>    <span class="k">def</span> <span class="nf">findReference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Set find reference options.</span>
+        <span class="c1"># The reference options specify the behavior of the find reference sequence.</span>
+        <span class="c1"># The reference flags can be ORed to build the reference options.</span>
+        <span class="c1"># By default (options = 0) the positioner returns to the position of the reference mark.</span>
+        <span class="c1"># Note: In contrast to previous controller systems this is not mandatory.</span>
+        <span class="c1"># The MCS2 controller is able to find the reference position &quot;on-the-fly&quot;.</span>
+        <span class="c1"># See the MCS2 Programmer Guide for a description of the different modes.</span>
+
+        <span class="n">channel_array</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#move the stage system first up to avoid the sample crashing</span>
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channel_array</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 find reference on channel: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span>
+
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">REFERENCING_OPTIONS</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># Set velocity to 1mm/s</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_VELOCITY</span><span class="p">,</span> <span class="mi">2000000000</span><span class="p">)</span>
+            <span class="c1"># Set acceleration to 10mm/s2.</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_ACCELERATION</span><span class="p">,</span> <span class="mi">10000000000</span><span class="p">)</span>
+            <span class="c1"># Start referencing sequence</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">Reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+            <span class="c1"># Note that the function call returns immediately, without waiting for the movement to complete.</span>
+            <span class="c1"># The &quot;ChannelState.REFERENCING&quot; flag in the channel state can be monitored to determine</span>
+            <span class="c1"># the end of the referencing sequence.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_referencing</span><span class="p">()</span>
+
+        <span class="c1">#Set all positions to 0 pm</span>
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">no_of_channels</span><span class="p">):</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CHANNEL_STATE</span><span class="p">)</span>
+            <span class="c1"># The returned channel state holds a bit field of several state flags.</span>
+            <span class="c1"># See the MCS2 Programmers Guide for the meaning of all state flags.</span>
+            <span class="c1"># We pick the &quot;sensorPresent&quot; flag to check if there is a positioner connected</span>
+            <span class="c1"># which has an integrated sensor.</span>
+            <span class="c1"># Note that in contrast to previous controller systems the controller supports</span>
+            <span class="c1"># hotplugging of the sensor module and the actuators.</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POSITION</span><span class="p">)</span>
+            <span class="n">base_unit</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POS_BASE_UNIT</span><span class="p">)</span>
+
+            <span class="c1">#print(&quot;MCS2 position of channel {}: {}&quot;.format(channel, position), end=&#39;&#39;)</span>
+            <span class="c1">#print(&quot;pm.&quot;) if base_unit == ctl.BaseUnit.METER else print(&quot;ndeg.&quot;)</span>
+
+            <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># in pm | ndeg</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 setting position of channel </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">position</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">base_unit</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POS_BASE_UNIT</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pm.&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">base_unit</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">BaseUnit</span><span class="o">.</span><span class="n">METER</span> <span class="k">else</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ndeg.&quot;</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SLC_translationstage.close"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">Close</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 close.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_waitForEvent_referencing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Wait for events generated by the connected device &quot;&quot;&quot;</span>
+        <span class="c1"># The wait for event function blocks until an event was received or the timeout elapsed.</span>
+        <span class="c1"># In case of timeout, a &quot;ctl.Error&quot; exception is raised containing the &quot;TIMEOUT&quot; error.</span>
+        <span class="c1"># If the &quot;timeout&quot; parameter is set to &quot;ctl.INFINITE&quot; the call blocks until an event is received.</span>
+        <span class="c1"># This can be useful in case the WaitForEvent function runs in a separate thread.</span>
+        <span class="c1"># For simplicity, this is not shown here thus we set a timeout of 3 seconds.</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="mi">60000</span>  <span class="c1"># in ms</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+            <span class="c1"># The &quot;type&quot; field specifies the event. The &quot;idx&quot; field holds the device index for this event</span>
+            <span class="c1"># The &quot;i32&quot; data field gives additional information about the event.</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">REFERENCE_FOUND</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">NONE</span><span class="p">):</span>
+                    <span class="c1"># Movement finished.</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 reference found, channel: &quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_MovementComplete</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># The movement failed for some reason. E.g. an endstop was detected.</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 reference found, channel: </span><span class="si">{}</span><span class="s2">, error: 0x</span><span class="si">{:04X}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">) &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">,</span>
+                                                                                              <span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span>
+                                                                                                  <span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># The code should be prepared to handle unexpected events beside the expected ones.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 received event: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetEventInfo</span><span class="p">(</span><span class="n">event</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_referencing</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 wait for event timed out after </span><span class="si">{}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)))</span>
+            <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_waitForEvent_MovementComplete_Channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nb_channels</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Wait for movement complete events generated by the connected device &quot;&quot;&quot;</span>
+        <span class="nb">iter</span> <span class="o">=</span><span class="mi">0</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="mi">30000</span>  <span class="c1"># in ms</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">done</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">MOVEMENT_FINISHED</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">NONE</span><span class="p">):</span>
+                        <span class="c1">#print(&quot;MCS2 movement finished, channel: &quot;, event.idx)</span>
+                        <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">+</span><span class="mi">1</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">nb_channels</span> <span class="o">==</span> <span class="nb">iter</span><span class="p">):</span>
+                            <span class="n">done</span><span class="o">=</span><span class="kc">True</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 movement finished, channel: </span><span class="si">{}</span><span class="s2">, error: 0x</span><span class="si">{:04X}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">) &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 received event: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetEventInfo</span><span class="p">(</span><span class="n">event</span><span class="p">)))</span>
+
+            <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 wait for event timed out after </span><span class="si">{}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)))</span>
+                <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_waitForEvent_MovementComplete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Wait for movement complete events generated by the connected device &quot;&quot;&quot;</span>
+
+        <span class="n">timeout</span> <span class="o">=</span> <span class="mi">30000</span>  <span class="c1"># in ms</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">MOVEMENT_FINISHED</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">NONE</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 movement finished, channel: &quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 movement finished, channel: </span><span class="si">{}</span><span class="s2">, error: 0x</span><span class="si">{:04X}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">) &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 received event: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetEventInfo</span><span class="p">(</span><span class="n">event</span><span class="p">)))</span>
+
+        <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 wait for event timed out after </span><span class="si">{}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)))</span>
+            <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_waitForEvent_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for events generated by the connected device&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">INFINITE</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">STREAM_FINISHED</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetEventInfo</span><span class="p">(</span><span class="n">event</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventParameter</span><span class="o">.</span><span class="n">PARAM_RESULT</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 stream ended&quot;</span><span class="p">)</span>
+                        <span class="c1"># All streaming frames were processed, stream finished.</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                    <span class="k">elif</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventParameter</span><span class="o">.</span><span class="n">PARAM_RESULT</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">:</span>
+                        <span class="c1"># Stream was canceled by the user.</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 stream aborted by user&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Stream was canceled by device.</span>
+                        <span class="c1"># Note: The event parameter now holds the error code as well as the channel index responsible for the failure</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 stream aborted by device: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">EventParameter</span><span class="o">.</span><span class="n">PARAM_RESULT</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">))</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">STREAM_READY</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">STREAM_TRIGGERED</span><span class="p">:</span>
+                    <span class="c1"># These events are mainly useful when the STREAM_TRIGGER_MODE_EXTERNAL_ONCE trigger mode is used.</span>
+                    <span class="c1"># A STREAM_READY event is generated to indicate that the stream is ready to be triggered</span>
+                    <span class="c1"># by the external trigger. In this armed state the device waits for the trigger to occur and then generates a</span>
+                    <span class="c1"># STREAM_TRIGGERED event.</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 stream ready to trigger or triggered&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># The code should be prepared to handle unexpected events beside the expected ones.</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 received event: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetEventInfo</span><span class="p">(</span><span class="n">event</span><span class="p">)))</span>
+
+            <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">CANCELED</span><span class="p">:</span>
+                    <span class="c1"># we use &quot;INFINITE&quot; timeout, so the function call will return only when canceled by the &quot;Cancel&quot; function</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 canceled wait for event&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)))</span>
+                <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_waitForEvent_CommandGroupTriggered</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Wait for events generated by the connected device &quot;&quot;&quot;</span>
+
+        <span class="n">timeout</span> <span class="o">=</span> <span class="mi">100000</span>  <span class="c1"># in ms</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">done</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventType</span><span class="o">.</span><span class="n">CMD_GROUP_TRIGGERED</span><span class="p">:</span>
+                    <span class="c1"># A command group has been executed.</span>
+                    <span class="c1"># The event parameter holds:</span>
+                    <span class="c1"># - the result code of the group (Bit 0-15)</span>
+                    <span class="c1"># - the corresponding transmit handle of the group (Bit 31-24)</span>
+                    <span class="n">t_handle</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventParameter</span><span class="o">.</span><span class="n">PARAM_HANDLE</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)</span>
+                    <span class="n">result_code</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EventParameter</span><span class="o">.</span><span class="n">PARAM_RESULT</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">i32</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result_code</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                        <span class="c1">#print(&quot;MCS2 command group triggered, handle: {}&quot;.format(t_handle))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># The command group failed -&gt; the reason may be found in the result code.</span>
+                        <span class="c1"># To determine which command caused the error, read the individual results of the command</span>
+                        <span class="c1"># with &quot;WaitForWrite&quot; / &quot;ReadProperty_x&quot;.</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="s2">&quot;MCS2 command group failed, handle: </span><span class="si">{}</span><span class="s2">, error: 0x</span><span class="si">{:04X}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t_handle</span><span class="p">,</span> <span class="n">result_code</span><span class="p">,</span>
+                                                                                                 <span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span>
+                                                                                                     <span class="n">result_code</span><span class="p">)))</span>
+                    <span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># ignore other events and wait for the next one</span>
+                    <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 wait for event timed out after </span><span class="si">{}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)))</span>
+                <span class="k">return</span>
+
+    <span class="c1"># def stream_csvFile(self):</span>
+    <span class="c1">#</span>
+    <span class="c1">#     NUMBER_OF_STREAMING_CHANNELS = 2</span>
+    <span class="c1">#     MAX_NUMBER_OF_FRAMES = 1024</span>
+    <span class="c1">#     STREAM_FILE_NAME = &quot;streamPoses.csv&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1">#     self.stream_done.clear()</span>
+    <span class="c1">#     self.stream_abort.clear()</span>
+    <span class="c1">#</span>
+    <span class="c1">#     try:</span>
+    <span class="c1">#         with open(STREAM_FILE_NAME) as file:</span>
+    <span class="c1">#             # Consume the head line</span>
+    <span class="c1">#             next(file)</span>
+    <span class="c1">#             no_of_frames = 0</span>
+    <span class="c1">#             valid = True</span>
+    <span class="c1">#             stream_buffer = []</span>
+    <span class="c1">#             for line in file:</span>
+    <span class="c1">#                 line = line.strip()</span>
+    <span class="c1">#                 # Ignore blank lines</span>
+    <span class="c1">#                 if not line:</span>
+    <span class="c1">#                     continue</span>
+    <span class="c1">#                 ch_A, pos_A, ch_B, pos_B = line.split(&quot;,&quot;)</span>
+    <span class="c1">#                 # Basic valid checks</span>
+    <span class="c1">#                 if (int(ch_A) &lt; 0) or (int(ch_B) &lt; 0) or (int(ch_A) &gt; int(ch_B)):</span>
+    <span class="c1">#                     # Channels must be in ascending order</span>
+    <span class="c1">#                     valid = False</span>
+    <span class="c1">#                     break</span>
+    <span class="c1">#                 if no_of_frames &gt;= MAX_NUMBER_OF_FRAMES:</span>
+    <span class="c1">#                     break</span>
+    <span class="c1">#                 # Write frames to buffer</span>
+    <span class="c1">#                 frame = [int(ch_A), int(pos_A), int(ch_B), int(pos_B)]</span>
+    <span class="c1">#                 stream_buffer.append(frame)</span>
+    <span class="c1">#                 no_of_frames += 1</span>
+    <span class="c1">#     except Exception as e:</span>
+    <span class="c1">#         print(&quot;Failed to open pose file {}: {}, abort.&quot;.format(STREAM_FILE_NAME, e))</span>
+    <span class="c1">#         input()</span>
+    <span class="c1">#         sys.exit(1)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if (not valid):</span>
+    <span class="c1">#         print(&quot;File format invalid.&quot;)</span>
+    <span class="c1">#         input()</span>
+    <span class="c1">#         sys.exit(1)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         print(&quot;Read {} stream frames from file {}&quot;.format(no_of_frames, STREAM_FILE_NAME))</span>
+    <span class="c1">#</span>
+    <span class="c1">#     try:</span>
+    <span class="c1">#</span>
+    <span class="c1">#         # Spawn a thread to receive events from the controller.</span>
+    <span class="c1">#         event_handle_thread = Thread(target=self._waitForEvent_stream)</span>
+    <span class="c1">#         event_handle_thread.start()</span>
+    <span class="c1">#</span>
+    <span class="c1">#         # Set position zero, enable amplifier</span>
+    <span class="c1">#         # Sensor power mode: enabled (disable power save, which is not allowed with position streaming)</span>
+    <span class="c1">#         for channel in range(NUMBER_OF_STREAMING_CHANNELS):</span>
+    <span class="c1">#             ctl.SetProperty_i64(self.d_handle, channel, ctl.Property.POSITION, 0)</span>
+    <span class="c1">#             ctl.SetProperty_i32(self.d_handle, channel, ctl.Property.SENSOR_POWER_MODE, ctl.SensorPowerMode.ENABLED)</span>
+    <span class="c1">#             ctl.SetProperty_i32(self.d_handle, channel, ctl.Property.AMPLIFIER_ENABLED, ctl.TRUE)</span>
+    <span class="c1">#</span>
+    <span class="c1">#         # Configure stream (optional)</span>
+    <span class="c1">#         # Note: the stream rate must be a whole-number multiplier of the external sync rate.</span>
+    <span class="c1">#         # Set external sync rate to 100Hz (only active when using trigger mode STREAM_TRIGGER_MODE_EXTERNAL_SYNC)</span>
+    <span class="c1">#         ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_EXT_SYNC_RATE, 100)</span>
+    <span class="c1">#         # Set stream base rate to 1kHz</span>
+    <span class="c1">#         ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.STREAM_BASE_RATE, 1000)</span>
+    <span class="c1">#         # Prepare for streaming, select desired trigger mode</span>
+    <span class="c1">#         # (using STREAM_TRIGGER_MODE_DIRECT starts the stream as soon as enough frames were sent to the device)</span>
+    <span class="c1">#         s_handle = ctl.OpenStream(self.d_handle, ctl.StreamTriggerMode.DIRECT)</span>
+    <span class="c1">#         # Send all frames in a loop</span>
+    <span class="c1">#         # Note: the &quot;AbortStream&quot; function could be used to abort a running stream programmatically.</span>
+    <span class="c1">#         for frame_idx in range(no_of_frames):</span>
+    <span class="c1">#             # The &quot;waitForEvent&quot; thread received an &quot;abort&quot; event.</span>
+    <span class="c1">#             if self.stream_abort.isSet():</span>
+    <span class="c1">#                 break</span>
+    <span class="c1">#             # Make list from stream data, each frame contains all</span>
+    <span class="c1">#             # target positions for all channels that participate in the trajectory.</span>
+    <span class="c1">#             # The frame data list must have the structure:</span>
+    <span class="c1">#             # &lt;chA&gt;,&lt;posA,&lt;chB&gt;,&lt;posB&gt;</span>
+    <span class="c1">#             frame = stream_buffer[frame_idx]</span>
+    <span class="c1">#             ctl.StreamFrame(self.d_handle, s_handle, frame)</span>
+    <span class="c1">#</span>
+    <span class="c1">#         # All frames sent, close stream</span>
+    <span class="c1">#         ctl.CloseStream(self.d_handle, s_handle)</span>
+    <span class="c1">#         # Wait for the &quot;stream done&quot; event.</span>
+    <span class="c1">#         self.stream_done.wait()</span>
+    <span class="c1">#         # Cancel waiting for events.</span>
+    <span class="c1">#         ctl.Cancel(self.d_handle)</span>
+    <span class="c1">#         # Wait for the &quot;waitForEvent&quot; thread to terminate.</span>
+    <span class="c1">#         event_handle_thread.join()</span>
+    <span class="c1">#</span>
+    <span class="c1">#     except ctl.Error as e:</span>
+    <span class="c1">#         # Passing an error code to &quot;GetResultInfo&quot; returns a human readable string</span>
+    <span class="c1">#         # specifying the error.</span>
+    <span class="c1">#         print(&quot;MCS2 {}: {}, error: {} (0x{:04X}) in line: {}.&quot;</span>
+    <span class="c1">#               .format(e.func, ctl.GetResultInfo(e.code), ctl.ErrorCode(e.code).name, e.code,</span>
+    <span class="c1">#                       (sys.exc_info()[-1].tb_lineno)))</span>
+    <span class="c1">#</span>
+    <span class="c1">#     except Exception as ex:</span>
+    <span class="c1">#         print(&quot;Unexpected error: {}, {} in line: {}&quot;.format(ex, type(ex), (sys.exc_info()[-1].tb_lineno)))</span>
+    <span class="c1">#         raise</span>
+
+<div class="viewcode-block" id="SLC_translationstage.moveToPosition"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.moveToPosition">[docs]</a>    <span class="k">def</span> <span class="nf">moveToPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position_list</span><span class="p">):</span>
+        <span class="n">r_id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">9</span>
+        <span class="n">t_handle</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">OpenCommandGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">CmdGroupTriggerMode</span><span class="o">.</span><span class="n">DIRECT</span><span class="p">)</span>
+
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">AMPLIFIER_ENABLED</span><span class="p">,</span>
+                                               <span class="n">ctl</span><span class="o">.</span><span class="n">TRUE</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">AMPLIFIER_ENABLED</span><span class="p">,</span>
+                                               <span class="n">ctl</span><span class="o">.</span><span class="n">TRUE</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">AMPLIFIER_ENABLED</span><span class="p">,</span>
+                                               <span class="n">ctl</span><span class="o">.</span><span class="n">TRUE</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="n">ctl</span><span class="o">.</span><span class="n">CloseCommandGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="c1"># Wait for the &quot;triggered&quot; event before reading the results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_CommandGroupTriggered</span><span class="p">()</span>
+        <span class="c1"># One important thing to notice is that the WaitForWrite function calls must be issued</span>
+        <span class="c1"># after the command group was closed. Otherwise the function calls will block.</span>
+        <span class="c1"># Note that synchronous property accesses cannot be put into a command group.</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForWrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">r_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForWrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">r_id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForWrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">r_id</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+
+        <span class="c1">##start movement</span>
+        <span class="n">t_handle</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">OpenCommandGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">CmdGroupTriggerMode</span><span class="o">.</span><span class="n">DIRECT</span><span class="p">)</span>
+
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_MODE</span><span class="p">,</span>
+                                               <span class="n">ctl</span><span class="o">.</span><span class="n">MoveMode</span><span class="o">.</span><span class="n">CL_ABSOLUTE</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_MODE</span><span class="p">,</span>
+                                               <span class="n">ctl</span><span class="o">.</span><span class="n">MoveMode</span><span class="o">.</span><span class="n">CL_ABSOLUTE</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_MODE</span><span class="p">,</span>
+                                               <span class="n">ctl</span><span class="o">.</span><span class="n">MoveMode</span><span class="o">.</span><span class="n">CL_ABSOLUTE</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_VELOCITY</span><span class="p">,</span>
+                                               <span class="mi">10000000000</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_VELOCITY</span><span class="p">,</span>
+                                               <span class="mi">10000000000</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_VELOCITY</span><span class="p">,</span>
+                                               <span class="mi">10000000000</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_ACCELERATION</span><span class="p">,</span>
+                                               <span class="mi">100000000000</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_ACCELERATION</span><span class="p">,</span>
+                                               <span class="mi">100000000000</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestWriteProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_ACCELERATION</span><span class="p">,</span>
+                                               <span class="mi">100000000000</span><span class="p">,</span> <span class="n">tHandle</span><span class="o">=</span><span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="n">ctl</span><span class="o">.</span><span class="n">Move</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">position_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">Move</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">position_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">Move</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">position_list</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="n">ctl</span><span class="o">.</span><span class="n">CloseCommandGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="c1"># Wait for the &quot;triggered&quot; event before reading the results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_CommandGroupTriggered</span><span class="p">()</span>
+
+
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">r_id</span><span class="p">:</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">WaitForWrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_MovementComplete_Channels</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1"># Next we create a command group to read some properties: the current position of both channels.</span>
+        <span class="n">t_handle</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">OpenCommandGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">CmdGroupTriggerMode</span><span class="o">.</span><span class="n">DIRECT</span><span class="p">)</span>
+
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestReadProperty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestReadProperty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">r_id</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">RequestReadProperty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">t_handle</span><span class="p">)</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">CloseCommandGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">t_handle</span><span class="p">)</span>
+
+        <span class="c1"># Wait for the &quot;triggered&quot; event before reading the results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_CommandGroupTriggered</span><span class="p">()</span>
+        <span class="c1"># The same rule applies as for write properties:</span>
+        <span class="c1"># Put the RequestReadProperty calls into the command group,</span>
+        <span class="c1"># but issue e.g. ReadProperty_i64 calls after the group close.</span>
+        <span class="n">position_0</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ReadProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">r_id</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">position_1</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ReadProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">r_id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">position_2</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ReadProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">r_id</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Position channel 0: </span><span class="si">{}</span><span class="s2"> pm, channel 1: </span><span class="si">{}</span><span class="s2"> pm, channel 2: </span><span class="si">{}</span><span class="s2"> pm.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">position_0</span><span class="p">,</span> <span class="n">position_1</span><span class="p">,</span> <span class="n">position_2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SLC_translationstage.streamStackAcquisition_externalTrigger_setup"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_setup">[docs]</a>    <span class="k">def</span> <span class="nf">streamStackAcquisition_externalTrigger_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_of_frames</span><span class="p">,</span> <span class="n">increment</span><span class="p">,</span> <span class="n">slow_velocity</span><span class="p">,</span> <span class="n">slow_acceleration</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param no_of_frames: how many frames the stream will be</span>
+<span class="sd">        :param increment: how many um the stream will go up</span>
+<span class="sd">        :param slow_velocity: the factor for velocity of 10 mm/s</span>
+<span class="sd">        :param slow_acceleration: the factor for acceleration 100 mm/s2</span>
+<span class="sd">        :return: a waiting stream to receive voltage inputs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1">#check velocity not too high</span>
+        <span class="k">if</span> <span class="n">slow_velocity</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">slow_velocity</span> <span class="o">=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">slow_acceleration</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">slow_acceleration</span> <span class="o">=</span><span class="mi">1</span>
+
+        <span class="c1">#get starting position for stream</span>
+        <span class="n">startPosition</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">POSITION</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">startPosition</span><span class="p">)</span>
+
+        <span class="c1">#generate array with relative positions to starting value based on the chosen increment</span>
+        <span class="n">stream_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">frame_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">no_of_frames</span><span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">startPosition</span> <span class="o">+</span> <span class="n">frame_idx</span> <span class="o">*</span> <span class="n">increment</span><span class="p">)]</span>
+            <span class="n">stream_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">stream_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">startPosition</span><span class="p">])</span>
+
+        <span class="c1">#set stage speed</span>
+        <span class="n">velocityvalue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ulonglong</span><span class="p">(</span><span class="n">slow_velocity</span> <span class="o">*</span> <span class="mi">10000000000</span><span class="p">)</span>
+        <span class="n">accelerationvalue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ulonglong</span><span class="p">(</span><span class="n">slow_acceleration</span> <span class="o">*</span> <span class="mi">100000000000</span><span class="p">)</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_VELOCITY</span><span class="p">,</span> <span class="n">velocityvalue</span><span class="p">)</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">MOVE_ACCELERATION</span><span class="p">,</span> <span class="n">accelerationvalue</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Spawn a thread to receive events from the controller.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_handle_thread_triggeredStream</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_waitForEvent_stream</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_handle_thread_triggeredStream</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+            <span class="c1"># Set enable amplifier</span>
+            <span class="c1"># Sensor power mode: enabled (disable power save, which is not allowed with position streaming)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">SENSOR_POWER_MODE</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">SensorPowerMode</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">AMPLIFIER_ENABLED</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">TRUE</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set trigger condition to rising edge.&quot;</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">DEV_INPUT_TRIG_CONDITION</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">TriggerCondition</span><span class="o">.</span><span class="n">RISING</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Configure input trigger mode to stream mode.&quot;</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">DEV_INPUT_TRIG_MODE</span><span class="p">,</span>
+                                <span class="n">ctl</span><span class="o">.</span><span class="n">DeviceInputTriggerMode</span><span class="o">.</span><span class="n">STREAM</span><span class="p">)</span>
+
+            <span class="c1"># print(&quot;set output trigger to report when target reached&quot;)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">IO_MODULE_VOLTAGE</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">IOModuleVoltage</span><span class="o">.</span><span class="n">VOLTAGE_3V3</span><span class="p">)</span>
+            <span class="c1"># # Enable the digital output driver circuit of the I/O module.</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">IO_MODULE_OPTIONS</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">IOModuleOption</span><span class="o">.</span><span class="n">DIGITAL_OUTPUT_ENABLED</span><span class="p">)</span>
+            <span class="c1">#</span>
+
+            <span class="c1">#position compare</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_POS_COMP_START_THRESHOLD</span><span class="p">,</span> <span class="n">startPosition</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get result 1&quot;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_POS_COMP_INCREMENT</span><span class="p">,</span> <span class="n">increment</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_POS_COMP_DIRECTION</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">EITHER_DIRECTION</span><span class="p">)</span>
+            <span class="c1"># disable limits</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_POS_COMP_LIMIT_MIN</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_POS_COMP_LIMIT_MAX</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get result 2&quot;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_OUTPUT_TRIG_POLARITY</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">TriggerPolarity</span><span class="o">.</span><span class="n">ACTIVE_HIGH</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get result 4&quot;</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_OUTPUT_TRIG_PULSE_WIDTH</span><span class="p">,</span> <span class="mi">5000000</span><span class="p">)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">CH_OUTPUT_TRIG_MODE</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ChannelOutputTriggerMode</span><span class="o">.</span><span class="n">POSITION_COMPARE</span><span class="p">)</span>
+
+
+
+            <span class="c1"># ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_POLARITY, ctl.TriggerPolarity.ACTIVE_HIGH)</span>
+            <span class="c1"># ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_PULSE_WIDTH, 1000000)</span>
+            <span class="c1"># ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_MODE, ctl.ChannelOutputTriggerMode.TARGET_REACHED)</span>
+            <span class="c1">#ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_OUTPUT_TRIG_MODE, ctl.ChannelOutputTriggerMode.ACTIVELY_MOVING)</span>
+
+
+
+
+            <span class="c1"># Configure stream (optional)</span>
+            <span class="c1"># Note: the stream rate must be a whole-number multiplier of the external sync rate.</span>
+            <span class="c1"># Set external sync rate to 100Hz (only active when using trigger mode STREAM_TRIGGER_MODE_EXTERNAL_SYNC)</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">STREAM_EXT_SYNC_RATE</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="c1"># Set stream base rate to 1kHz</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">SetProperty_i32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Property</span><span class="o">.</span><span class="n">STREAM_BASE_RATE</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+            <span class="c1"># Prepare for streaming, select desired trigger mode</span>
+            <span class="n">s_handle</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">OpenStream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">StreamTriggerMode</span><span class="o">.</span><span class="n">EXTERNAL</span><span class="p">)</span>
+            <span class="c1"># Send all frames in a loop</span>
+            <span class="c1"># Note: the &quot;AbortStream&quot; function could be used to abort a running stream programmatically.</span>
+            <span class="k">for</span> <span class="n">frame_idx</span> <span class="ow">in</span> <span class="n">stream_buffer</span><span class="p">:</span>
+                <span class="c1"># The &quot;waitForEvent&quot; thread received an &quot;abort&quot; event.</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span><span class="o">.</span><span class="n">isSet</span><span class="p">():</span>
+                    <span class="k">break</span>
+                <span class="c1"># Make list from stream data, each frame contains all</span>
+                <span class="c1"># target positions for all channels that participate in the trajectory.</span>
+                <span class="c1"># The frame data list must have the structure:</span>
+                <span class="c1"># &lt;chA&gt;,&lt;posA,&lt;chB&gt;,&lt;posB&gt;</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">frame_idx</span>
+                <span class="n">ctl</span><span class="o">.</span><span class="n">StreamFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">s_handle</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+            <span class="c1"># All frames sent, close stream</span>
+            <span class="n">ctl</span><span class="o">.</span><span class="n">CloseStream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">,</span> <span class="n">s_handle</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">ctl</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Passing an error code to &quot;GetResultInfo&quot; returns a human readable string</span>
+            <span class="c1"># specifying the error.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MCS2 </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">, error: </span><span class="si">{}</span><span class="s2"> (0x</span><span class="si">{:04X}</span><span class="s2">) in line: </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">GetResultInfo</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">),</span> <span class="n">ctl</span><span class="o">.</span><span class="n">ErrorCode</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                          <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">)))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error: </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> in line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">ex</span><span class="p">),</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tb_lineno</span><span class="p">)))</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd"><a class="viewcode-back" href="../../../src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd">[docs]</a>    <span class="k">def</span> <span class="nf">streamStackAcquisition_externalTrigger_waitEnd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Wait for the &quot;stream done&quot; event.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="c1"># Cancel waiting for events.</span>
+        <span class="n">ctl</span><span class="o">.</span><span class="n">Cancel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_handle</span><span class="p">)</span>
+        <span class="c1"># Wait for the &quot;waitForEvent&quot; thread to terminate.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handle_thread_triggeredStream</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1">##test here code of this class</span>
+
+    <span class="n">stage_id</span> <span class="o">=</span> <span class="s1">&#39;network:sn:MCS2-00000382&#39;</span>
+
+    <span class="n">translationstage</span> <span class="o">=</span> <span class="n">SLC_translationstage</span><span class="p">(</span><span class="n">stage_id</span><span class="p">)</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">findReference</span><span class="p">()</span>
+    <span class="c1">#3000000 = 3 um</span>
+    <span class="c1">#translationstage.streamPosition(100, 3000000)</span>
+    <span class="n">position_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1000000000</span><span class="p">,</span> <span class="mi">2000000000</span><span class="p">,</span> <span class="mi">8000000000</span><span class="p">]</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">moveToPosition</span><span class="p">(</span><span class="n">position_list</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">streamStackAcquisition</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5000000</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">position_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3000000000</span><span class="p">,</span> <span class="o">-</span><span class="mi">2000000000</span><span class="p">,</span> <span class="o">-</span><span class="mi">8000000000</span><span class="p">]</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">moveToPosition</span><span class="p">(</span><span class="n">position_list</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">streamStackAcquisition</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5000000</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">position_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">moveToPosition</span><span class="p">(</span><span class="n">position_list</span><span class="p">)</span>
+    <span class="c1">#translationstage.stream_csvFile()</span>
+    <span class="c1">#translationstage.streamStackAcquisition(1000, 5000000)</span>
+    <span class="c1">#translationstage.stream_csvFile()</span>
+
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

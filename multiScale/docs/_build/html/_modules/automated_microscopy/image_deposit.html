@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>automated_microscopy.image_deposit &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">automated_microscopy.image_deposit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for automated_microscopy.image_deposit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tifffile</span> <span class="kn">import</span> <span class="n">imread</span><span class="p">,</span> <span class="n">imwrite</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<div class="viewcode-block" id="images_InMemory_class"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.image_deposit.images_InMemory_class">[docs]</a><span class="k">class</span> <span class="nc">images_InMemory_class</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class is containing the images for calculations of drift correction, template matching and other smart microscopy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_lowResMaxProjection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_lowResMaxProjection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResMaxprojection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResMaxProjection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial1projection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial1Projection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial2projection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial2Projection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionImageList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionImageList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial1ImageList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial1ImageList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial2ImageList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial2ImageList</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="images_InMemory_class.reset"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.image_deposit.images_InMemory_class.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        resets class to default value (without any images saved).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="images_InMemory_class.addNewImage"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.image_deposit.images_InMemory_class.addNewImage">[docs]</a>    <span class="k">def</span> <span class="nf">addNewImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whichlist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add an Image newly to a list.</span>
+<span class="sd">        :param whichlist: which list to add image - options: &quot;current_lowRes_Proj&quot;, &quot;previous_lowresProj&quot;,</span>
+<span class="sd">                          &quot;current_highRes_Proj&quot;, &quot;previous_highRes_Proj&quot;, &quot;current_transmissionImage&quot;,</span>
+<span class="sd">                          &quot;previous_transmissionImage&quot;, &quot;current_highRes_Axial1Proj&quot;, &quot;previous_highRes_Axial1Proj&quot;,</span>
+<span class="sd">                          &quot;current_highRes_Axial2Proj&quot;, &quot;previous_highRes_Axial2Proj&quot;, &quot;current_transmissionAxial1Image&quot;,</span>
+<span class="sd">                          &quot;current_transmissionAxial2Image&quot;,&quot;previous_transmissionAxial1Image&quot;, &quot;previous_transmissionAxial2Image&quot;</span>
+<span class="sd">        :param PosNumber: the corresponding position number</span>
+<span class="sd">        :param image:  the image to add</span>
+<span class="sd">        :return: updated list in class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_lowResMaxProjection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_lowresProj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_lowResMaxProjection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResMaxprojection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_highRes_Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResMaxProjection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Axial1Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial1projection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_highRes_Axial1Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial1Projection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Axial2Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial2projection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_highRes_Axial2Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial2Projection</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionImageList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_transmissionImage&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionImageList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial1ImageList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_transmissionAxial1Image&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial1ImageList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial2ImageList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_transmissionAxial2Image&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial2ImageList</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="images_InMemory_class.replaceImage"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.image_deposit.images_InMemory_class.replaceImage">[docs]</a>    <span class="k">def</span> <span class="nf">replaceImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whichlist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        replace an Image with index PosNumber in the list &quot;whichlist&quot; with image.</span>
+<span class="sd">        :param whichlist: which list to add image - options: &quot;current_lowRes_Proj&quot;, &quot;previous_lowresProj&quot;,</span>
+<span class="sd">                          &quot;current_highRes_Proj&quot;, &quot;previous_highRes_Proj&quot;, &quot;current_transmissionImage&quot;,</span>
+<span class="sd">                          &quot;previous_transmissionImage&quot;, &quot;current_highRes_Axial1Proj&quot;, &quot;previous_highRes_Axial1Proj&quot;,</span>
+<span class="sd">                          &quot;current_highRes_Axial2Proj&quot;, &quot;previous_highRes_Axial2Proj&quot;, &quot;current_transmissionAxial1Image&quot;,</span>
+<span class="sd">                          &quot;current_transmissionAxial2Image&quot;,&quot;previous_transmissionAxial1Image&quot;, &quot;previous_transmissionAxial2Image&quot;</span>
+<span class="sd">        :param PosNumber: the corresponding position number</span>
+<span class="sd">        :param image:  the image to add</span>
+<span class="sd">        :return: updated list in class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_lowResMaxProjection</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_lowResMaxProjection</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_lowresProj&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResMaxprojection</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResMaxProjection</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_highRes_Proj&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_highRes_Proj&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Axial1Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial1projection</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial1Projection</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_highRes_Axial1Proj&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_highRes_Axial1Proj&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Axial2Proj&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial2projection</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial2Projection</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_highRes_Axial2Proj&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_highRes_Axial2Proj&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionImageList</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionImageList</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_transmissionImage&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial1ImageList</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial1ImageList</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_transmissionAxial1Image&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial2ImageList</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial2ImageList</span><span class="p">,</span>
+                             <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_transmissionAxial2Image&quot;</span><span class="p">)</span></div>
+        <span class="c1"># if whichlist == &quot;previous_highRes_Proj&quot;:</span>
+        <span class="c1">#     self.previousTP_highResMaxProjection.append((PosNumber, image))</span>
+        <span class="c1"># if whichlist == &quot;transmission_ImageList&quot;:</span>
+        <span class="c1">#     self.driftcorrection_transmissionImageList.append((PosNumber, image))</span>
+
+    <span class="k">def</span> <span class="nf">_updatelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imagelist</span><span class="p">,</span> <span class="n">previousimagelist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">strcurrentlist</span><span class="p">,</span> <span class="n">strpreviouslist</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        helper function for replace image.</span>
+<span class="sd">        :param imagelist: list to change</span>
+<span class="sd">        :param previousimagelist: list of previous timepoint to change</span>
+<span class="sd">        :param PosNumber: entry number</span>
+<span class="sd">        :param image: image to update</span>
+<span class="sd">        :param strcurrentlist: string to current list</span>
+<span class="sd">        :param strpreviouslist: string to previous list</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found_image</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">#find entry in current image list, and update image in it</span>
+        <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imagelist</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">imagelist</span><span class="p">[</span><span class="nb">iter</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">PosNumber</span><span class="p">:</span>
+                <span class="n">found_image</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">temporaryimage</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">imagelist</span><span class="p">[</span><span class="nb">iter</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#copy so that it is not overwritten</span>
+                <span class="n">imagelist</span><span class="p">[</span><span class="nb">iter</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+                <span class="c1">#update previous time point list</span>
+                <span class="n">found_previous_image</span> <span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">iter2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">previousimagelist</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">previousimagelist</span><span class="p">[</span><span class="n">iter2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">PosNumber</span><span class="p">:</span>
+                        <span class="n">previousimagelist</span><span class="p">[</span><span class="n">iter2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">temporaryimage</span><span class="p">)</span>
+                        <span class="n">found_previous_image</span><span class="o">=</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">found_previous_image</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="c1">#if not found, add new image</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addNewImage</span><span class="p">(</span><span class="n">strpreviouslist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">temporaryimage</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">found_image</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#print(&quot;add new image&quot; + str(image.shape) + &quot;:&quot; + strcurrentlist)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addNewImage</span><span class="p">(</span><span class="n">strcurrentlist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+
+<div class="viewcode-block" id="images_InMemory_class.image_retrieval"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.image_deposit.images_InMemory_class.image_retrieval">[docs]</a>    <span class="k">def</span> <span class="nf">image_retrieval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">whichlist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get an image from a list</span>
+<span class="sd">        :param whichlist: which list to retrieve image - options: &quot;current_lowRes_Proj&quot;, &quot;previous_lowresProj&quot;,</span>
+<span class="sd">                          &quot;current_highRes_Proj&quot;, &quot;previous_highRes_Proj&quot;, &quot;current_transmissionImage&quot;,</span>
+<span class="sd">                          &quot;previous_transmissionImage&quot;, &quot;current_highRes_Axial1Proj&quot;, &quot;previous_highRes_Axial1Proj&quot;,</span>
+<span class="sd">                          &quot;current_highRes_Axial2Proj&quot;, &quot;previous_highRes_Axial2Proj&quot;, &quot;current_transmissionAxial1Image&quot;,</span>
+<span class="sd">                          &quot;current_transmissionAxial2Image&quot;,&quot;previous_transmissionAxial1Image&quot;, &quot;previous_transmissionAxial2Image&quot;</span>
+<span class="sd">        :param PosNumber: what is the Position Number (PosNumber) associated with the image</span>
+<span class="sd">        :return: image, or if image is not found returns an array with value zero: np.array([0]) for easy checking</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_lowResMaxProjection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_lowresProj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previousTP_lowResMaxProjection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResMaxprojection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_highRes_Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResMaxProjection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Axial1Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial1projection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_highRes_Axial1Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial1Projection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_highRes_Axial2Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentTP_highResAxial2projection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_highRes_Axial2Proj&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previousTP_highResAxial2Projection</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionImageList</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_transmissionImage&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionImageList</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial1ImageList</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_transmissionAxial1Image&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial1ImageList</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_transmissionAxial2ImageList</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whichlist</span> <span class="o">==</span> <span class="s2">&quot;previous_transmissionAxial2Image&quot;</span><span class="p">:</span>
+            <span class="n">returnimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_transmissionAxial2ImageList</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">returnimage</span></div>
+
+    <span class="k">def</span> <span class="nf">_image_retrievalSupport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currentlist</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        support function for function image_retrieval, searches a list for the right PosNumber element.</span>
+<span class="sd">        :param currentlist: list to search for PosNumber</span>
+<span class="sd">        :param PosNumber: Indicator number of the saved image</span>
+<span class="sd">        :return: image saved at the specific location - or an array with element 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found_image</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">currentlist</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">currentlist</span><span class="p">[</span><span class="nb">iter</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">PosNumber</span><span class="p">:</span>
+                <span class="n">returnimage_2</span> <span class="o">=</span> <span class="n">currentlist</span><span class="p">[</span><span class="nb">iter</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">found_image</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">found_image</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">returnimage_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">returnimage_2</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c1">#load some images to assign and replace images.</span>
+    <span class="n">image_deposit</span> <span class="o">=</span> <span class="n">images_InMemory_class</span><span class="p">()</span>
+    <span class="n">img_lowrestrans_name</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/transmission/lowres_transmission.tif&quot;</span>
+    <span class="n">img_lowrestrans</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_lowrestrans_name</span><span class="p">)</span>
+    <span class="n">img_crop_name</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/transmission/lowres_transmission_ROI.tif&quot;</span>
+    <span class="n">img_crop</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_crop_name</span><span class="p">)</span>
+    <span class="n">img_3</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/transmission/lowres_transmission_found.tif&quot;</span>
+    <span class="n">img_3</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_3</span><span class="p">)</span>
+
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">img_lowrestrans</span><span class="p">)</span>
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">img_3</span><span class="p">)</span>
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">img_lowrestrans</span><span class="p">)</span>
+
+    <span class="n">im1</span> <span class="o">=</span> <span class="n">image_deposit</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">im2</span> <span class="o">=</span> <span class="n">image_deposit</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;previous_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_lowrestrans</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="s1">&#39;False&#39;</span><span class="p">)</span>
+
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">img_crop</span><span class="p">)</span>
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">img_crop</span><span class="p">)</span>
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">img_crop</span><span class="p">)</span>
+
+    <span class="n">im3</span> <span class="o">=</span> <span class="n">image_deposit</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">im4</span> <span class="o">=</span> <span class="n">image_deposit</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;previous_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;next3&quot;</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im4</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="s1">&#39;False&#39;</span><span class="p">)</span>
+
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">img_lowrestrans</span><span class="p">)</span>
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">img_3</span><span class="p">)</span>
+    <span class="n">image_deposit</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">img_lowrestrans</span><span class="p">)</span>
+    <span class="n">im1</span> <span class="o">=</span> <span class="n">image_deposit</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">im2</span> <span class="o">=</span> <span class="n">image_deposit</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;previous_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="s1">&#39;False&#39;</span><span class="p">)</span>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

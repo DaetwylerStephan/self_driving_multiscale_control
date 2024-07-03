@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.stages.rotation_stage_cmd &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.stages.rotation_stage_cmd</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.stages.rotation_stage_cmd</h1><div class="highlight"><pre>
+<span></span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">rotation_stage_cmd.py</span>
+<span class="sd">========================================</span>
+<span class="sd">Script containing all functions to initialize and operate the rotation stage SR2812 from Smaract</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># Import MCSControl_PythonWrapper.py</span>
+<span class="kn">from</span> <span class="nn">.MCSControl.MCSControl_PythonWrapper</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># ### implement getchar() function for single character user input</span>
+<span class="k">class</span> <span class="nc">_GetchWindows</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">msvcrt</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">msvcrt</span>
+        <span class="k">return</span> <span class="n">msvcrt</span><span class="o">.</span><span class="n">getch</span><span class="p">()</span>
+
+<span class="n">getch</span> <span class="o">=</span> <span class="n">_GetchWindows</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SR2812_rotationstage"><a class="viewcode-back" href="../../../src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage">[docs]</a><span class="k">class</span> <span class="nc">SR2812_rotationstage</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locator</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize rotation stage parameters, and print out some parameters for debugging</span>
+<span class="sd">        Input: locator address of the rotation stage, e.g. usb:id:3948963323</span>
+<span class="sd">        Output: an initialized and connected stage.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># initialize some variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensorEnabled</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># initialize sensorEnbaled variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">()</span>  <span class="c1"># initialize MCS control handle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numOfChannels</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensorType</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_int</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">()</span>
+
+
+
+        <span class="c1"># check dll version (not really necessary)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">()</span>
+        <span class="n">SA_GetDLLVersion</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;DLL-version: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="c1"># /* Open the first MCS with USB interface in synchronous communication mode */</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_OpenSystem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">locator</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;sync,reset&#39;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span> <span class="n">SA_GetSensorEnabled_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">sensorEnabled</span><span class="p">)</span> <span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensorEnabled</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">SA_SENSOR_ENABLED</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sensors are enabled: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensorEnabled</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: sensor not enabled: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensorEnabled</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GetNumberOfChannels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numOfChannels</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of Channels: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numOfChannels</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="c1"># set channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1">#print out sensor type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GetSensorType_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensorType</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SensorType: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sensorType</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+
+
+<div class="viewcode-block" id="SR2812_rotationstage.ExitIfError"><a class="viewcode-back" href="../../../src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.ExitIfError">[docs]</a>    <span class="k">def</span> <span class="nf">ExitIfError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        MCS controller error message parser.</span>
+<span class="sd">        Input: status report of the stage</span>
+<span class="sd">        Output: print an error message if applicable</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#init error_msg variable</span>
+        <span class="n">error_msg</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_char_p</span><span class="p">()</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="n">SA_OK</span><span class="p">):</span>
+            <span class="n">SA_GetStatusInfo</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MCS error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error_msg</span><span class="o">.</span><span class="n">value</span><span class="p">[:]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="SR2812_rotationstage.moveToAngle"><a class="viewcode-back" href="../../../src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.moveToAngle">[docs]</a>    <span class="k">def</span> <span class="nf">moveToAngle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+        <span class="n">angleposition</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GotoAngleAbsolute_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">angleposition</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR2812_rotationstage.getAngle"><a class="viewcode-back" href="../../../src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.getAngle">[docs]</a>    <span class="k">def</span> <span class="nf">getAngle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">revolution</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">()</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_int</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GetAngle_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">revolution</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Position: </span><span class="si">{}</span><span class="s2"> ugrad (Press </span><span class="se">\&#39;</span><span class="s2">s</span><span class="se">\&#39;</span><span class="s2"> to change step size. Press </span><span class="se">\&#39;</span><span class="s2">q</span><span class="se">\&#39;</span><span class="s2"> to exit.)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR2812_rotationstage.ManualMove"><a class="viewcode-back" href="../../../src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.ManualMove">[docs]</a>    <span class="k">def</span> <span class="nf">ManualMove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Use the _GetchWindows class to manually operate the initialized stage from the command line.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">step_angle</span> <span class="o">=</span> <span class="mi">1000000</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ENTER COMMAND AND RETURN</span><span class="se">\n</span><span class="s2">&quot;</span> \
+              <span class="s2">&quot;+  Move positioner up by </span><span class="si">{}</span><span class="s2">mgrad</span><span class="se">\n</span><span class="s2">&quot;</span> \
+              <span class="s2">&quot;-  Move positioner down by </span><span class="si">{}</span><span class="s2">mgrad</span><span class="se">\n</span><span class="s2">&quot;</span> \
+              <span class="s2">&quot;s  Change step size</span><span class="se">\n</span><span class="s2">&quot;</span> \
+              <span class="s2">&quot;q  Quit program</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step_angle</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">step_angle</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">))</span>
+
+        <span class="c1"># // ----------------------------------------------------------------------------------</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">getch</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Enter step size (ugrad):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">step_angle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ENTER COMMAND AND RETURN</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                      <span class="s2">&quot;+  Move positioner up by </span><span class="si">{}</span><span class="s2">mgrad</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                      <span class="s2">&quot;-  Move positioner down by </span><span class="si">{}</span><span class="s2">mgrad</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                      <span class="s2">&quot;s  Change step size</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                      <span class="s2">&quot;q  Quit program</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step_angle</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">step_angle</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GotoAngleRelative_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="o">-</span><span class="n">step_angle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GotoAngleRelative_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">step_angle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+
+        <span class="c1"># - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span>
+        <span class="c1"># // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span>
+        <span class="c1"># // wait until movement has finished</span>
+        <span class="c1"># // in synchronous communication mode, the current status of each channel</span>
+        <span class="c1"># // must be checked periodically (&#39;polled&#39;) to know when a movement has</span>
+         <span class="c1"># // finished:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GetStatus_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">))</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">SA_TARGET_STATUS</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">SA_STOPPED_STATUS</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="c1"># // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span>
+
+            <span class="n">revolution</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_GetAngle_S</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">revolution</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Position: </span><span class="si">{}</span><span class="s2"> ugrad (Press </span><span class="se">\&#39;</span><span class="s2">s</span><span class="se">\&#39;</span><span class="s2"> to change step size. Press </span><span class="se">\&#39;</span><span class="s2">q</span><span class="se">\&#39;</span><span class="s2"> to exit.)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
+                <span class="c1"># // - - - - - - - - - - -</span>
+
+<div class="viewcode-block" id="SR2812_rotationstage.close"><a class="viewcode-back" href="../../../src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># /* At the end of the program you should release all opened systems. */</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ExitIfError</span><span class="p">(</span><span class="n">SA_CloseSystem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcsHandle</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stage closed&#39;</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1">##test here code of this class</span>
+
+    <span class="n">stage_id</span> <span class="o">=</span> <span class="s1">&#39;usb:id:3948963323&#39;</span>
+
+    <span class="n">rotationstage</span> <span class="o">=</span> <span class="n">SR2812_rotationstage</span><span class="p">(</span><span class="n">stage_id</span><span class="p">)</span>
+    <span class="n">rotationstage</span><span class="o">.</span><span class="n">ManualMove</span><span class="p">()</span>
+    <span class="n">rotationstage</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

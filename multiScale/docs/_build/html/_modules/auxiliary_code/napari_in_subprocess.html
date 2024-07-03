@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>auxiliary_code.napari_in_subprocess &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">auxiliary_code.napari_in_subprocess</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for auxiliary_code.napari_in_subprocess</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># Printing from a child process is tricky:</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">redirect_stdout</span>
+<span class="c1"># Showing exceptions from a child process is tricky:</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="c1"># Napari/Qt stuff</span>
+<span class="kn">import</span> <span class="nn">napari</span>
+<span class="kn">from</span> <span class="nn">qtpy.QtCore</span> <span class="kn">import</span> <span class="n">QTimer</span>
+<span class="c1"># Our stuff</span>
+<span class="kn">from</span> <span class="nn">.concurrency_tools</span> <span class="kn">import</span> <span class="n">ObjectInSubprocess</span><span class="p">,</span> <span class="n">SharedNDArray</span><span class="p">,</span> <span class="n">_dummy_function</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">auxiliary_code.constants</span> <span class="kn">import</span> <span class="n">Camera_parameters</span>
+
+
+<div class="viewcode-block" id="display"><a class="viewcode-back" href="../../auxiliary_code.html#auxiliary_code.napari_in_subprocess.display">[docs]</a><span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="n">display_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a simplified non-blocking napari viewer in a subprocess.</span>
+
+<span class="sd">    If you don&#39;t know what you&#39;re doing, this is probably the only thing</span>
+<span class="sd">    you should import from this module.</span>
+
+<span class="sd">    If you&#39;re using a custom _NapariDisplay, pass it as `display_type`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">display_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">display_type</span> <span class="o">=</span> <span class="n">_NapariDisplay</span>
+    <span class="n">display</span> <span class="o">=</span> <span class="n">ObjectInSubprocess</span><span class="p">(</span><span class="n">display_type</span><span class="p">,</span> <span class="n">custom_loop</span><span class="o">=</span><span class="n">_napari_child_loop</span><span class="p">,</span>
+                                 <span class="n">close_method_name</span><span class="o">=</span><span class="s1">&#39;close&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">display</span></div>
+
+<span class="k">class</span> <span class="nc">_NapariDisplay</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is a barebones example of a simplified napari viewer.</span>
+
+<span class="sd">    The idea is to expose a subset of napari&#39;s rich, deep API as a shallow,</span>
+<span class="sd">    simple API that concurrency_tools.ObjectInSubprocess can handle.</span>
+
+<span class="sd">    We encourage you to define your own version of this class to suit your</span>
+<span class="sd">    purposes. The only requirement is that it has a `close` method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span> <span class="o">=</span> <span class="n">napari</span><span class="o">.</span><span class="n">Viewer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowrespreview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Camera_parameters</span><span class="o">.</span><span class="n">LR_height_pixel</span><span class="p">,</span> <span class="n">Camera_parameters</span><span class="o">.</span><span class="n">LR_width_pixel</span><span class="p">)),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lowres_preview&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowrespreview</span><span class="o">.</span><span class="n">contrast_limits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highrespreview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Camera_parameters</span><span class="o">.</span><span class="n">HR_height_pixel</span><span class="p">,</span> <span class="n">Camera_parameters</span><span class="o">.</span><span class="n">HR_width_pixel</span><span class="p">)),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;highres_preview&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highrespreview</span><span class="o">.</span><span class="n">contrast_limits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">show_image_lowres</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lowrespreview</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">im</span>
+
+    <span class="k">def</span> <span class="nf">show_image_highres</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">highrespreview</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">im</span>
+
+    <span class="k">def</span> <span class="nf">show_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;stack_image&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack_image</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">im</span>
+
+    <span class="k">def</span> <span class="nf">show_maxproj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;stack_maxproj_image&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack_maxproj_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stack max projections&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack_maxproj_image</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">im</span>
+
+    <span class="k">def</span> <span class="nf">set_contrast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">,</span> <span class="n">imagetoscale</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">imagetoscale</span> <span class="o">==</span> <span class="s2">&quot;highrespreview&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">highrespreview</span><span class="o">.</span><span class="n">contrast_limits_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">highrespreview</span><span class="o">.</span><span class="n">contrast_limits</span> <span class="o">=</span> <span class="p">(</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;updated ---------------------------------------2&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">imagetoscale</span> <span class="o">==</span> <span class="s2">&quot;lowrespreview&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;updated ---------------------------------------2low&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">lowrespreview</span><span class="o">.</span><span class="n">contrast_limits_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lowrespreview</span><span class="o">.</span><span class="n">contrast_limits</span> <span class="o">=</span> <span class="p">(</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1"># We&#39;re pretty confident that you shouldn&#39;t have to understand anything below</span>
+<span class="c1"># this. If you want to extend the functionality of the simplified napari viewer</span>
+<span class="c1"># this can probably be done by creating your own modified version of the</span>
+<span class="c1"># _NapariDisplay class above.</span>
+
+<span class="k">def</span> <span class="nf">_napari_child_loop</span><span class="p">(</span><span class="n">child_pipe</span><span class="p">,</span> <span class="n">initializer</span><span class="p">,</span> <span class="n">initargs</span><span class="p">,</span> <span class="n">initkwargs</span><span class="p">,</span>
+                       <span class="n">close_method_name</span><span class="p">,</span> <span class="n">closeargs</span><span class="p">,</span> <span class="n">closekwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Teach Qt&#39;s event loop how to act like an ObjectInSubprocess&#39;s child</span>
+<span class="sd">    process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">closeargs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span> <span class="k">if</span> <span class="n">closeargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">closeargs</span>
+    <span class="n">closekwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">closekwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">closekwargs</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">{</span> <span class="c1"># Mutable, to store the state of the child object.</span>
+        <span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;initial_init&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="k">while</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">]:</span>
+        <span class="c1"># We&#39;d ideally check that the pipe was still healthy, but we don&#39;t know</span>
+        <span class="c1"># how to do that gracefully.</span>
+        <span class="k">with</span> <span class="n">napari</span><span class="o">.</span><span class="n">gui_qt</span><span class="p">():</span>
+            <span class="c1"># Initialize a napari-specific object</span>
+            <span class="n">printed_output</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span> <span class="c1"># Create an instance of our napari object...</span>
+                <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">printed_output</span><span class="p">):</span>
+                    <span class="n">obj</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="o">*</span><span class="n">initargs</span><span class="p">,</span> <span class="o">**</span><span class="n">initkwargs</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">close_method_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">close_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">close_method_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;initial_init&#39;</span><span class="p">]:</span>
+                    <span class="n">child_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;Successfully initialized&#39;</span><span class="p">,</span>
+                                     <span class="n">printed_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()))</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;initial_init&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span> <span class="c1"># If we fail to initialize, just give up.</span>
+                <span class="c1"># If this isn&#39;t the initial init, this exception will substitute</span>
+                <span class="c1"># for the response to the next method call of the proxied napari</span>
+                <span class="c1"># object.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exception occurred while trying to initialize napari!&#39;</span><span class="p">)</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">child_traceback_string</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                <span class="n">child_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">e</span><span class="p">,</span> <span class="n">printed_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()))</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">command_timer</span> <span class="o">=</span> <span class="n">QTimer</span><span class="p">()</span>
+            <span class="k">def</span> <span class="nf">communicate</span><span class="p">():</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Execute commands from the main process.</span>
+
+<span class="sd">                Periodically called by Qt&#39;s event loop.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="n">printed_output</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">child_pipe</span><span class="o">.</span><span class="n">poll</span><span class="p">():</span>
+                        <span class="k">return</span>
+                <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
+                    <span class="c1"># Windows raises this if parent closes the pipe.</span>
+                    <span class="c1"># If the pipe is closed, we should close too.</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">close_method_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">close_method</span><span class="p">(</span><span class="o">*</span><span class="n">closeargs</span><span class="p">,</span> <span class="o">**</span><span class="n">closekwargs</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="n">child_pipe</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
+                    <span class="c1"># If the pipe is closed and there is nothing to receive,</span>
+                    <span class="c1"># we should close too.</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">close_method_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">close_method</span><span class="p">(</span><span class="o">*</span><span class="n">closeargs</span><span class="p">,</span> <span class="o">**</span><span class="n">closekwargs</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="n">cmd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># This is how the parent signals us to exit.</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">close_method_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">close_method</span><span class="p">(</span><span class="o">*</span><span class="n">closeargs</span><span class="p">,</span> <span class="o">**</span><span class="n">closekwargs</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="n">method_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">cmd</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">printed_output</span><span class="p">):</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">_dummy_function</span> <span class="c1"># Cheaper than a real callable</span>
+                    <span class="n">child_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">result</span><span class="p">,</span> <span class="n">printed_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()))</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">e</span><span class="o">.</span><span class="n">child_traceback_string</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                    <span class="n">child_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">e</span><span class="p">,</span> <span class="n">printed_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()))</span>
+
+            <span class="n">command_timer</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">communicate</span><span class="p">)</span>
+            <span class="n">command_timer_interval_ms</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">command_timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">command_timer_interval_ms</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;keep_launching_napari&#39;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Blocks until something is in pipe or pipe is broken.</span>
+                <span class="n">child_pipe</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
+                <span class="k">return</span>
+
+<span class="c1"># A mocked &quot;microscope&quot; object for testing and demonstrating proxied</span>
+<span class="c1"># Napari displays. Since this is just for testing our imports are ugly:</span>
+<span class="k">class</span> <span class="nc">_Microscope</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">queue</span>
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_buffers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">SharedNDArray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">2060</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_buffer_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_buffers</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_buffer_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Displaying&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_buffers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">data_buffers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="s1">&#39;images.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="n">ObjectInSubprocess</span><span class="p">(</span><span class="n">_Camera</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">display</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">snap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="kn">from</span> <span class="nn">concurrency_tools</span> <span class="kn">import</span> <span class="n">CustodyThread</span>
+        <span class="k">def</span> <span class="nf">snap_task</span><span class="p">(</span><span class="n">custody</span><span class="p">):</span>
+            <span class="n">custody</span><span class="o">.</span><span class="n">switch_from</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="p">)</span>
+            <span class="n">which_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_buffer_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">data_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_buffers</span><span class="p">[</span><span class="n">which_buffer</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">data_buffer</span><span class="p">)</span>
+            <span class="n">custody</span><span class="o">.</span><span class="n">switch_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">show_image</span><span class="p">(</span><span class="n">data_buffer</span><span class="p">)</span>
+            <span class="n">custody</span><span class="o">.</span><span class="n">switch_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_buffer_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">which_buffer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+                <span class="n">time_elapsed</span> <span class="o">=</span>  <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.2f</span><span class="s2"> average FPS&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">/</span> <span class="n">time_elapsed</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">CustodyThread</span><span class="p">(</span><span class="n">first_resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">snap_task</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">_Camera</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">scope</span> <span class="o">=</span> <span class="n">_Microscope</span><span class="p">()</span>
+    <span class="n">snap_threads</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Launching a ton of &#39;snap&#39; threads...&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">snap</span><span class="p">()</span>
+        <span class="n">snap_threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snap_threads</span><span class="p">),</span> <span class="s2">&quot;&#39;snap&#39; threads launched.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">th</span> <span class="ow">in</span> <span class="n">snap_threads</span><span class="p">:</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All &#39;snap&#39; threads finished execution.&quot;</span><span class="p">)</span>
+    <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Hit enter to close napari...&#39;</span><span class="p">)</span>
+    <span class="c1"># This will just close the viewer, not the child process.</span>
+    <span class="n">scope</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># If you want to stop the child process before the end of the script,</span>
+    <span class="c1"># all you have to do is remove all references to the object:</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">display</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+    <span class="n">scope</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># or del scope.display</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">con</span><span class="o">.</span><span class="n">child_process</span><span class="o">.</span><span class="n">is_alive</span><span class="p">(),</span> <span class="s1">&#39;Napari process should be dead!&#39;</span>
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

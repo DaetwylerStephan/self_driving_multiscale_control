@@ -1,0 +1,54 @@
+.. self-driving multi-scale imaging documentation master file, created by
+   sphinx-quickstart on Tue Jul  2 17:26:50 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to self-driving multi-scale imaging's documentation!
+============================================================
+
+**Self-driving, multi-scale software** is an open-source Python software for custom multi-scale
+light-sheet microscope control where the low-resolution guides high-resolution acquisition over hours of imaging.
+Thereby, the software follows an MVC design pattern with:
+
+* the controller: multiScale_main.py
+* the model: multiScope.py with all hardware control code in src (camera, filter wheel, slit, stages, ni_board)
+* the viewer: gui folder and auxiliary_code (napari_in_subprocess.py)
+
+The hardware are synchronized in time using an NI DAQ card (ni_board). The voltage arrays for the NI board are generated in the acquisition_array_class.py file.
+
+
+
+
+.. note::
+
+   This project is under active development. See our `GitHub repository for updates
+   <https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging>`_.
+
+.. warning::
+
+    Please be advised that there are inherent risks associated with the use of this software.
+    Despite precautions, the complexity and nature of automated software and
+    hardware can lead to unpredictable outcomes. Therefore, the Fiolka Lab and UT
+    Southwestern expressly disclaim any responsibility for any damages, losses, or
+    injuries that may arise from or be related to the use of this software.
+    Users should be aware of these risks and agree to utilize this software at their own risk.
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+**Funding**
+============
+This software is supported by the
+
+- NIH National Cancer Institute (1U54CA268072).
+- Swiss National Science Foundation (191347 to S.D)
+- NIGMS National Institute of General Medical Sciences (R35 GM133522 to R.F.)
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

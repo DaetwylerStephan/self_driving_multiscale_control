@@ -104,7 +104,7 @@ class Run_Tab(tk.Frame):
         roi_settings.grid(row=4, column=3, rowspan=2, sticky=tk.W + tk.E+tk.S+tk.N)
 
         #define some labels here to ensure existance for code
-        self.stack_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
+        #self.stack_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
         self.timelapse_aq_progressindicator = tk.Label(statusprogress_settings, text=" 0 of 0")
 
         ### ----------------------------laser settings -----------------------------------------------------------------
@@ -399,12 +399,12 @@ class Run_Tab(tk.Frame):
         self.roi_applybutton.grid(row=2, column=6,columnspan=1,sticky = tk.W + tk.E)
 
         ### ----------------------------progress display settings ------------------------------------------------------
-        stackprogress_label = ttk.Label(statusprogress_settings, text="Stack progress:").grid(row=1, column=0)
+        #stackprogress_label = ttk.Label(statusprogress_settings, text="Stack progress:").grid(row=1, column=0)
         self.stack_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.stack_aq_progress,
                                                         maximum=self.stack_aq_numberOfPlanes_lowres.get())
-        self.stack_aq_progressbar.grid(row=1, column=2, sticky=tk.E)
-        self.stack_aq_progressindicator.config(text="0 of " + str(self.stack_aq_numberOfPlanes_lowres.get()))
-        self.stack_aq_progressindicator.grid(row=1, column=4, sticky=tk.E)
+        # self.stack_aq_progressbar.grid(row=1, column=2, sticky=tk.E)
+        # self.stack_aq_progressindicator.config(text="0 of " + str(self.stack_aq_numberOfPlanes_lowres.get()))
+        # self.stack_aq_progressindicator.grid(row=1, column=4, sticky=tk.E)
 
         timelapseprogress_label = ttk.Label(statusprogress_settings, text="Timelapse progress:").grid(row=2, column=0)
         self.timelapse_aq_progressbar = ttk.Progressbar(statusprogress_settings, variable=self.timelapse_aq_progress, maximum=self.timelapse_aq_nbTimepoints)

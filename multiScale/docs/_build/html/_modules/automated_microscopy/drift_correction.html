@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>automated_microscopy.drift_correction &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">automated_microscopy.drift_correction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for automated_microscopy.drift_correction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tifffile</span> <span class="kn">import</span> <span class="n">imread</span><span class="p">,</span> <span class="n">imwrite</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">auxiliary_code.constants</span> <span class="kn">import</span> <span class="n">Image_parameters</span>
+<span class="kn">from</span> <span class="nn">automated_microscopy.template_matching</span> <span class="kn">import</span> <span class="n">automated_templateMatching</span>
+<span class="kn">from</span> <span class="nn">automated_microscopy.image_deposit</span> <span class="kn">import</span> <span class="n">images_InMemory_class</span>
+
+<span class="kn">from</span> <span class="nn">pystackreg</span> <span class="kn">import</span> <span class="n">StackReg</span>
+<span class="kn">import</span> <span class="nn">pystackreg</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">transform</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">exposure</span>
+
+<div class="viewcode-block" id="drift_correction"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction">[docs]</a><span class="k">class</span> <span class="nc">drift_correction</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">lowres_PosList</span><span class="p">,</span>
+                 <span class="n">highres_PosList</span><span class="p">,</span>
+                 <span class="n">lowres_zspacing</span><span class="p">,</span>
+                 <span class="n">highres_zspacing</span><span class="p">,</span>
+                 <span class="n">highresShape_width</span><span class="p">,</span>
+                 <span class="n">highresShape_height</span><span class="p">,</span>
+                 <span class="n">timepoint</span><span class="p">,</span>
+                 <span class="n">imageRepoLists</span><span class="p">,</span>
+                 <span class="n">debugfilepath</span><span class="o">=</span><span class="s2">&quot;path.txt&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param lowres_PosList: the list of position of the low resolution imaging</span>
+<span class="sd">        :param highres_PosList: the list of position of the high resolution imaging</span>
+<span class="sd">        :param lowres_zspacing: the plane spacing of the low resolution stacks</span>
+<span class="sd">        :param highres_zspacing: the plane spacing of the high resolution stacks</span>
+<span class="sd">        :param highresShape_width: width of image, convention: np.array(height, width) and cv2.function(width, height)</span>
+<span class="sd">        :param highresShape_height: height of image (lowres max 5092 / highres max 2048)</span>
+<span class="sd">        :param lowresShape_width: width of image, convention: np.array(height, width) and cv2.function(width, height)</span>
+<span class="sd">        :param lowresShape_height: height of low res image (lowres max 5092 / highres max 2048)</span>
+<span class="sd">        :param filepath: (optional) filepath to logging the drift correction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#init it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span> <span class="o">=</span> <span class="n">lowres_PosList</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span> <span class="o">=</span> <span class="n">highres_PosList</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalingfactor</span> <span class="o">=</span> <span class="mf">11.11</span> <span class="o">/</span> <span class="mf">4.25</span> <span class="o">*</span><span class="mi">1000</span> <span class="c1">#scalingfactor for how much one mm is in pixel on low res view</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalingfactorLowToHighres</span> <span class="o">=</span> <span class="mf">11.11</span> <span class="o">/</span> <span class="mf">55.55</span> <span class="o">*</span> <span class="mf">6.5</span> <span class="o">/</span> <span class="mf">4.25</span> <span class="c1">#scalingfactor for high/low res camera views</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibration_height</span> <span class="o">=</span> <span class="mi">130</span> <span class="c1">#pixel difference height between center of camera field of low res and high res</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibration_width</span> <span class="o">=</span> <span class="mi">159</span> <span class="c1">#pixel difference width between center of camera field of low res and high res</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowres_zspacing</span> <span class="o">=</span> <span class="n">lowres_zspacing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highres_zspacing</span> <span class="o">=</span> <span class="n">highres_zspacing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highres_width</span> <span class="o">=</span> <span class="n">highresShape_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highres_height</span> <span class="o">=</span> <span class="n">highresShape_height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># an array to indicate whether the drift correction was completed.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span> <span class="o">=</span> <span class="n">imageRepoLists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">increase_crop_size</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c1">#in transmission image - increase crop size of image for better template matching</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">=</span> <span class="n">timepoint</span>
+
+        <span class="c1">#check for filepath - if provided, enter debug mode to save temporary images to debug folder</span>
+        <span class="k">if</span> <span class="n">debugfilepath</span> <span class="o">==</span><span class="s2">&quot;path.txt&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debugmode</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">debugfilepath</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debugmode</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span> <span class="o">=</span> <span class="n">debugfilepath</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">templatematching</span> <span class="o">=</span> <span class="n">automated_templateMatching</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lock_2</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="drift_correction.calculate_drift_highRes"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.calculate_drift_highRes">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_drift_highRes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyview</span><span class="p">,</span> <span class="n">xzview</span><span class="p">,</span> <span class="n">yzview</span><span class="p">,</span> <span class="n">previousimage</span><span class="p">,</span> <span class="n">z_step</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        calculate drift based on high resolution images from previous timepoint, and update position list</span>
+<span class="sd">        :param xyview:</span>
+<span class="sd">        :param xzview:</span>
+<span class="sd">        :param yzview:</span>
+<span class="sd">        :param previousimage: file path to previous time point image</span>
+<span class="sd">        :param z_step:</span>
+<span class="sd">        :param PosNumber: unique ID of stack</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1">#load timepoint</span>
+        <span class="n">isExist</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">previousimage</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">isExist</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Wanted to make drift correction to reference image that does not exist&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="c1">#return if file does not exist - e.g. for first timepoint</span>
+
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">previousimage</span><span class="p">)</span>
+
+        <span class="n">ref_xy</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">xyview</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">:</span><span class="n">xyview</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">ref_yz</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">xyview</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xyview</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:]</span>
+        <span class="n">ref_xz</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="n">xyview</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">xyview</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="k">assert</span> <span class="n">ref_xy</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">xyview</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">assert</span> <span class="n">ref_yz</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">yzview</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">assert</span> <span class="n">ref_xz</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">xzview</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">correctX1</span><span class="p">,</span> <span class="n">correctY1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_image</span><span class="p">(</span><span class="n">ref_xy</span><span class="p">,</span> <span class="n">xyview</span><span class="p">,</span> <span class="s1">&#39;translation&#39;</span><span class="p">)</span>
+        <span class="n">correctZ1</span><span class="p">,</span> <span class="n">correctY2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_image</span><span class="p">(</span><span class="n">ref_yz</span><span class="p">,</span> <span class="n">yzview</span><span class="p">,</span> <span class="s1">&#39;translation&#39;</span><span class="p">)</span>
+        <span class="n">correctX2</span><span class="p">,</span> <span class="n">correctZ2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_image</span><span class="p">(</span><span class="n">ref_xz</span><span class="p">,</span> <span class="n">xzview</span><span class="p">,</span> <span class="s1">&#39;translation&#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">correctX1</span><span class="p">,</span> <span class="n">correctX2</span><span class="p">,</span> <span class="n">correctY1</span><span class="p">,</span> <span class="n">correctY2</span><span class="p">,</span> <span class="n">correctZ1</span><span class="p">,</span> <span class="n">correctZ2</span><span class="p">)</span>
+
+        <span class="n">correctX_mm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span> <span class="o">*</span> <span class="n">Image_parameters</span><span class="o">.</span><span class="n">xy_pixelsize_highres_um</span> <span class="o">*</span> <span class="p">(</span><span class="n">correctX1</span> <span class="o">+</span> <span class="n">correctX2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+        <span class="n">correctY_mm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span> <span class="o">*</span> <span class="n">Image_parameters</span><span class="o">.</span><span class="n">xy_pixelsize_highres_um</span> <span class="o">*</span> <span class="p">(</span><span class="n">correctY1</span> <span class="o">+</span> <span class="n">correctY2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+        <span class="n">correctZ_mm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span> <span class="o">*</span> <span class="n">z_step</span> <span class="o">*</span> <span class="p">(</span><span class="n">correctZ1</span> <span class="o">+</span> <span class="n">correctZ2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+
+        <span class="n">correctionarray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">correctX_mm</span><span class="p">,</span> <span class="n">correctY_mm</span><span class="p">,</span> <span class="n">correctZ_mm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">correctX_mm</span><span class="p">,</span><span class="n">correctY_mm</span><span class="p">,</span> <span class="n">correctZ_mm</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">correctionarray</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="c1">#print(&quot;y:&quot; + str(y))</span>
+        <span class="n">newposition</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+        <span class="c1">#print(newposition)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;position list: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)]</span> <span class="o">=</span> <span class="n">newposition</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;position list updated: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)]))</span></div>
+
+
+<div class="viewcode-block" id="drift_correction.find_corresponsingHighResTiles"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles">[docs]</a>    <span class="k">def</span> <span class="nf">find_corresponsingHighResTiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LowResPosNumber</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        find all high resolution stacks that are closest to a given low res view (of the same angle)</span>
+<span class="sd">        :param LowResPosNumber: position of the low resolution view in the lowres position list.</span>
+<span class="sd">        :return: list of all highres stacks PosNumbers which are assigned to low resolution stack.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="n">list_highresregions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">highresline</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">)):</span>
+            <span class="n">posnumberhighres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">highresline</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">lowresnb_current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_closestLowResTile</span><span class="p">(</span><span class="n">posnumberhighres</span><span class="p">,</span> <span class="n">return_number</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">lowresnb_current</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lowresnb_current</span> <span class="o">==</span> <span class="n">LowResPosNumber</span><span class="p">:</span>
+                <span class="n">highresPosNb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">highresline</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span> <span class="c1">#get unique ID from highres position</span>
+                <span class="n">list_highresregions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">highresPosNb</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">list_highresregions</span></div>
+
+    <span class="k">def</span> <span class="nf">_find_Index_of_PosNumber</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lock_2</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="nb">iter</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="n">PosNumber</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="nb">iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lock_2</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">index</span>
+
+<div class="viewcode-block" id="drift_correction.find_closestLowResTile"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.find_closestLowResTile">[docs]</a>    <span class="k">def</span> <span class="nf">find_closestLowResTile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">return_number</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        find corresponding low resolution stack to selected high-res region (PosNumber) (of the same angle).</span>
+<span class="sd">        :param PosNumber: position of the highres view in the highres position list with unique ID.</span>
+<span class="sd">        :param return_number: if True, return number e.g. 1, if False return string for filename &quot;low_stack000&quot;</span>
+<span class="sd">        :return: the corresponding file name of the low resolution stack which is closest to the high res stack.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">highrespoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)][</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)][</span><span class="mi">4</span><span class="p">]))</span>
+
+        <span class="n">positioniter</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">positionnumber</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">lowresline</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span><span class="p">)):</span>
+            <span class="n">positioniter</span> <span class="o">=</span> <span class="n">positioniter</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c1"># get current position from list</span>
+
+            <span class="n">angleLow</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span><span class="p">[</span><span class="n">lowresline</span><span class="p">][</span><span class="mi">4</span><span class="p">]))</span>
+            <span class="n">lowrespoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span><span class="p">[</span><span class="n">lowresline</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">angle</span><span class="o">==</span><span class="n">angleLow</span><span class="p">:</span>
+                <span class="n">dist_current</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">highrespoint</span> <span class="o">-</span> <span class="n">lowrespoint</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">dist</span> <span class="o">=</span> <span class="n">dist_current</span>
+                    <span class="n">pos_label_line</span> <span class="o">=</span> <span class="s2">&quot;low_stack&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">positioniter</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">positionnumber</span> <span class="o">=</span> <span class="n">positioniter</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">dist_current</span><span class="p">:</span>
+                    <span class="n">dist</span> <span class="o">=</span> <span class="n">dist_current</span>
+                    <span class="n">pos_label_line</span> <span class="o">=</span> <span class="s2">&quot;low_stack&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">positioniter</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">positionnumber</span> <span class="o">=</span> <span class="n">positioniter</span>
+
+        <span class="k">if</span> <span class="n">return_number</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pos_label_line</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">positionnumber</span></div>
+
+<div class="viewcode-block" id="drift_correction.calculate_Lateral_drift"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_Lateral_drift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PosNumberID</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;fluorescence&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        calculates lateral drift correction based on low res view.</span>
+<span class="sd">        :param PosNumber: which entry of the highres list with ID=PosNumber are you trying to correct?</span>
+<span class="sd">        :param mode: what drift correction are you running? e.g. on transmission image or fluorescence image</span>
+<span class="sd">        :return: (rownumber, columnnumber, crop_height, crop_width) - the position of the newly found view in the max projection</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">lateralId</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">UpDownID</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">PosNumber</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">PosNumberID</span><span class="p">)</span>
+
+        <span class="c1">#transmission is different as there is no 1-to-1 correspondance between lowres and highres view. Therefore, one needs to first establish</span>
+        <span class="c1">#an image of the region to follow. This image is saved in the image list</span>
+        <span class="c1">#if mode==&quot;transmission&quot;:</span>
+        <span class="k">if</span> <span class="mi">1</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Use transmission image for drift correction&#39;</span><span class="p">)</span>
+
+            <span class="c1"># retrieve corresponding high res image</span>
+            <span class="n">image_transmission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+
+            <span class="c1">#establish the position of the first tile.</span>
+            <span class="k">if</span> <span class="n">image_transmission</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Establish first corresponding transmission image&#39;</span><span class="p">)</span>
+
+                <span class="c1">#find corresponding low resolution tile to high resolution image and get coordinates.</span>
+                <span class="n">lowstacknumber</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_closestLowResTile</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">return_number</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="n">coordinates_lowres</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span><span class="p">[</span><span class="n">lowstacknumber</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+                <span class="n">coordinates_highres</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)][</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+
+                <span class="c1"># get low resolution image</span>
+                <span class="n">img_lowrestrans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">,</span> <span class="n">lowstacknumber</span><span class="p">)</span>
+
+                <span class="c1">#calulate pixel coordinates from physical stage coordinates</span>
+                <span class="n">loc</span><span class="p">,</span> <span class="n">pixel_width_highresInLowres</span><span class="p">,</span> <span class="n">pixel_height_highresInLowres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_pixelcoord_from_physicalcoordinates</span><span class="p">(</span><span class="n">coordinates_lowres</span><span class="p">,</span> <span class="n">coordinates_highres</span><span class="p">,</span> <span class="n">img_lowrestrans</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+                <span class="c1">#retrieve region in lowres view of highres view</span>
+                <span class="n">corresponding_lowres_view</span> <span class="o">=</span> <span class="n">img_lowrestrans</span><span class="p">[</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]:(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">pixel_height_highresInLowres</span><span class="p">),</span> <span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]:(</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">pixel_width_highresInLowres</span><span class="p">)]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;corr&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">corresponding_lowres_view</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+                <span class="c1">#assign the image to the image list</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">corresponding_lowres_view</span><span class="p">))</span>
+
+                <span class="c1"># debug mode - save image</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugmode</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="c1">#generate filenames</span>
+                    <span class="n">file_maxproj</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span><span class="p">,</span> <span class="s2">&quot;transmission_maxproj_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
+                    <span class="c1">#save files</span>
+                    <span class="c1">#img_rgb_sc = cv2.rectangle(img_lowrestrans, (loc[1], loc[0]), (loc[1] + pixel_w_highresInLowres, loc[0] + pixel_h_highresInLowres), (0, 255, 255), 2)</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">file_maxproj</span><span class="p">,</span> <span class="n">corresponding_lowres_view</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pixel_height_highresInLowres</span><span class="p">,</span> <span class="n">pixel_width_highresInLowres</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># if not first time, take previous image and find corresponding image in translation image with template matching</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;perform matching on transmission image&quot;</span><span class="p">)</span>
+
+                <span class="c1">#get corresponding low res stack</span>
+                <span class="n">stacknumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_closestLowResTile</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">,</span> <span class="n">return_number</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">lowresstackimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">,</span> <span class="n">stacknumber</span><span class="p">)</span>
+                <span class="n">currenthighresPosindex</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span>
+
+                <span class="c1">#perform template matching</span>
+                <span class="p">(</span><span class="n">row_number</span><span class="p">,</span> <span class="n">column_number</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">templatematching</span><span class="o">.</span><span class="n">scaling_templateMatching_multiprocessing</span><span class="p">(</span><span class="n">lowresstackimage</span><span class="p">,</span> <span class="n">image_transmission</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1">#update image in &quot;current_transmissionImage&quot; list</span>
+                <span class="n">pixel_width_highresInLowres</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactorLowToHighres</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">increase_crop_size</span><span class="p">)</span>
+                <span class="n">pixel_height_highresInLowres</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactorLowToHighres</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">increase_crop_size</span><span class="p">)</span>
+                <span class="n">current_crop_image</span> <span class="o">=</span> <span class="n">lowresstackimage</span><span class="p">[</span><span class="n">row_number</span><span class="p">:(</span><span class="n">row_number</span><span class="o">+</span><span class="n">pixel_height_highresInLowres</span><span class="p">),</span> <span class="n">column_number</span><span class="p">:(</span><span class="n">column_number</span><span class="o">+</span><span class="n">pixel_width_highresInLowres</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_crop_image</span><span class="p">))</span>
+
+
+                <span class="c1">#calculate the physical position of where to image highres stack</span>
+                <span class="c1">#1.calculate middle position</span>
+                <span class="n">center_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lowresstackimage</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_width</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lowresstackimage</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_height</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;center: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">center_pixel</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pixel height: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pixel_height_highresInLowres</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pixel width&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pixel_width_highresInLowres</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;row &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_number</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; column_number: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_number</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scaling factor&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactor</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lowrespos&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span><span class="p">[</span><span class="n">stacknumber</span><span class="p">]))</span>
+                <span class="n">row_number_middle</span> <span class="o">=</span> <span class="n">row_number</span> <span class="o">+</span> <span class="n">pixel_height_highresInLowres</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">column_number_middle</span> <span class="o">=</span> <span class="n">column_number</span> <span class="o">+</span> <span class="n">pixel_width_highresInLowres</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">mm_difference</span> <span class="o">=</span> <span class="p">((</span><span class="n">row_number_middle</span> <span class="o">-</span> <span class="n">center_pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactor</span><span class="p">,</span> <span class="p">(</span><span class="n">column_number_middle</span> <span class="o">-</span> <span class="n">center_pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactor</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lateraldrift corr&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mm_difference</span><span class="p">))</span>
+
+                <span class="c1">#update position in highpositionlist</span>
+                <span class="c1">#oldposition = self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)]</span>
+                <span class="n">lowresposition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowres_positionList</span><span class="p">[</span><span class="n">stacknumber</span><span class="p">]),</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span>
+                <span class="n">correctionarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">mm_difference</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">mm_difference</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">newposition</span> <span class="o">=</span> <span class="n">lowresposition</span> <span class="o">+</span> <span class="n">correctionarray</span>
+                <span class="n">newposition</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">currenthighresPosindex</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">axialposition</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">currenthighresPosindex</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span> <span class="c1">#you don&#39;t want to overwrite the axial position</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;before update: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">currenthighresPosindex</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">currenthighresPosindex</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">newposition</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">currenthighresPosindex</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">axialposition</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;after update: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="n">currenthighresPosindex</span><span class="p">]))</span>
+
+
+
+                <span class="c1"># debug mode - save image</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugmode</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="c1"># generate filenames</span>
+                    <span class="n">file_maxproj</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span><span class="p">,</span> <span class="s2">&quot;transmission_maxproj_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
+                    <span class="c1"># save files</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">file_maxproj</span><span class="p">,</span> <span class="n">current_crop_image</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="p">(</span><span class="n">row_number</span><span class="p">,</span> <span class="n">column_number</span><span class="p">,</span> <span class="n">pixel_height_highresInLowres</span><span class="p">,</span> <span class="n">pixel_width_highresInLowres</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="drift_correction.calculate_pixelcoord_from_physicalcoordinates"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_pixelcoord_from_physicalcoordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates_lowres</span><span class="p">,</span> <span class="n">coordinates_highres</span><span class="p">,</span> <span class="n">lowresshape</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        calulate pixel coordinates from physical stage coordinates</span>
+<span class="sd">        :param coordinates_lowres, stage coordinates of lowres image</span>
+<span class="sd">        :param coordinates_highres, stage coordinates of highres image</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lateralId</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">UpDownID</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># caclulate coordinate differences and scale them from mm to pixel values.</span>
+        <span class="n">coordinate_difference</span> <span class="o">=</span> <span class="n">coordinates_lowres</span> <span class="o">-</span> <span class="n">coordinates_highres</span>
+        <span class="n">coordinate_difference</span><span class="p">[</span><span class="n">lateralId</span><span class="p">]</span> <span class="o">=</span> <span class="n">coordinate_difference</span><span class="p">[</span><span class="n">lateralId</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalingfactor</span>
+        <span class="n">coordinate_difference</span><span class="p">[</span><span class="n">UpDownID</span><span class="p">]</span> <span class="o">=</span> <span class="n">coordinate_difference</span><span class="p">[</span><span class="n">UpDownID</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalingfactor</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;coordinate diff&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">coordinate_difference</span><span class="p">))</span>
+
+        <span class="c1"># get central pixel for low resolution stack with calibration</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lowresshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_width</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">lowresshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_height</span><span class="p">)</span> <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loc &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">loc</span><span class="p">))</span>
+        <span class="c1"># highres size in lowres:</span>
+        <span class="n">pixel_width_highresInLowres</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactorLowToHighres</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">increase_crop_size</span><span class="p">)</span>
+        <span class="n">pixel_height_highresInLowres</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalingfactorLowToHighres</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">increase_crop_size</span><span class="p">)</span>
+
+
+
+        <span class="c1"># calculate displacement</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">coordinate_difference</span><span class="p">[</span><span class="n">lateralId</span><span class="p">]</span> <span class="o">-</span> <span class="n">pixel_height_highresInLowres</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+               <span class="nb">int</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">coordinate_difference</span><span class="p">[</span><span class="n">UpDownID</span><span class="p">]</span> <span class="o">-</span> <span class="n">pixel_width_highresInLowres</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;first location&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">loc</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">loc</span><span class="p">,</span> <span class="n">pixel_width_highresInLowres</span><span class="p">,</span> <span class="n">pixel_height_highresInLowres</span></div>
+
+<div class="viewcode-block" id="drift_correction.calculate_axialdrift"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_axialdrift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">image1</span><span class="p">,</span> <span class="n">image2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;fluorescence&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        calculates axial drift correction based on low res view.</span>
+<span class="sd">        :param image of axial max projection around laterally corrected position.</span>
+<span class="sd">        :param PosNumber: which entry of the highres list are you trying to correct?</span>
+<span class="sd">        :param mode: what drift correction are you running? e.g. on transmission image or fluorescence image</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1">#if mode == &quot;transmission&quot;:</span>
+        <span class="k">if</span> <span class="mi">1</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># retrieve corresponding high res image</span>
+            <span class="n">lowres_axial1_transmission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+
+            <span class="c1"># if return zero array, safe the image as first tile in the list.</span>
+            <span class="k">if</span> <span class="n">lowres_axial1_transmission</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Establish axis images for transmission&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">image1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">image2</span><span class="p">))</span>
+
+                <span class="c1"># debug mode - save image</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugmode</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="c1"># generate filenames</span>
+                    <span class="n">file_axial1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span><span class="p">,</span> <span class="s2">&quot;transmission_axial1proj_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
+                    <span class="n">file_axial2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span><span class="p">,</span> <span class="s2">&quot;transmission_axial2proj_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># save files</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">file_axial1</span><span class="p">,</span> <span class="n">image1</span><span class="p">)</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">file_axial2</span><span class="p">,</span> <span class="n">image2</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculate axial drift for transmission&quot;</span><span class="p">)</span>
+
+                <span class="c1"># get corresponding low res stack</span>
+                <span class="n">correctX1</span><span class="p">,</span> <span class="n">correctZ1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_image</span><span class="p">(</span><span class="n">lowres_axial1_transmission</span><span class="p">,</span> <span class="n">image1</span><span class="p">,</span> <span class="s1">&#39;translation&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">correctX1</span><span class="p">,</span> <span class="n">correctZ1</span><span class="p">)</span>
+
+                <span class="n">lowres_axial2_transmission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">)</span>
+                <span class="n">correctY2</span><span class="p">,</span> <span class="n">correctZ2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">register_image</span><span class="p">(</span><span class="n">lowres_axial2_transmission</span><span class="p">,</span> <span class="n">image2</span><span class="p">,</span> <span class="s1">&#39;translation&#39;</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="n">correctY2</span><span class="p">,</span> <span class="n">correctZ2</span><span class="p">)</span>
+                <span class="n">correctZ</span> <span class="o">=</span> <span class="p">(</span><span class="n">correctZ1</span> <span class="o">+</span> <span class="n">correctZ2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+
+                <span class="c1">#we are interested only in the</span>
+
+                <span class="c1"># debug mode - save image</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debugmode</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="c1"># generate filenames</span>
+                    <span class="n">file_axial1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span><span class="p">,</span> <span class="s2">&quot;transmission_axial1proj_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
+                    <span class="n">file_axial2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfolder</span><span class="p">,</span> <span class="s2">&quot;transmission_axial2proj_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">+</span> <span class="s2">&quot;.tif&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># save files</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">file_axial1</span><span class="p">,</span> <span class="n">image1</span><span class="p">)</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">file_axial2</span><span class="p">,</span> <span class="n">image2</span><span class="p">)</span>
+
+                <span class="c1">#divide by 1000000000 as these are the stage units in pm to mm conversion for the position list</span>
+                <span class="n">correctionFactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowres_zspacing</span><span class="o">/</span><span class="mi">1000000000</span><span class="o">*</span><span class="n">correctZ</span>
+
+                <span class="c1">#update position in highresposition list</span>
+                <span class="n">oldposition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)]</span>
+                <span class="n">correctionarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">correctionFactor</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">newposition</span> <span class="o">=</span> <span class="n">oldposition</span> <span class="o">+</span> <span class="n">correctionarray</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">highres_positionList</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)]</span> <span class="o">=</span> <span class="n">newposition</span>
+
+                <span class="c1">#Update image repository</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">image1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">image2</span><span class="p">))</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;axial drift correction:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">correctionFactor</span><span class="p">))</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">correctionFactor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="drift_correction.indicate_driftcorrectionCompleted"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted">[docs]</a>    <span class="k">def</span> <span class="nf">indicate_driftcorrectionCompleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PosNumber</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param PosNumber:</span>
+<span class="sd">        :return: update completed array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="n">PosNumber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="drift_correction.register_image"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.register_image">[docs]</a>    <span class="k">def</span> <span class="nf">register_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">mov</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        register two images (ref, mov) to each other using the StackReg</span>
+<span class="sd">        :param ref: reference image</span>
+<span class="sd">        :param mov: moving image</span>
+<span class="sd">        :param mode: rigid (if mode==&#39;rigid&#39;), else translation</span>
+<span class="sd">        :return: lateral (xshift, yshift)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span><span class="o">==</span><span class="s1">&#39;rigid&#39;</span><span class="p">:</span>
+            <span class="n">sr</span> <span class="o">=</span> <span class="n">StackReg</span><span class="p">(</span><span class="n">StackReg</span><span class="o">.</span><span class="n">RIGID_BODY</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sr</span> <span class="o">=</span> <span class="n">StackReg</span><span class="p">(</span><span class="n">StackReg</span><span class="o">.</span><span class="n">TRANSLATION</span><span class="p">)</span>
+        <span class="n">reg</span> <span class="o">=</span> <span class="n">sr</span><span class="o">.</span><span class="n">register_transform</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span><span class="n">mov</span><span class="p">)</span>
+        <span class="n">xshift</span> <span class="o">=</span> <span class="n">sr</span><span class="o">.</span><span class="n">get_matrix</span><span class="p">()[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">yshift</span> <span class="o">=</span> <span class="n">sr</span><span class="o">.</span><span class="n">get_matrix</span><span class="p">()[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">xshift</span><span class="p">,</span> <span class="n">yshift</span></div>
+
+<div class="viewcode-block" id="drift_correction.plot_registration"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.plot_registration">[docs]</a>    <span class="k">def</span> <span class="nf">plot_registration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">mov</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        plot images</span>
+<span class="sd">        :param ref: image 1</span>
+<span class="sd">        :param mov: image 2</span>
+<span class="sd">        :return: plots them and their overlay</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+
+        <span class="n">before_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composite_images</span><span class="p">([</span><span class="n">ref</span><span class="p">,</span> <span class="n">mov</span><span class="p">])</span>
+
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;reference image&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mov</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;shifted image&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">before_reg</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;overlay&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">);</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="s1">&#39;False&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="drift_correction.overlay_images"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.overlay_images">[docs]</a>    <span class="k">def</span> <span class="nf">overlay_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">equalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aggregator</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">equalize</span><span class="p">:</span>
+            <span class="n">imgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">exposure</span><span class="o">.</span><span class="n">equalize_hist</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">imgs</span><span class="p">]</span>
+
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">aggregator</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="drift_correction.composite_images"><a class="viewcode-back" href="../../automated_microscopy.html#automated_microscopy.drift_correction.drift_correction.composite_images">[docs]</a>    <span class="k">def</span> <span class="nf">composite_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">equalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aggregator</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">equalize</span><span class="p">:</span>
+            <span class="n">imgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">exposure</span><span class="o">.</span><span class="n">equalize_hist</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">imgs</span><span class="p">]</span>
+
+        <span class="n">imgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">img</span> <span class="o">/</span> <span class="n">img</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">imgs</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">imgs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">imgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">imgs</span><span class="p">))</span>
+
+        <span class="n">imgs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">imgs</span></div></div>
+
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c1">#set test positions</span>
+    <span class="n">stage_PositionList</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mf">1.13718</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.69498</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0845</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span><span class="mi">4</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="n">stage_highres_PositionList</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.2441</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.69498</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.00431</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1.2441</span><span class="p">,</span> <span class="o">-</span><span class="mf">25.25631</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.89739</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+
+    <span class="c1">#load test images</span>
+    <span class="n">img_lowres_t0000</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/transmission_timeseries/lowres_transmission_t0000.tif&quot;</span>
+    <span class="n">img_lowres_t0001</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/transmission_timeseries/lowres_transmission100pixel_t0001.tif&quot;</span>
+    <span class="n">img_lowres_t0002</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/transmission_timeseries/lowres_transmission200pixel_t0002.tif&quot;</span>
+    <span class="n">img_lowrestrans</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_lowres_t0000</span><span class="p">)</span>
+    <span class="n">img_lowres_t_t0000</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_lowres_t0000</span><span class="p">)</span>
+    <span class="n">img_lowres_t_t0001</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_lowres_t0001</span><span class="p">)</span>
+    <span class="n">img_lowres_t_t0002</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">img_lowres_t0002</span><span class="p">)</span>
+
+    <span class="n">currenttime</span> <span class="o">=</span> <span class="s2">&quot;t00000&quot;</span>
+
+    <span class="c1">#initialize image repository class and drift correction class</span>
+    <span class="n">imagerepoclass</span> <span class="o">=</span> <span class="n">images_InMemory_class</span><span class="p">()</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">drift_correction</span><span class="p">(</span><span class="n">stage_PositionList</span><span class="p">,</span>
+                         <span class="n">stage_highres_PositionList</span><span class="p">,</span>
+                         <span class="mf">3.5</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">,</span>
+                         <span class="mf">0.3</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">,</span>
+                         <span class="mi">2048</span><span class="p">,</span>
+                         <span class="mi">2048</span><span class="p">,</span>
+                         <span class="n">currenttime</span><span class="p">,</span>
+                         <span class="n">imagerepoclass</span><span class="p">,</span>
+                         <span class="n">debugfilepath</span><span class="o">=</span><span class="s2">&quot;D://test/drift_correctionTest/transmission_timeseries_result&quot;</span><span class="p">)</span>
+
+    <span class="nb">list</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">find_corresponsingHighResTiles</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">_find_Index_of_PosNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+
+    <span class="n">image_first_axial1</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/output1/axial1/transmission_axial1proj_1t00000.tif&quot;</span>
+    <span class="n">image_first_axial2</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/output1/axial2/transmission_axial2proj_1t00000.tif&quot;</span>
+    <span class="n">img_first_axial1</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">image_first_axial1</span><span class="p">)</span>
+    <span class="n">img_first_axial2</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">image_first_axial2</span><span class="p">)</span>
+
+
+    <span class="n">image_old_axial1</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/output1/axial1/transmission_axial1proj_1.0t00039.tif&quot;</span>
+    <span class="n">image_new_axial1</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/output1/axial1/transmission_axial1proj_1.0t00040.tif&quot;</span>
+    <span class="n">image_old_axial2</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/output1/axial2/transmission_axial2proj_1.0t00039.tif&quot;</span>
+    <span class="n">image_new_axial2</span> <span class="o">=</span> <span class="s2">&quot;D://test/drift_correctionTest/output1/axial2/transmission_axial2proj_1.0t00040.tif&quot;</span>
+    <span class="n">img_old_axial1</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">image_old_axial1</span><span class="p">)</span>
+    <span class="n">img_new_axial1</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">image_new_axial1</span><span class="p">)</span>
+    <span class="n">img_old_axial2</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">image_old_axial2</span><span class="p">)</span>
+    <span class="n">img_new_axial2</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">image_new_axial2</span><span class="p">)</span>
+
+
+    <span class="n">c</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial1Image&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">img_first_axial1</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_transmissionAxial2Image&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">img_first_axial2</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">calculate_axialdrift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">img_new_axial1</span><span class="p">,</span> <span class="n">img_new_axial2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;transmission&#39;</span><span class="p">)</span>
+
+
+
+    <span class="c1"># ---------------------------------------------------------------------------------------------------</span>
+    <span class="c1">#test: lateral drift</span>
+
+    <span class="c1">#first acquisition</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">img_lowres_t_t0000</span><span class="p">)</span>
+    <span class="n">lat_drift1</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">calculate_Lateral_drift</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;transmission&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lat_drift1</span><span class="p">)</span>
+    <span class="n">tmpimag1</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1">#second acquisition</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">currenttimepoint</span> <span class="o">=</span> <span class="s2">&quot;t00001&quot;</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">replaceImage</span><span class="p">(</span><span class="s2">&quot;current_lowRes_Proj&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">img_lowres_t_t0001</span><span class="p">)</span>
+    <span class="c1">#c.ImageRepo.replaceImage(&quot;current_lowRes_Proj&quot;, 0, img_lowres_t_t0000)</span>
+    <span class="n">lat_drift2</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">calculate_Lateral_drift</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;transmission&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">lat_drift2</span><span class="p">)</span>
+    <span class="n">tmpimag2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ImageRepo</span><span class="o">.</span><span class="n">image_retrieval</span><span class="p">(</span><span class="s2">&quot;current_transmissionImage&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># # #third acquisition</span>
+    <span class="c1"># c.currenttimepoint = &quot;t00002&quot;</span>
+    <span class="c1"># c.ImageRepo.replaceImage(&quot;current_lowRes_Proj&quot;, 0, img_lowres_t_t0002)</span>
+    <span class="c1"># lat_drift3 = c.calculate_Lateral_drift(2, mode=&#39;transmission&#39;)</span>
+    <span class="c1"># print(lat_drift3)</span>
+    <span class="c1"># tmpimag3 = copy.deepcopy(c.ImageRepo.image_retrieval(&quot;current_transmissionImage&quot;, 2))</span>
+    <span class="c1">#</span>
+    <span class="c1"># f2, ax2 = plt.subplots(3, 1, figsize=(18, 40))</span>
+    <span class="c1"># ax2[0].imshow(tmpimag1, cmap=&#39;gray&#39;)</span>
+    <span class="c1"># ax2[1].imshow(tmpimag2, cmap=&#39;gray&#39;)</span>
+    <span class="c1"># ax2[2].imshow(tmpimag3, cmap=&#39;gray&#39;)</span>
+    <span class="c1"># plt.show(block=&#39;False&#39;)</span>
+
+    <span class="c1">#---------------------------------------------------------------------------------------------------</span>
+    <span class="c1">#load sample images</span>
+    <span class="c1"># img0name = &quot;D://test/drift_correctionTest/CH488/t00000.tif&quot;</span>
+    <span class="c1"># img1name = &quot;D://test/drift_correctionTest/CH488/t00001.tif&quot;</span>
+    <span class="c1"># # img0name =&quot;D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00000.tif&quot;</span>
+    <span class="c1"># # img1name =&quot;D://multiScope_Data//20220421_Daetwyler_Xenograft//Experiment0007//projections//high_stack_001//CH488///t00001.tif&quot;</span>
+    <span class="c1"># #</span>
+    <span class="c1"># img0 = imread(img0name)</span>
+    <span class="c1"># img1 = imread(img1name)</span>
+    <span class="c1"># img0_cropXY = img0[0:1024, 0:2048]</span>
+    <span class="c1"># img1_cropXY = img1[0:1024, 0:2048]</span>
+    <span class="c1"># img0_cropXZ = img0[1024:, 0:2048]</span>
+    <span class="c1"># img1_cropXZ = img1[1024:, 0:2048]</span>
+    <span class="c1"># img0_cropYZ = img0[0:1024, 2048:]</span>
+    <span class="c1"># img1_cropZY = img1[0:1024, 2048:]</span>
+    <span class="c1">#</span>
+    <span class="c1"># img0_cropXY = img0[0:2048, 0:2048]</span>
+    <span class="c1"># img1_cropXY = img1[0:2048, 0:2048]</span>
+    <span class="c1"># img0_cropXZ = img0[2048:, 0:2048]</span>
+    <span class="c1"># img1_cropXZ = img1[2048:, 0:2048]</span>
+    <span class="c1"># img0_cropYZ = img0[0:2048, 2048:]</span>
+    <span class="c1"># img1_cropZY = img1[0:2048, 2048:]</span>
+    <span class="c1">#</span>
+    <span class="c1"># c.plot_registration(img0_cropXY, img1_cropXY)</span>
+    <span class="c1"># c.plot_registration(img0_cropXZ, img1_cropXZ)</span>
+    <span class="c1"># c.plot_registration(img0_cropYZ, img1_cropZY)</span>
+
+    <span class="c1">#c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, &quot;D://test/drift_correctionTest/CH488/t00000.tif&quot;, 0.3, 0)</span>
+    <span class="c1"># c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, &quot;D://test/drift_correctionTest/CH488/t00000.tif&quot;, 0.3, 0)</span>
+    <span class="c1"># c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, &quot;D://test/drift_correctionTest/CH488/t00000.tif&quot;, 0.3, 0)</span>
+    <span class="c1"># c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, &quot;D://test/drift_correctionTest/CH488/t00000.tif&quot;, 0.3, 0)</span>
+    <span class="c1"># #c.calculate_drift_highRes(img1_cropXY, img1_cropXZ, img1_cropZY, img0name, 0.3, 1)</span>
+
+
+
+    <span class="c1"># pos = c.find_closestLowResTile(0)</span>
+    <span class="c1"># print(pos)</span>
+    <span class="c1">#</span>
+    <span class="c1"># img_lowrestrans_name = &quot;D://test/drift_correctionTest/transmission/lowres_transmission.tif&quot;</span>
+    <span class="c1"># img_lowres = imread(img_lowrestrans_name)</span>
+    <span class="c1"># print(img_lowres.shape)</span>
+    <span class="c1"># imagerepoclass.replaceImage(&quot;current_lowRes_Proj&quot;, 0, img_lowres)</span>
+    <span class="c1">#</span>
+    <span class="c1"># c.calculate_drift_lowRes_complete(&quot;D://test/drift_correctionTest/CH488/t00000.tif&quot;, 0, mode=&#39;transmission&#39;, firsttimepoint=True)</span>
+    <span class="c1">#c.register_image(img0_crop,img1_crop,&quot;translation&quot;)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

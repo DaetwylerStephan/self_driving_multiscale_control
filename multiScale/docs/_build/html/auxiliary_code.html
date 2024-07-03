@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>auxiliary_code package &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">auxiliary_code package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-auxiliary_code.concurrency_tools">auxiliary_code.concurrency_tools module</a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.CustodyThread"><code class="docutils literal notranslate"><span class="pre">CustodyThread</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.CustodyThread.__init__"><code class="docutils literal notranslate"><span class="pre">CustodyThread.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.FancyThread"><code class="docutils literal notranslate"><span class="pre">FancyThread</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.MyTestClass"><code class="docutils literal notranslate"><span class="pre">MyTestClass</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.MyTestClass.run"><code class="docutils literal notranslate"><span class="pre">MyTestClass.run()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.MyTestClass.time_it"><code class="docutils literal notranslate"><span class="pre">MyTestClass.time_it()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess"><code class="docutils literal notranslate"><span class="pre">ObjectInSubprocess</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess.__init__"><code class="docutils literal notranslate"><span class="pre">ObjectInSubprocess.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.PoliteThread"><code class="docutils literal notranslate"><span class="pre">PoliteThread</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread"><code class="docutils literal notranslate"><span class="pre">ResultThread</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread.__init__"><code class="docutils literal notranslate"><span class="pre">ResultThread.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread.get_result"><code class="docutils literal notranslate"><span class="pre">ResultThread.get_result()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread.run"><code class="docutils literal notranslate"><span class="pre">ResultThread.run()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread.start"><code class="docutils literal notranslate"><span class="pre">ResultThread.start()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.SharedNDArray"><code class="docutils literal notranslate"><span class="pre">SharedNDArray</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.__init__"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.black_hole"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.black_hole()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.fill_and_return_array"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.fill_and_return_array()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.get_attribute"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.get_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.get_shape_of_numpy_array"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.get_shape_of_numpy_array()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.mirror"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.mirror()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.nested_method"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.nested_method()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.printing_method"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.printing_method()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.return_slice"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.return_slice()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.sleep"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.sleep()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.store_array"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.store_array()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.sum"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.TestClass.sum()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_array_values_after_passing_to_subprocess"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_array_values_after_passing_to_subprocess()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_attribute_access"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_attribute_access()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_create_and_close_object_in_subprocess"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_create_and_close_object_in_subprocess()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_incorrect_thread_management"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_incorrect_thread_management()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_lock_with_waitlist"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_lock_with_waitlist()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_object_in_subprocess_overhead"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_object_in_subprocess_overhead()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_passing_modifying_and_retrieving_shared_array"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_passing_modifying_and_retrieving_shared_array()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_passing_normal_numpy_array"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_passing_normal_numpy_array()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_printing_in_child_processes"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_printing_in_child_processes()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_sending_shared_arrays"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_sending_shared_arrays()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_setting_attribute_of_object_in_subprocess"><code class="docutils literal notranslate"><span class="pre">TestObjectInSubprocess.test_setting_attribute_of_object_in_subprocess()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_catching_exception"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_catching_exception()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_custody_thread_target_args"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_custody_thread_target_args()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_getting_result"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_getting_result()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_new_start_behavior"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_new_start_behavior()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_passing_args_and_kwargs"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_passing_args_and_kwargs()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_providing_first_resource"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_providing_first_resource()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_subclassed_threading_types"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_subclassed_threading_types()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_threadlike_behavior"><code class="docutils literal notranslate"><span class="pre">TestResultThreadAndCustodyThread.test_threadlike_behavior()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_accessing_unlinked_memory_during_deserialization"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_accessing_unlinked_memory_during_deserialization()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_accessing_unlinked_memory_in_subprocess"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_accessing_unlinked_memory_in_subprocess()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_auto_unlinking_memory"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_auto_unlinking_memory()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_ndarraylike_behavior"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_ndarraylike_behavior()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_serialization"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_serialization()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_serializing_and_deserializing"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_serializing_and_deserializing()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_subclassed_numpy_array_types"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_subclassed_numpy_array_types()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_viewcasting"><code class="docutils literal notranslate"><span class="pre">TestSharedNDArray.test_viewcasting()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-auxiliary_code.constants">auxiliary_code.constants module</a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.ASLM_parameters"><code class="docutils literal notranslate"><span class="pre">ASLM_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.ASLM_parameters.remote_mirror_maxVol"><code class="docutils literal notranslate"><span class="pre">ASLM_parameters.remote_mirror_maxVol</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.ASLM_parameters.remote_mirror_minVol"><code class="docutils literal notranslate"><span class="pre">ASLM_parameters.remote_mirror_minVol</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.ASLM_parameters.simultaneous_lines"><code class="docutils literal notranslate"><span class="pre">ASLM_parameters.simultaneous_lines</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters"><code class="docutils literal notranslate"><span class="pre">Camera_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.HR_height_pixel"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.HR_height_pixel</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.HR_width_pixel"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.HR_width_pixel</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.LR_height_pixel"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.LR_height_pixel</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.LR_width_pixel"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.LR_width_pixel</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.highres_line_digitization_time"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.highres_line_digitization_time</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_height"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.low_to_highres_calibration_height</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_width"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.low_to_highres_calibration_width</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters.lowres_line_digitization_time"><code class="docutils literal notranslate"><span class="pre">Camera_parameters.lowres_line_digitization_time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.FileSave_parameters"><code class="docutils literal notranslate"><span class="pre">FileSave_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.FileSave_parameters.parentdir"><code class="docutils literal notranslate"><span class="pre">FileSave_parameters.parentdir</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.FilterWheel_parameters"><code class="docutils literal notranslate"><span class="pre">FilterWheel_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.FilterWheel_parameters.avail_filters"><code class="docutils literal notranslate"><span class="pre">FilterWheel_parameters.avail_filters</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.FilterWheel_parameters.comport"><code class="docutils literal notranslate"><span class="pre">FilterWheel_parameters.comport</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Image_parameters"><code class="docutils literal notranslate"><span class="pre">Image_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.Image_parameters.xy_pixelsize_highres_um"><code class="docutils literal notranslate"><span class="pre">Image_parameters.xy_pixelsize_highres_um</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Image_parameters.xy_pixelsize_lowres_um"><code class="docutils literal notranslate"><span class="pre">Image_parameters.xy_pixelsize_lowres_um</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.LED_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.LED_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.adjustmentfactor"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.adjustmentfactor</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.ao_nchannels"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.ao_nchannels</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.ao_type"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.ao_type</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.ao_type_constant"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.ao_type_constant</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.flip_mirror_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.flip_mirror_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.highres_camera"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.highres_camera</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.laser488"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.laser488</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.laser552"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.laser552</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.laser594"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.laser594</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.laser640"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.laser640</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.led"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.led</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.line_selection"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.line_selection</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.lowres_camera"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.lowres_camera</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.mSPIM_mirror_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_voltage"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.mSPIM_mirror_voltage</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.maxVol_constant"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.maxVol_constant</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.max_mSPIM_constant"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.max_mSPIM_constant</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.minVol_constant"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.minVol_constant</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.power_488_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.power_488_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.power_552_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.power_552_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.power_594_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.power_594_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.power_640_line"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.power_640_line</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.rate"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.rate</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.stage"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.stage</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters.voicecoil"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters.voicecoil</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Stage_parameters"><code class="docutils literal notranslate"><span class="pre">Stage_parameters</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.Stage_parameters.adjustableslit_max"><code class="docutils literal notranslate"><span class="pre">Stage_parameters.adjustableslit_max</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Stage_parameters.stage_id_XYZ"><code class="docutils literal notranslate"><span class="pre">Stage_parameters.stage_id_XYZ</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.Stage_parameters.stage_id_rot"><code class="docutils literal notranslate"><span class="pre">Stage_parameters.stage_id_rot</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration"><code class="docutils literal notranslate"><span class="pre">microscope_configuration</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration.filterwheel"><code class="docutils literal notranslate"><span class="pre">microscope_configuration.filterwheel</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration.highres_camera"><code class="docutils literal notranslate"><span class="pre">microscope_configuration.highres_camera</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration.lowres_camera"><code class="docutils literal notranslate"><span class="pre">microscope_configuration.lowres_camera</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration.ni_board"><code class="docutils literal notranslate"><span class="pre">microscope_configuration.ni_board</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration.rotationstage"><code class="docutils literal notranslate"><span class="pre">microscope_configuration.rotationstage</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration.translationstage"><code class="docutils literal notranslate"><span class="pre">microscope_configuration.translationstage</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-auxiliary_code.napari_in_subprocess">auxiliary_code.napari_in_subprocess module</a><ul>
+<li><a class="reference internal" href="#auxiliary_code.napari_in_subprocess.display"><code class="docutils literal notranslate"><span class="pre">display()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-auxiliary_code.write_parameters">auxiliary_code.write_parameters module</a><ul>
+<li><a class="reference internal" href="#auxiliary_code.write_parameters.write_Params"><code class="docutils literal notranslate"><span class="pre">write_Params</span></code></a><ul>
+<li><a class="reference internal" href="#auxiliary_code.write_parameters.write_Params.__init__"><code class="docutils literal notranslate"><span class="pre">write_Params.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#auxiliary_code.write_parameters.write_Params.write_to_textfile"><code class="docutils literal notranslate"><span class="pre">write_Params.write_to_textfile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-auxiliary_code">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">auxiliary_code package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/auxiliary_code.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="auxiliary-code-package">
+<h1>auxiliary_code package<a class="headerlink" href="#auxiliary-code-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-auxiliary_code.concurrency_tools">
+<span id="auxiliary-code-concurrency-tools-module"></span><h2>auxiliary_code.concurrency_tools module<a class="headerlink" href="#module-auxiliary_code.concurrency_tools" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.CustodyThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">CustodyThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_resource</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.CustodyThread" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread" title="auxiliary_code.concurrency_tools.ResultThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultThread</span></code></a></p>
+<p>Threads that can access shared resources in the order they were launched.</p>
+<p>See the docstring at the top of this module for examples.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.CustodyThread.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_resource</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.CustodyThread.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>This constructor should always be called with keyword arguments. Arguments are:</p>
+<p><em>group</em> should be None; reserved for future extension when a ThreadGroup
+class is implemented.</p>
+<p><em>target</em> is the callable object to be invoked by the run()
+method. Defaults to None, meaning nothing is called.</p>
+<p><em>name</em> is the thread name. By default, a unique name is constructed of
+the form “Thread-N” where N is a small decimal number.</p>
+<p><em>args</em> is the argument tuple for the target invocation. Defaults to ().</p>
+<p><em>kwargs</em> is a dictionary of keyword arguments for the target
+invocation. Defaults to {}.</p>
+<p>If a subclass overrides the constructor, it must make sure to invoke
+the base class constructor (Thread.__init__()) before doing anything
+else to the thread.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.FancyThread">
+<span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">FancyThread</span></span><a class="headerlink" href="#auxiliary_code.concurrency_tools.FancyThread" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread" title="auxiliary_code.concurrency_tools.ResultThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultThread</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.MyTestClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">MyTestClass</span></span><a class="headerlink" href="#auxiliary_code.concurrency_tools.MyTestClass" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Homemade testing class. Mostly written out of curiosity to see
+what features we would want and if it could be done easily without adding
+another import. Not as featured as a “real” testing package, but that
+wasn’t the point.</p>
+<p>To create a set of tests, subclass this class and add methods to it.</p>
+<p>By default, methods names starting with <cite>test_</cite> will be called by <cite>run</cite>.</p>
+<p>If the test is expected to generate any specific print output in STDOUT,
+return that expected output as a string from the test function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.MyTestClass.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_fast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.MyTestClass.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all methods that begin with <cite>test_prefix</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.MyTestClass.time_it">
+<span class="sig-name descname"><span class="pre">time_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_loops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_us</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.MyTestClass.time_it" title="Permalink to this definition"></a></dt>
+<dd><p>Useful for testing the performance of a specific function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test</strong> (<em>- func &lt;callable&gt;</em><em> | </em><em>function/method to</em>) – </p></li>
+<li><p><strong>test</strong> – </p></li>
+<li><p><strong>function</strong> (<em>- args/kwargs</em><em> | </em><em>arguments to the</em>) – </p></li>
+<li><p><strong>exception?</strong> (<em>- fail &lt;bool&gt;</em><em> | </em><em>Allow the method to raise an</em>) – </p></li>
+<li><p><strong>this</strong> (<em>- timeout_us &lt;int/float&gt;</em><em> | </em><em>If the average duration exceeds</em>) – limit, raise a TimeoutError.</p></li>
+<li><p><strong>bar.</strong> (<em>- name &lt;str&gt;</em><em> | </em><em>formatted name for the progress</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ObjectInSubprocess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">ObjectInSubprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initializer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">initargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_method_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closeargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closekwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ObjectInSubprocess.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initializer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">initargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_method_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closeargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closekwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Make an object in a child process, that acts like it isn’t.</p>
+<p>As much as possible, we try to make instances of ObjectInSubprocess
+behave as if they’re an instance of the object living in the parent
+process. They’re not, of course: they live in a child process. If you
+have spare cores on your machine, this turns CPU-bound operations
+(which  threading can’t parallelize) into IO-bound operations (which
+threading CAN parallelize),  without too much mental overhead for the
+coder.</p>
+<p>initializer – callable that returns an instance of a Python object
+initargs, initkwargs –  arguments to ‘initializer’
+close_method_name – string, optional, name of our object’s method to</p>
+<blockquote>
+<div><p>be called automatically when the child process exits</p>
+</div></blockquote>
+<p>closeargs, closekwargs – arguments to ‘close_method’</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.PoliteThread">
+<span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">PoliteThread</span></span><a class="headerlink" href="#auxiliary_code.concurrency_tools.PoliteThread" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#auxiliary_code.concurrency_tools.CustodyThread" title="auxiliary_code.concurrency_tools.CustodyThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">CustodyThread</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">ResultThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></p>
+<p>threading.Thread with all the simple features we wish it had.</p>
+<p>We added a ‘get_result’ method that returns values/raises exceptions.</p>
+<p>We changed the return value of ‘start’ from ‘None’ to ‘self’ – just to
+trivially save us a line of code when launching threads.</p>
+<p>Example:
+<a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a></p>
+<blockquote>
+<div><dl class="simple">
+<dt>def f(a):</dt><dd><p>‘’’ A function that does something… ‘’’
+return a.sum()</p>
+</dd>
+</dl>
+<p>##
+## Getting Results:
+##
+a = np.ones((2,), dtype=’uint8’)</p>
+<p># Our problem:
+th = threading.Thread(target=f, args=(a,))
+th.start()
+th.join() # We can’t access the result of f(a) without redefining f!</p>
+<p># Our solution:
+res_th = ResultThread(target=f, args=(a,)).start()
+res = res_th.get_result() # returns f(a)
+assert res == 2</p>
+<p>##
+## Error handling
+##
+a = 1</p>
+<p># Our problem:
+th = threading.Thread(target=f, args=(a,))
+th.start()
+th.join()
+# f(a) raised an unhandled exception. Our parent thread has no idea!</p>
+<p># Our solution:
+res_th = ResultThread(target=f, args=(a,)).start()
+try:</p>
+<blockquote>
+<div><p>res = res_th.get_result()</p>
+</div></blockquote>
+<dl class="simple">
+<dt>except AttributeError:</dt><dd><p>print(“AttributeError was raised in thread!”)</p>
+</dd>
+<dt>else:</dt><dd><dl class="simple">
+<dt>raise AssertionError(</dt><dd><p>‘We expected an AttributeError to be raised on join!’)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p># Unhandled exceptions raised during evaluation of ‘f’ are reraised in
+# the parent thread when you call ‘get_result’.
+# Tracebacks may print to STDERR when the exception occurs in
+# the child thread, but don’t affect the parent thread (yet).</p>
+</div></blockquote>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a>`
+NOTE: This module modifies threading.excepthook. You can’t just copy/paste
+this class definition and expect it to work.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>This constructor should always be called with keyword arguments. Arguments are:</p>
+<p><em>group</em> should be None; reserved for future extension when a ThreadGroup
+class is implemented.</p>
+<p><em>target</em> is the callable object to be invoked by the run()
+method. Defaults to None, meaning nothing is called.</p>
+<p><em>name</em> is the thread name. By default, a unique name is constructed of
+the form “Thread-N” where N is a small decimal number.</p>
+<p><em>args</em> is the argument tuple for the target invocation. Defaults to ().</p>
+<p><em>kwargs</em> is a dictionary of keyword arguments for the target
+invocation. Defaults to {}.</p>
+<p>If a subclass overrides the constructor, it must make sure to invoke
+the base class constructor (Thread.__init__()) before doing anything
+else to the thread.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.get_result">
+<span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.get_result" title="Permalink to this definition"></a></dt>
+<dd><p>Either returns a value or raises an exception.</p>
+<p>Optionally accepts a timeout in seconds. If thread has not returned
+after timeout seconds, raises a TimeoutError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.start" title="Permalink to this definition"></a></dt>
+<dd><p>Start the thread’s activity.</p>
+<p>It must be called at most once per thread object. It arranges for the
+object’s run() method to be invoked in a separate thread of control.</p>
+<p>This method will raise a RuntimeError if called more than once on the
+same thread object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.SharedNDArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">SharedNDArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_memory_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.SharedNDArray" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+<p>A numpy array that lives in shared memory</p>
+<p>Inputs and outputs to/from ObjectInSubprocess are ‘serialized’, which
+is pretty fast - except for large in-memory objects. The only large
+in-memory objects we regularly deal with are numpy arrays, so it
+makes sense to provide a way to pass large numpy arrays via shared memory
+(which avoids slow serialization).</p>
+<p>Maybe you wanted to write code that looks like this:</p>
+<blockquote>
+<div><p>data_buf = np.zeros((400, 2000, 2000), dtype=’uint16’)
+display_buf = np.zeros((2000, 2000), dtype=’uint8’)</p>
+<p>camera = Camera()
+preprocessor = Preprocessor()
+display = Display()</p>
+<p>camera.record(num_images=400, out=data_buf)
+preprocessor.process(in=data_buf, out=display_buf)
+display.show(display_buf)</p>
+</div></blockquote>
+<p>…but instead you write code that looks like this:</p>
+<blockquote>
+<div><p>data_buf = SharedNDArray(shape=(400, 2000, 2000), dtype=’uint16’)
+display_buf = SharedNDArray(shape=(2000, 2000), dtype=’uint8’)</p>
+<p>camera = ObjectInSubprocess(Camera)
+preprocessor = ObjectInSubprocess(Preprocessor)
+display = ObjectInSubprocess(Display)</p>
+<p>camera.record(num_images=400, out=data_buf)
+preprocessor.process(in=data_buf, out=display_buf)
+display.show(display_buf)</p>
+</div></blockquote>
+<p>…and your payoff is, each object gets its own CPU core, AND passing
+large numpy arrays between the processes is still really fast!</p>
+<p>To implement this we used memmap from numpy.core as a template.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">TestObjectInSubprocess</span></span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#auxiliary_code.concurrency_tools.MyTestClass" title="auxiliary_code.concurrency_tools.MyTestClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MyTestClass</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TestClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Toy class that can be put in a subprocess for testing.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.black_hole">
+<span class="sig-name descname"><span class="pre">black_hole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.black_hole" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.fill_and_return_array">
+<span class="sig-name descname"><span class="pre">fill_and_return_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.fill_and_return_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.get_attribute">
+<span class="sig-name descname"><span class="pre">get_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.get_attribute" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.get_shape_of_numpy_array">
+<span class="sig-name descname"><span class="pre">get_shape_of_numpy_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.get_shape_of_numpy_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.mirror">
+<span class="sig-name descname"><span class="pre">mirror</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.mirror" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.nested_method">
+<span class="sig-name descname"><span class="pre">nested_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crash</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.nested_method" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.printing_method">
+<span class="sig-name descname"><span class="pre">printing_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.printing_method" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.return_slice">
+<span class="sig-name descname"><span class="pre">return_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.return_slice" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.sleep">
+<span class="sig-name descname"><span class="pre">sleep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.sleep" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.store_array">
+<span class="sig-name descname"><span class="pre">store_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.store_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.sum">
+<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.TestClass.sum" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_array_values_after_passing_to_subprocess">
+<span class="sig-name descname"><span class="pre">test_array_values_after_passing_to_subprocess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_array_values_after_passing_to_subprocess" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_attribute_access">
+<span class="sig-name descname"><span class="pre">test_attribute_access</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_attribute_access" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_create_and_close_object_in_subprocess">
+<span class="sig-name descname"><span class="pre">test_create_and_close_object_in_subprocess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_create_and_close_object_in_subprocess" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_incorrect_thread_management">
+<span class="sig-name descname"><span class="pre">test_incorrect_thread_management</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_incorrect_thread_management" title="Permalink to this definition"></a></dt>
+<dd><p>Test accessing an object in a subprocess from multiple threads
+without using a custody object. This is expected to raise a
+RunTimeError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_lock_with_waitlist">
+<span class="sig-name descname"><span class="pre">test_lock_with_waitlist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_lock_with_waitlist" title="Permalink to this definition"></a></dt>
+<dd><p>Test that CustodyThreads stay in order while using resources.
+ObjectsInSubprocess are just mocked as _WaitingList objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_object_in_subprocess_overhead">
+<span class="sig-name descname"><span class="pre">test_object_in_subprocess_overhead</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_object_in_subprocess_overhead" title="Permalink to this definition"></a></dt>
+<dd><p>Test the overhead of accessing ObjectInSubprocess methods/attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_passing_modifying_and_retrieving_shared_array">
+<span class="sig-name descname"><span class="pre">test_passing_modifying_and_retrieving_shared_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_passing_modifying_and_retrieving_shared_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_passing_normal_numpy_array">
+<span class="sig-name descname"><span class="pre">test_passing_normal_numpy_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_passing_normal_numpy_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_printing_in_child_processes">
+<span class="sig-name descname"><span class="pre">test_printing_in_child_processes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_printing_in_child_processes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_sending_shared_arrays">
+<span class="sig-name descname"><span class="pre">test_sending_shared_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_sending_shared_arrays" title="Permalink to this definition"></a></dt>
+<dd><p>Testing sending a SharedNDArray to a ObjectInSubprocess.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_setting_attribute_of_object_in_subprocess">
+<span class="sig-name descname"><span class="pre">test_setting_attribute_of_object_in_subprocess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestObjectInSubprocess.test_setting_attribute_of_object_in_subprocess" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">TestResultThreadAndCustodyThread</span></span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#auxiliary_code.concurrency_tools.MyTestClass" title="auxiliary_code.concurrency_tools.MyTestClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MyTestClass</span></code></a></p>
+<p>Various tests of the functions and expected behavior of the ResultThread
+and CustodyThread classes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_catching_exception">
+<span class="sig-name descname"><span class="pre">test_catching_exception</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_catching_exception" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_custody_thread_target_args">
+<span class="sig-name descname"><span class="pre">test_custody_thread_target_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_custody_thread_target_args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_getting_result">
+<span class="sig-name descname"><span class="pre">test_getting_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_getting_result" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_new_start_behavior">
+<span class="sig-name descname"><span class="pre">test_new_start_behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_new_start_behavior" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_passing_args_and_kwargs">
+<span class="sig-name descname"><span class="pre">test_passing_args_and_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_passing_args_and_kwargs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_providing_first_resource">
+<span class="sig-name descname"><span class="pre">test_providing_first_resource</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_providing_first_resource" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_subclassed_threading_types">
+<span class="sig-name descname"><span class="pre">test_subclassed_threading_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_subclassed_threading_types" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_threadlike_behavior">
+<span class="sig-name descname"><span class="pre">test_threadlike_behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestResultThreadAndCustodyThread.test_threadlike_behavior" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">TestSharedNDArray</span></span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#auxiliary_code.concurrency_tools.MyTestClass" title="auxiliary_code.concurrency_tools.MyTestClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MyTestClass</span></code></a></p>
+<p>Various tests of the SharedNDArray class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_accessing_unlinked_memory_during_deserialization">
+<span class="sig-name descname"><span class="pre">test_accessing_unlinked_memory_during_deserialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_accessing_unlinked_memory_during_deserialization" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_accessing_unlinked_memory_in_subprocess">
+<span class="sig-name descname"><span class="pre">test_accessing_unlinked_memory_in_subprocess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_accessing_unlinked_memory_in_subprocess" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_auto_unlinking_memory">
+<span class="sig-name descname"><span class="pre">test_auto_unlinking_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_auto_unlinking_memory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_ndarraylike_behavior">
+<span class="sig-name descname"><span class="pre">test_ndarraylike_behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_ndarraylike_behavior" title="Permalink to this definition"></a></dt>
+<dd><p>Testing if we broke how an ndarray is supposed to behave.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_serialization">
+<span class="sig-name descname"><span class="pre">test_serialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_serialization" title="Permalink to this definition"></a></dt>
+<dd><p>Testing serializing/deserializing a SharedNDArray</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_serializing_and_deserializing">
+<span class="sig-name descname"><span class="pre">test_serializing_and_deserializing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_serializing_and_deserializing" title="Permalink to this definition"></a></dt>
+<dd><p>Test serializing/deserializing arrays with random shapes, dtypes, and
+slicing operators.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_subclassed_numpy_array_types">
+<span class="sig-name descname"><span class="pre">test_subclassed_numpy_array_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_subclassed_numpy_array_types" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.TestSharedNDArray.test_viewcasting">
+<span class="sig-name descname"><span class="pre">test_viewcasting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.TestSharedNDArray.test_viewcasting" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code.constants">
+<span id="auxiliary-code-constants-module"></span><h2>auxiliary_code.constants module<a class="headerlink" href="#module-auxiliary_code.constants" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">ASLM_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters.remote_mirror_maxVol">
+<span class="sig-name descname"><span class="pre">remote_mirror_maxVol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5</span></em><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters.remote_mirror_maxVol" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters.remote_mirror_minVol">
+<span class="sig-name descname"><span class="pre">remote_mirror_minVol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-2.5</span></em><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters.remote_mirror_minVol" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters.simultaneous_lines">
+<span class="sig-name descname"><span class="pre">simultaneous_lines</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">17</span></em><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters.simultaneous_lines" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">Camera_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.HR_height_pixel">
+<span class="sig-name descname"><span class="pre">HR_height_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2048</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.HR_height_pixel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.HR_width_pixel">
+<span class="sig-name descname"><span class="pre">HR_width_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2048</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.HR_width_pixel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.LR_height_pixel">
+<span class="sig-name descname"><span class="pre">LR_height_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2960</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.LR_height_pixel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.LR_width_pixel">
+<span class="sig-name descname"><span class="pre">LR_width_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5056</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.LR_width_pixel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.highres_line_digitization_time">
+<span class="sig-name descname"><span class="pre">highres_line_digitization_time</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0112</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.highres_line_digitization_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_height">
+<span class="sig-name descname"><span class="pre">low_to_highres_calibration_height</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">130</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_height" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_width">
+<span class="sig-name descname"><span class="pre">low_to_highres_calibration_width</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">159</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_width" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.lowres_line_digitization_time">
+<span class="sig-name descname"><span class="pre">lowres_line_digitization_time</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01026</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.lowres_line_digitization_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FileSave_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">FileSave_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.FileSave_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FileSave_parameters.parentdir">
+<span class="sig-name descname"><span class="pre">parentdir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:/multiScope_Data/'</span></em><a class="headerlink" href="#auxiliary_code.constants.FileSave_parameters.parentdir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FilterWheel_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">FilterWheel_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.FilterWheel_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FilterWheel_parameters.avail_filters">
+<span class="sig-name descname"><span class="pre">avail_filters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'515-30-25':</span> <span class="pre">1,</span> <span class="pre">'572/20-25':</span> <span class="pre">2,</span> <span class="pre">'615/20-25':</span> <span class="pre">3,</span> <span class="pre">'676/37-25':</span> <span class="pre">4,</span> <span class="pre">'block':</span> <span class="pre">0,</span> <span class="pre">'transmission':</span> <span class="pre">5}</span></em><a class="headerlink" href="#auxiliary_code.constants.FilterWheel_parameters.avail_filters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FilterWheel_parameters.comport">
+<span class="sig-name descname"><span class="pre">comport</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'COM6'</span></em><a class="headerlink" href="#auxiliary_code.constants.FilterWheel_parameters.comport" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Image_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">Image_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.Image_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Image_parameters.xy_pixelsize_highres_um">
+<span class="sig-name descname"><span class="pre">xy_pixelsize_highres_um</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.117</span></em><a class="headerlink" href="#auxiliary_code.constants.Image_parameters.xy_pixelsize_highres_um" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Image_parameters.xy_pixelsize_lowres_um">
+<span class="sig-name descname"><span class="pre">xy_pixelsize_lowres_um</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3825</span></em><a class="headerlink" href="#auxiliary_code.constants.Image_parameters.xy_pixelsize_lowres_um" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">NI_board_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.LED_line">
+<span class="sig-name descname"><span class="pre">LED_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao30'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.LED_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.adjustmentfactor">
+<span class="sig-name descname"><span class="pre">adjustmentfactor</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.adjustmentfactor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.ao_nchannels">
+<span class="sig-name descname"><span class="pre">ao_nchannels</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.ao_nchannels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.ao_type">
+<span class="sig-name descname"><span class="pre">ao_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'6738'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.ao_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.ao_type_constant">
+<span class="sig-name descname"><span class="pre">ao_type_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'6738_constant'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.ao_type_constant" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.flip_mirror_line">
+<span class="sig-name descname"><span class="pre">flip_mirror_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao26'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.flip_mirror_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.highres_camera">
+<span class="sig-name descname"><span class="pre">highres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.highres_camera" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser488">
+<span class="sig-name descname"><span class="pre">laser488</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser488" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser552">
+<span class="sig-name descname"><span class="pre">laser552</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser552" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser594">
+<span class="sig-name descname"><span class="pre">laser594</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser594" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser640">
+<span class="sig-name descname"><span class="pre">laser640</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser640" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.led">
+<span class="sig-name descname"><span class="pre">led</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.led" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.line_selection">
+<span class="sig-name descname"><span class="pre">line_selection</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao0,</span> <span class="pre">Dev1/ao1,</span> <span class="pre">Dev1/ao3,</span> <span class="pre">Dev1/ao5,</span> <span class="pre">Dev1/ao6,</span> <span class="pre">Dev1/ao8,</span> <span class="pre">Dev1/ao11,</span> <span class="pre">Dev1/ao12'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.line_selection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.lowres_camera">
+<span class="sig-name descname"><span class="pre">lowres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.lowres_camera" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_line">
+<span class="sig-name descname"><span class="pre">mSPIM_mirror_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao29'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_voltage">
+<span class="sig-name descname"><span class="pre">mSPIM_mirror_voltage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_voltage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.maxVol_constant">
+<span class="sig-name descname"><span class="pre">maxVol_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.maxVol_constant" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.max_mSPIM_constant">
+<span class="sig-name descname"><span class="pre">max_mSPIM_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.max_mSPIM_constant" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.minVol_constant">
+<span class="sig-name descname"><span class="pre">minVol_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.minVol_constant" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_488_line">
+<span class="sig-name descname"><span class="pre">power_488_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao17'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_488_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_552_line">
+<span class="sig-name descname"><span class="pre">power_552_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao18'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_552_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_594_line">
+<span class="sig-name descname"><span class="pre">power_594_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao22'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_594_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_640_line">
+<span class="sig-name descname"><span class="pre">power_640_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao25'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_640_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.rate">
+<span class="sig-name descname"><span class="pre">rate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20000.0</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.rate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.stage">
+<span class="sig-name descname"><span class="pre">stage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.stage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.voicecoil">
+<span class="sig-name descname"><span class="pre">voicecoil</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.voicecoil" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">Stage_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters.adjustableslit_max">
+<span class="sig-name descname"><span class="pre">adjustableslit_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4024</span></em><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters.adjustableslit_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters.stage_id_XYZ">
+<span class="sig-name descname"><span class="pre">stage_id_XYZ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'network:sn:MCS2-00000382'</span></em><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters.stage_id_XYZ" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters.stage_id_rot">
+<span class="sig-name descname"><span class="pre">stage_id_rot</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'usb:id:3948963323'</span></em><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters.stage_id_rot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">microscope_configuration</span></span><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.filterwheel">
+<span class="sig-name descname"><span class="pre">filterwheel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Ludl_filterwheel'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.filterwheel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.highres_camera">
+<span class="sig-name descname"><span class="pre">highres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Photometrics_highres'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.highres_camera" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.lowres_camera">
+<span class="sig-name descname"><span class="pre">lowres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Photometrics_lowres'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.lowres_camera" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.ni_board">
+<span class="sig-name descname"><span class="pre">ni_board</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'NI_Board'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.ni_board" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.rotationstage">
+<span class="sig-name descname"><span class="pre">rotationstage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Smaract_RotationStage'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.rotationstage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.translationstage">
+<span class="sig-name descname"><span class="pre">translationstage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Smaract_TranslationStage'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.translationstage" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code.napari_in_subprocess">
+<span id="auxiliary-code-napari-in-subprocess-module"></span><h2>auxiliary_code.napari_in_subprocess module<a class="headerlink" href="#module-auxiliary_code.napari_in_subprocess" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="auxiliary_code.napari_in_subprocess.display">
+<span class="sig-prename descclassname"><span class="pre">auxiliary_code.napari_in_subprocess.</span></span><span class="sig-name descname"><span class="pre">display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">display_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.napari_in_subprocess.display" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a simplified non-blocking napari viewer in a subprocess.</p>
+<p>If you don’t know what you’re doing, this is probably the only thing
+you should import from this module.</p>
+<p>If you’re using a custom _NapariDisplay, pass it as <cite>display_type</cite>.</p>
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code.write_parameters">
+<span id="auxiliary-code-write-parameters-module"></span><h2>auxiliary_code.write_parameters module<a class="headerlink" href="#module-auxiliary_code.write_parameters" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.write_parameters.write_Params">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.write_parameters.</span></span><span class="sig-name descname"><span class="pre">write_Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.write_parameters.write_Params" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.write_parameters.write_Params.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.write_parameters.write_Params.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.write_parameters.write_Params.write_to_textfile">
+<span class="sig-name descname"><span class="pre">write_to_textfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roilowres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roihighres</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.write_parameters.write_Params.write_to_textfile" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-auxiliary_code" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

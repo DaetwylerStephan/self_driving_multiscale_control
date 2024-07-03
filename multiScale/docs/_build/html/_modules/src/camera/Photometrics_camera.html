@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.camera.Photometrics_camera &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.camera.Photometrics_camera</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.camera.Photometrics_camera</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pyvcam</span> <span class="kn">import</span> <span class="n">pvc</span>
+<span class="kn">from</span> <span class="nn">pyvcam.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+
+<div class="viewcode-block" id="Photo_Camera"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera">[docs]</a><span class="k">class</span> <span class="nc">Photo_Camera</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera_name</span><span class="p">):</span>
+        <span class="n">pvc</span><span class="o">.</span><span class="n">init_pvcam</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pvcam initialized&quot;</span><span class="p">)</span>
+
+        <span class="n">camera_names</span> <span class="o">=</span> <span class="n">Camera</span><span class="o">.</span><span class="n">get_available_camera_names</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Available cameras: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_names</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span> <span class="o">=</span> <span class="n">Camera</span><span class="o">.</span><span class="n">select_camera</span><span class="p">(</span><span class="n">camera_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start camera: &#39;</span> <span class="o">+</span> <span class="n">camera_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera detected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera open&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Photo_Camera.close"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pvc</span><span class="o">.</span><span class="n">uninit_pvcam</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera closed&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.getinfo"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.getinfo">[docs]</a>    <span class="k">def</span> <span class="nf">getinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">trigger_table</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.get_imageroi"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.get_imageroi">[docs]</a>    <span class="k">def</span> <span class="nf">get_imageroi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">shape</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.set_imageroi"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.set_imageroi">[docs]</a>    <span class="k">def</span> <span class="nf">set_imageroi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        s2 = s1 + w - 1</span>
+<span class="sd">        p2 = p1 + h - 1</span>
+<span class="sd">        :param s1:</span>
+<span class="sd">        :param p1:</span>
+<span class="sd">        :param w:</span>
+<span class="sd">        :param h:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">reset_rois</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">set_roi</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.prepare_stack_acquisition"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_stack_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure_time</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Changes the settings of the low res camera to start stack acquisitions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_mode</span> <span class="o">=</span> <span class="s1">&#39;Edge Trigger&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_out_mode</span> <span class="o">=</span> <span class="s2">&quot;Any Row&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">speed_table_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Collect frames in live mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">start_live</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="n">exposure_time</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera ready&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.prepare_stack_acquisition_seq"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_seq">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_stack_acquisition_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure_time</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Changes the settings of the low res camera to start stack acquisitions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_mode</span> <span class="o">=</span> <span class="s1">&#39;Edge Trigger&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_out_mode</span> <span class="o">=</span> <span class="s2">&quot;Any Row&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">speed_table_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Collect frames in live mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">start_live</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="n">exposure_time</span><span class="p">,</span>  <span class="n">buffer_frame_count</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera ready&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.init_camerabuffer"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer">[docs]</a>    <span class="k">def</span> <span class="nf">init_camerabuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbplanes</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camerabuffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">nbplanes</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.init_camerabuffer2"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer2">[docs]</a>    <span class="k">def</span> <span class="nf">init_camerabuffer2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camerabuffer</span> <span class="o">=</span> <span class="n">buffer</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.get_camerabuffer"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.get_camerabuffer">[docs]</a>    <span class="k">def</span> <span class="nf">get_camerabuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camerabuffer</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">camerabuffer</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.init_previewbuffer"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.init_previewbuffer">[docs]</a>    <span class="k">def</span> <span class="nf">init_previewbuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewbuffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.get_previewbuffer"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.get_previewbuffer">[docs]</a>    <span class="k">def</span> <span class="nf">get_previewbuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">previewbuffer</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.prepare_stack_acquisition_highres"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_highres">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_stack_acquisition_highres</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure_time</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Changes the settings of the highres camera to start stack acquisitions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_mode</span> <span class="o">=</span> <span class="s1">&#39;Edge Trigger&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_out_mode</span> <span class="o">=</span> <span class="s2">&quot;Any Row&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">speed_table_index</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">readout_port</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">prog_scan_mode</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Collect frames in live mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">start_live</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="n">exposure_time</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera ready&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Photo_Camera.return_camera_readouttime"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.return_camera_readouttime">[docs]</a>    <span class="k">def</span> <span class="nf">return_camera_readouttime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">readout_time</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.prepare_ASLM_acquisition"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_ASLM_acquisition">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_ASLM_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure_time</span><span class="p">,</span> <span class="n">scandelay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Changes the settings of the camera to ASLM acquisitions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_mode</span> <span class="o">=</span> <span class="s1">&#39;Edge Trigger&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">speed_table_index</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># 1 for 100 MHz</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">readout_port</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">prog_scan_mode</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Scan mode options: {&#39;Auto&#39;: 0, &#39;Line Delay&#39;: 1, &#39;Scan Width&#39;: 2}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">prog_scan_dir</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Scan direction options: {&#39;Down&#39;: 0, &#39;Up&#39;: 1, &#39;Down/Up Alternate&#39;: 2}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">prog_scan_line_delay</span> <span class="o">=</span> <span class="n">scandelay</span>  <span class="c1"># 11.2 us x factor, e.g. a factor = 6 equals 67.2 us</span>
+
+        <span class="c1">#The   Line   Output   Mode   is   used   for   synchronization   purposes   when</span>
+        <span class="c1"># uses   Programmable Scan mode. Line Output Mode creates a rising edge for each</span>
+        <span class="c1"># row that the rolling shutter read out mechanism of the sensor advances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_out_mode</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">start_live</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="n">exposure_time</span><span class="p">)</span></div>
+
+
+    <span class="c1"># def run_stack_acquisition_buffer(self, nb_planes, buffer, maxproj_xy, maxproj_xz, maxproj_yz):</span>
+    <span class="c1">#     &quot;&quot;&quot;Run a stack acquisition.&quot;&quot;&quot;</span>
+    <span class="c1">#     framesReceived = 0</span>
+    <span class="c1">#     while framesReceived &lt; nb_planes:</span>
+    <span class="c1">#         # time.sleep(0.001)</span>
+    <span class="c1">#</span>
+    <span class="c1">#         try:</span>
+    <span class="c1">#             fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])</span>
+    <span class="c1">#</span>
+    <span class="c1">#             def maxprojection_generation(framenb, bufferimage):</span>
+    <span class="c1">#                 maxproj_xy[:] = np.maximum(maxproj_xy, bufferimage)</span>
+    <span class="c1">#                 maxproj_xz[framenb, :] = np.max(bufferimage, axis=0)</span>
+    <span class="c1">#                 maxproj_yz[:, framenb] = np.max(bufferimage, axis=1)</span>
+    <span class="c1">#                 print(framenb, flush=True)</span>
+    <span class="c1">#</span>
+    <span class="c1">#             maxprojection_thread = ct.ResultThread(target=maxprojection_generation, args=(framesReceived, buffer[framesReceived, :, :])).start()</span>
+    <span class="c1">#</span>
+    <span class="c1">#             framesReceived += 1</span>
+    <span class="c1">#             print(&quot;{}:{}&quot;.format(framesReceived, fps), flush=True)</span>
+    <span class="c1">#</span>
+    <span class="c1">#</span>
+    <span class="c1">#         except Exception as e:</span>
+    <span class="c1">#             print(str(e))</span>
+    <span class="c1">#             break</span>
+    <span class="c1">#     self.cam.finish()</span>
+    <span class="c1">#     return</span>
+
+<div class="viewcode-block" id="Photo_Camera.run_stack_acquisition_buffer_fast"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_fast">[docs]</a>    <span class="k">def</span> <span class="nf">run_stack_acquisition_buffer_fast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nb_planes</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">flipimage</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a stack acquisition.</span>
+<span class="sd">        :param nb_planes: how many planes to acquire</span>
+<span class="sd">        :param buffer: the buffer to save the acquired planes to</span>
+<span class="sd">        :param flipimage - if TRUE flip image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">framesReceived</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">framesReceived</span> <span class="o">&lt;</span> <span class="n">nb_planes</span><span class="p">:</span>
+            <span class="c1"># time.sleep(0.001)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">frame_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">poll_frame</span><span class="p">(</span><span class="n">timeout_ms</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+                <span class="c1">#fps, frame_count = self.cam.poll_frame2(out=buffer[framesReceived, :, :])</span>
+                <span class="c1">#t0 = time.perf_counter()</span>
+                <span class="k">if</span> <span class="n">flipimage</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                    <span class="n">buffer</span><span class="p">[</span><span class="n">framesReceived</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">buffer</span><span class="p">[</span><span class="n">framesReceived</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:])</span>
+
+                <span class="c1">#frame[&#39;pixel_data&#39;][:] = None</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">del</span> <span class="n">frame</span>
+                <span class="c1">#gc.collect()</span>
+                <span class="c1">#t1= t0-time.perf_counter()</span>
+                <span class="c1">#buffer[framesReceived,:,:] = np.zeros([2960, 5056],dtype=&#39;uint16&#39;)</span>
+                <span class="n">framesReceived</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1">#print(t1)</span>
+                <span class="c1">#print(&quot;{}:{}&quot;.format(framesReceived, fps), flush=True)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.run_stack_acquisition_buffer_pull"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_pull">[docs]</a>    <span class="k">def</span> <span class="nf">run_stack_acquisition_buffer_pull</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a stack acquisition.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1">#fps, frame_count = self.cam.poll_frame2(out=buffer)</span>
+            <span class="n">frame</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">frame_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">poll_frame</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:]</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="Photo_Camera.set_up_lowres_preview"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.set_up_lowres_preview">[docs]</a>    <span class="k">def</span> <span class="nf">set_up_lowres_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_mode</span> <span class="o">=</span> <span class="s2">&quot;Internal Trigger&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_out_mode</span> <span class="o">=</span> <span class="s2">&quot;Any Row&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">speed_table_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">start_live</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="n">exposure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.set_up_highrespreview"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.set_up_highrespreview">[docs]</a>    <span class="k">def</span> <span class="nf">set_up_highrespreview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_mode</span> <span class="o">=</span> <span class="s2">&quot;Internal Trigger&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">exp_out_mode</span> <span class="o">=</span> <span class="s2">&quot;Any Row&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">speed_table_index</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">prog_scan_mode</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">start_live</span><span class="p">(</span><span class="n">exp_time</span><span class="o">=</span><span class="n">exposure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.run_preview"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_preview">[docs]</a>    <span class="k">def</span> <span class="nf">run_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">flipimage</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">frame</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">frame_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">poll_frame</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">flipimage</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:]))</span></div>
+
+
+<div class="viewcode-block" id="Photo_Camera.acquire_preview_tobuffer"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.acquire_preview_tobuffer">[docs]</a>    <span class="k">def</span> <span class="nf">acquire_preview_tobuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">frame</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">frame_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">poll_frame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previewbuffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:])</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.run_preview_ASLM"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_preview_ASLM">[docs]</a>    <span class="k">def</span> <span class="nf">run_preview_ASLM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+        <span class="n">framesReceived</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;in run_preview_ASLM: framesReceived started&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">framesReceived</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">frame_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">poll_frame</span><span class="p">()</span>
+                <span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;pixel_data&#39;</span><span class="p">][:]))</span>
+                <span class="n">framesReceived</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">framesReceived</span><span class="p">,</span> <span class="n">fps</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.end_stackacquisition"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.end_stackacquisition">[docs]</a>    <span class="k">def</span> <span class="nf">end_stackacquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Photo_Camera.end_preview"><a class="viewcode-back" href="../../../src.camera.html#src.camera.Photometrics_camera.Photo_Camera.end_preview">[docs]</a>    <span class="k">def</span> <span class="nf">end_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">camera</span> <span class="o">=</span> <span class="n">Photo_Camera</span><span class="p">(</span><span class="s1">&#39;PMUSBCam00&#39;</span><span class="p">)</span>
+    <span class="c1"># camera = Photo_Camera(&#39;PMPCIECam00&#39;)</span>
+
+    <span class="n">camera</span><span class="o">.</span><span class="n">getinfo</span><span class="p">()</span>
+    <span class="n">camera</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

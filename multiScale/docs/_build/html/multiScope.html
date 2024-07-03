@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>multiScope module &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">multiScope module</a><ul>
+<li><a class="reference internal" href="#multiScope.multiScopeModel"><code class="docutils literal notranslate"><span class="pre">multiScopeModel</span></code></a><ul>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.__init__"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.acquire_stack_highres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.acquire_stack_highres()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.acquire_stack_lowres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.acquire_stack_lowres()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.calculate_ASLMparameters"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.calculate_ASLMparameters()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.changeHRtoLR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeHRtoLR()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.changeLRtoHR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeLRtoHR()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.check_movementboundaries"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.check_movementboundaries()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.close"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.close()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.finish_all_tasks"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.finish_all_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.move_to_position"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.move_to_position()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.prepare_acquisition"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.prepare_acquisition()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.preview_highres_ASLM"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_ASLM()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.preview_highres_static"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_static()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.preview_lowres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_lowres()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.save_currentpositionToFile"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.save_currentpositionToFile()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.set_laserpower"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.set_laserpower()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.smooth_sawtooth"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.smooth_sawtooth()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.stack_acquisition_master"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.stack_acquisition_master()</span></code></a></li>
+<li><a class="reference internal" href="#multiScope.multiScopeModel.update_bufferSize"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.update_bufferSize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">multiScope module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/multiScope.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-multiScope">
+<span id="multiscope-module"></span><h1>multiScope module<a class="headerlink" href="#module-multiScope" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multiScope.</span></span><span class="sig-name descname"><span class="pre">multiScopeModel</span></span><a class="headerlink" href="#multiScope.multiScopeModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>The main model class of the multi-scale microscope.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.acquire_stack_highres">
+<span class="sig-name descname"><span class="pre">acquire_stack_highres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_startposition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.acquire_stack_highres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.acquire_stack_lowres">
+<span class="sig-name descname"><span class="pre">acquire_stack_lowres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_startposition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.acquire_stack_lowres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.calculate_ASLMparameters">
+<span class="sig-name descname"><span class="pre">calculate_ASLMparameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desired_exposuretime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.calculate_ASLMparameters" title="Permalink to this definition"></a></dt>
+<dd><p>calculate the parameters for an ASLM acquisition
+:param desired_exposuretime: the exposure time that is desired for the whole acquisition
+:return: set the important parameters for ASLM acquisitions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.changeHRtoLR">
+<span class="sig-name descname"><span class="pre">changeHRtoLR</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.changeHRtoLR" title="Permalink to this definition"></a></dt>
+<dd><p>change from high resolution to low resolution acquisition settings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.changeLRtoHR">
+<span class="sig-name descname"><span class="pre">changeLRtoHR</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.changeLRtoHR" title="Permalink to this definition"></a></dt>
+<dd><p>change from low resolution to high resolution acquisition settings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.check_movementboundaries">
+<span class="sig-name descname"><span class="pre">check_movementboundaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.check_movementboundaries" title="Permalink to this definition"></a></dt>
+<dd><p>:param array = [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to
+:return: an array which has no out of range positions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close all opened channels, camera etc</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.finish_all_tasks">
+<span class="sig-name descname"><span class="pre">finish_all_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.finish_all_tasks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.move_to_position">
+<span class="sig-name descname"><span class="pre">move_to_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positionlist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.move_to_position" title="Permalink to this definition"></a></dt>
+<dd><p>move to specified position according to positionlist
+:param positionlist: list of positions in format, e.g. [44280000, -2000000000, -2587870000]
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.prepare_acquisition">
+<span class="sig-name descname"><span class="pre">prepare_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_startposition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">laser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.prepare_acquisition" title="Permalink to this definition"></a></dt>
+<dd><p>prepare acquisition by moving filter wheel and stage system to the correct position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.preview_highres_ASLM">
+<span class="sig-name descname"><span class="pre">preview_highres_ASLM</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.preview_highres_ASLM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.preview_highres_static">
+<span class="sig-name descname"><span class="pre">preview_highres_static</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.preview_highres_static" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.preview_lowres">
+<span class="sig-name descname"><span class="pre">preview_lowres</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.preview_lowres" title="Permalink to this definition"></a></dt>
+<dd><p>starts a custody thread to run a low resolution preview.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.save_currentpositionToFile">
+<span class="sig-name descname"><span class="pre">save_currentpositionToFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_startposition</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.save_currentpositionToFile" title="Permalink to this definition"></a></dt>
+<dd><p>saves current position to file/append it, called by stack_acquisition_master
+:param filepath:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.set_laserpower">
+<span class="sig-name descname"><span class="pre">set_laserpower</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">powersettings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.set_laserpower" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.smooth_sawtooth">
+<span class="sig-name descname"><span class="pre">smooth_sawtooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.smooth_sawtooth" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.stack_acquisition_master">
+<span class="sig-name descname"><span class="pre">stack_acquisition_master</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whichlaser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolutionmode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.stack_acquisition_master" title="Permalink to this definition"></a></dt>
+<dd><p>Master to start stack acquisitions of different channels and resolution modes. Decides which stack acquisition method to call
+:param current_folder: folder to save the acquired data
+:param current_folder: folder to save the projected data
+:param current_startposition: start position for the stack streaming
+:param whichlaser: which channels to image
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScope.multiScopeModel.update_bufferSize">
+<span class="sig-name descname"><span class="pre">update_bufferSize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.update_bufferSize" title="Permalink to this definition"></a></dt>
+<dd><p>This handles the size of the buffers during acquisitions.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

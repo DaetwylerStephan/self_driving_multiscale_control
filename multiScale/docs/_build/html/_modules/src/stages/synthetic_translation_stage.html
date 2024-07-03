@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.stages.synthetic_translation_stage &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=359c27e9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.stages.synthetic_translation_stage</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.stages.synthetic_translation_stage</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">synthetic_translation_stage.py</span>
+<span class="sd">========================================</span>
+<span class="sd">Script containing all functions to initialize and operate a synthetic translation stage</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Thread</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+
+
+<div class="viewcode-block" id="Synthetic_translationstage"><a class="viewcode-back" href="../../../src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage">[docs]</a><span class="k">class</span> <span class="nc">Synthetic_translationstage</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize translation stage parameters, and print out some parameters for debugging</span>
+<span class="sd">        Input: locator address of the translation stage, e.g. usb:sn:MCS2-00001795</span>
+<span class="sd">        Output: an initialized and connected stage.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_of_channels</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_z</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># initialize stream events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Synthetic translation stage initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Synthetic_translationstage.findReference"><a class="viewcode-back" href="../../../src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.findReference">[docs]</a>    <span class="k">def</span> <span class="nf">findReference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Set find reference options.</span>
+        <span class="c1"># The reference options specify the behavior of the find reference sequence.</span>
+        <span class="c1"># The reference flags can be ORed to build the reference options.</span>
+        <span class="c1"># By default (options = 0) the positioner returns to the position of the reference mark.</span>
+        <span class="c1"># Note: In contrast to previous controller systems this is not mandatory.</span>
+        <span class="c1"># The MCS2 controller is able to find the reference position &quot;on-the-fly&quot;.</span>
+        <span class="c1"># See the MCS2 Programmer Guide for a description of the different modes.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_z</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="Synthetic_translationstage.close"><a class="viewcode-back" href="../../../src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Synthetic translation stage closed.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Synthetic_translationstage.moveToPosition"><a class="viewcode-back" href="../../../src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.moveToPosition">[docs]</a>    <span class="k">def</span> <span class="nf">moveToPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position_list</span><span class="p">):</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;move to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">position_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;move to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">position_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;move to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">position_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup"><a class="viewcode-back" href="../../../src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup">[docs]</a>    <span class="k">def</span> <span class="nf">streamStackAcquisition_externalTrigger_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_of_frames</span><span class="p">,</span> <span class="n">increment</span><span class="p">,</span> <span class="n">slow_velocity</span><span class="p">,</span> <span class="n">slow_acceleration</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param no_of_frames: how many frames the stream will be</span>
+<span class="sd">        :param increment: how many um the stream will go up</span>
+<span class="sd">        :param slow_velocity: the factor for velocity of 10 mm/s</span>
+<span class="sd">        :param slow_acceleration: the factor for acceleration 100 mm/s2</span>
+<span class="sd">        :return: a waiting stream to receive voltage inputs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_done</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_abort</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1">#check velocity not too high</span>
+        <span class="k">if</span> <span class="n">slow_velocity</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">slow_velocity</span> <span class="o">=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">slow_acceleration</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">slow_acceleration</span> <span class="o">=</span><span class="mi">1</span>
+
+        <span class="c1">#get starting position for stream</span>
+        <span class="n">startPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_z</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">startPosition</span><span class="p">)</span>
+
+        <span class="c1">#generate array with relative positions to starting value based on the chosen increment</span>
+        <span class="n">stream_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">frame_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">no_of_frames</span><span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">startPosition</span> <span class="o">+</span> <span class="n">frame_idx</span> <span class="o">*</span> <span class="n">increment</span><span class="p">)]</span>
+            <span class="n">stream_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">stream_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">startPosition</span><span class="p">])</span>
+
+
+        <span class="c1">#iterate through stream_buffer</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd"><a class="viewcode-back" href="../../../src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd">[docs]</a>    <span class="k">def</span> <span class="nf">streamStackAcquisition_externalTrigger_waitEnd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Wait for the &quot;stream done&quot; event.</span>
+        <span class="k">pass</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1">##test here code of this class</span>
+
+    <span class="n">translationstage</span> <span class="o">=</span> <span class="n">Synthetic_translationstage</span><span class="p">()</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">findReference</span><span class="p">()</span>
+    <span class="c1">#3000000 = 3 um</span>
+    <span class="c1">#translationstage.streamPosition(100, 3000000)</span>
+    <span class="n">position_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1000000000</span><span class="p">,</span> <span class="mi">2000000000</span><span class="p">,</span> <span class="mi">8000000000</span><span class="p">]</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">moveToPosition</span><span class="p">(</span><span class="n">position_list</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">streamStackAcquisition_externalTrigger_setup</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5000000</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">position_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3000000000</span><span class="p">,</span> <span class="o">-</span><span class="mi">2000000000</span><span class="p">,</span> <span class="o">-</span><span class="mi">8000000000</span><span class="p">]</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">moveToPosition</span><span class="p">(</span><span class="n">position_list</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">streamStackAcquisition_externalTrigger_setup</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5000000</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">position_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">moveToPosition</span><span class="p">(</span><span class="n">position_list</span><span class="p">)</span>
+    <span class="c1">#translationstage.stream_csvFile()</span>
+    <span class="c1">#translationstage.streamStackAcquisition(1000, 5000000)</span>
+    <span class="c1">#translationstage.stream_csvFile()</span>
+
+    <span class="n">translationstage</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

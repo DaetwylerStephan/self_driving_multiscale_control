@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>multiScale_main module &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">multiScale_main module</a><ul>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller</span></code></a><ul>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.__init__"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.abort_stack"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.abort_stack()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.abort_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.abort_timelapse()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_stack()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_stack_task()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_timelapse()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.changeROI"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.changeROI()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.changefilter"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.changefilter()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.close"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.close()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.disable_keyboard_movement"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.disable_keyboard_movement()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.enable_keyboard_movement"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.enable_keyboard_movement()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.key_pressed"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.key_pressed()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.movestage"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.movestage()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.movestageToPosition"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.movestageToPosition()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_highrespreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_highrespreview()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_lowrespreview()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_stop_preview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_stop_preview()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_timelapse()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateDriftCorrectionSettings()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateExposureParameters()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateGUItext"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateGUItext()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateHighResLaserParameters()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateLowResLaserParameters()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.update_ASLMParameters()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.update_stack_aq_parameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.update_stack_aq_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updatefilename"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updatefilename()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updatepreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updatepreview()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">multiScale_main module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/multiScale_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-multiScale_main">
+<span id="multiscale-main-module"></span><h1>multiScale_main module<a class="headerlink" href="#module-multiScale_main" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multiScale_main.</span></span><span class="sig-name descname"><span class="pre">MultiScale_Microscope_Controller</span></span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the controller in an MVC-scheme for mediating the interaction between the View (GUI) and the model (multiScope.py).
+Use: <a class="reference external" href="https://www.python-course.eu/tkinter_events_binds.php">https://www.python-course.eu/tkinter_events_binds.php</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.abort_stack">
+<span class="sig-name descname"><span class="pre">abort_stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.abort_stack" title="Permalink to this definition"></a></dt>
+<dd><p>set flag to abort stack acquisition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.abort_timelapse">
+<span class="sig-name descname"><span class="pre">abort_timelapse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.abort_timelapse" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_stack">
+<span class="sig-name descname"><span class="pre">acquire_stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack" title="Permalink to this definition"></a></dt>
+<dd><p>start a stack acquisition thread</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task">
+<span class="sig-name descname"><span class="pre">acquire_stack_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task" title="Permalink to this definition"></a></dt>
+<dd><p>acquire a stack acquisition - processes in thread (to not stop GUI from working)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse">
+<span class="sig-name descname"><span class="pre">acquire_timelapse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse" title="Permalink to this definition"></a></dt>
+<dd><p>start a time-lapse acquisition thread, called from GUI (otherwise it freezes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.changeROI">
+<span class="sig-name descname"><span class="pre">changeROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.changeROI" title="Permalink to this definition"></a></dt>
+<dd><p>change the ROI - options (‘Full Chip’, ‘1024x1024’, ‘512x512’, ‘256x256’, ‘Custom’)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.changefilter">
+<span class="sig-name descname"><span class="pre">changefilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">laser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.changefilter" title="Permalink to this definition"></a></dt>
+<dd><p>changes the filter to the specified one by the laser active</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.close" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.disable_keyboard_movement">
+<span class="sig-name descname"><span class="pre">disable_keyboard_movement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.disable_keyboard_movement" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.enable_keyboard_movement">
+<span class="sig-name descname"><span class="pre">enable_keyboard_movement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.enable_keyboard_movement" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.key_pressed">
+<span class="sig-name descname"><span class="pre">key_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.key_pressed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.movestage">
+<span class="sig-name descname"><span class="pre">movestage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.movestage" title="Permalink to this definition"></a></dt>
+<dd><p>moves the stage to a certain position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.movestageToPosition">
+<span class="sig-name descname"><span class="pre">movestageToPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.movestageToPosition" title="Permalink to this definition"></a></dt>
+<dd><p>moves the stage to a saved position, indicated by a field in the GUI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run" title="Permalink to this definition"></a></dt>
+<dd><p>Run the Tkinter Gui in the main loop
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_highrespreview">
+<span class="sig-name descname"><span class="pre">run_highrespreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_highrespreview" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the execution of a high resolution preview.
+Required:
+change mirror, set exposure time, start preview, set continue_preview_highres to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview">
+<span class="sig-name descname"><span class="pre">run_lowrespreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the execution of a low resolution preview.
+Required:
+change mirror, start preview, set continue_preview_highres to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_stop_preview">
+<span class="sig-name descname"><span class="pre">run_stop_preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_stop_preview" title="Permalink to this definition"></a></dt>
+<dd><p>Stops an executing preview and resets the profile of the preview buttons that were sunken after starting a preview</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_timelapse">
+<span class="sig-name descname"><span class="pre">run_timelapse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_timelapse" title="Permalink to this definition"></a></dt>
+<dd><p>thread that controls time-lapse, started from function acquire_timelapse, which is called from GUI(self, event):</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings">
+<span class="sig-name descname"><span class="pre">updateDriftCorrectionSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings" title="Permalink to this definition"></a></dt>
+<dd><p>update settings of the drift correction
+:return: settings updated in model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters">
+<span class="sig-name descname"><span class="pre">updateExposureParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateGUItext">
+<span class="sig-name descname"><span class="pre">updateGUItext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateGUItext" title="Permalink to this definition"></a></dt>
+<dd><p>update text labes in GUI here
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters">
+<span class="sig-name descname"><span class="pre">updateHighResLaserParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters" title="Permalink to this definition"></a></dt>
+<dd><p>update the laser power</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters">
+<span class="sig-name descname"><span class="pre">updateLowResLaserParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters" title="Permalink to this definition"></a></dt>
+<dd><p>update the laser power</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters">
+<span class="sig-name descname"><span class="pre">update_ASLMParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.update_stack_aq_parameters">
+<span class="sig-name descname"><span class="pre">update_stack_aq_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.update_stack_aq_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updatefilename">
+<span class="sig-name descname"><span class="pre">updatefilename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updatefilename" title="Permalink to this definition"></a></dt>
+<dd><p>construct the filename used to save data, based on the information from the GUI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updatepreview">
+<span class="sig-name descname"><span class="pre">updatepreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updatepreview" title="Permalink to this definition"></a></dt>
+<dd><p>Updates preview functionalities: auto-scaling of intensity values</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

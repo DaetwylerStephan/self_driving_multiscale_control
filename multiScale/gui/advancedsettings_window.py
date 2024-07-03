@@ -5,12 +5,21 @@ from tkinter import messagebox
 
 
 class AdvancedSettings_Tab(tk.Frame):
-    """
-    A tab for advanced settings such as rotational stage calibration etc
+    """Advanced Settings Tab
+
+    A tab for advanced settings such as setting of : \n
+    - axially swept light sheet parameters
+    - alignment mode to control the voltage at the remote mirror
+    - advanced stack acquisition settings such as camera delay and stage velocity/acceleration
 
     """
 
     def __init__(self, parent, *args, **kwargs):
+        """
+        Initialize Advanced Settings Tab
+
+        :param parent: the ttk.Notebook class
+        """
         super().__init__(parent, *args, **kwargs)
 
         # intro-text
@@ -229,9 +238,15 @@ class AdvancedSettings_Tab(tk.Frame):
         self.voltageLowRes_entry.grid(row=32, column=2, sticky=tk.W + tk.S)
         self.voltageHighRes_entry.grid(row=40, column=2, sticky=tk.W + tk.S)
 
-    def print_values(self):
-        print("test")
-
     def change_voltage(self, voltage, factor):
+        """
+        convert input from the +/- buttons to an increase of 0.1 in voltage with the pressing of one button
+
+        :param voltage: tkinter voltage variable,  voltage value to modify
+        :param factor:  +1 or -1, determines whether to increase or decrease voltage
+        :return: none (updated voltage value)
+        """
+
+
         new_voltage = round(voltage.get() + 0.1* factor,4)
         voltage.set(new_voltage)
