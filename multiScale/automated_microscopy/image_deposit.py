@@ -4,10 +4,19 @@ from matplotlib import pyplot as plt
 import copy
 
 class images_InMemory_class:
+    """
+    Image repository class.
+
+    This class is generating an image repository with the (maximum intensity projection) images for calculations of
+    drift correction, template matching and other smart microscopy applications.
+    """
+
     def __init__(self):
         """
-        This class is containing the images for calculations of drift correction, template matching and other smart microscopy
+        Initialize images_InMemory_class with empty placeholders.
+
         """
+
         self.currentTP_lowResMaxProjection = []
         self.previousTP_lowResMaxProjection = []
         self.currentTP_highResMaxprojection = []
@@ -25,14 +34,15 @@ class images_InMemory_class:
 
     def reset(self):
         """
-        resets class to default value (without any images saved).
+        Resets class to default value (without any images saved).
         """
         self.__init__()
 
 
     def addNewImage(self, whichlist, PosNumber, image):
         """
-        add an Image newly to a list.
+        Add an image newly to a selected list (whichlist) at position number PosNumber
+
         :param whichlist: which list to add image - options: "current_lowRes_Proj", "previous_lowresProj",
                           "current_highRes_Proj", "previous_highRes_Proj", "current_transmissionImage",
                           "previous_transmissionImage", "current_highRes_Axial1Proj", "previous_highRes_Axial1Proj",
@@ -40,8 +50,8 @@ class images_InMemory_class:
                           "current_transmissionAxial2Image","previous_transmissionAxial1Image", "previous_transmissionAxial2Image"
         :param PosNumber: the corresponding position number
         :param image:  the image to add
-        :return: updated list in class
         """
+
         if whichlist == "current_lowRes_Proj":
             self.currentTP_lowResMaxProjection.append((PosNumber, image))
         if whichlist == "previous_lowresProj":
@@ -73,7 +83,8 @@ class images_InMemory_class:
 
     def replaceImage(self, whichlist, PosNumber, image):
         """
-        replace an Image with index PosNumber in the list "whichlist" with image.
+        Replace an image at index PosNumber in the list "whichlist" with new image (image).
+
         :param whichlist: which list to add image - options: "current_lowRes_Proj", "previous_lowresProj",
                           "current_highRes_Proj", "previous_highRes_Proj", "current_transmissionImage",
                           "previous_transmissionImage", "current_highRes_Axial1Proj", "previous_highRes_Axial1Proj",
@@ -118,14 +129,14 @@ class images_InMemory_class:
 
     def _updatelist(self, imagelist, previousimagelist, PosNumber, image, strcurrentlist, strpreviouslist):
         """
-        helper function for replace image.
+        Helper function to replace images.
+
         :param imagelist: list to change
         :param previousimagelist: list of previous timepoint to change
         :param PosNumber: entry number
         :param image: image to update
         :param strcurrentlist: string to current list
         :param strpreviouslist: string to previous list
-        :return:
         """
         found_image = 0
 
@@ -150,15 +161,18 @@ class images_InMemory_class:
 
     def image_retrieval(self, whichlist, PosNumber):
         """
-        get an image from a list
+        Get an image from a list.
+
         :param whichlist: which list to retrieve image - options: "current_lowRes_Proj", "previous_lowresProj",
                           "current_highRes_Proj", "previous_highRes_Proj", "current_transmissionImage",
                           "previous_transmissionImage", "current_highRes_Axial1Proj", "previous_highRes_Axial1Proj",
                           "current_highRes_Axial2Proj", "previous_highRes_Axial2Proj", "current_transmissionAxial1Image",
                           "current_transmissionAxial2Image","previous_transmissionAxial1Image", "previous_transmissionAxial2Image"
         :param PosNumber: what is the Position Number (PosNumber) associated with the image
+
         :return: image, or if image is not found returns an array with value zero: np.array([0]) for easy checking
         """
+
         if whichlist == "current_lowRes_Proj":
             returnimage = self._image_retrievalSupport(self.currentTP_lowResMaxProjection, PosNumber)
         if whichlist == "previous_lowresProj":
@@ -191,7 +205,8 @@ class images_InMemory_class:
 
     def _image_retrievalSupport(self, currentlist, PosNumber):
         """
-        support function for function image_retrieval, searches a list for the right PosNumber element.
+        Support function for function image_retrieval, searches a list for the right PosNumber element.
+
         :param currentlist: list to search for PosNumber
         :param PosNumber: Indicator number of the saved image
         :return: image saved at the specific location - or an array with element 0

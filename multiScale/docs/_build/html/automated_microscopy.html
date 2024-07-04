@@ -47,11 +47,6 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">automated_microscopy package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-automated_microscopy.add_boxes">automated_microscopy.add_boxes module</a><ul>
-<li><a class="reference internal" href="#automated_microscopy.add_boxes.function_calculator"><code class="docutils literal notranslate"><span class="pre">function_calculator()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.add_boxes.readintextfile"><code class="docutils literal notranslate"><span class="pre">readintextfile()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#module-automated_microscopy.drift_correction">automated_microscopy.drift_correction module</a><ul>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction"><code class="docutils literal notranslate"><span class="pre">drift_correction</span></code></a><ul>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.__init__"><code class="docutils literal notranslate"><span class="pre">drift_correction.__init__()</span></code></a></li>
@@ -126,19 +121,6 @@
 <h1>automated_microscopy package<a class="headerlink" href="#automated-microscopy-package" title="Permalink to this heading"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
-<section id="module-automated_microscopy.add_boxes">
-<span id="automated-microscopy-add-boxes-module"></span><h2>automated_microscopy.add_boxes module<a class="headerlink" href="#module-automated_microscopy.add_boxes" title="Permalink to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="automated_microscopy.add_boxes.function_calculator">
-<span class="sig-prename descclassname"><span class="pre">automated_microscopy.add_boxes.</span></span><span class="sig-name descname"><span class="pre">function_calculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates_highres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parentfilepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.add_boxes.function_calculator" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="automated_microscopy.add_boxes.readintextfile">
-<span class="sig-prename descclassname"><span class="pre">automated_microscopy.add_boxes.</span></span><span class="sig-name descname"><span class="pre">readintextfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_posarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_posarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.add_boxes.readintextfile" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 </section>
 <section id="module-automated_microscopy.drift_correction">
 <span id="automated-microscopy-drift-correction-module"></span><h2>automated_microscopy.drift_correction module<a class="headerlink" href="#module-automated_microscopy.drift_correction" title="Permalink to this heading"></a></h2>
@@ -275,32 +257,30 @@
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.image_deposit.</span></span><span class="sig-name descname"><span class="pre">images_InMemory_class</span></span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Image repository class.</p>
+<p>This class is generating an image repository with the (maximum intensity projection) images for calculations of
+drift correction, template matching and other smart microscopy applications.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>This class is containing the images for calculations of drift correction, template matching and other smart microscopy</p>
+<dd><p>Initialize images_InMemory_class with empty placeholders.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.addNewImage">
 <span class="sig-name descname"><span class="pre">addNewImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.addNewImage" title="Permalink to this definition"></a></dt>
-<dd><p>add an Image newly to a list.
-:param whichlist: which list to add image - options: “current_lowRes_Proj”, “previous_lowresProj”,</p>
-<blockquote>
-<div><p>“current_highRes_Proj”, “previous_highRes_Proj”, “current_transmissionImage”,
-“previous_transmissionImage”, “current_highRes_Axial1Proj”, “previous_highRes_Axial1Proj”,
-“current_highRes_Axial2Proj”, “previous_highRes_Axial2Proj”, “current_transmissionAxial1Image”,
-“current_transmissionAxial2Image”,”previous_transmissionAxial1Image”, “previous_transmissionAxial2Image”</p>
-</div></blockquote>
+<dd><p>Add an image newly to a selected list (whichlist) at position number PosNumber</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>whichlist</strong> – which list to add image - options: “current_lowRes_Proj”, “previous_lowresProj”,
+“current_highRes_Proj”, “previous_highRes_Proj”, “current_transmissionImage”,
+“previous_transmissionImage”, “current_highRes_Axial1Proj”, “previous_highRes_Axial1Proj”,
+“current_highRes_Axial2Proj”, “previous_highRes_Axial2Proj”, “current_transmissionAxial1Image”,
+“current_transmissionAxial2Image”,”previous_transmissionAxial1Image”, “previous_transmissionAxial2Image”</p></li>
 <li><p><strong>PosNumber</strong> – the corresponding position number</p></li>
 <li><p><strong>image</strong> – the image to add</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>updated list in class</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,17 +288,17 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.image_retrieval">
 <span class="sig-name descname"><span class="pre">image_retrieval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.image_retrieval" title="Permalink to this definition"></a></dt>
-<dd><p>get an image from a list
-:param whichlist: which list to retrieve image - options: “current_lowRes_Proj”, “previous_lowresProj”,</p>
-<blockquote>
-<div><p>“current_highRes_Proj”, “previous_highRes_Proj”, “current_transmissionImage”,
-“previous_transmissionImage”, “current_highRes_Axial1Proj”, “previous_highRes_Axial1Proj”,
-“current_highRes_Axial2Proj”, “previous_highRes_Axial2Proj”, “current_transmissionAxial1Image”,
-“current_transmissionAxial2Image”,”previous_transmissionAxial1Image”, “previous_transmissionAxial2Image”</p>
-</div></blockquote>
+<dd><p>Get an image from a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>PosNumber</strong> – what is the Position Number (PosNumber) associated with the image</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>whichlist</strong> – which list to retrieve image - options: “current_lowRes_Proj”, “previous_lowresProj”,
+“current_highRes_Proj”, “previous_highRes_Proj”, “current_transmissionImage”,
+“previous_transmissionImage”, “current_highRes_Axial1Proj”, “previous_highRes_Axial1Proj”,
+“current_highRes_Axial2Proj”, “previous_highRes_Axial2Proj”, “current_transmissionAxial1Image”,
+“current_transmissionAxial2Image”,”previous_transmissionAxial1Image”, “previous_transmissionAxial2Image”</p></li>
+<li><p><strong>PosNumber</strong> – what is the Position Number (PosNumber) associated with the image</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>image, or if image is not found returns an array with value zero: np.array([0]) for easy checking</p>
@@ -329,17 +309,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.replaceImage">
 <span class="sig-name descname"><span class="pre">replaceImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.replaceImage" title="Permalink to this definition"></a></dt>
-<dd><p>replace an Image with index PosNumber in the list “whichlist” with image.
-:param whichlist: which list to add image - options: “current_lowRes_Proj”, “previous_lowresProj”,</p>
-<blockquote>
-<div><p>“current_highRes_Proj”, “previous_highRes_Proj”, “current_transmissionImage”,
-“previous_transmissionImage”, “current_highRes_Axial1Proj”, “previous_highRes_Axial1Proj”,
-“current_highRes_Axial2Proj”, “previous_highRes_Axial2Proj”, “current_transmissionAxial1Image”,
-“current_transmissionAxial2Image”,”previous_transmissionAxial1Image”, “previous_transmissionAxial2Image”</p>
-</div></blockquote>
+<dd><p>Replace an image at index PosNumber in the list “whichlist” with new image (image).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>whichlist</strong> – which list to add image - options: “current_lowRes_Proj”, “previous_lowresProj”,
+“current_highRes_Proj”, “previous_highRes_Proj”, “current_transmissionImage”,
+“previous_transmissionImage”, “current_highRes_Axial1Proj”, “previous_highRes_Axial1Proj”,
+“current_highRes_Axial2Proj”, “previous_highRes_Axial2Proj”, “current_transmissionAxial1Image”,
+“current_transmissionAxial2Image”,”previous_transmissionAxial1Image”, “previous_transmissionAxial2Image”</p></li>
 <li><p><strong>PosNumber</strong> – the corresponding position number</p></li>
 <li><p><strong>image</strong> – the image to add</p></li>
 </ul>
@@ -353,7 +331,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.reset">
 <span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.reset" title="Permalink to this definition"></a></dt>
-<dd><p>resets class to default value (without any images saved).</p>
+<dd><p>Resets class to default value (without any images saved).</p>
 </dd></dl>
 
 </dd></dl>

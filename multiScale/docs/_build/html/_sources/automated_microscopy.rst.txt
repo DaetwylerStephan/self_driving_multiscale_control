@@ -4,14 +4,6 @@ automated\_microscopy package
 Submodules
 ----------
 
-automated\_microscopy.add\_boxes module
----------------------------------------
-
-.. automodule:: automated_microscopy.add_boxes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 automated\_microscopy.drift\_correction module
 ----------------------------------------------
 
