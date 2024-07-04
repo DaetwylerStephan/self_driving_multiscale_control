@@ -51,7 +51,7 @@
 <li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highResASLM_StackAq_array()</span></code></a></li>
 <li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highResSPIM_StackAq_array()</span></code></a></li>
 <li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highresASLM_preview_array()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highres_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highres_preview_array()</span></code></a></li>
+<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highresSPIM_preview_array()</span></code></a></li>
 <li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_lowRes_StackAq_array()</span></code></a></li>
 <li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_lowres_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_lowres_preview_array()</span></code></a></li>
 </ul>
@@ -90,42 +90,112 @@
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">acquisition_array_class.</span></span><span class="sig-name descname"><span class="pre">acquisition_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>generate the voltage curves needed for the acquisitions on the NI board
-returns the arrays.</p>
+<p>Acquisition array class.</p>
+<p>Its methods generate the voltage arrays that are sent to the NI board for fast synchronization of the different hardware
+components for:</p>
+<ul class="simple">
+<li><p>Low-resolution preview</p></li>
+<li><p>High-resolution static light-sheet (SPIM) preview</p></li>
+<li><p>High-resolution axially-swept light-sheet (ASLM) preview</p></li>
+<li><p>Low-resolution stack acquisition</p></li>
+<li><p>High-resolution static light-sheet (SPIM) stack acquisition</p></li>
+<li><p>High-resolution axially-swept light-sheet (ASLM) stack acquisition</p></li>
+</ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize the acquisition_arrays class. This class has the model as parameter to have access to all parameters that are
+set in the model (multiScope.py).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> – the microscope model class</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array">
 <span class="sig-name descname"><span class="pre">get_highResASLM_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This function generates the voltage array for the high-resolution axially-swept light-sheet (ASLM) stack acquisition.
+Triggers for the camera, stage and lasers are needed, and a smooth/windowed “sawtooth” pattern needs to be applied at the
+remote mirror.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_laserline</strong> – Sets which wavelength/laser to image.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>basic_unit - voltage array with voltages to be sent to the NI board</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array">
 <span class="sig-name descname"><span class="pre">get_highResSPIM_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This function generates the voltage array for the high-resolution static light-sheet (SPIM) stack acquisition.
+Triggers for the camera, stage and lasers are needed, and a static voltage needs to be applied to the remote mirror.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_laserline</strong> – Sets which wavelength/laser to image.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>basic_unit - voltage array with voltages to be sent to the NI board</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array">
 <span class="sig-name descname"><span class="pre">get_highresASLM_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This function generates the voltage array for the high-resolution axially-swept light-sheet (ASLM) preview.
+For ASLM, the laser on/off signal needs to be sent and the voltage of the remote mirror needs to be adjusted during an exposure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>basic_unit - voltage array with voltages to be sent to the NI board</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highres_preview_array">
-<span class="sig-name descname"><span class="pre">get_highres_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highres_preview_array" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array">
+<span class="sig-name descname"><span class="pre">get_highresSPIM_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array" title="Permalink to this definition"></a></dt>
+<dd><p>This function generates the voltage array for the high-resolution SPIM (static light-sheet) preview.
+As no stage or camera functions are triggered in the preview, only the laser on/off trigger signal needs
+to be sent. If the microscope is in alignment mode, also the remote mirror voltage can be adjusted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>basic_unit - voltage array with voltages to be sent to the NI board</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array">
 <span class="sig-name descname"><span class="pre">get_lowRes_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This function generates the voltage array for the low-resolution stack acquisition.
+Triggers for the camera, stage and lasers are needed, and a static voltage needs to be applied to the remote mirror.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_laserline</strong> – Sets which wavelength/laser to image.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>basic_unit - voltage array with voltages to be sent to the NI board</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_lowres_preview_array">
 <span class="sig-name descname"><span class="pre">get_lowres_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_lowres_preview_array" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This function generates the voltage array for the low-resolution preview. As no stage or camera functions are triggered
+in the preview, only the laser on/off trigger signal needs to be sent. If the microscope is in alignment mode, also the
+remote mirror voltage can be adjusted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>basic_unit - voltage array with voltages to be sent to the NI board</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

@@ -623,7 +623,7 @@ class multiScopeModel:
             def laser_preview_highres():
                 # old_laserline = 0
                 while self.continue_preview_highres:
-                    basic_unit = self.get_acq_array.get_highres_preview_array()
+                    basic_unit = self.get_acq_array.get_highresSPIM_preview_array()
                     self.ao.play_voltages(basic_unit, block=True)
 
             # run laser as sub-thread that is terminated when the preview button is pressed (self.continue_preview_highres is false).
