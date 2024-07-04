@@ -128,7 +128,8 @@ class multiScopeModel:
         # drift correction
         self.ImageRepo = images_InMemory_class() #place holder for obtaining drift correction class from controller
         self.driftcorrectionmodule = 0 #place holder for obtaining drift correction class from controller
-        self.drift_correctionOnHighRes = 0 #parameter whether high res drift correction is enabled
+
+        #self.drift_correctionOnHighRes = 0 #parameter whether high res drift correction is enabled
         self.drift_correctionOnLowRes = 0 #parameter whether low res drift correction is enabled
         self.drift_which_channels = [0,0,0,0,0] #array on which channels drift correction is run
         self.perform_driftcorrectionOnChannel = 0 #flag whether for current stack, drift correction should be performed
@@ -1176,17 +1177,17 @@ class multiScopeModel:
                 if self.displayImStack == 1:
                     self.display.show_stack(self.high_res_buffers[current_bufferiter])
 
-                ###drift-correction module here for high res driftcorrection
-                if driftcorr_OnChannel == 1:
-                    if self.drift_correctionOnHighRes ==1:
-                        current_region_iter = self.current_region.split('stack')[1]
-                        self.driftcorrectionmodule.calculate_drift_highRes(maxproj_xy,
-                                                                           maxproj_xz,
-                                                                           maxproj_yzTransposed,
-                                                                           pastfilepathforprojection,
-                                                                           (self.highres_planespacing/1000000),
-                                                                           current_region_item
-                                                                           )
+                # ###drift-correction module here for high res driftcorrection
+                # if driftcorr_OnChannel == 1:
+                #     if self.drift_correctionOnHighRes ==1:
+                #         current_region_iter = self.current_region.split('stack')[1]
+                #         self.driftcorrectionmodule.calculate_drift_highRes(maxproj_xy,
+                #                                                            maxproj_xz,
+                #                                                            maxproj_yzTransposed,
+                #                                                            pastfilepathforprojection,
+                #                                                            (self.highres_planespacing/1000000),
+                #                                                            current_region_item
+                #                                                            )
 
 
             projection_thread2 = ct.ResultThread(target=calculate_projection_highres).start()

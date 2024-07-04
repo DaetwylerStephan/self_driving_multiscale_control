@@ -8,15 +8,15 @@ class AdvancedSettings_Tab(tk.Frame):
     """Advanced Settings Tab
 
     A tab for advanced settings such as setting of : \n
-    - axially swept light sheet parameters
-    - alignment mode to control the voltage at the remote mirror
-    - advanced stack acquisition settings such as camera delay and stage velocity/acceleration
+    - Axially-swept light sheet parameters
+    - Alignment mode to control the voltage at the remote mirror
+    - Advanced stack acquisition settings such as camera delay and stage velocity/acceleration
 
     """
 
     def __init__(self, parent, *args, **kwargs):
         """
-        Initialize Advanced Settings Tab
+        Initialize advanced settings tab
 
         :param parent: the ttk.Notebook class
         """
@@ -240,11 +240,10 @@ class AdvancedSettings_Tab(tk.Frame):
 
     def change_voltage(self, voltage, factor):
         """
-        convert input from the +/- buttons to an increase of 0.1 in voltage with the pressing of one button
+        Convert input from the +/- buttons to a change of 0.1 in voltage.
 
         :param voltage: tkinter voltage variable,  voltage value to modify
         :param factor:  +1 or -1, determines whether to increase or decrease voltage
-        :return: none (updated voltage value)
         """
 
 

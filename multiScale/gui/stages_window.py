@@ -4,16 +4,28 @@ from tkinter import ttk
 from tkinter import messagebox
 
 class Stages_Tab(tk.Frame):
-    """
-    A stages tab to select which positions will be imaged in a timelapse
-    - table to display selected positions
-    - activate keyboard for movement and add positions (a,s,w,d and r,t)
-    - change speed of stages for selecting
-    - a tool to make a mosaic of the selected positions
+    """Stage tab
+
+    A stages tab to select which positions will be imaged in a timelapse \n
+
+    - Change step size of stage movements
+    - Move to position (value entry and buttons)
+    - Activate keyboard for movement and add positions (a,s,w,d and r,t)
+    - Move to a defined position in the table (right)
+    - Automatically generate mosaic of positions
+    - Two tables to display selected low-res and high-res positions
+
+    Note: Positions are displayed using a ttk.Treeview construct.
 
     """
 
     def __init__(self, parent, *args, **kwargs):
+        """
+        Initialize stages Tab
+
+        :param parent: the ttk.Notebook class
+        """
+
         super().__init__(parent, *args, **kwargs)
 
         # intro-text
@@ -102,8 +114,8 @@ class Stages_Tab(tk.Frame):
         positionAngle_label = ttk.Label(movetoposition, text="Phi").grid(row=8, column=0)
         movetospecificPosition_label = ttk.Label(movetoposition, text="Move to position:").grid(row=14, column=0, columnspan=2)
 
-        self.stage_move_left_bt = tk.Button(movetoposition, text="<", command=lambda : self.change_currentposition(self.stage_moveto_lateral, -1))
-        self.stage_move_right_bt = tk.Button(movetoposition, text=">", command=lambda : self.change_currentposition(self.stage_moveto_lateral, 1))
+        self.stage_move_left_bt = tk.Button(movetoposition, text="<", command=lambda : self.change_currentposition(self.stage_moveto_lateral, 1))
+        self.stage_move_right_bt = tk.Button(movetoposition, text=">", command=lambda : self.change_currentposition(self.stage_moveto_lateral, -1))
         self.stage_move_up_bt = tk.Button(movetoposition, text="/\ ", command=lambda : self.change_currentposition(self.stage_moveto_updown, 1))
         self.stage_move_down_bt = tk.Button(movetoposition, text="\/", command=lambda : self.change_currentposition(self.stage_moveto_updown, -1))
         self.stage_move_forwardAxial_bt = tk.Button(movetoposition, text="Z-", command=lambda : self.change_currentposition(self.stage_moveto_axial, -1))
@@ -185,11 +197,11 @@ class Stages_Tab(tk.Frame):
         # labels (positioned)
         position_label_lowres = ttk.Label(saved_lowRes_positions, text="Position:").grid(row=0, column=0)
         self.stage_savedPos_tree = ttk.Treeview(saved_lowRes_positions, columns=("Position", "X", "Y", "Z", "Phi"), show="headings", height=9)
-        self.stage_addPos_bt = tk.Button(saved_lowRes_positions, text="Add position", command=lambda : self.addPos())
-        self.stage_deletePos_bt = tk.Button(saved_lowRes_positions, text="Delete position", command=lambda : self.deletePos())
-        self.stage_savePos_bt = tk.Button(saved_lowRes_positions, text="Save list", command=lambda : self.savePosList())
-        self.stage_loadPos_bt = tk.Button(saved_lowRes_positions, text="Load saved list", command=lambda : self.loadPosList())
-        self.stage_Revert_bt = tk.Button(saved_lowRes_positions, text="Revert", command=lambda : self.revertList())
+        self.stage_addPos_bt = tk.Button(saved_lowRes_positions, text="Add position", command=lambda : self.addlowresPos())
+        self.stage_deletePos_bt = tk.Button(saved_lowRes_positions, text="Delete position", command=lambda : self.deletelowresPos())
+        self.stage_savePos_bt = tk.Button(saved_lowRes_positions, text="Save list", command=lambda : self.savelowresPosList())
+        self.stage_loadPos_bt = tk.Button(saved_lowRes_positions, text="Load saved list", command=lambda : self.loadlowresPosList())
+        self.stage_Revert_bt = tk.Button(saved_lowRes_positions, text="Revert", command=lambda : self.revertlowresList())
         self.stage_addPos_index_entry = tk.Entry(saved_lowRes_positions, textvariable=self.stage_currentPosindex, width=4)
 
         ybarSrolling = tk.Scrollbar(saved_lowRes_positions, orient =tk.VERTICAL, command=self.stage_savedPos_tree.yview())
@@ -279,15 +291,35 @@ class Stages_Tab(tk.Frame):
 #---------------------------------------------------------------------------------------------------------------------
 
     def update_stage_trans_stepsize(self, event):
+        """
+        When the Tkinter slider (apply a logarithmic scaling to the slider) for the translation stage step size is changed,
+        update the value of the stage_trans_stepsize parameter (displayed in the entry field).
+
+        :param event: update event
+        """
         newvalue = 100 * 0.02 ** (3-self.linear_stage_trans_stepsize.get())
         newvalue = round(newvalue,5)
         self.stage_trans_stepsize.set(newvalue)
 
     def change_currentposition(self, direction, factor):
+        """
+        This function changes the value of the stage position (direction) in the direction of the factor (+1 or -1)
+        by the value of the translation stage step size.
+
+        :param direction: Defines which stage position to update (e.g. self.stage_moveto_lateral)
+        :param factor: Defines direction of update (+1/-1)
+        """
         new_position = round(direction.get() + self.stage_trans_stepsize.get() * factor,7)
         direction.set(new_position)
 
     def change_angle(self, direction, factor):
+        """
+        This function changes the value of the rotational stage position (direction) in the direction of the factor (+1 or -1)
+        by the value of the rotational stage step size.
+
+        :param direction: Defines the rotational stage position to update (self.stage_moveto_angle)
+        :param factor: Defines direction of update (+1/-1)
+        """
         new_position = round(direction.get() + self.stage_rot_stepsize.get() * factor, 5)
 
         if new_position < 0:
@@ -297,13 +329,22 @@ class Stages_Tab(tk.Frame):
 
         direction.set(new_position)
 
-    def savePosList(self):
+    def savelowresPosList(self):
+        """
+        Save the current low resolution stage position list
+        """
         self.stage_savePositionList = self.stage_PositionList.copy()
 
     def savehighresPosList(self):
+        """
+        Save the current high resolution stage position list
+        """
         self.stage_highres_savePositionList = self.stage_highres_PositionList.copy()
 
-    def deletePos(self):
+    def deletelowresPos(self):
+        """
+        Delete position in low-resolution position list that corresponds to the current selected position (self.stage_currentPosIndex)
+        """
         # save previous state
         self.stage_oldPositionList = self.stage_PositionList.copy()
 
@@ -318,6 +359,9 @@ class Stages_Tab(tk.Frame):
         self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
 
     def deletehighresPos(self):
+        """
+        Delete position in high-resolution position list that corresponds to the current selected position (self.stage_currenthighresPosindex)
+        """
         # save previous state
         self.stage_highres_oldPositionList = self.stage_highres_PositionList.copy()
 
@@ -330,7 +374,10 @@ class Stages_Tab(tk.Frame):
         # display new tree
         self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
 
-    def loadPosList(self):
+    def loadlowresPosList(self):
+        """
+        Load saved low-resolution position list from memory
+        """
         # save previous state
         self.stage_oldPositionList = self.stage_PositionList.copy()
         #load list
@@ -339,6 +386,9 @@ class Stages_Tab(tk.Frame):
         self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
 
     def loadhighresPosList(self):
+        """
+        Load saved high-resolution position list from memory
+        """
         # save previous state
         self.stage_highres_oldPositionList = self.stage_highres_PositionList.copy()
         #load list
@@ -346,17 +396,27 @@ class Stages_Tab(tk.Frame):
         # display tree
         self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
 
-    def revertList(self):
+    def revertlowresList(self):
+        """
+        Go back to previous low-resolution position list (e.g. to list before loading a saved list, or adding a position).
+        """
         self.stage_PositionList = self.stage_oldPositionList.copy()
         # display tree
         self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
 
     def reverthighresList(self):
+        """
+        Go back to previous high-resolution position list (e.g. to list before loading a saved list, or adding a position).
+        """
         self.stage_highres_PositionList = self.stage_highres_oldPositionList.copy()
         # display tree
         self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
 
-    def addPos(self):
+    def addlowresPos(self):
+        """
+        Add the current stage positions (translational stage, rotational stage) at the current stage position
+        index (self.stage_currentPosindex) in the low-resolution position list.
+        """
         #save previous state
         self.stage_oldPositionList = self.stage_PositionList.copy()
 
@@ -381,6 +441,10 @@ class Stages_Tab(tk.Frame):
         self.display_tree(self.stage_savedPos_tree, self.stage_PositionList)
 
     def addhighresPos(self):
+        """
+        Add the current stage positions (translational stage, rotational stage) at the current stage position
+        index (self.stage_currentPosindex) in the high-resolution position list.
+        """
         #save previous state
         self.stage_highres_oldPositionList = self.stage_highres_PositionList.copy()
 
@@ -405,6 +469,12 @@ class Stages_Tab(tk.Frame):
         self.display_tree(self.stage_highres_savedPos_tree, self.stage_highres_PositionList)
 
     def display_tree(self, tree, positionlist):
+        """
+        Update the display of the positions in the GUI position table.
+
+        :param tree: Which tree to update low-resolution data tree (self.stage_savedPos_tree) or high-resolution (self.stage_highres_savedPos_tree)
+        :param positionlist: Current updated positions to display
+        """
         #delete current tree
         tree.delete(*tree.get_children())
 
@@ -416,6 +486,11 @@ class Stages_Tab(tk.Frame):
             tree.insert("", index=iter, iid=newitem, values=listelement)
 
     def makeMosaic(self, camera):
+        """
+        Generate a mosaic based on the selected parameters for either high- or low-resolution data
+
+        :param camera: defines whether mosaic is generated for high-resolution ("highres") or low-resolution ("lowres") data
+        """
 
         #backup and select which camera
         if camera == "highres":

@@ -5,17 +5,25 @@ import datetime as dt
 import math
 
 class Run_Tab(tk.Frame):
-    """
-    A run tab to select parameters such as
-    - acquisition settings, e.g. nb of time points, which channels are imaged
-    - Cycle laser (e.g. per stack or per plane)
-    - which channel is displayed
-    - preview button
-    - number of planes
-    - plane spacing
+    """Run Tab
+
+    A run tab to select parameters such as: \n
+
+    - Preview or stack acquisition
+    - Stack acquisition parameters such as number of planes, which lasers to image, which cameras, plane distance
+    - Time-lapse acquisition settings such as time interval and duration
+    - Laser settings such as laser power of low- and highres illumination
+    - Camera settings such as exposure time
+    - Region of interest to image
+
     """
 
     def __init__(self, parent, *args, **kwargs):
+        """
+        Initialize run tab
+
+        :param parent: the ttk.Notebook class
+        """
         super().__init__(parent, **kwargs)
 
         # intro-text
@@ -417,6 +425,11 @@ class Run_Tab(tk.Frame):
 #---------------------------------------------------------------------------------------------------------------------
 
     def preview_change(self, button):
+        """
+        Set from the controller to sink or raise button (change appearance), e.g. when running a preview or a stack acquisition.
+
+        :param button: tkinter button to sink or raise
+        """
         if (button.cget('relief') == "sunken"):
             button.config(relief="raised")
         else:
@@ -424,6 +437,12 @@ class Run_Tab(tk.Frame):
 
 
     def preview_filter_select(self, button):
+        """
+        Change appearance of buttons for excitation wavelength. As a result, only the button of the selected wavelength (laser),
+        that is running in the preview, is sunk. All other buttons are raised.
+
+        :param button: tkinter button to sink
+        """
         self.bt_changeTo488.config(relief="raised")
         self.bt_changeTo552.config(relief="raised")
         self.bt_changeTo594.config(relief="raised")
@@ -432,13 +451,16 @@ class Run_Tab(tk.Frame):
         self.bt_changeTo_trans.config(relief="raised")
         button.config(relief="sunken")
 
-    def sunk_timelapseButton(self, event):
-        print("sink timelapse button")
-        self.bt_run_timelapse.config(relief="sunken")
-        self.update()
+    # def sunk_timelapseButton(self, event):
+    #     print("sink timelapse button")
+    #     self.bt_run_timelapse.config(relief="sunken")
+    #     self.update()
 
 
     def updateTimesTimelapse(self):
+        """
+        Updates the displayed time-lapse parameters, such as starting time or the expected end time of the time-lapse.
+        """
         now = dt.datetime.now()
         nowtime = now.strftime("%A-%Y-%m-%d %H:%M:%S")
         self.timelapse_lb_starttime.config(text=nowtime)

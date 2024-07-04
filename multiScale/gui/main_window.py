@@ -1,4 +1,3 @@
-"""A better Hello World for Tkinter"""
 
 import tkinter as tk
 from tkinter import ttk
@@ -22,11 +21,23 @@ except ImportError:
 
 class MultiScope_MainGui(ttk.Notebook):
     """
-    This is the main GUI class for the multi-scale microscope. It arranges the microscope GUI into different tabs:
-    a welcome tab, a settings tab, a stage settings tab, a run tab and the advanced settings
+    This is the main GUI class for the multi-scale microscope. It organizes and arranges the microscope GUI into different tabs: \n
+    - A welcome tab
+    - A stage tab
+    - A run tab
+    - An advanced settings tab
+    - A tab to control the self-driving acquisition.
+
+    This is also the class to call when only starting the GUI without the model by calling: python main_window.py
+
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize GUI
+
+        """
+
         super().__init__(**kwargs)
 
         # set the window properties

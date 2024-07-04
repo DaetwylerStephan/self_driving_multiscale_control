@@ -277,7 +277,7 @@ class MultiScale_Microscope_Controller():
         '''
         #determine whether drift correction is active; and on which channel
         print("drift correction settings updated")
-        self.model.drift_correctionOnHighRes = self.view.automatedMicroscopySettingstab.drift_correction_highres.get()  # parameter whether high res drift correction is enabled
+        #self.model.drift_correctionOnHighRes = self.view.automatedMicroscopySettingstab.drift_correction_highres.get()  # parameter whether high res drift correction is enabled
         self.model.drift_correctionOnLowRes = self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()  # parameter whether low res drift correction is enabled
         self.model.drift_which_channels = [self.view.automatedMicroscopySettingstab.driftcorrection_488.get(),
                                            self.view.automatedMicroscopySettingstab.driftcorrection_552.get(),
@@ -680,7 +680,7 @@ class MultiScale_Microscope_Controller():
             print(stackfilepath)
 
             #no need for drift correction if single stack is acquired
-            self.model.drift_correctionOnHighRes = 0  # parameter whether high res drift correction is enabled
+            #self.model.drift_correctionOnHighRes = 0  # parameter whether high res drift correction is enabled
             self.model.drift_correctionOnLowRes = 0  # parameter whether low res drift correction is enabled
         else:
             stackfilepath = self.current_timelapse_filepath
