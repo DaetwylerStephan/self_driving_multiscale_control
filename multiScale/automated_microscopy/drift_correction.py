@@ -6,7 +6,12 @@ import copy
 import sys
 import threading
 
-sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
+try:
+    sys.path.append('C://Users/Colfax-202008/PycharmProjects/ContextDriven_MicroscopeControl/multiScale')
+except:
+    print("check append path in drift_correction.py module")
+    sys.path.append(os.path.abspath("./multiScale"))
+
 from auxiliary_code.constants import Image_parameters
 from automated_microscopy.template_matching import automated_templateMatching
 from automated_microscopy.image_deposit import images_InMemory_class
@@ -19,7 +24,9 @@ from skimage import transform, io, exposure
 
 class drift_correction:
     """
-    This class provides the methods to calculate the shift over time for self-driving microscopy based on the low-resolution images.
+    This class provides the tools to guide high-resolution acquisition using low-resolution images (multi-scale microscopy) for self-driving
+    microscopy over long time periods.
+
     """
 
     def __init__(self,
@@ -134,7 +141,7 @@ class drift_correction:
 
     def find_corresponsingHighResTiles(self, LowResPosNumber):
         '''
-        Find all high resolution stacks that are closest to a given low res view (of the same angle)
+        Find all high resolution stacks that are closest to a given low res view (at the same angle)
 
         :param LowResPosNumber: position of the low resolution view in the lowres position list.
         :return: list of all highres stacks PosNumbers which are assigned to low resolution stack.
@@ -169,12 +176,11 @@ class drift_correction:
 
     def find_closestLowResTile(self, PosNumber, return_number=False):
         '''
-        Find corresponding low resolution stack to selected high-res region (PosNumber) (of the same angle).
+        Find corresponding low resolution stack to selected (high-resolution) region of interest (PosNumber) (at the same angle).
 
         :param PosNumber: unique ID of highres view (note: not index).
         :param return_number: if True, return number e.g. 1, if False return string for filename "low_stack000"
-        :return: Based on the input of return_number, returns either the corresponding file name of the low resolution stack (e.g. "low_stack000")
-        which is closest to the high res stack or its number (e.g. "1")
+        :return: Based on the input of return_number, returns either the corresponding file name of the low resolution stack (e.g. "low_stack000") which is closest to the high res stack or its number (e.g. "1")
         '''
 
         highrespoint = np.array(self.highres_positionList[self._find_Index_of_PosNumber(PosNumber)][1:4])
@@ -208,10 +214,11 @@ class drift_correction:
 
     def calculate_Lateral_drift(self, PosNumberID):
         '''
-        Calculates lateral drift correction based on low resolution view.
+        Finds the new (current) lateral position of the region of interest (PosNumberID) in the corresponding low-resolution view
+        by calling the template matching function.
 
-        :param PosNumber: which entry of the highres list with ID=PosNumber are you trying to correct?
-        :return: (rownumber, columnnumber, crop_height, crop_width) - the position of the newly found view in the max projection
+        :param PosNumber: unique ID of high-resolution region of interest to find (correct its position)
+        :return: (rownumber, columnnumber, crop_height, crop_width) - the new position of the region of interest in the low-resolution image.
         '''
 
         lateralId = 0
@@ -316,12 +323,12 @@ class drift_correction:
 
     def calculate_pixelcoord_from_physicalcoordinates(self, coordinates_lowres, coordinates_highres, lowresshape):
         """
-        Calulate pixel coordinates from physical stage coordinates (important to establish view correspondance at first timepoint).
+        Calulate pixel coordinates from physical stage coordinates (important at first timepoint to match region of interest to low-resolution data).
 
         :param coordinates_lowres: stage coordinates of lowres image
         :param coordinates_highres: stage coordinates of highres image
         :param lowresshape: shape of low-resolution image
-        :return:
+        :return: (loc, pixel_width_highresInLowres, pixel_height_highresInLowres) with loc being the location and the new image width and height after scaling
         """
         lateralId = 0
         UpDownID = 1
@@ -352,9 +359,9 @@ class drift_correction:
         '''
         Calculates axial drift correction based on low-resolution view.
 
-        :param image1: maximum intensity projection in axial direction 1 (xz) around laterally corrected position.
-        :param image2: maximum intensity projection in axial direction 2 (yz) around laterally corrected position
-        :param PosNumber: unique ID of high-resolution view to correct
+        :param image1: Maximum intensity projection in axial direction 1 (xz) around laterally corrected position.
+        :param image2: Maximum intensity projection in axial direction 2 (yz) around laterally corrected position
+        :param PosNumber: Unique ID of high-resolution view to correct
         :return: correction factor, if previous time-point images have been saved in the image repository.
         '''
 

@@ -2,11 +2,28 @@
 
 
 class write_Params:
+    """
+    Writes the experiment_settings.txt file with the current microscope model parameters.
+    """
     def __init__(self, view):
+        """
+        Initiate the writer class by importing the view where all user parameters are set.
+
+        :param view: view object of the MVC design pattern.
+        """
         self.view = view
 
 
     def write_to_textfile(self, filePath, roilowres, roihighres):
+        """
+        Writes the Experiment_settings.txt file to disk.
+        
+        :param filePath: File path to save the Experiment_settings.txt file.
+        :param roilowres: The current ROI of the low-resolution camera .
+        :param roihighres: The current ROI of the high-resolution camera.
+        :return:
+        """
+
         with open(filePath, 'w') as f:
             f.write('Experiment parameters of ' + filePath + "\n")
             f.write('---------------------------------------------\n')

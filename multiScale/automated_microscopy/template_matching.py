@@ -19,7 +19,6 @@ class automated_templateMatching:
     def __init__(self):
         """
         Initiate the class with template matching methods
-
         """
         self.Lock = mp.Lock()
 
@@ -32,7 +31,7 @@ class automated_templateMatching:
         :param template: highres image which we want to find in the low-res / big image
         :param scaling_factor: scaling of the highres image (template) to match image dimensions of low res image
         :param showimage: show image when executing template matching
-        :return:(row_number, column_number) of the max value
+        :return: (row_number, column_number) of the max value
         '''
 
         #convert image to unit32 file type for OpenCV template matching algorithm
@@ -79,7 +78,7 @@ class automated_templateMatching:
         :param template: highres image which we want to find in the low-res / big image
         :param scaling_factor: if images have different scales, set it here
         :param showimage: show image when executing template matching
-        :return:(row_number, column_number) of the max value of template matching
+        :return: (row_number, column_number) of the max value of template matching
         '''
 
         #convert image to unit32 file type for OpenCV template matching algorithm
@@ -147,7 +146,7 @@ class automated_templateMatching:
         :param template_sc: image which we want to find in the low-res / big image
         :param scaling_factor: if images have different scales, set it here
         :param showimage: show image when executing template matching
-        :return:(row_number, column_number) of the max value of template matching
+        :return: (row_number, column_number) of the max value of template matching
         '''
 
         #convert image to unit32 file type for OpenCV template matching algorithm

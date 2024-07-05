@@ -124,7 +124,8 @@
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.drift_correction.</span></span><span class="sig-name descname"><span class="pre">drift_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class provides the methods to calculate the shift over time for self-driving microscopy based on the low-resolution images.</p>
+<p>This class provides the tools to guide high-resolution acquisition using low-resolution images (multi-scale microscopy) for self-driving
+microscopy over long time periods.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.__init__" title="Permalink to this definition"></a></dt>
@@ -149,13 +150,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift">
 <span class="sig-name descname"><span class="pre">calculate_Lateral_drift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumberID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift" title="Permalink to this definition"></a></dt>
-<dd><p>Calculates lateral drift correction based on low resolution view.</p>
+<dd><p>Finds the region of interest (PosNumberID) in the corresponding low-resolution view
+by calling the template matching function and thus returns its new position.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>PosNumber</strong> – which entry of the highres list with ID=PosNumber are you trying to correct?</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>(rownumber, columnnumber, crop_height, crop_width) - the position of the newly found view in the max projection</p>
+<dd class="field-even"><p>(rownumber, columnnumber, crop_height, crop_width) - the new position of the region of interest in the low-resolution image.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -191,7 +193,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>(loc, pixel_width_highresInLowres, pixel_height_highresInLowres) with loc being the location and the new image width and height after scaling</p>
 </dd>
 </dl>
 </dd></dl>
@@ -208,10 +210,9 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Based on the input of return_number, returns either the corresponding file name of the low resolution stack (e.g. “low_stack000”)</p>
+<dd class="field-even"><p>Based on the input of return_number, returns either the corresponding file name of the low resolution stack (e.g. “low_stack000”) which is closest to the high res stack or its number (e.g. “1”)</p>
 </dd>
 </dl>
-<p>which is closest to the high res stack or its number (e.g. “1”)</p>
 </dd></dl>
 
 <dl class="py method">
@@ -355,25 +356,28 @@ drift correction, template matching and other smart microscopy applications.</p>
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.template_matching.</span></span><span class="sig-name descname"><span class="pre">automated_templateMatching</span></span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides the methods for template matching.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initiate the class with template matching methods</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching">
 <span class="sig-name descname"><span class="pre">scaling_templateMatching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Performs template matching across different scales.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>template</strong> – highres image which we want to find in the low-res / big image</p></li>
 <li><p><strong>searchimage</strong> – the big image, in which we want to find the template</p></li>
-<li><p><strong>scaling_factor</strong> – scaling of the highres image (template) to match image dimensions of low res image</p></li>
+<li><p><strong>template</strong> – highres image which we want to find in the low-res / big image</p></li>
+<li><p><strong>scaling_factor</strong> – if images have different scales, set it here</p></li>
 <li><p><strong>showimage</strong> – show image when executing template matching</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>(row_number, column_number) of the max value of template matching</p>
 </dd>
 </dl>
 </dd></dl>
@@ -381,17 +385,18 @@ drift correction, template matching and other smart microscopy applications.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching_multiprocessing">
 <span class="sig-name descname"><span class="pre">scaling_templateMatching_multiprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching_multiprocessing" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Performs template matching across different scales, accelerated by multiple processors (for each scale one process).</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>template</strong> – highres image which we want to find in the low-res / big image</p></li>
-<li><p><strong>searchimage</strong> – the big image, in which we want to find the template</p></li>
-<li><p><strong>scaling_factor</strong> – scaling of the highres image (template) to match image dimensions of low res image</p></li>
+<li><p><strong>searchimage_sc</strong> – the big image, in which we want to find the template</p></li>
+<li><p><strong>template_sc</strong> – image which we want to find in the low-res / big image</p></li>
+<li><p><strong>scaling_factor</strong> – if images have different scales, set it here</p></li>
 <li><p><strong>showimage</strong> – show image when executing template matching</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>(row_number, column_number) of the max value of template matching</p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,23 +404,38 @@ drift correction, template matching and other smart microscopy applications.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.simple_templateMatching">
 <span class="sig-name descname"><span class="pre">simple_templateMatching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.simple_templateMatching" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Performs simple template matching</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>template</strong> – highres image which we want to find in the low-res / big image</p></li>
 <li><p><strong>searchimage</strong> – the big image, in which we want to find the template</p></li>
+<li><p><strong>template</strong> – highres image which we want to find in the low-res / big image</p></li>
 <li><p><strong>scaling_factor</strong> – scaling of the highres image (template) to match image dimensions of low res image</p></li>
 <li><p><strong>showimage</strong> – show image when executing template matching</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(row_number, column_number) of the max value</p>
+</dd>
 </dl>
-<p>:return:(row_number, column_number) of the max value</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess">
-<span class="sig-name descname"><span class="pre">template_processing_subprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_resized</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tW</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">template_processing_subprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_resized</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Function called by scaling_templateMatching_multiprocessing for multi-processed template matching. Updates queue with values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lock</strong> – lock for multi-processing</p></li>
+<li><p><strong>scale</strong> – current scale applied for multi-scale template matching</p></li>
+<li><p><strong>template_resized</strong> – image which we want to find in the low-res / big image</p></li>
+<li><p><strong>searchimage_sc</strong> – the big image, in which we want to find the template</p></li>
+<li><p><strong>queue</strong> – results queue of multi-processing</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
