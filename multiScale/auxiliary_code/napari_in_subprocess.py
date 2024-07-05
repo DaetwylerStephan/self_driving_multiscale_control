@@ -15,9 +15,7 @@ from auxiliary_code.constants import Camera_parameters
 
 def display(display_type=None):
     """Creates a simplified non-blocking napari viewer in a subprocess.
-
-    If you don't know what you're doing, this is probably the only thing
-    you should import from this module.
+    Class from Andrew York et al. Check out: https://github.com/AndrewGYork/tools
 
     If you're using a custom _NapariDisplay, pass it as `display_type`.
     """
@@ -28,15 +26,15 @@ def display(display_type=None):
     return display
 
 class _NapariDisplay:
-    """This is a barebones example of a simplified napari viewer.
+    """This is a simplified napari viewer.
 
     The idea is to expose a subset of napari's rich, deep API as a shallow,
     simple API that concurrency_tools.ObjectInSubprocess can handle.
-
-    We encourage you to define your own version of this class to suit your
-    purposes. The only requirement is that it has a `close` method.
     """
     def __init__(self):
+        """
+        Initialize the Napari viewer and define the low-resolution and high-resolution preview images.
+        """
         self.viewer = napari.Viewer()
         self.lowrespreview = self.viewer.add_image(np.zeros((Camera_parameters.LR_height_pixel, Camera_parameters.LR_width_pixel)), name="lowres_preview")
         self.lowrespreview.contrast_limits=(0,10000)
@@ -45,42 +43,64 @@ class _NapariDisplay:
         self.highrespreview.contrast_limits=(0, 10000)
 
     def show_image_lowres(self, im):
-            self.lowrespreview.data = im
+        """
+        Update the low-resolution preview image.
+        :param im: Image to display.
+        """
+        self.lowrespreview.data = im
 
     def show_image_highres(self, im):
-            self.highrespreview.data = im
+        """
+        Update the high-resolution preview image.
+        :param im: Image to display.
+        """
+        self.highrespreview.data = im
 
     def show_stack(self, im):
+        """
+        Shows a stack or updates it.
+
+        :param im: Image stack to display.
+        """
         if not hasattr(self, 'stack_image'):
             self.stack_image = self.viewer.add_image(im)
         else:
             self.stack_image.data = im
 
     def show_maxproj(self, im):
+        """
+        Shows a stack max projection or updates it.
+
+        :param im: Image stack to display.
+        """
         if not hasattr(self, 'stack_maxproj_image'):
             self.stack_maxproj_image = self.viewer.add_image(im, name="stack max projections")
         else:
             self.stack_maxproj_image.data = im
 
     def set_contrast(self, minval, maxval, imagetoscale):
+        """
+        Sets contrast of displayed images.
+
+        :param minval: Minimal value of contrast
+        :param maxval: Maximal value of contrast
+        :param imagetoscale: image to adjust contrast in (highrespreview or lowrespreview).
+        """
         if imagetoscale == "highrespreview":
             self.highrespreview.contrast_limits_range = (minval, maxval)
             self.highrespreview.contrast_limits = (minval, maxval)
-            print("updated ---------------------------------------2")
 
         if imagetoscale == "lowrespreview":
-            print("updated ---------------------------------------2low")
-
             self.lowrespreview.contrast_limits_range = (minval, maxval)
             self.lowrespreview.contrast_limits = (minval, maxval)
 
     def close(self):
+        """
+        Close Napari viewer.
+        """
         self.viewer.close()
 
-# We're pretty confident that you shouldn't have to understand anything below
-# this. If you want to extend the functionality of the simplified napari viewer
-# this can probably be done by creating your own modified version of the
-# _NapariDisplay class above.
+# Below are Napari viewer classes for running it in a subprocess.
 
 def _napari_child_loop(child_pipe, initializer, initargs, initkwargs,
                        close_method_name, closeargs, closekwargs):

@@ -215,7 +215,9 @@ if __name__ == '__main__':
 '''
 
 class SharedNDArray(np.ndarray):
-    """A numpy array that lives in shared memory
+    """
+    A numpy array that lives in shared memory. Class from Andrew York et al.
+    Check out: https://github.com/AndrewGYork/tools
 
     Inputs and outputs to/from ObjectInSubprocess are 'serialized', which
     is pretty fast - except for large in-memory objects. The only large
@@ -223,21 +225,7 @@ class SharedNDArray(np.ndarray):
     makes sense to provide a way to pass large numpy arrays via shared memory
     (which avoids slow serialization).
 
-    Maybe you wanted to write code that looks like this:
-
-        data_buf = np.zeros((400, 2000, 2000), dtype='uint16')
-        display_buf = np.zeros((2000, 2000), dtype='uint8')
-
-        camera = Camera()
-        preprocessor = Preprocessor()
-        display = Display()
-
-        camera.record(num_images=400, out=data_buf)
-        preprocessor.process(in=data_buf, out=display_buf)
-        display.show(display_buf)
-
-    ...but instead you write code that looks like this:
-
+    Example:
         data_buf = SharedNDArray(shape=(400, 2000, 2000), dtype='uint16')
         display_buf = SharedNDArray(shape=(2000, 2000), dtype='uint8')
 
@@ -249,11 +237,12 @@ class SharedNDArray(np.ndarray):
         preprocessor.process(in=data_buf, out=display_buf)
         display.show(display_buf)
 
-    ...and your payoff is, each object gets its own CPU core, AND passing
+    Here, each object gets its own CPU core, AND passing
     large numpy arrays between the processes is still really fast!
 
     To implement this we used memmap from numpy.core as a template.
     """
+
     def __new__(cls, shape=None, dtype=float, shared_memory_name=None,
                 offset=0, strides=None, order=None):
         if shared_memory_name is None:
@@ -327,59 +316,37 @@ class SharedNDArray(np.ndarray):
 class ResultThread(threading.Thread):
     """threading.Thread with all the simple features we wish it had.
 
+    Class from Andrew York et al. Check out: https://github.com/AndrewGYork/tools
+
     We added a 'get_result' method that returns values/raises exceptions.
 
     We changed the return value of 'start' from 'None' to 'self' -- just to
     trivially save us a line of code when launching threads.
 
     Example:
-    ```
         def f(a):
             ''' A function that does something... '''
             return a.sum()
 
-        ##
         ## Getting Results:
-        ##
-        a = np.ones((2,), dtype='uint8')
+        a = np.ones((2,), dtype='uint8')\n
 
-        # Our problem:
-        th = threading.Thread(target=f, args=(a,))
-        th.start()
-        th.join() # We can't access the result of f(a) without redefining f!
+        res_th = ResultThread(target=f, args=(a,)).start()\n
+        res = res_th.get_result() # returns f(a)\n
+        assert res == 2\n
 
-        # Our solution:
-        res_th = ResultThread(target=f, args=(a,)).start()
-        res = res_th.get_result() # returns f(a)
-        assert res == 2
-
-        ##
         ## Error handling
-        ##
         a = 1
 
-        # Our problem:
-        th = threading.Thread(target=f, args=(a,))
-        th.start()
-        th.join()
-        # f(a) raised an unhandled exception. Our parent thread has no idea!
-
-        # Our solution:
         res_th = ResultThread(target=f, args=(a,)).start()
-        try:
-            res = res_th.get_result()
-        except AttributeError:
-            print("AttributeError was raised in thread!")
-        else:
-            raise AssertionError(
-                'We expected an AttributeError to be raised on join!')
+        # try: \n
+        #     res = res_th.get_result()\n
+        # except AttributeError:\n
+        #     print("AttributeError was raised in thread!")\n
+        # else:\n
+        #     raise AssertionError('We expected an AttributeError to be raised on join!')\n
 
-        # Unhandled exceptions raised during evaluation of 'f' are reraised in
-        # the parent thread when you call 'get_result'.
-        # Tracebacks may print to STDERR when the exception occurs in
-        # the child thread, but don't affect the parent thread (yet).
-    ```
-    NOTE: This module modifies threading.excepthook. You can't just copy/paste
+    This module modifies threading.excepthook. You can't just copy/paste
     this class definition and expect it to work.
     """
     def __init__(self, group=None, target=None, name=None, args=(),
@@ -410,6 +377,8 @@ class ResultThread(threading.Thread):
 
         Optionally accepts a timeout in seconds. If thread has not returned
         after timeout seconds, raises a TimeoutError.
+
+        :param timeout: Set timeout value to wait for join of threads. Default is None.
         """
         super().join(timeout=timeout)
         if self.is_alive(): ## Thread could potentially not be done yet!
@@ -420,6 +389,7 @@ class ResultThread(threading.Thread):
 
 class CustodyThread(ResultThread):
     """Threads that can access shared resources in the order they were launched.
+    Class from Andrew York et al. Check out: https://github.com/AndrewGYork/tools
 
     See the docstring at the top of this module for examples.
     """
@@ -459,14 +429,15 @@ def _my_threading_excepthook(args):
 
 threading.excepthook = _my_threading_excepthook
 
-FancyThread = ResultThread # So Andy can refer to it like this.
-PoliteThread = CustodyThread
+# FancyThread = ResultThread # So Andy can refer to it like this.
+# PoliteThread = CustodyThread
 
 class ObjectInSubprocess:
     def __init__(self, initializer, *initargs, custom_loop=None,
                  close_method_name=None, closeargs=None, closekwargs=None,
                  **initkwargs):
         """Make an object in a child process, that acts like it isn't.
+        Class from Andrew York et al. Check out: https://github.com/AndrewGYork/tools
 
         As much as possible, we try to make instances of ObjectInSubprocess
         behave as if they're an instance of the object living in the parent
@@ -476,11 +447,12 @@ class ObjectInSubprocess:
         threading CAN parallelize),  without too much mental overhead for the
         coder.
 
-        initializer -- callable that returns an instance of a Python object
-        initargs, initkwargs --  arguments to 'initializer'
-        close_method_name -- string, optional, name of our object's method to
-            be called automatically when the child process exits
-        closeargs, closekwargs -- arguments to 'close_method'
+        :param initializer: Callable that returns an instance of a Python object
+        :param initargs: Arguments to 'initializer'
+        :param  initkwargs: Arguments to 'initializer'
+        :param close_method_name: String, optional, name of our object's method to be called automatically when the child process exits
+        :param closeargs: Arguments to 'close_method'
+        :param closekwargs: Arguments to 'close_method'
         """
         # Put an instance of the Python object returned by 'initializer'
         # in a child process:
@@ -765,7 +737,7 @@ if mp.get_start_method(allow_none=True) != "spawn":
     mp.set_start_method("spawn")
 
 # Testing block:
-class MyTestClass:
+class _MyTestClass:
     """Homemade testing class. Mostly written out of curiosity to see
     what features we would want and if it could be done easily without adding
     another import. Not as featured as a "real" testing package, but that
@@ -890,7 +862,7 @@ class MyTestClass:
         return time_per_loop_us
 
 
-class TestResultThreadAndCustodyThread(MyTestClass):
+class _TestResultThreadAndCustodyThread(_MyTestClass):
     """Various tests of the functions and expected behavior of the ResultThread
     and CustodyThread classes.
     """
@@ -1024,7 +996,7 @@ class TestResultThreadAndCustodyThread(MyTestClass):
         finally: # if anything goes wrong, make sure the thread exits
             mutable_variables['step'] = -1
 
-class TestSharedNDArray(MyTestClass):
+class _TestSharedNDArray(_MyTestClass):
     """Various tests of the SharedNDArray class"""
     def test_subclassed_numpy_array_types(self):
         a = SharedNDArray(shape=(1,), dtype='uint8')
@@ -1142,7 +1114,7 @@ class TestSharedNDArray(MyTestClass):
             raise AssertionError('Did not get the error we expected')
 
     def test_accessing_unlinked_memory_in_subprocess(self):
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         original_dimensions = (3, 3, 3, 256, 256)
         a = SharedNDArray(shape=original_dimensions, dtype='uint8')
         p.store_array(a)
@@ -1196,7 +1168,7 @@ class TestSharedNDArray(MyTestClass):
         assert expected_total == reloaded_total, \
             f'Failed {dtype.name}/{original_dimensions}/{slicer}'
 
-class TestObjectInSubprocess(MyTestClass):
+class _TestObjectInSubprocess(_MyTestClass):
     class TestClass:
         """Toy class that can be put in a subprocess for testing."""
         def __init__(self, *args, **kwargs):
@@ -1246,7 +1218,7 @@ class TestObjectInSubprocess(MyTestClass):
 
     def test_create_and_close_object_in_subprocess(self):
         import gc
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         dummy_namespace = p._
         del p
         gc.collect()
@@ -1255,19 +1227,19 @@ class TestObjectInSubprocess(MyTestClass):
 
     def test_passing_normal_numpy_array(self):
         a = np.zeros((3, 3), dtype=int)
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         (_a,), _ = p.mirror(a)
         assert np.array_equal(a, _a), f"{a} != {_a} ({a.dtype}|{_a.dtype}"
 
     def test_passing_modifying_and_retrieving_shared_array(self):
         a = SharedNDArray(shape=(10, 10), dtype=int)
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         b = p.fill_and_return_array(a, 1)
         assert np.array_equal(a, b)
 
     def test_attribute_access(self):
         p = ObjectInSubprocess(
-            TestObjectInSubprocess.TestClass, 'attribute', x=4)
+            _TestObjectInSubprocess.TestClass, 'attribute', x=4)
         assert p.x == 4
         assert getattr(p, 'arg_0') == 'attribute'
         try:
@@ -1278,8 +1250,8 @@ class TestObjectInSubprocess(MyTestClass):
             raise AssertionError('Did not get the error we expected')
 
     def test_printing_in_child_processes(self):
-        a = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
-        b = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        a = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
+        b = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         expected_output = ''
         b.printing_method( 'Hello')
         expected_output += 'Hello\n'
@@ -1294,7 +1266,7 @@ class TestObjectInSubprocess(MyTestClass):
         return expected_output
 
     def test_setting_attribute_of_object_in_subprocess(self):
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         assert not hasattr(p, 'z')
         p.z = 10
         assert hasattr(p, 'z')
@@ -1304,7 +1276,7 @@ class TestObjectInSubprocess(MyTestClass):
         assert p.get_attribute('z') == 100
 
     def test_array_values_after_passing_to_subprocess(self):
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         a = SharedNDArray(shape=(10, 1))
         a[:] = 1
         assert a.sum() == p.sum(a)
@@ -1314,7 +1286,7 @@ class TestObjectInSubprocess(MyTestClass):
         """
         print('Performance summary:')
         n_loops = 10000
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass, x=4)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass, x=4)
         t = self.time_it(
             n_loops, lambda: p.x, timeout_us=100, name='Attribute access')
         print(f" {t:.2f} \u03BCs per get-attribute.")
@@ -1345,7 +1317,7 @@ class TestObjectInSubprocess(MyTestClass):
         sz = int(np.prod(shape, dtype='uint64')*np.dtype(int).itemsize)
         direction = '<->' if method_name == 'mirror' else '->'
         name = f'{shape} array {direction} {pass_by}'
-        shm_obj = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        shm_obj = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         if pass_by == 'reference':
             a = SharedNDArray(shape, dtype=dtype)
             timeout_us = 5e3
@@ -1421,7 +1393,7 @@ class TestObjectInSubprocess(MyTestClass):
         without using a custody object. This is expected to raise a
         RunTimeError.
         """
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         exceptions = []
         def unsafe_fn():
             try:
@@ -1436,7 +1408,7 @@ class TestObjectInSubprocess(MyTestClass):
     def test_sending_shared_arrays(self):
         """Testing sending a SharedNDArray to a ObjectInSubprocess."""
 
-        p = ObjectInSubprocess(TestObjectInSubprocess.TestClass)
+        p = ObjectInSubprocess(_TestObjectInSubprocess.TestClass)
         original_dimensions = (3, 3, 3, 256, 256)
         a = SharedNDArray(shape=original_dimensions, dtype='uint8')
 
@@ -1459,6 +1431,6 @@ class TestObjectInSubprocess(MyTestClass):
         assert _a.strides != a.strides
 
 if __name__ == "__main__":
-    TestResultThreadAndCustodyThread().run()
-    TestSharedNDArray().run()
-    TestObjectInSubprocess().run()
+    _TestResultThreadAndCustodyThread().run()
+    _TestSharedNDArray().run()
+    _TestObjectInSubprocess().run()

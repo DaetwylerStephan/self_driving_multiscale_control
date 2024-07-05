@@ -15,7 +15,7 @@ import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.write_parameters as write_params
 from auxiliary_code.constants import Camera_parameters
 from auxiliary_code.constants import NI_board_parameters
-from auxiliary_code.constants import FileSave_parameters
+from auxiliary_code.constants import microscope_configuration
 from auxiliary_code.constants import ASLM_parameters
 from automated_microscopy.drift_correction import drift_correction
 from automated_microscopy.image_deposit import images_InMemory_class
@@ -579,7 +579,7 @@ class MultiScale_Microscope_Controller():
         """
         construct the filename used to save data, based on the information from the GUI
         """
-        parentdir = FileSave_parameters.parentdir
+        parentdir = microscope_configuration.parentdir
 
         modelorganism = self.view.welcometab.welcome_modelorganism.get()
         date = dt.datetime.now().strftime("%Y%m%d")

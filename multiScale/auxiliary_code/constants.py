@@ -1,4 +1,7 @@
 class microscope_configuration:
+    """
+    Microscope configuration class. Define which hardware to use here and where to save images.
+    """
     lowres_camera = 'Photometrics_lowres'
     highres_camera = 'Photometrics_highres'
     filterwheel = 'Ludl_filterwheel'
@@ -6,15 +9,20 @@ class microscope_configuration:
     rotationstage = 'Smaract_RotationStage'
     translationstage = 'Smaract_TranslationStage'
 
+    parentdir = "D:/multiScope_Data/"
+
+    # Synthetic microscope.
     # lowres_camera = 'Synthetic_camera'
     # highres_camera = 'Synthetic_camera'
     # filterwheel = 'Synthetic_Filterwheel'
     # rotationstage = 'Synthetic_RotationStage'
     # translationstage = 'Synthetic_TranslationStage'
-    #
     # ni_board = 'Synthetic_niBoard'
 
 class FilterWheel_parameters:
+    """
+    Filter wheel configuration class. Define which filters are available and which comport to use for connection.
+    """
     avail_filters = {'515-30-25': 1,
                '572/20-25': 2,
                '615/20-25': 3,
@@ -25,6 +33,9 @@ class FilterWheel_parameters:
     comport= 'COM6'
 
 class Stage_parameters:
+    """
+    Stage configuration. Define the connection values for the Smaract stages.
+    """
     #stage_id_XYZ = 'usb:sn:MCS2-00001795'
     stage_id_XYZ = 'network:sn:MCS2-00000382'
     stage_id_rot = 'usb:id:3948963323'
@@ -32,6 +43,9 @@ class Stage_parameters:
     adjustableslit_max = 4024
 
 class Camera_parameters:
+    """
+    Camera configuration values. Define here settings for the Photometrics cameras.
+    """
     HR_width_pixel = 2048
     HR_height_pixel = 2048
     LR_width_pixel = 5056
@@ -42,18 +56,27 @@ class Camera_parameters:
     low_to_highres_calibration_height = 130
 
 class Image_parameters:
+    """
+    Image parameters. Define here values for the xy lateral pixel sizes.
+    """
     xy_pixelsize_lowres_um =  0.3825
     xy_pixelsize_highres_um = 0.117
 
-class FileSave_parameters:
-    parentdir = "D:/multiScope_Data/"
+
+
 
 class ASLM_parameters:
+    """
+    ASLM parameters. Define here the parameters for the ASLM voltage.
+    """
     simultaneous_lines = 17 #for a NA0.4 light-sheet, the expected length is around 2 um, with the 55.5x magnification, and 6.5 um pixel size (2*55.5/6.5) this translates to 17 lines
     remote_mirror_minVol = -2.5
     remote_mirror_maxVol = 2.5
 
 class NI_board_parameters:
+    """
+    NI board parameters. Define here the on which channels the hardware components are connected to.
+    """
     # "ao0/highrescamera", "ao1/lowrescamera", "ao3/stage", "ao5/laser488TTL",
     # "ao6/laser552_TTL", "ao8/laser594_TTL", "ao11/laser640_TTL", "ao12/voicecoil"
     line_selection = "Dev1/ao0, Dev1/ao1, Dev1/ao3, Dev1/ao5, Dev1/ao6, Dev1/ao8, Dev1/ao11, Dev1/ao12"
