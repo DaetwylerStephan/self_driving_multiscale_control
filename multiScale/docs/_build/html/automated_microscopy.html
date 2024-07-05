@@ -52,14 +52,10 @@
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.__init__"><code class="docutils literal notranslate"><span class="pre">drift_correction.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_Lateral_drift()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_axialdrift()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_drift_highRes"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_drift_highRes()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_pixelcoord_from_physicalcoordinates()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.composite_images"><code class="docutils literal notranslate"><span class="pre">drift_correction.composite_images()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.find_closestLowResTile"><code class="docutils literal notranslate"><span class="pre">drift_correction.find_closestLowResTile()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles"><code class="docutils literal notranslate"><span class="pre">drift_correction.find_corresponsingHighResTiles()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted"><code class="docutils literal notranslate"><span class="pre">drift_correction.indicate_driftcorrectionCompleted()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.overlay_images"><code class="docutils literal notranslate"><span class="pre">drift_correction.overlay_images()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.plot_registration"><code class="docutils literal notranslate"><span class="pre">drift_correction.plot_registration()</span></code></a></li>
 <li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.register_image"><code class="docutils literal notranslate"><span class="pre">drift_correction.register_image()</span></code></a></li>
 </ul>
 </li>
@@ -128,10 +124,12 @@
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.drift_correction.</span></span><span class="sig-name descname"><span class="pre">drift_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides the methods to calculate the shift over time for self-driving microscopy based on the low-resolution images.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.__init__" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Initiate self-driving module</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lowres_PosList</strong> – the list of position of the low resolution imaging</p></li>
@@ -139,9 +137,9 @@
 <li><p><strong>lowres_zspacing</strong> – the plane spacing of the low resolution stacks</p></li>
 <li><p><strong>highres_zspacing</strong> – the plane spacing of the high resolution stacks</p></li>
 <li><p><strong>highresShape_width</strong> – width of image, convention: np.array(height, width) and cv2.function(width, height)</p></li>
-<li><p><strong>highresShape_height</strong> – height of image (lowres max 5092 / highres max 2048)</p></li>
+<li><p><strong>highresShape_height</strong> – height of image (here: highres max 2048)</p></li>
 <li><p><strong>lowresShape_width</strong> – width of image, convention: np.array(height, width) and cv2.function(width, height)</p></li>
-<li><p><strong>lowresShape_height</strong> – height of low res image (lowres max 5092 / highres max 2048)</p></li>
+<li><p><strong>lowresShape_height</strong> – height of low res image (here: lowres max 5092)</p></li>
 <li><p><strong>filepath</strong> – (optional) filepath to logging the drift correction</p></li>
 </ul>
 </dd>
@@ -150,73 +148,93 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift">
-<span class="sig-name descname"><span class="pre">calculate_Lateral_drift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumberID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fluorescence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift" title="Permalink to this definition"></a></dt>
-<dd><p>calculates lateral drift correction based on low res view.
-:param PosNumber: which entry of the highres list with ID=PosNumber are you trying to correct?
-:param mode: what drift correction are you running? e.g. on transmission image or fluorescence image
-:return: (rownumber, columnnumber, crop_height, crop_width) - the position of the newly found view in the max projection</p>
+<span class="sig-name descname"><span class="pre">calculate_Lateral_drift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumberID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates lateral drift correction based on low resolution view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>PosNumber</strong> – which entry of the highres list with ID=PosNumber are you trying to correct?</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(rownumber, columnnumber, crop_height, crop_width) - the position of the newly found view in the max projection</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_axialdrift">
-<span class="sig-name descname"><span class="pre">calculate_axialdrift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fluorescence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift" title="Permalink to this definition"></a></dt>
-<dd><p>calculates axial drift correction based on low res view.
-:param image of axial max projection around laterally corrected position.
-:param PosNumber: which entry of the highres list are you trying to correct?
-:param mode: what drift correction are you running? e.g. on transmission image or fluorescence image
-:return:</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_drift_highRes">
-<span class="sig-name descname"><span class="pre">calculate_drift_highRes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyview</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xzview</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yzview</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previousimage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_drift_highRes" title="Permalink to this definition"></a></dt>
-<dd><p>calculate drift based on high resolution images from previous timepoint, and update position list
-:param xyview:
-:param xzview:
-:param yzview:
-:param previousimage: file path to previous time point image
-:param z_step:
-:param PosNumber: unique ID of stack
-:return:</p>
+<span class="sig-name descname"><span class="pre">calculate_axialdrift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates axial drift correction based on low-resolution view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image1</strong> – maximum intensity projection in axial direction 1 (xz) around laterally corrected position.</p></li>
+<li><p><strong>image2</strong> – maximum intensity projection in axial direction 2 (yz) around laterally corrected position</p></li>
+<li><p><strong>PosNumber</strong> – unique ID of high-resolution view to correct</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>correction factor, if previous time-point images have been saved in the image repository.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates">
 <span class="sig-name descname"><span class="pre">calculate_pixelcoord_from_physicalcoordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates_lowres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates_highres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowresshape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates" title="Permalink to this definition"></a></dt>
-<dd><p>calulate pixel coordinates from physical stage coordinates
-:param coordinates_lowres, stage coordinates of lowres image
-:param coordinates_highres, stage coordinates of highres image
-:return:</p>
+<dd><p>Calulate pixel coordinates from physical stage coordinates (important to establish view correspondance at first timepoint).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coordinates_lowres</strong> – stage coordinates of lowres image</p></li>
+<li><p><strong>coordinates_highres</strong> – stage coordinates of highres image</p></li>
+<li><p><strong>lowresshape</strong> – shape of low-resolution image</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.composite_images">
-<span class="sig-name descname"><span class="pre">composite_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equalize=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregator=&lt;function</span> <span class="pre">mean&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.composite_images" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.find_closestLowResTile">
 <span class="sig-name descname"><span class="pre">find_closestLowResTile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.find_closestLowResTile" title="Permalink to this definition"></a></dt>
-<dd><p>find corresponding low resolution stack to selected high-res region (PosNumber) (of the same angle).
-:param PosNumber: position of the highres view in the highres position list with unique ID.
-:param return_number: if True, return number e.g. 1, if False return string for filename “low_stack000”
-:return: the corresponding file name of the low resolution stack which is closest to the high res stack.</p>
+<dd><p>Find corresponding low resolution stack to selected high-res region (PosNumber) (of the same angle).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>PosNumber</strong> – unique ID of highres view (note: not index).</p></li>
+<li><p><strong>return_number</strong> – if True, return number e.g. 1, if False return string for filename “low_stack000”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Based on the input of return_number, returns either the corresponding file name of the low resolution stack (e.g. “low_stack000”)</p>
+</dd>
+</dl>
+<p>which is closest to the high res stack or its number (e.g. “1”)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles">
 <span class="sig-name descname"><span class="pre">find_corresponsingHighResTiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LowResPosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles" title="Permalink to this definition"></a></dt>
-<dd><p>find all high resolution stacks that are closest to a given low res view (of the same angle)
-:param LowResPosNumber: position of the low resolution view in the lowres position list.
-:return: list of all highres stacks PosNumbers which are assigned to low resolution stack.</p>
+<dd><p>Find all high resolution stacks that are closest to a given low res view (of the same angle)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>LowResPosNumber</strong> – position of the low resolution view in the lowres position list.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of all highres stacks PosNumbers which are assigned to low resolution stack.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted">
 <span class="sig-name descname"><span class="pre">indicate_driftcorrectionCompleted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Indicate that correction for PosNumber has been finished by setting array value to 1.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>PosNumber</strong> – </p>
+<dd class="field-odd"><p><strong>PosNumber</strong> – unique ID of position</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>update completed array</p>
@@ -225,27 +243,21 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.overlay_images">
-<span class="sig-name descname"><span class="pre">overlay_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equalize=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregator=&lt;function</span> <span class="pre">mean&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.overlay_images" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.plot_registration">
-<span class="sig-name descname"><span class="pre">plot_registration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mov</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.plot_registration" title="Permalink to this definition"></a></dt>
-<dd><p>plot images
-:param ref: image 1
-:param mov: image 2
-:return: plots them and their overlay</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.register_image">
 <span class="sig-name descname"><span class="pre">register_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.register_image" title="Permalink to this definition"></a></dt>
-<dd><p>register two images (ref, mov) to each other using the StackReg
-:param ref: reference image
-:param mov: moving image
-:param mode: rigid (if mode==’rigid’), else translation
-:return: lateral (xshift, yshift)</p>
+<dd><p>Register two images (ref, mov) to each other using StackReg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> – reference image</p></li>
+<li><p><strong>mov</strong> – moving image</p></li>
+<li><p><strong>mode</strong> – rigid (if mode==’rigid’), else translation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>lateral shift (xshift, yshift)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
