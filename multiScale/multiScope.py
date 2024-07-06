@@ -43,7 +43,7 @@ from automated_microscopy.image_deposit import images_InMemory_class
 
 class multiScopeModel:
     """
-    The main model class of the multi-scale microscope. Here all hardware components are controlled.
+    The main model class of the multi-scale microscope. Here all hardware components are initialized, started/controlled.
     """
 
     def __init__(
@@ -52,7 +52,6 @@ class multiScopeModel:
         """
         Initialize the multiScopeModel.
         """
-        self.unfinished_tasks = queue.Queue()
 
         self.num_frames = 0
         self.initial_time = time.perf_counter()
@@ -403,7 +402,6 @@ class multiScopeModel:
         """
         Close all opened channels, tasks, camera, NI board, stages and display.
         """
-        self.finish_all_tasks()
         self.lowres_camera.close()
         self.highres_camera.close()
         self.ao.close()
@@ -413,20 +411,6 @@ class multiScopeModel:
         self.display.close()  # more work needed here
         print('Closed multiScope')
 
-    def finish_all_tasks(self):
-        """
-        Close tasks and queues that might be open.
-        """
-
-        collected_tasks = []
-        while True:
-            try:
-                th = self.unfinished_tasks.get_nowait()
-            except queue.Empty:
-                break
-            th.join()
-            collected_tasks.append(th)
-        return collected_tasks
 
 #######################################################################################################################
 # functions to control buffers and hardware run from GUI: update_bufferSize, set_laserpower, check_movementboundaries,
@@ -511,9 +495,10 @@ class multiScopeModel:
         '''
         Define here the movement boundaries of your stage system.
 
-        :param array = [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to
+        :param array: [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to.
         :return: an array which has no out of range positions
         '''
+
         if array[0] > 20 * 1000000000:
             array[0] = 19.9 * 1000000000
         if array[0] < -20 * 1000000000:
@@ -877,7 +862,7 @@ class multiScopeModel:
         '''
         Saves current position to file/append it, called by stack_acquisition_master.
 
-        :param filepath: filepath to position list file.
+        :param filepath: filepath to save current position.
         :param current_startposition: position to save to file.
         '''
 

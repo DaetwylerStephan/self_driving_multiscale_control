@@ -55,7 +55,6 @@
 <li><a class="reference internal" href="#multiScope.multiScopeModel.changeLRtoHR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeLRtoHR()</span></code></a></li>
 <li><a class="reference internal" href="#multiScope.multiScopeModel.check_movementboundaries"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.check_movementboundaries()</span></code></a></li>
 <li><a class="reference internal" href="#multiScope.multiScopeModel.close"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.close()</span></code></a></li>
-<li><a class="reference internal" href="#multiScope.multiScopeModel.finish_all_tasks"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.finish_all_tasks()</span></code></a></li>
 <li><a class="reference internal" href="#multiScope.multiScopeModel.move_to_position"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.move_to_position()</span></code></a></li>
 <li><a class="reference internal" href="#multiScope.multiScopeModel.prepare_acquisition"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.prepare_acquisition()</span></code></a></li>
 <li><a class="reference internal" href="#multiScope.multiScopeModel.preview_highres_ASLM"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_ASLM()</span></code></a></li>
@@ -102,7 +101,7 @@
 <dt class="sig sig-object py" id="multiScope.multiScopeModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multiScope.</span></span><span class="sig-name descname"><span class="pre">multiScopeModel</span></span><a class="headerlink" href="#multiScope.multiScopeModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The main model class of the multi-scale microscope. Here all hardware components are controlled.</p>
+<p>The main model class of the multi-scale microscope. Here all hardware components are initialized, started/controlled.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScope.multiScopeModel.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.__init__" title="Permalink to this definition"></a></dt>
@@ -167,20 +166,20 @@
 <dt class="sig sig-object py" id="multiScope.multiScopeModel.check_movementboundaries">
 <span class="sig-name descname"><span class="pre">check_movementboundaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.check_movementboundaries" title="Permalink to this definition"></a></dt>
 <dd><p>Define here the movement boundaries of your stage system.</p>
-<p>:param array = [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to
-:return: an array which has no out of range positions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>array</strong> – [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an array which has no out of range positions</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScope.multiScopeModel.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.close" title="Permalink to this definition"></a></dt>
 <dd><p>Close all opened channels, tasks, camera, NI board, stages and display.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="multiScope.multiScopeModel.finish_all_tasks">
-<span class="sig-name descname"><span class="pre">finish_all_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScope.multiScopeModel.finish_all_tasks" title="Permalink to this definition"></a></dt>
-<dd><p>Close tasks and queues that might be open.</p>
 </dd></dl>
 
 <dl class="py method">
