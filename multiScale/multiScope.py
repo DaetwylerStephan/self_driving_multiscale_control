@@ -42,11 +42,15 @@ from automated_microscopy.drift_correction import drift_correction
 from automated_microscopy.image_deposit import images_InMemory_class
 
 class multiScopeModel:
+    """
+    The main model class of the multi-scale microscope. Here all hardware components are controlled.
+    """
+
     def __init__(
             self
     ):
         """
-        The main model class of the multi-scale microscope.
+        Initialize the multiScopeModel.
         """
         self.unfinished_tasks = queue.Queue()
 
@@ -133,7 +137,7 @@ class multiScopeModel:
         self.drift_correctionOnLowRes = 0 #parameter whether low res drift correction is enabled
         self.drift_which_channels = [0,0,0,0,0] #array on which channels drift correction is run
         self.perform_driftcorrectionOnChannel = 0 #flag whether for current stack, drift correction should be performed
-        self.current_PosNumber = 0 #todo previously 'item0'
+        self.current_PosNumber = 0
 
         # initialize buffers
         self.update_bufferSize()
@@ -184,7 +188,7 @@ class multiScopeModel:
 #######################################################################################################################
     def _init_lowres_camera(self):
         """
-        Initialize low resolution camera
+        Initialize the low-resolution camera (Photometrics or synthetic)
         """
         print("Initializing low resolution camera ..")
 
@@ -205,7 +209,7 @@ class multiScopeModel:
 
     def _init_highres_camera(self):
         """
-        Initialize low resolution camera
+        Initialize the high-resolution camera (Photometrics or synthetic)
         """
         if microscope_configuration.highres_camera == 'Photometrics_highres':
             print("Initializing high resolution camera..")
@@ -223,6 +227,9 @@ class multiScopeModel:
             print("done with camera.")
 
     def _init_display(self):
+        """
+        Initialize the high-resolution camera (Photometrics or synthetic)
+        """
         print("Initializing display...")
         self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop=napari._napari_child_loop,
                                              close_method_name='close')
@@ -231,7 +238,7 @@ class multiScopeModel:
 
     def _init_ao(self):
         """
-        Initialize National Instruments card 6378 as device 1, Dev1
+        Initialize National Instruments card 6378 as device 1, Dev1 or a synthetic NI board
         """
         print("Initializing ao card...", end=' ')
         if microscope_configuration.ni_board == 'NI_Board':
@@ -325,7 +332,7 @@ class multiScopeModel:
 
     def _init_filterwheel(self):
         """
-        Initialize filterwheel
+        Initialize Ludl filterwheel or synthetic filterwheel
         """
         if microscope_configuration.filterwheel == 'Ludl_filterwheel':
             ComPort = FilterWheel_parameters.comport
@@ -339,6 +346,7 @@ class multiScopeModel:
             self.filterwheel.set_filter('676/37-25', wait_until_done=False)
             print("done with Ludl filterwheel.")
         else:
+            #synthetic filter wheel
             ComPort = FilterWheel_parameters.comport
             self.filters = FilterWheel_parameters.avail_filters
             print("Initializing filter wheel...", end=' ')
@@ -348,7 +356,7 @@ class multiScopeModel:
 
     def _init_XYZ_stage(self):
         """
-        Initialize translation stage
+        Initialize Smaract translation stage or synthetic stage
         """
         if microscope_configuration.translationstage == 'Smaract_TranslationStage':
             print("Initializing XYZ stage usb:sn:MCS2-00001795...")
@@ -364,7 +372,7 @@ class multiScopeModel:
 
     def _init_rotation_stage(self):
         """
-        Initialize rotation stage
+        Initialize Smaract rotation stage or synthetic rotation stage
         """
         print("Initializing rotation stage...")
         if microscope_configuration.rotationstage == 'Smaract_RotationStage':
@@ -393,8 +401,8 @@ class multiScopeModel:
 #######################################################################################################################
     def close(self):
         """
-        Close all opened channels, camera etc
-                """
+        Close all opened channels, tasks, camera, NI board, stages and display.
+        """
         self.finish_all_tasks()
         self.lowres_camera.close()
         self.highres_camera.close()
@@ -406,6 +414,10 @@ class multiScopeModel:
         print('Closed multiScope')
 
     def finish_all_tasks(self):
+        """
+        Close tasks and queues that might be open.
+        """
+
         collected_tasks = []
         while True:
             try:
@@ -423,7 +435,8 @@ class multiScopeModel:
 
     def update_bufferSize(self):
         """
-        This handles the size of the buffers during acquisitions.
+        This handles the size of the buffers during acquisitions. For example, if there is a change in plane number or ROI,
+        updates the buffers accordingly.
         """
 
         # check for whether some image dimension parameters were changed
@@ -484,6 +497,11 @@ class multiScopeModel:
             self.low_res_memory_names = [self.low_res_buffers[i].shared_memory.name for i in range(self.lowresbuffernumber)]
 
     def set_laserpower(self, powersettings):
+        """
+        Update the laser intensity by setting the corresponding NI board voltage sent to the laser.
+
+        :param powersettings: np.array with 4 entries for 4 lasers
+        """
         self.ao_laser488_power.setconstantvoltage(powersettings[0])
         self.ao_laser552_power.setconstantvoltage(powersettings[1])
         self.ao_laser594_power.setconstantvoltage(powersettings[2])
@@ -491,6 +509,8 @@ class multiScopeModel:
 
     def check_movementboundaries(self, array):
         '''
+        Define here the movement boundaries of your stage system.
+
         :param array = [axialPosition, lateralPosition, updownPosition, anglePosition], a list of position the stages moves to
         :return: an array which has no out of range positions
         '''
@@ -513,9 +533,9 @@ class multiScopeModel:
 
     def move_to_position(self, positionlist):
         """
-        move to specified position according to positionlist
+        Move to specified position according to positionlist
+
         :param positionlist: list of positions in format, e.g. [44280000, -2000000000, -2587870000]
-        :return:
         """
         positionlistInt = np.array(positionlist, dtype=np.int64)
         self.XYZ_stage.moveToPosition(positionlistInt[0:3])
@@ -532,14 +552,14 @@ class multiScopeModel:
 
     def changeLRtoHR(self):
         """
-        change from low resolution to high resolution acquisition settings
+        Change the microscope from a low-resolution to a high-resolution acquisition configuration (flip mirror)
         """
         self.flipMirrorPosition_power.setconstantvoltage(0)
         #self.move_adjustableslit(self.slitopening_highres, 1)
 
     def changeHRtoLR(self):
         """
-        change from high resolution to low resolution acquisition settings
+        Change the microscope from a high-resolution to a low-resolution acquisition configuration (flip mirror)
         """
         self.flipMirrorPosition_power.setconstantvoltage(3)
         #self.move_adjustableslit(self.slitopening_lowres, 1)
@@ -550,15 +570,21 @@ class multiScopeModel:
 
     def preview_lowres(self):
         """
-        starts a custody thread to run a low resolution preview.
+        Starts a custody thread to run a low-resolution preview.
         """
 
         def preview_lowres_task(custody):
+            """
+            Thread task for low-resolution preview.
+            """
 
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
             def laser_preview():
+                """
+                Calculate NI board voltages (laser) for low-resolution preview and send it to the NI board.
+                """
                 while self.continue_preview_lowres:
                     basic_unit = self.get_acq_array.get_lowres_preview_array()
                     self.ao.set_verbose(verbosevalue=False)
@@ -581,7 +607,6 @@ class multiScopeModel:
                     currentlaserpower = self.lowres_laserpower
 
                 custody.switch_from(None, to=self.lowres_camera)
-                # self.lowres_camera.run_preview(out=self.low_res_buffer)
                 self.lowres_camera.acquire_preview_tobuffer()
                 self.low_res_buffer = self.lowres_camera.get_previewbuffer()
                 # display
@@ -592,7 +617,6 @@ class multiScopeModel:
                     minval = np.amin(self.low_res_buffer)
                     maxval = np.amax(self.low_res_buffer)
                     self.display.set_contrast(minval, maxval, "lowrespreview")
-                    print("updated preview settings")
 
                 custody.switch_from(self.display, to=None)
                 self.num_frames += 1
@@ -605,7 +629,6 @@ class multiScopeModel:
 
             self.lowres_camera.end_preview()
 
-        # self.low_res_buffer = ct.SharedNDArray(shape=(self.current_lowresROI_height, self.current_lowresROI_width), dtype='uint16')
         self.low_res_buffer = np.zeros([self.current_lowresROI_height, self.current_lowresROI_width], dtype="uint16")
         self.lowres_camera.init_previewbuffer(self.current_lowresROI_height, self.current_lowresROI_width)
         self.continue_preview_lowres = True
@@ -615,12 +638,21 @@ class multiScopeModel:
 
     ###this is the code to run a high resolution preview with a static light-sheet
     def preview_highres_static(self):
+        """
+        Starts a custody thread to run a high-resolution SPIM preview.
+        """
         def preview_highres_task(custody):
+            """
+            Thread task for high-resolution SPIM preview.
+            """
 
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
             def laser_preview_highres():
+                """
+                Calculate NI board voltages (laser) for high-resolution SPIM preview and send it to the NI board until preview is ended.
+                """
                 # old_laserline = 0
                 while self.continue_preview_highres:
                     basic_unit = self.get_acq_array.get_highresSPIM_preview_array()
@@ -667,9 +699,9 @@ class multiScopeModel:
 
     def calculate_ASLMparameters(self, desired_exposuretime):
         """
-        calculate the parameters for an ASLM acquisition
+        Calculate and set the parameters for an ASLM acquisition.
+
         :param desired_exposuretime: the exposure time that is desired for the whole acquisition
-        :return: set the important parameters for ASLM acquisitions
         """
         linedelay = Camera_parameters.highres_line_digitization_time
         nbrows = self.current_highresROI_height
@@ -683,8 +715,13 @@ class multiScopeModel:
                 self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time, self.ASLM_scanWidth))
 
     def preview_highres_ASLM(self):
+        """
+        Starts a custody thread to run a high-resolution ASLM preview.
+        """
         def preview_highresASLM_task(custody):
-
+            """
+            Thread task for high-resolution ASLM preview.
+            """
             self.num_frames = 0
             self.initial_time = time.perf_counter()
 
@@ -760,13 +797,15 @@ class multiScopeModel:
 
     def stack_acquisition_master(self, current_folder, current_position, whichlaser, resolutionmode):
         """
-        Master to start stack acquisitions of different channels and resolution modes. Decides which stack acquisition method to call
+        Start stack acquisitions of different channels and resolution modes, including setting laser powers, saving of start position to file,
+        generation of filepaths, and decides which stack acquisition method to call.
+
         :param current_folder: folder to save the acquired data
-        :param current_folder: folder to save the projected data
-        :param current_startposition: start position for the stack streaming
+        :param current_position: start position for the stack streaming
         :param whichlaser: which channels to image
-        :return:
+        :param resolutionmode: which scale, options: low, highASLM, highSPIM
         """
+
         #get current start position
         # get current position from list
         xpos = int(float(current_position[1]) * 1000000000)
@@ -836,10 +875,12 @@ class multiScopeModel:
 
     def save_currentpositionToFile(self, filepath, current_startposition):
         '''
-        saves current position to file/append it, called by stack_acquisition_master
-        :param filepath:
-        :return:
+        Saves current position to file/append it, called by stack_acquisition_master.
+
+        :param filepath: filepath to position list file.
+        :param current_startposition: position to save to file.
         '''
+
         # make positions folder if it does not exist to write file
         try:
             os.makedirs(os.path.dirname(filepath))
@@ -857,7 +898,10 @@ class multiScopeModel:
 
     def prepare_acquisition(self, current_startposition, laser):
         """
-        prepare acquisition by moving filter wheel and stage system to the correct position
+        Prepare acquisition by moving filter wheel and stage system to the correct position, and updating buffer sizes.
+
+        :param current_startposition: position to move the stage to for starting a stack.
+        :param laser: wavelength to image.
         """
 
         def movestage():
@@ -884,7 +928,18 @@ class multiScopeModel:
         thread_stagemove.get_result()
 
     def acquire_stack_lowres(self, current_startposition, current_laserline, filepath):
+        """
+        Starts a custody thread to run a low-resolution stack acquisition. Also updates the buffer used.
+
+        :param current_startposition: start position for the stack acquisition
+        :param current_laserline: which wavelength is acquired.
+        :param filepath: filepath to save acquired low-resolution image stack.
+        """
+
         def acquire_task(custody):
+            """
+            Thread task for low-resolution stack acquisition.
+            """
             print("new low res stack acquisition started...")
             custody.switch_from(None, to=self.lowres_camera)
 
@@ -1048,7 +1103,19 @@ class multiScopeModel:
         acquire_thread.get_result()
 
     def acquire_stack_highres(self, current_startposition, current_laserline, filepath, modality):
+        """
+        Starts a custody thread to run a high-resolution stack acquisition (SPIM or ASLM). Also updates the buffer used.
+
+        :param current_startposition: start position for the stack acquisition
+        :param current_laserline: which wavelength is acquired.
+        :param filepath: filepath to save acquired low-resolution image stack.
+        :param modality: ASLM or SPIM?
+        """
+
         def acquire_taskHighResSPIM(custody):
+            """
+            Thread task for high-resolution stack acquisition.
+            """
             print("start")
             custody.switch_from(None, to=self.highres_camera)
 
@@ -1129,7 +1196,7 @@ class multiScopeModel:
             def calculate_projection_highres():
                 # calculate projections
 
-                #todo - list all parameters here that change from stack to stack to avoid racing conditions....
+                #list all parameters here that change from stack to stack to avoid racing conditions....
                 filepathforprojection_three = copy.deepcopy(self.current_projectionfilepath_three)  # assign now as filepath is updated for next stack acquired
                 filepathforprojection_XY = copy.deepcopy(self.current_projectionfilepath_XY)  # assign now as filepath is updated for next stack acquired
                 filepathforprojection_XZ = copy.deepcopy(self.current_projectionfilepath_XZ)  # assign now as filepath is updated for next stack acquired
@@ -1205,6 +1272,13 @@ class multiScopeModel:
         acquire_threadHighResSPIM.get_result()
 
     def smooth_sawtooth(self, array, window_len=101):
+        """
+        Smooth an array with a defined window length.
+
+        :param array: Array to smooth
+        :param window_len: Window length over which to average values.
+        :return: smooth array.
+        """
 
         if (window_len % 2) == 0:
             window_len = window_len + 1

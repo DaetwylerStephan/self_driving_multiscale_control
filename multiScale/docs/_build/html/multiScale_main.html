@@ -53,6 +53,7 @@
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_stack()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_stack_task()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_timelapse()</span></code></a></li>
+<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse_task"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_timelapse_task()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.changeROI"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.changeROI()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.changefilter"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.changefilter()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.close"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.close()</span></code></a></li>
@@ -65,10 +66,8 @@
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_highrespreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_highrespreview()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_lowrespreview()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_stop_preview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_stop_preview()</span></code></a></li>
-<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.run_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_timelapse()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateDriftCorrectionSettings()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateExposureParameters()</span></code></a></li>
-<li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateGUItext"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateGUItext()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateHighResLaserParameters()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateLowResLaserParameters()</span></code></a></li>
 <li><a class="reference internal" href="#multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.update_ASLMParameters()</span></code></a></li>
@@ -111,49 +110,78 @@
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multiScale_main.</span></span><span class="sig-name descname"><span class="pre">MultiScale_Microscope_Controller</span></span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the controller in an MVC-scheme for mediating the interaction between the View (GUI) and the model (multiScope.py).
-Use: <a class="reference external" href="https://www.python-course.eu/tkinter_events_binds.php">https://www.python-course.eu/tkinter_events_binds.php</a></p>
+<p>This is the controller in an MVC-scheme for mediating the interaction between the View (GUI, MultiScope_MainGui) and the model (multiScope.py).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize the MultiScale_Microscope_Controller.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.abort_stack">
 <span class="sig-name descname"><span class="pre">abort_stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.abort_stack" title="Permalink to this definition"></a></dt>
-<dd><p>set flag to abort stack acquisition</p>
+<dd><p>Set flag to abort stack acquisition after pressing button in the Viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.abort_timelapse">
 <span class="sig-name descname"><span class="pre">abort_timelapse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.abort_timelapse" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Set flag to stop time-lapse imaging after pressing button in the Viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_stack">
 <span class="sig-name descname"><span class="pre">acquire_stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack" title="Permalink to this definition"></a></dt>
-<dd><p>start a stack acquisition thread</p>
+<dd><p>Start a stack acquisition thread after pressing button in the Viewer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task">
 <span class="sig-name descname"><span class="pre">acquire_stack_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task" title="Permalink to this definition"></a></dt>
-<dd><p>acquire a stack acquisition - processes in thread (to not stop GUI from working)</p>
+<dd><p>Acquire a stack acquisition. This is its own thread to not stop GUI from working.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse">
 <span class="sig-name descname"><span class="pre">acquire_timelapse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse" title="Permalink to this definition"></a></dt>
-<dd><p>start a time-lapse acquisition thread, called from GUI (otherwise it freezes)</p>
+<dd><p>Start a  time-lapse  acquisition thread after pressing button in the Viewer.
+A thread is called to not freeze the GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse_task">
+<span class="sig-name descname"><span class="pre">acquire_timelapse_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse_task" title="Permalink to this definition"></a></dt>
+<dd><p>Thread that controls time-lapse acquisitions, started from the function acquire_timelapse called from the GUI.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.changeROI">
 <span class="sig-name descname"><span class="pre">changeROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.changeROI" title="Permalink to this definition"></a></dt>
-<dd><p>change the ROI - options (‘Full Chip’, ‘1024x1024’, ‘512x512’, ‘256x256’, ‘Custom’)</p>
+<dd><p>Updates the ROI settings of the camera with options (‘Full Chip’, ‘1024x1024’, ‘512x512’, ‘256x256’, ‘Custom’, ‘Usual’)
+by reading the viewer values and updating the corresponding model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -161,127 +189,237 @@ Use: <a class="reference external" href="https://www.python-course.eu/tkinter_ev
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.changefilter">
 <span class="sig-name descname"><span class="pre">changefilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">laser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.changefilter" title="Permalink to this definition"></a></dt>
-<dd><p>changes the filter to the specified one by the laser active</p>
+<dd><p>Changes the filter wheel filter position and the current_laser in the model upon pressing the corresponding button in the Viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> – Variable of the Tkinter event (press button).</p></li>
+<li><p><strong>laser</strong> – String, which laser to change to (488, 552, 594, 640, LED).</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.close" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Close the model.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.disable_keyboard_movement">
 <span class="sig-name descname"><span class="pre">disable_keyboard_movement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.disable_keyboard_movement" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Disable keyboard to move stages upon button press in the Viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (button pressed).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.enable_keyboard_movement">
 <span class="sig-name descname"><span class="pre">enable_keyboard_movement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.enable_keyboard_movement" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Enable keyboard to move stages upon button press in the Viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (button pressed).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.key_pressed">
 <span class="sig-name descname"><span class="pre">key_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.key_pressed" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Key board assignment of keys (w, s, a, d, q, e and up/down, left/right) to control stage movement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (keys pressed).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.movestage">
 <span class="sig-name descname"><span class="pre">movestage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.movestage" title="Permalink to this definition"></a></dt>
-<dd><p>moves the stage to a certain position</p>
+<dd><p>Moves the translational and rotational stage to the current position by reading the current stage values from the viewer and calling the
+corresponding model function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.movestageToPosition">
 <span class="sig-name descname"><span class="pre">movestageToPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.movestageToPosition" title="Permalink to this definition"></a></dt>
-<dd><p>moves the stage to a saved position, indicated by a field in the GUI</p>
+<dd><p>Moves the stage to a previously saved position by reading in the position number (user input field in GUI), updating the
+values of the stage position correspondingly and calling the model function to move the stage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run" title="Permalink to this definition"></a></dt>
-<dd><p>Run the Tkinter Gui in the main loop
-:return:</p>
+<dd><p>Run the Tkinter GUI in the main loop</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_highrespreview">
 <span class="sig-name descname"><span class="pre">run_highrespreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_highrespreview" title="Permalink to this definition"></a></dt>
-<dd><p>Runs the execution of a high resolution preview.
-Required:
-change mirror, set exposure time, start preview, set continue_preview_highres to True.</p>
+<dd><p>Connects the viewer button to run a high-resolution preview (SPIM or ASLM) with the corresponding model function (SPIM or ASLM). Before starting a preview,
+it checks whether the mirror position (changeLRtoHR) needs to change and sets the model.continue_preview_highres value to True</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview">
 <span class="sig-name descname"><span class="pre">run_lowrespreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview" title="Permalink to this definition"></a></dt>
-<dd><p>Runs the execution of a low resolution preview.
-Required:
-change mirror, start preview, set continue_preview_highres to True.</p>
+<dd><p>Connects the viewer button to run a low-resolution preview with the corresponding model function. Before starting a preview,
+it checks whether the mirror position (changeHRtoLR) needs to change and sets the model.continue_preview_lowres value to True</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_stop_preview">
 <span class="sig-name descname"><span class="pre">run_stop_preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_stop_preview" title="Permalink to this definition"></a></dt>
-<dd><p>Stops an executing preview and resets the profile of the preview buttons that were sunken after starting a preview</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.run_timelapse">
-<span class="sig-name descname"><span class="pre">run_timelapse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.run_timelapse" title="Permalink to this definition"></a></dt>
-<dd><p>thread that controls time-lapse, started from function acquire_timelapse, which is called from GUI(self, event):</p>
+<dd><p>Stops the running preview and resets the profile of the preview buttons that were sunken after starting a preview</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – Variable of the Tkinter event (press button).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings">
 <span class="sig-name descname"><span class="pre">updateDriftCorrectionSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings" title="Permalink to this definition"></a></dt>
-<dd><p>update settings of the drift correction
-:return: settings updated in model</p>
+<dd><p>Update settings for the self-driving microscope module such as which channel should guide the high-resolution imaging and whether to apply self-driving microscopy
+by reading the viewer values and updating the corresponding model parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters">
 <span class="sig-name descname"><span class="pre">updateExposureParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateGUItext">
-<span class="sig-name descname"><span class="pre">updateGUItext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateGUItext" title="Permalink to this definition"></a></dt>
-<dd><p>update text labes in GUI here
-:return:</p>
+<dd><p>Updates the camera exposure time by reading the viewer values and updating the model exposure_time values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters">
 <span class="sig-name descname"><span class="pre">updateHighResLaserParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters" title="Permalink to this definition"></a></dt>
-<dd><p>update the laser power</p>
+<dd><p>Updates the high-resolution laser power by reading the viewer values and calls the high-resolution laser power setting function in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters">
 <span class="sig-name descname"><span class="pre">updateLowResLaserParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters" title="Permalink to this definition"></a></dt>
-<dd><p>update the laser power</p>
+<dd><p>Updates the low-resolution laser power by reading the viewer values and calls the laser power setting function in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters">
 <span class="sig-name descname"><span class="pre">update_ASLMParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Updates the axially-swept  parameters such as minimal and maximal scan voltage, scan voltage for each wavelength,
+scan direction, or scan width by reading the viewer values and updating the corresponding model parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.update_stack_aq_parameters">
 <span class="sig-name descname"><span class="pre">update_stack_aq_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.update_stack_aq_parameters" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Updates the stack acquisition parameters such as plane spacing, plane number, stage velocity and acceleration and camera trigger delay
+by taking the viewer values and updates the corresponding model parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updatefilename">
 <span class="sig-name descname"><span class="pre">updatefilename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updatefilename" title="Permalink to this definition"></a></dt>
-<dd><p>construct the filename used to save data, based on the information from the GUI</p>
+<dd><p>Construct the filename used to save data, based on the information from the GUI</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="multiScale_main.MultiScale_Microscope_Controller.updatepreview">
 <span class="sig-name descname"><span class="pre">updatepreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#multiScale_main.MultiScale_Microscope_Controller.updatepreview" title="Permalink to this definition"></a></dt>
 <dd><p>Updates preview functionalities: auto-scaling of intensity values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>indx</strong> – Variable of the Tkinter trace_add function.</p></li>
+<li><p><strong>mode</strong> – Variable of the Tkinter trace_add function.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

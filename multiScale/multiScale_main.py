@@ -22,14 +22,13 @@ from automated_microscopy.image_deposit import images_InMemory_class
 
 class MultiScale_Microscope_Controller():
     """
-    This is the controller in an MVC-scheme for mediating the interaction between the View (GUI) and the model (multiScope.py).
-    Use: https://www.python-course.eu/tkinter_events_binds.php
+    This is the controller in an MVC-scheme for mediating the interaction between the View (GUI, MultiScope_MainGui) and the model (multiScope.py).
     """
 
-    #todo: check that stage values - e.g. with plane spacing, plane number don't expand beyond the possible travel range
-    #todo: move to selected region in high resolution.
-
     def __init__(self):
+        """
+        Initialize the MultiScale_Microscope_Controller.
+        """
         self.root = tk.Tk()
 
         # Create scope object as model
@@ -58,7 +57,7 @@ class MultiScale_Microscope_Controller():
         self.model.driftcorrectionmodule = self.drift_correctionmodule
 
         #define here which buttons run which function in the multiScope model
-        self.continuetimelapse = 1 #enable functionality to stop timelapse
+        self.stoptimelapse = 1 #enable functionality to stop timelapse
 
         #######connect buttons / variables from GUI with functions here-----------------------------------
         # connect all the buttons that start a functionality like preview, stack acquisition, etc.
@@ -151,8 +150,7 @@ class MultiScale_Microscope_Controller():
 
     def run(self):
         """
-        Run the Tkinter Gui in the main loop
-        :return:
+        Run the Tkinter GUI in the main loop
         """
         self.root.title("Multi-scale microscope V1")
         self.root.geometry("800x600")
@@ -161,12 +159,19 @@ class MultiScale_Microscope_Controller():
         self.root.mainloop()
 
     def close(self):
+        """
+        Close the model.
+        """
         self.model.LED_voltage.setconstantvoltage(0)
         self.model.close()
 
     def updateLowResLaserParameters(self, var, indx, mode):
         """
-        update the laser power
+        Updates the low-resolution laser power by reading the viewer values and calls the laser power setting function in the model.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
         """
         # get laser power from GUI and construct laser power setting array
         # multiply with 5 here as the laser is modulated within 0 to 5 V
@@ -181,7 +186,11 @@ class MultiScale_Microscope_Controller():
 
     def updateHighResLaserParameters(self, var, indx, mode):
         """
-        update the laser power
+        Updates the high-resolution laser power by reading the viewer values and calls the high-resolution laser power setting function in the model.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
         """
         voltage488_HR = self.view.runtab.laser488_percentage_HR.get() * 5 / 100.
         voltage552_HR = self.view.runtab.laser552_percentage_HR.get() * 5 / 100.
@@ -203,6 +212,13 @@ class MultiScale_Microscope_Controller():
     #         self.model.mSPIMmirror_voltage.setconstantvoltage(voltage)
 
     def updateExposureParameters(self, var, indx, mode):
+        """
+        Updates the camera exposure time by reading the viewer values and updating the model exposure_time values.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
+        """
         # exposure time
 
         if self.view.runtab.cam_lowresExposure.get()>5:
@@ -212,6 +228,14 @@ class MultiScale_Microscope_Controller():
         print("updated exposure time")
 
     def update_stack_aq_parameters(self, var, indx, mode):
+        """
+        Updates the stack acquisition parameters such as plane spacing, plane number, stage velocity and acceleration and camera trigger delay
+        by taking the viewer values and updates the corresponding model parameters.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
+        """
         #advanced stack acquisition parameters from advanced settings tab
         self.model.delay_cameratrigger = self.view.advancedSettingstab.stack_aq_camera_delay.get()/1000 #divide by 1000 - from ms to seconds
         self.model.highres_planespacing = int(self.view.runtab.stack_aq_plane_spacing_highres.get() * 1000000)
@@ -224,6 +248,14 @@ class MultiScale_Microscope_Controller():
         print("stack acquisition settings updated")
 
     def update_ASLMParameters(self, var, indx, mode):
+        """
+        Updates the axially-swept  parameters such as minimal and maximal scan voltage, scan voltage for each wavelength,
+        scan direction, or scan width by reading the viewer values and updating the corresponding model parameters.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
+        """
         # get remote mirror voltage from GUI and update model parameter, also check for boundaries
         minVol = ASLM_parameters.remote_mirror_minVol
         maxVol = ASLM_parameters.remote_mirror_maxVol
@@ -272,8 +304,12 @@ class MultiScale_Microscope_Controller():
 
     def updateDriftCorrectionSettings(self, var, indx, mode):
         '''
-        update settings of the drift correction
-        :return: settings updated in model
+        Update settings for the self-driving microscope module such as which channel should guide the high-resolution imaging and whether to apply self-driving microscopy
+        by reading the viewer values and updating the corresponding model parameters.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
         '''
         #determine whether drift correction is active; and on which channel
         print("drift correction settings updated")
@@ -291,18 +327,12 @@ class MultiScale_Microscope_Controller():
             self.model.drift_transmission = 0
 
 
-    def updateGUItext(self):
-        '''
-        update text labes in GUI here
-        :return:
-        '''
-        self.model.currentFPS #todo
-
     def changeROI(self,event):
         '''
-        change the ROI - options ('Full Chip', '1024x1024', '512x512', '256x256', 'Custom')
+        Updates the ROI settings of the camera with options ('Full Chip', '1024x1024', '512x512', '256x256', 'Custom', 'Usual')
+        by reading the viewer values and updating the corresponding model parameters.
 
-        :return:
+        :param event: Variable of the Tkinter event (press button).
         '''
         #which ROI selected
         lowresstartx = 0
@@ -396,9 +426,10 @@ class MultiScale_Microscope_Controller():
 
     def run_lowrespreview(self, event):
         '''
-        Runs the execution of a low resolution preview.
-        Required:
-        change mirror, start preview, set continue_preview_highres to True.
+        Connects the viewer button to run a low-resolution preview with the corresponding model function. Before starting a preview,
+        it checks whether the mirror position (changeHRtoLR) needs to change and sets the model.continue_preview_lowres value to True
+
+        :param event: Variable of the Tkinter event (press button).
         '''
 
         #end highres preview
@@ -412,7 +443,6 @@ class MultiScale_Microscope_Controller():
 
             # set parameter that you run a preview
             self.model.continue_preview_lowres = True
-            #self.model.laserOn = self.current_laser
 
             #set button layout - sunken relief
             def set_button():
@@ -426,9 +456,10 @@ class MultiScale_Microscope_Controller():
 
     def run_highrespreview(self, event):
         '''
-        Runs the execution of a high resolution preview.
-        Required:
-        change mirror, set exposure time, start preview, set continue_preview_highres to True.
+        Connects the viewer button to run a high-resolution preview (SPIM or ASLM) with the corresponding model function (SPIM or ASLM). Before starting a preview,
+        it checks whether the mirror position (changeLRtoHR) needs to change and sets the model.continue_preview_highres value to True
+
+        :param event: Variable of the Tkinter event (press button).
         '''
 
         #end highres preview
@@ -463,16 +494,21 @@ class MultiScale_Microscope_Controller():
     def updatepreview(self, var, indx, mode):
         '''
         Updates preview functionalities: auto-scaling of intensity values
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
         '''
         if self.view.runtab.preview_autoIntensity.get() == 1:
             self.model.autoscale_preview = 1
-            print("updated ---------------------------------------1")
         else:
             self.model.autoscale_preview =0
 
     def run_stop_preview(self, event):
         '''
-        Stops an executing preview and resets the profile of the preview buttons that were sunken after starting a preview
+        Stops the running preview and resets the profile of the preview buttons that were sunken after starting a preview
+
+        :param event: Variable of the Tkinter event (press button).
         '''
         if self.model.continue_preview_lowres == True:
             self.model.continue_preview_lowres =False
@@ -484,7 +520,12 @@ class MultiScale_Microscope_Controller():
 
     def movestage(self, var,indx, mode):
         """
-        moves the stage to a certain position
+        Moves the translational and rotational stage to the current position by reading the current stage values from the viewer and calling the
+        corresponding model function.
+
+        :param var: Variable of the Tkinter trace_add function.
+        :param indx: Variable of the Tkinter trace_add function.
+        :param mode: Variable of the Tkinter trace_add function.
         """
         #get positions from GUI and constract position array "moveToPosition"
         lateralPosition = self.view.stagessettingstab.stage_moveto_lateral.get() * 1000000000
@@ -495,13 +536,19 @@ class MultiScale_Microscope_Controller():
 
         #check not to exceed limits
         moveToPosition = self.model.check_movementboundaries(moveToPosition)
+        self.view.stagessettingstab.stage_moveto_axial.set(moveToPosition[0])
+        self.view.stagessettingstab.stage_moveto_lateral.set(moveToPosition[1])
+        self.view.stagessettingstab.stage_moveto_updown.set(moveToPosition[2])
 
         #move
         self.model.move_to_position(moveToPosition)
 
     def movestageToPosition(self, event):
         """
-        moves the stage to a saved position, indicated by a field in the GUI
+        Moves the stage to a previously saved position by reading in the position number (user input field in GUI), updating the
+        values of the stage position correspondingly and calling the model function to move the stage.
+
+        :param event: Variable of the Tkinter event (press button).
         """
         position = self.view.stagessettingstab.stage_move_to_specificposition.get()
         print(position)
@@ -550,7 +597,10 @@ class MultiScale_Microscope_Controller():
 
     def changefilter(self, event, laser):
         """
-        changes the filter to the specified one by the laser active
+        Changes the filter wheel filter position and the current_laser in the model upon pressing the corresponding button in the Viewer.
+
+        :param event: Variable of the Tkinter event (press button).
+        :param laser: String, which laser to change to (488, 552, 594, 640, LED).
         """
         print("change filter to laser: " + laser)
         if laser == '488':
@@ -577,7 +627,8 @@ class MultiScale_Microscope_Controller():
 
     def updatefilename(self):
         """
-        construct the filename used to save data, based on the information from the GUI
+        Construct the filename used to save data, based on the information from the GUI
+
         """
         parentdir = microscope_configuration.parentdir
 
@@ -599,21 +650,25 @@ class MultiScale_Microscope_Controller():
 
     def acquire_stack(self, event):
         """
-        start a stack acquisition thread
+        Start a stack acquisition thread after pressing button in the Viewer
+
+        :param event: Variable of the Tkinter event (press button).
         """
         self.model.abortStackFlag = 0
         ct.ResultThread(target=self.acquire_stack_task).start()
 
     def abort_stack(self, event):
         """
-        set flag to abort stack acquisition
+        Set flag to abort stack acquisition after pressing button in the Viewer.
+
+        :param event: Variable of the Tkinter event (press button).
         """
         self.model.abortStackFlag = 1
 
 
     def acquire_stack_task(self):
         """
-        acquire a stack acquisition - processes in thread (to not stop GUI from working)
+        Acquire a stack acquisition. This is its own thread to not stop GUI from working.
         """
         self.view.runtab.stack_aq_bt_run_stack.config(relief="sunken")
         self.view.update()
@@ -636,7 +691,7 @@ class MultiScale_Microscope_Controller():
 
         #save acquistition parameters and construct file name to save (only if not time-lapse)
         stackfilepath = self.parentfolder
-        if self.continuetimelapse != 0:
+        if self.stoptimelapse != 0:
 
             # generate file path
             nbfiles_folder = len(glob.glob(os.path.join(self.parentfolder, 'Experiment*')))
@@ -722,14 +777,14 @@ class MultiScale_Microscope_Controller():
 
         #################-----------------------------------------------------------------------------------------------
         #wait for all drift correction positions to be calculated before proceeding to high resolution imaging
-        if self.continuetimelapse == 0:
+        if self.stoptimelapse == 0:
             #call here drift correction if based on low resolution imaging
             if self.view.automatedMicroscopySettingstab.drift_correction_lowres.get()==1:
 
                 print("Wait until drift correction is calculated")
                 while np.sum(self.model.driftcorrectionmodule.completed) != len(self.model.driftcorrectionmodule.completed):
                     time.sleep(0.05)
-                    if self.continuetimelapse == 1:
+                    if self.stoptimelapse == 1:
                         break
 
                 #update stage position list by taking latest list from driftcorrectionmodule
@@ -780,7 +835,10 @@ class MultiScale_Microscope_Controller():
 
     def acquire_timelapse(self, event):
         """
-        start a time-lapse acquisition thread, called from GUI (otherwise it freezes)
+        Start a  time-lapse  acquisition thread after pressing button in the Viewer.
+        A thread is called to not freeze the GUI.
+
+        :param event: Variable of the Tkinter event (press button).
         """
 
         #update GUI
@@ -800,19 +858,19 @@ class MultiScale_Microscope_Controller():
         self.model.continue_preview_lowres = False
         self.model.continue_preview_highres = False
 
-        self.continuetimelapse = 0
+        self.stoptimelapse = 0
         print("acquiring timelapse")
 
         #(1) NOTE: You cannot use a While loop here as it makes the Tkinter mainloop freeze - put the time-lapse instead into a thread
         #(2) where you can run while loops etc.
-        self.timelapse_thread = Thread(target=self.run_timelapse)
+        self.timelapse_thread = Thread(target=self.acquire_timelapse_task)
         self.timelapse_thread.start()
         #after that main loop continues
 
 
-    def run_timelapse(self):
+    def acquire_timelapse_task(self):
         """
-        thread that controls time-lapse, started from function acquire_timelapse, which is called from GUI(self, event):
+        Thread that controls time-lapse acquisitions, started from the function acquire_timelapse called from the GUI.
         """
 
         # generate file path
@@ -879,7 +937,7 @@ class MultiScale_Microscope_Controller():
             print("time interval:"  + str(timeinterval))
 
             ## stop time-lapse acquisition if you stop it
-            if self.continuetimelapse == 1:
+            if self.stoptimelapse == 1:
                 break  # Break while loop when stop = 1
 
             #start stack acquisition and wait for it to finish before continuing with next stack acquisition
@@ -891,29 +949,49 @@ class MultiScale_Microscope_Controller():
             totaltime = self.view.runtab.timelapse_aq_timeinterval_min.get() * 60 + self.view.runtab.timelapse_aq_timeinterval_seconds.get()
 
             remaining_waittime = 1
-            while (remaining_waittime>0) and (self.continuetimelapse == 0):
+            while (remaining_waittime>0) and (self.stoptimelapse == 0):
                 t1 = time.perf_counter() - t0
                 remaining_waittime = totaltime - t1
 
-        self.continuetimelapse = 1
+        self.stoptimelapse = 1
         self.view.runtab.timelapse_aq_bt_run_timelapse.config(relief="raised")
         self.view.update()
 
 
     def abort_timelapse(self,event):
-        self.continuetimelapse = 1
+        """
+        Set flag to stop time-lapse imaging after pressing button in the Viewer.
+
+        :param event:  Variable of the Tkinter event (press button).
+        """
+        self.stoptimelapse = 1
 
 
 #enable keyboard movements ---------------------------------------------------------------------------------------------
     def enable_keyboard_movement(self, event):
+        """
+        Enable keyboard to move stages upon button press in the Viewer.
+
+        :param event:  Variable of the Tkinter event (button pressed).
+        """
         self.root.bind("<Key>", self.key_pressed)
         self.root.update()
 
     def disable_keyboard_movement(self, event):
+        """
+        Disable keyboard to move stages upon button press in the Viewer.
+
+        :param event:  Variable of the Tkinter event (button pressed).
+        """
         self.root.unbind("<Key>")
         self.root.update()
 
     def key_pressed(self, event):
+        """
+        Key board assignment of keys (w, s, a, d, q, e and up/down, left/right) to control stage movement.
+
+        :param event:  Variable of the Tkinter event (keys pressed).
+        """
         print(event.keysym)
         if event.char == "w" or event.keysym =="Up":
             self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_updown, 1)
@@ -924,11 +1002,11 @@ class MultiScale_Microscope_Controller():
             self.view.stagessettingstab.stage_last_key.set("s")
 
         if event.char =="a" or event.keysym =="Left":
-            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_lateral, -1)
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_lateral, 1)
             self.view.stagessettingstab.stage_last_key.set("a")
 
         if event.char == "d" or event.keysym =="Right":
-            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_lateral, 1)
+            self.view.stagessettingstab.change_currentposition(self.view.stagessettingstab.stage_moveto_lateral, -1)
             self.view.stagessettingstab.stage_last_key.set("d")
 
         if event.char == "q":
