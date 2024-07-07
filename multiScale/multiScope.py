@@ -592,8 +592,9 @@ class multiScopeModel:
                     currentlaserpower = self.lowres_laserpower
 
                 custody.switch_from(None, to=self.lowres_camera)
-                self.lowres_camera.acquire_preview_tobuffer()
-                self.low_res_buffer = self.lowres_camera.get_previewbuffer()
+                self.low_res_buffer = self.lowres_camera.run_preview_lowres()
+                #self.lowres_camera.run_preview_lowres(out=self.low_res_buffer)
+
                 # display
                 custody.switch_from(self.lowres_camera, to=self.display)
                 self.display.show_image_lowres(self.low_res_buffer)
@@ -652,7 +653,7 @@ class multiScopeModel:
                 self.highres_camera.set_up_highrespreview(self.exposure_time_HR)
                 self.num_frames += 1
                 custody.switch_from(None, to=self.highres_camera)
-                self.highres_camera.run_preview(out=self.high_res_buffer, flipimage=True)
+                self.highres_camera.run_preview_highres(out=self.high_res_buffer, flipimage=True)
 
                 # display acquired image
                 custody.switch_from(self.highres_camera, to=self.display)
@@ -695,9 +696,9 @@ class multiScopeModel:
         self.ASLM_acquisition_time = (self.ASLM_line_delay + 1) * nbrows * linedelay + self.ASLM_lineExposure + (
                     self.ASLM_line_delay + 1) * linedelay
 
-        print(
-            "ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time for {} scan width".format(
-                self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time, self.ASLM_scanWidth))
+        # print(
+        #     "ASLM parameters are: {} exposure time, and {} line delay factor, {} total acquisition time for {} scan width".format(
+        #         self.ASLM_lineExposure, self.ASLM_line_delay, self.ASLM_acquisition_time, self.ASLM_scanWidth))
 
     def preview_highres_ASLM(self):
         """
@@ -720,7 +721,6 @@ class multiScopeModel:
 
                 # generate acquisition array
                 basic_unit = self.get_acq_array.get_highresASLM_preview_array()
-                print("array generated")
 
                 custody.switch_from(None, to=self.highres_camera)
 
@@ -730,16 +730,15 @@ class multiScopeModel:
 
                 # start camera thread to poll for new images
                 def start_camera_streamASLMpreview():
-                    self.highres_camera.run_preview_ASLM(out=self.high_res_buffer)
+                    self.highres_camera.run_preview_highres(out=self.high_res_buffer)
 
                 camera_stream_thread_ASLMpreview = ct.ResultThread(target=start_camera_streamASLMpreview).start()
 
                 # play voltages
                 self.ao.play_voltages(block=True, force_final_zeros=False)
 
-                print("voltages played")
                 camera_stream_thread_ASLMpreview.get_result()
-                print("camera thread returned")
+
                 self.num_frames += 1
 
                 # display
@@ -933,7 +932,7 @@ class multiScopeModel:
 
             # prepare camera for stack acquisition - put in thread so that program executes faster :)
             def prepare_camera():
-                self.lowres_camera.prepare_stack_acquisition_seq(self.exposure_time_LR)
+                self.lowres_camera.prepare_stack_acquisition_lowres(self.exposure_time_LR)
 
             camera_prepare_thread = ct.ResultThread(target=prepare_camera).start()
 
@@ -1262,7 +1261,7 @@ class multiScopeModel:
 
         :param array: Array to smooth
         :param window_len: Window length over which to average values.
-        :return: smooth array.
+        :return: smoothened array.
         """
 
         if (window_len % 2) == 0:

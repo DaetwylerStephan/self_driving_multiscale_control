@@ -50,26 +50,16 @@
 <li><a class="reference internal" href="#module-src.camera.Photometrics_camera">src.camera.Photometrics_camera module</a><ul>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera"><code class="docutils literal notranslate"><span class="pre">Photo_Camera</span></code></a><ul>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.__init__"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.acquire_preview_tobuffer"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.acquire_preview_tobuffer()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.close"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.close()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.end_preview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.end_preview()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.end_stackacquisition"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.end_stackacquisition()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.get_camerabuffer"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.get_camerabuffer()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.get_imageroi"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.get_imageroi()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.get_previewbuffer"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.get_previewbuffer()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.getinfo"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.getinfo()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.init_camerabuffer()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer2"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.init_camerabuffer2()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.init_previewbuffer"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.init_previewbuffer()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_ASLM_acquisition"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_ASLM_acquisition()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_stack_acquisition()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_highres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_stack_acquisition_highres()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_seq"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_stack_acquisition_seq()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.return_camera_readouttime"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.return_camera_readouttime()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_preview()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview_ASLM"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_preview_ASLM()</span></code></a></li>
+<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_lowres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_stack_acquisition_lowres()</span></code></a></li>
+<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview_highres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_preview_highres()</span></code></a></li>
+<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview_lowres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_preview_lowres()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_fast"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_stack_acquisition_buffer_fast()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_pull"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_stack_acquisition_buffer_pull()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.set_imageroi"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.set_imageroi()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.set_up_highrespreview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.set_up_highrespreview()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Photometrics_camera.Photo_Camera.set_up_lowres_preview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.set_up_lowres_preview()</span></code></a></li>
@@ -92,26 +82,16 @@
 </li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera</span></code></a><ul>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.acquire_preview_tobuffer"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.acquire_preview_tobuffer()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.close()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_preview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.end_preview()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_stackacquisition"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.end_stackacquisition()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_camerabuffer"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.get_camerabuffer()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_imageroi"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.get_imageroi()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_previewbuffer"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.get_previewbuffer()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.getinfo"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.getinfo()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_camerabuffer"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.init_camerabuffer()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_camerabuffer2"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.init_camerabuffer2()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_previewbuffer"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.init_previewbuffer()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_ASLM_acquisition"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_ASLM_acquisition()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_stack_acquisition()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_highres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_stack_acquisition_highres()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_seq"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_stack_acquisition_seq()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.return_camera_readouttime"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.return_camera_readouttime()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_preview()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_ASLM"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_preview_ASLM()</span></code></a></li>
+<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_lowres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_stack_acquisition_lowres()</span></code></a></li>
+<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_highres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_preview_highres()</span></code></a></li>
+<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_lowres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_preview_lowres()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_fast"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_stack_acquisition_buffer_fast()</span></code></a></li>
-<li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_pull"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_stack_acquisition_buffer_pull()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_imageroi"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.set_imageroi()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_highrespreview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.set_up_highrespreview()</span></code></a></li>
 <li><a class="reference internal" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_lowres_preview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.set_up_lowres_preview()</span></code></a></li>
@@ -159,141 +139,173 @@
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.camera.Photometrics_camera.</span></span><span class="sig-name descname"><span class="pre">Photo_Camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the main class to control the Photometrics camera and call functions from the pyvcam / PyVCAM-master Python wrapper.</p>
+<p>Note:
+For the Photometrics camera to work, please go first to the PyVCAM-master folder and run:
+python setup.py install</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.acquire_preview_tobuffer">
-<span class="sig-name descname"><span class="pre">acquire_preview_tobuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.acquire_preview_tobuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize Photometrics camera class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>camera_name</strong> – name of the camera. If you don’t know it, PVCamTest displays it when running it.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.close" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Close the camera and un-initializes the PVCAM library.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.end_preview">
 <span class="sig-name descname"><span class="pre">end_preview</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.end_preview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.end_stackacquisition">
-<span class="sig-name descname"><span class="pre">end_stackacquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.end_stackacquisition" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.get_camerabuffer">
-<span class="sig-name descname"><span class="pre">get_camerabuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.get_camerabuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Finish preview imaging.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.get_imageroi">
 <span class="sig-name descname"><span class="pre">get_imageroi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.get_imageroi" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.get_previewbuffer">
-<span class="sig-name descname"><span class="pre">get_previewbuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.get_previewbuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.getinfo">
-<span class="sig-name descname"><span class="pre">getinfo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.getinfo" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer">
-<span class="sig-name descname"><span class="pre">init_camerabuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbplanes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer2">
-<span class="sig-name descname"><span class="pre">init_camerabuffer2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.init_camerabuffer2" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Return the current region of interest / image shape of it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>shape of ROI of camera.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.init_previewbuffer">
-<span class="sig-name descname"><span class="pre">init_previewbuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.init_previewbuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">init_previewbuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimension1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.init_previewbuffer" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize a buffer to write images from the low-resolution preview function to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension1</strong> – dimension 1 of preview buffer (self.current_lowresROI_height)</p></li>
+<li><p><strong>dimension2</strong> – dimension 2 of preview buffer (self.current_lowresROI_width)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.prepare_ASLM_acquisition">
 <span class="sig-name descname"><span class="pre">prepare_ASLM_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scandelay</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_ASLM_acquisition" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the camera to ASLM acquisitions.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition">
-<span class="sig-name descname"><span class="pre">prepare_stack_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the low res camera to start stack acquisitions.</p>
+<dd><p>Changes the settings of the high-resolution camera to start preview or stack acquisitions using axially-swept light-sheet microscopy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p></li>
+<li><p><strong>scandelay</strong> – scan delay for ASLM.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_highres">
 <span class="sig-name descname"><span class="pre">prepare_stack_acquisition_highres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_highres" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the highres camera to start stack acquisitions.</p>
+<dd><p>Changes the settings of the high-resolution camera to start stack acquisitions using static light-sheet imaging (SPIM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_seq">
-<span class="sig-name descname"><span class="pre">prepare_stack_acquisition_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_seq" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the low res camera to start stack acquisitions.</p>
+<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_lowres">
+<span class="sig-name descname"><span class="pre">prepare_stack_acquisition_lowres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_lowres" title="Permalink to this definition"></a></dt>
+<dd><p>Changes the settings of the low-resolution camera to start stack acquisitions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.return_camera_readouttime">
-<span class="sig-name descname"><span class="pre">return_camera_readouttime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.return_camera_readouttime" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.run_preview_highres">
+<span class="sig-name descname"><span class="pre">run_preview_highres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview_highres" title="Permalink to this definition"></a></dt>
+<dd><p>Acquire and return a buffer image for the high-resolution preview (SPIM and ASLM). Update buffer out</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> – buffer to update with acquired image</p></li>
+<li><p><strong>flipimage</strong> – do you want to change the orientation of the image to display.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.run_preview">
-<span class="sig-name descname"><span class="pre">run_preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.run_preview_ASLM">
-<span class="sig-name descname"><span class="pre">run_preview_ASLM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview_ASLM" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.run_preview_lowres">
+<span class="sig-name descname"><span class="pre">run_preview_lowres</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.run_preview_lowres" title="Permalink to this definition"></a></dt>
+<dd><p>Acquire and return a buffer image for the low-resolution preview.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>acquired image</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_fast">
 <span class="sig-name descname"><span class="pre">run_stack_acquisition_buffer_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_planes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_fast" title="Permalink to this definition"></a></dt>
-<dd><p>Run a stack acquisition.
-:param nb_planes: how many planes to acquire
-:param buffer: the buffer to save the acquired planes to
-:param flipimage - if TRUE flip image</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_pull">
-<span class="sig-name descname"><span class="pre">run_stack_acquisition_buffer_pull</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_pull" title="Permalink to this definition"></a></dt>
-<dd><p>Run a stack acquisition.</p>
+<dd><p>Run a stack acquisition of low- or high-res imaging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_planes</strong> – how many planes to acquire</p></li>
+<li><p><strong>buffer</strong> – the buffer to save the acquired planes to</p></li>
+<li><p><strong>flipimage</strong> – (optional) True/False. If TRUE flip image</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.set_imageroi">
 <span class="sig-name descname"><span class="pre">set_imageroi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.set_imageroi" title="Permalink to this definition"></a></dt>
-<dd><p>s2 = s1 + w - 1
-p2 = p1 + h - 1
-:param s1:
-:param p1:
-:param w:
-:param h:
-:return:</p>
+<dd><p>Configures and set a ROI on the camera.
+s2 = s1 + w - 1
+p2 = p1 + h - 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s1</strong> – starting point x (width)</p></li>
+<li><p><strong>p1</strong> – starting point y (height)</p></li>
+<li><p><strong>w</strong> – width of selected image ROI (how many columns)</p></li>
+<li><p><strong>h</strong> – height of selected image ROI (how many rows)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.set_up_highrespreview">
 <span class="sig-name descname"><span class="pre">set_up_highrespreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.set_up_highrespreview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Changes the settings of the high-resolution camera to start a high-resolution static (SPIM) preview.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Photometrics_camera.Photo_Camera.set_up_lowres_preview">
 <span class="sig-name descname"><span class="pre">set_up_lowres_preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Photometrics_camera.Photo_Camera.set_up_lowres_preview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Changes the settings of the low-resolution camera to start a preview.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -304,27 +316,34 @@ p2 = p1 + h - 1
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.camera.Synthetic_camera.</span></span><span class="sig-name descname"><span class="pre">Synthentic_cam_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The API of a synthetic camera object that returns random pictures around a median value.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize synthetic camera object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>camera_name</strong> – Determines initial “Chip size” (lowres_synthetic: (2960, 5056); else (2048, 2048)).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.close" title="Permalink to this definition"></a></dt>
-<dd><p>close synthetic camera object</p>
+<dd><p>Close the synthetic camera.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.finish">
 <span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.finish" title="Permalink to this definition"></a></dt>
-<dd><p>finish acquisitoin synthetic camera object</p>
+<dd><p>Finish acquisition in synthetic camera object</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.open">
 <span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.open" title="Permalink to this definition"></a></dt>
-<dd><p>open synthetic camera object</p>
+<dd><p>Open synthetic camera object</p>
 </dd></dl>
 
 <dl class="py method">
@@ -362,141 +381,168 @@ p2 = p1 + h - 1
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.camera.Synthetic_camera.</span></span><span class="sig-name descname"><span class="pre">Synthetic_Photo_Camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the main class to control a synthetic camera object.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.acquire_preview_tobuffer">
-<span class="sig-name descname"><span class="pre">acquire_preview_tobuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.acquire_preview_tobuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize synthetic camera class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>camera_name</strong> – name of the camera.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.close" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Close the synthetic camera.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_preview">
 <span class="sig-name descname"><span class="pre">end_preview</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_preview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_stackacquisition">
-<span class="sig-name descname"><span class="pre">end_stackacquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_stackacquisition" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_camerabuffer">
-<span class="sig-name descname"><span class="pre">get_camerabuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_camerabuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Finish preview imaging.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_imageroi">
 <span class="sig-name descname"><span class="pre">get_imageroi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_imageroi" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_previewbuffer">
-<span class="sig-name descname"><span class="pre">get_previewbuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_previewbuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.getinfo">
-<span class="sig-name descname"><span class="pre">getinfo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.getinfo" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_camerabuffer">
-<span class="sig-name descname"><span class="pre">init_camerabuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbplanes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_camerabuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_camerabuffer2">
-<span class="sig-name descname"><span class="pre">init_camerabuffer2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_camerabuffer2" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Return the current region of interest / image shape of it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>shape of ROI of camera.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_previewbuffer">
-<span class="sig-name descname"><span class="pre">init_previewbuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_previewbuffer" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">init_previewbuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimension1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_previewbuffer" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize a buffer to write images from the low-resolution preview function to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimension1</strong> – dimension 1 of preview buffer (self.current_lowresROI_height)</p></li>
+<li><p><strong>dimension2</strong> – dimension 2 of preview buffer (self.current_lowresROI_width)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_ASLM_acquisition">
 <span class="sig-name descname"><span class="pre">prepare_ASLM_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scandelay</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_ASLM_acquisition" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the camera to ASLM acquisitions.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition">
-<span class="sig-name descname"><span class="pre">prepare_stack_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the low res camera to start stack acquisitions.</p>
+<dd><p>Prepare the settings of the high-resolution camera to start preview or stack acquisitions using axially-swept light-sheet microscopy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p></li>
+<li><p><strong>scandelay</strong> – scan delay for ASLM.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_highres">
 <span class="sig-name descname"><span class="pre">prepare_stack_acquisition_highres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_highres" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the highres camera to start stack acquisitions.</p>
+<dd><p>Prepare the settings of the high-resolution camera to start stack acquisitions using static light-sheet imaging (SPIM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_seq">
-<span class="sig-name descname"><span class="pre">prepare_stack_acquisition_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_seq" title="Permalink to this definition"></a></dt>
-<dd><p>Changes the settings of the low res camera to start stack acquisitions.</p>
+<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_lowres">
+<span class="sig-name descname"><span class="pre">prepare_stack_acquisition_lowres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_lowres" title="Permalink to this definition"></a></dt>
+<dd><p>Prepare the settings of the low-resolution camera to start low-resolution stack acquisitions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.return_camera_readouttime">
-<span class="sig-name descname"><span class="pre">return_camera_readouttime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.return_camera_readouttime" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_highres">
+<span class="sig-name descname"><span class="pre">run_preview_highres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_highres" title="Permalink to this definition"></a></dt>
+<dd><p>Acquire and return a buffer image for the synthetic high-resolution preview (SPIM and ASLM). Update buffer out.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> – buffer to update with acquired image</p></li>
+<li><p><strong>flipimage</strong> – do you want to change the orientation of the image to display.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview">
-<span class="sig-name descname"><span class="pre">run_preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_ASLM">
-<span class="sig-name descname"><span class="pre">run_preview_ASLM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_ASLM" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_lowres">
+<span class="sig-name descname"><span class="pre">run_preview_lowres</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_lowres" title="Permalink to this definition"></a></dt>
+<dd><p>Acquire and return a buffer image for the low-resolution preview.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>acquired image</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_fast">
 <span class="sig-name descname"><span class="pre">run_stack_acquisition_buffer_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_planes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_fast" title="Permalink to this definition"></a></dt>
-<dd><p>Run a stack acquisition.
-:param nb_planes: how many planes to acquire
-:param buffer: the buffer to save the acquired planes to
-:param flipimage - if TRUE flip image</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_pull">
-<span class="sig-name descname"><span class="pre">run_stack_acquisition_buffer_pull</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_pull" title="Permalink to this definition"></a></dt>
-<dd><p>Run a stack acquisition.</p>
+<dd><p>Run a stack acquisition of low- or high-res imaging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_planes</strong> – how many planes to acquire</p></li>
+<li><p><strong>buffer</strong> – the buffer to save the acquired planes to</p></li>
+<li><p><strong>flipimage</strong> – True/False. if TRUE flip image</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_imageroi">
 <span class="sig-name descname"><span class="pre">set_imageroi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_imageroi" title="Permalink to this definition"></a></dt>
-<dd><p>s2 = s1 + w - 1
-p2 = p1 + h - 1
-:param s1:
-:param p1:
-:param w:
-:param h:
-:return:</p>
+<dd><p>Configures and set a ROI on the synthetic camera.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s1</strong> – starting point x (width)</p></li>
+<li><p><strong>p1</strong> – starting point y (height)</p></li>
+<li><p><strong>w</strong> – width of selected image ROI (how many columns)</p></li>
+<li><p><strong>h</strong> – height of selected image ROI (how many rows)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_highrespreview">
 <span class="sig-name descname"><span class="pre">set_up_highrespreview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_highrespreview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Prepare a high-resolution static (SPIM) preview of the synthetic camera.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_lowres_preview">
 <span class="sig-name descname"><span class="pre">set_up_lowres_preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_lowres_preview" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Prepare a low-resolution preview of the synthetic camera.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exposure_time</strong> – Exposure time for the current acquisition.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

@@ -3,38 +3,36 @@
 import numpy as np
 
 class Synthentic_cam_object:
+    """
+    The API of a synthetic camera object that returns random pictures around a median value.
+    """
+
     def __init__(self, camera_name):
+        """
+        Initialize synthetic camera object
+
+        :param camera_name: Determines initial "Chip size" (lowres_synthetic: (2960, 5056); else (2048, 2048)).
+        """
+
         self.camera_name = camera_name
         if self.camera_name == "lowres_synthetic":
             self.shape_roi = (2960,5056)
         else:
             self.shape_roi = (2048, 2048)
-        self.gain = 1
-        self.exp_mode = 'Edge Trigger'
-        self.exp_out_mode = "Any Row"
-        self.speed_table_index = 0
         self.median_value = 200
-        self.readout_time = 20
-        self.prog_scan_mode = 0
-        self.prog_scan_mode = 1  # Scan mode options: {'Auto': 0, 'Line Delay': 1, 'Scan Width': 2}
-        self.prog_scan_dir = 0  # Scan direction options: {'Down': 0, 'Up': 1, 'Down/Up Alternate': 2}
-        self.prog_scan_line_delay = 11.2  # 11.2 us x factor, e.g. a factor = 6 equals 67.2 us
-
-        # The   Line   Output   Mode   is   used   for   synchronization   purposes   when
-        # uses   Programmable Scan mode. Line Output Mode creates a rising edge for each
-        # row that the rolling shutter read out mechanism of the sensor advances
-        self.exp_out_mode = 4
 
     def close(self):
-        "close synthetic camera object"
+        """
+        Close the synthetic camera.
+        """
         pass
 
     def finish(self):
-        "finish acquisitoin synthetic camera object"
+        "Finish acquisition in synthetic camera object"
         pass
 
     def open(self):
-        "open synthetic camera object"
+        "Open synthetic camera object"
         pass
 
     def reset_rois(self):
@@ -63,8 +61,16 @@ class Synthentic_cam_object:
 
 
 class Synthetic_Photo_Camera:
+    """
+    This is the main class to control a synthetic camera object.
+    """
 
     def __init__(self, camera_name):
+        """
+        Initialize synthetic camera class.
+
+        :param camera_name: name of the camera.
+        """
         print("Synthetic camera start")
         self.cam = Synthentic_cam_object(camera_name)
         print('start camera: ' + camera_name)
@@ -73,120 +79,153 @@ class Synthetic_Photo_Camera:
         return None
 
     def close(self):
+        """
+        Close the synthetic camera.
+        """
         self.cam.close()
         print("camera closed")
 
-    def getinfo(self):
-        print("Synthetic camera trigger table")
-
     def get_imageroi(self):
+        """
+        Return the current region of interest / image shape of it.
+
+        :return: shape of ROI of camera.
+        """
         return self.cam.shape()
 
     def set_imageroi(self, s1, p1, w, h):
         """
-        s2 = s1 + w - 1
-        p2 = p1 + h - 1
-        :param s1:
-        :param p1:
-        :param w:
-        :param h:
-        :return:
+        Configures and set a ROI on the synthetic camera.
+
+        :param s1: starting point x (width)
+        :param p1: starting point y (height)
+        :param w: width of selected image ROI (how many columns)
+        :param h: height of selected image ROI (how many rows)
         """
         self.cam.reset_rois()
         self.cam.set_roi(s1, p1, w, h)
 
-    def prepare_stack_acquisition(self, exposure_time=20):
-        """Changes the settings of the low res camera to start stack acquisitions."""
-        self.cam.exp_mode = 'Edge Trigger'
-        self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = 0
+    #############################
+    # Preview functions
+    #############################
 
-        # Collect frames in live mode
-        self.cam.start_live(exp_time=exposure_time)
-        print("camera ready")
+    def set_up_lowres_preview(self, exposure=20):
+        """
+        Prepare a low-resolution preview of the synthetic camera.
+
+        :param exposure_time: Exposure time for the current acquisition.
+        """
+        self.cam.start_live(exp_time=exposure)
+
+    def set_up_highrespreview(self, exposure=20):
+        """
+        Prepare a high-resolution static (SPIM) preview of the synthetic camera.
+
+        :param exposure_time: Exposure time for the current acquisition.
+        """
+        self.cam.start_live(exp_time=exposure)
+
+    def init_previewbuffer(self, dimension1, dimension2):
+        """
+        Initialize a buffer to write images from the low-resolution preview function to.
+
+        :param dimension1: dimension 1 of preview buffer (self.current_lowresROI_height)
+        :param dimension2: dimension 2 of preview buffer (self.current_lowresROI_width)
+        """
+        self.previewbuffer = np.zeros([dimension1, dimension2], dtype="uint16")
 
 
-    def init_camerabuffer(self, nbplanes, width, height):
-        self.camerabuffer = np.zeros([nbplanes, width, height], dtype="uint16")
+    def run_preview_lowres(self):
+        """
+        Acquire and return a buffer image for the low-resolution preview.
 
-    def init_camerabuffer2(self, buffer):
-        self.camerabuffer = buffer
+        :return: acquired image
+        """
 
-    def get_camerabuffer(self):
-        print(self.camerabuffer.shape)
-        return self.camerabuffer
-
-    def init_previewbuffer(self, width, height):
-        self.previewbuffer = np.zeros([width, height], dtype="uint16")
-
-    def get_previewbuffer(self):
+        frame, fps, frame_count = self.cam.poll_frame()
+        self.previewbuffer = np.copy(frame)
         return self.previewbuffer
 
-    def prepare_stack_acquisition_highres(self, exposure_time=20):
-        """Changes the settings of the highres camera to start stack acquisitions."""
-        self.cam.exp_mode = 'Edge Trigger'
-        self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = 1
-        self.cam.readout_port = 0
-        self.cam.gain = 1
-        self.cam.prog_scan_mode = 0
+    def run_preview_highres(self, out, flipimage=True):
+        """
+        Acquire and return a buffer image for the synthetic high-resolution preview (SPIM and ASLM). Update buffer out.
 
-        # Collect frames in live mode
-        self.cam.start_live(exp_time=exposure_time)
-        print("camera ready")
+        :param out: buffer to update with acquired image
+        :param flipimage: do you want to change the orientation of the image to display.
+        """
+        framesReceived = 0
+        while framesReceived < 1:
+            try:
+                frame, fps, frame_count = self.cam.poll_frame()
+                if flipimage == False:
+                    out[:] = np.copy(frame['pixel_data'][:])
+                else:
+                    out[:] = np.flipud(np.copy(frame['pixel_data'][:]))
+                framesReceived += 1
+            except Exception as e:
+                print(str(e))
+                break
+
+    def end_preview(self):
+        """
+        Finish preview imaging.
+        """
+        self.cam.finish()
 
 
-    def return_camera_readouttime(self):
-        return self.cam.readout_time
+    #############################
+    #stack acquisition functions
+    #############################
+    def prepare_stack_acquisition_lowres(self, exposure_time=20):
+        """
+        Prepare the settings of the low-resolution camera to start low-resolution stack acquisitions.
 
-    def prepare_ASLM_acquisition(self, exposure_time, scandelay):
-        """Changes the settings of the camera to ASLM acquisitions."""
-        self.cam.exp_mode = 'Edge Trigger'
-        self.cam.speed_table_index = 1 # 1 for 100 MHz
-        self.cam.readout_port = 0
-        self.cam.gain = 1
-        self.cam.prog_scan_mode = 1 # Scan mode options: {'Auto': 0, 'Line Delay': 1, 'Scan Width': 2}
-        self.cam.prog_scan_dir = 0 # Scan direction options: {'Down': 0, 'Up': 1, 'Down/Up Alternate': 2}
-        self.cam.prog_scan_line_delay = scandelay  # 11.2 us x factor, e.g. a factor = 6 equals 67.2 us
-
-        #The   Line   Output   Mode   is   used   for   synchronization   purposes   when
-        # uses   Programmable Scan mode. Line Output Mode creates a rising edge for each
-        # row that the rolling shutter read out mechanism of the sensor advances
-        self.cam.exp_out_mode = 4
-
-        self.cam.start_live(exp_time=exposure_time)
-
-    def prepare_stack_acquisition_seq(self, exposure_time=20):
-        """Changes the settings of the low res camera to start stack acquisitions."""
-        self.cam.exp_mode = 'Edge Trigger'
-        self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = 0
-
-        # Collect frames in live mode
+        :param exposure_time: Exposure time for the current acquisition.
+        """
         self.cam.start_live(exp_time=exposure_time,  buffer_frame_count=70)
         print("camera ready")
 
+
+    def prepare_stack_acquisition_highres(self, exposure_time=20):
+        """
+        Prepare the settings of the high-resolution camera to start stack acquisitions using static light-sheet imaging (SPIM).
+
+        :param exposure_time: Exposure time for the current acquisition.
+        """
+        # Collect frames in live mode
+        self.cam.start_live(exp_time=exposure_time)
+        print("camera ready")
+
+    def prepare_ASLM_acquisition(self, exposure_time, scandelay):
+        """
+        Prepare the settings of the high-resolution camera to start preview or stack acquisitions using axially-swept light-sheet microscopy.
+
+        :param exposure_time: Exposure time for the current acquisition.
+        :param scandelay: scan delay for ASLM.
+        """
+
+        self.cam.start_live(exp_time=exposure_time)
+
+
     def run_stack_acquisition_buffer_fast(self, nb_planes, buffer, flipimage=False):
         """
-        Run a stack acquisition.
+        Run a stack acquisition of low- or high-res imaging.
+
         :param nb_planes: how many planes to acquire
         :param buffer: the buffer to save the acquired planes to
-        :param flipimage - if TRUE flip image
+        :param flipimage: True/False. if TRUE flip image
         """
+
         framesReceived = 0
         while framesReceived < nb_planes:
             try:
                 frame, fps, frame_count = self.cam.poll_frame(timeout_ms=10000)
-
                 if flipimage==True:
                     buffer[framesReceived, :, :] = np.flipud(np.copy(frame))
                 else:
                     buffer[framesReceived, :, :] = np.copy(frame)
-
-
                 frame = None
                 del frame
-
                 framesReceived += 1
 
             except Exception as e:
@@ -196,62 +235,6 @@ class Synthetic_Photo_Camera:
         self.cam.finish()
         return
 
-    def run_stack_acquisition_buffer_pull(self):
-        """Run a stack acquisition."""
-        try:
-            #fps, frame_count = self.cam.poll_frame2(out=buffer)
-            frame, fps, frame_count = self.cam.poll_frame()
-            return frame
-        except Exception as e:
-            print(str(e))
-        return
-
-
-    def set_up_lowres_preview(self, exposure=20):
-        self.cam.exp_mode = "Internal Trigger"
-        self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = 0
-        self.cam.start_live(exp_time=exposure)
-
-    def set_up_highrespreview(self, exposure=20):
-        self.cam.exp_mode = "Internal Trigger"
-        self.cam.exp_out_mode = "Any Row"
-        self.cam.speed_table_index = 1
-        self.cam.gain = 1
-        self.cam.prog_scan_mode = 0
-
-        self.cam.start_live(exp_time=exposure)
-
-    def run_preview(self, out, flipimage=False):
-        frame, fps, frame_count = self.cam.poll_frame()
-        if flipimage==False:
-            out[:] = np.copy(frame)
-        else:
-            out[:] = np.flipud(np.copy(frame))
-
-
-    def acquire_preview_tobuffer(self):
-        frame, fps, frame_count = self.cam.poll_frame()
-        self.previewbuffer = np.copy(frame)
-
-    def run_preview_ASLM(self, out):
-        framesReceived = 0
-        print("in run_preview_ASLM: framesReceived started")
-        while framesReceived < 1:
-            try:
-                frame, fps, frame_count = self.cam.poll_frame()
-                out[:] = np.flipud(np.copy(frame))
-                framesReceived += 1
-                print("{}:{}".format(framesReceived, fps))
-            except Exception as e:
-                print(str(e))
-                break
-
-    def end_stackacquisition(self):
-        self.cam.finish()
-
-    def end_preview(self):
-        self.cam.finish()
 
 
 if __name__ == '__main__':
