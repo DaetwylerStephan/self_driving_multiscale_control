@@ -28,35 +28,61 @@ class Synthentic_cam_object:
         pass
 
     def finish(self):
-        "Finish acquisition in synthetic camera object"
+        """
+        Finish acquisition of synthetic camera object
+        """
         pass
 
     def open(self):
-        "Open synthetic camera object"
+        """
+        Open a synthetic camera object
+        """
         pass
 
     def reset_rois(self):
-        "reset_rois"
+        """
+        Reset the ROIs of the synthetic camera object.
+        """
         if self.camera_name == "lowres_synthetic":
             self.shape_roi = (2960, 5056)
         else:
             self.shape_roi = (2048, 2048)
 
     def set_roi(self, s1, p1, w, h):
-        "set roi"
+        """
+        Set the ROIs of the synthetic camera object.
+
+        :param s1: starting point x (width)
+        :param p1: starting point y (height)
+        :param w: width of selected image ROI (how many columns)
+        :param h: height of selected image ROI (how many rows)
+        """
+
         self.shape_roi = (h, w)
 
-    def start_live(self, exp_time, buffer_frame_count=70):
-        "start acquisition"
+    def start_live(self, exp_time):
+        """
+        Set the synthetic camera object into acquisition mode (adjust mean value).
+
+        :param exp_time: Exposure time - affects median value
+        """
         self.median_value = 100 + (exp_time) * 150
         pass
 
-    def poll_frame(self, timeout_ms=10000):
-        "generate random frame"
+    def poll_frame(self):
+        """
+        Generate random frame and return it.
+
+        :return: frame, fps, frame_count.
+        """
         return np.random.normal(self.median_value, 50, size=self.shape_roi).astype(np.uint16), 60, 1
 
     def shape(self):
-        "return shape"
+        """
+        Return the shape of the ROI
+
+        :return: shape_roi
+        """
         return self.shape_roi
 
 
@@ -182,7 +208,7 @@ class Synthetic_Photo_Camera:
 
         :param exposure_time: Exposure time for the current acquisition.
         """
-        self.cam.start_live(exp_time=exposure_time,  buffer_frame_count=70)
+        self.cam.start_live(exp_time=exposure_time)
         print("camera ready")
 
 
@@ -219,7 +245,7 @@ class Synthetic_Photo_Camera:
         framesReceived = 0
         while framesReceived < nb_planes:
             try:
-                frame, fps, frame_count = self.cam.poll_frame(timeout_ms=10000)
+                frame, fps, frame_count = self.cam.poll_frame()
                 if flipimage==True:
                     buffer[framesReceived, :, :] = np.flipud(np.copy(frame))
                 else:

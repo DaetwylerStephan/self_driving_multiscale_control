@@ -53,14 +53,16 @@ class LudlFilterwheel:
 
     def close(self):
         '''
-        Close the filter wheel
+        Close the filter wheel.
         '''
 
     def _check_if_filter_in_filterdict(self, filter):
         '''
-        Checks if the filter designation (string) given as argument
-        exists in the filterdict
+        Checks if the filter designation (string) given as argument exists in the filterdict.
+
+        :param filter: String, name of filter, e.g. '515-30-25'
         '''
+
         if filter in self.filterdict:
             return True
         else:
@@ -73,7 +75,8 @@ class LudlFilterwheel:
         No checks are done whether the movement is completed or
         finished in time.
 
-
+        :param filter: String, name of filter, e.g. '515-30-25'
+        :param wait_until_done: flag
         '''
         if self._check_if_filter_in_filterdict(filter) is True:
             self.ser = Serial.Serial(self.COMport,
@@ -100,19 +103,7 @@ class LudlFilterwheel:
                 self.ser.close()
 
                 if wait_until_done:
-                    ''' Wait a certain number of seconds. This is a hack
-
-                    Testing with :
-                    self.sio.write(str('Rdstat S'))
-                    self.sio.flush()
-                    print('First:', self.sio.readline(10))
-                    time.sleep(0.1)
-                    self.sio.write(str('Rdstat S'))
-                    self.sio.flush()
-                    print('Second: ', self.sio.readline(10))
-
-                    yielded very unstable results, sometimes ":N -3", sometimes
-                    ":A" - and blocking & crashing the connection
+                    ''' Wait a certain number of seconds. This is a hack.
                     '''
                     time.sleep(self.wait_until_done_delay)
 

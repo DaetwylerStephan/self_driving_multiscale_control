@@ -337,42 +337,68 @@ p2 = p1 + h - 1</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.finish">
 <span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.finish" title="Permalink to this definition"></a></dt>
-<dd><p>Finish acquisition in synthetic camera object</p>
+<dd><p>Finish acquisition of synthetic camera object</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.open">
 <span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.open" title="Permalink to this definition"></a></dt>
-<dd><p>Open synthetic camera object</p>
+<dd><p>Open a synthetic camera object</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.poll_frame">
-<span class="sig-name descname"><span class="pre">poll_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.poll_frame" title="Permalink to this definition"></a></dt>
-<dd><p>generate random frame</p>
+<span class="sig-name descname"><span class="pre">poll_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.poll_frame" title="Permalink to this definition"></a></dt>
+<dd><p>Generate random frame and return it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>frame, fps, frame_count.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.reset_rois">
 <span class="sig-name descname"><span class="pre">reset_rois</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.reset_rois" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Reset the ROIs of the synthetic camera object.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.set_roi">
 <span class="sig-name descname"><span class="pre">set_roi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.set_roi" title="Permalink to this definition"></a></dt>
-<dd><p>set roi</p>
+<dd><p>Set the ROIs of the synthetic camera object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s1</strong> – starting point x (width)</p></li>
+<li><p><strong>p1</strong> – starting point y (height)</p></li>
+<li><p><strong>w</strong> – width of selected image ROI (how many columns)</p></li>
+<li><p><strong>h</strong> – height of selected image ROI (how many rows)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.shape">
 <span class="sig-name descname"><span class="pre">shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.shape" title="Permalink to this definition"></a></dt>
-<dd><p>return shape</p>
+<dd><p>Return the shape of the ROI</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>shape_roi</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.camera.Synthetic_camera.Synthentic_cam_object.start_live">
-<span class="sig-name descname"><span class="pre">start_live</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_frame_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.start_live" title="Permalink to this definition"></a></dt>
-<dd><p>start acquisition</p>
+<span class="sig-name descname"><span class="pre">start_live</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.camera.Synthetic_camera.Synthentic_cam_object.start_live" title="Permalink to this definition"></a></dt>
+<dd><p>Set the synthetic camera object into acquisition mode (adjust mean value).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exp_time</strong> – Exposure time - affects median value</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

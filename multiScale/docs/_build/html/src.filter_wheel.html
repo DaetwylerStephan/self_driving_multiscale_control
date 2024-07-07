@@ -167,7 +167,7 @@ filterwheel is assumed to be a double wheel.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.close" title="Permalink to this definition"></a></dt>
-<dd><p>Close the filter wheel</p>
+<dd><p>Close the filter wheel.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -176,6 +176,14 @@ filterwheel is assumed to be a double wheel.</p>
 <dd><p>Moves filter using the pyserial command set.</p>
 <p>No checks are done whether the movement is completed or
 finished in time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> – String, name of filter, e.g. ‘515-30-25’</p></li>
+<li><p><strong>wait_until_done</strong> – flag</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
