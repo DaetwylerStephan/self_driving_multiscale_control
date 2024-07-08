@@ -8,21 +8,34 @@ Welcome to self-driving multi-scale imaging's documentation!
 
 **Self-driving, multi-scale software** is an open-source Python software for custom multi-scale
 light-sheet microscope control where the low-resolution guides high-resolution acquisition over hours of imaging.
-Thereby, the software follows an MVC design pattern with:
-
-* the controller: multiScale_main.py
-* the model: multiScope.py with all hardware control code in src (camera, filter wheel, slit, stages, ni_board)
-* the viewer: gui folder and auxiliary_code (napari_in_subprocess.py)
-
-The hardware are synchronized in time using an NI DAQ card (ni_board). The voltage arrays for the NI board are generated in the acquisition_array_class.py file.
 
 
+.. toctree::
+   :caption: Getting Started
+   :maxdepth: 1
 
+   software_installation
+   microscope_configuration
+
+.. toctree::
+   :caption: Code organization
+   :maxdepth: 1
+
+   code_structure
+   user_interface
+
+
+References and API
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
 
 .. note::
 
    This project is under active development. See our `GitHub repository for updates
    <https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging>`_.
+
 
 .. warning::
 
@@ -34,10 +47,6 @@ The hardware are synchronized in time using an NI DAQ card (ni_board). The volta
     Users should be aware of these risks and agree to utilize this software at their own risk.
 
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 **Funding**
 ============
 This software is supported by the
@@ -46,9 +55,3 @@ This software is supported by the
 - Swiss National Science Foundation (191347 to S.D)
 - NIGMS National Institute of General Medical Sciences (R35 GM133522 to R.F.)
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

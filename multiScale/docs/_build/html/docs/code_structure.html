@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>conf module &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+  <title>Code organization &mdash; self-driving multi-scale imaging 1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -48,11 +48,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../software_installation.html">Software Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code organization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user_interface.html">User interface (GUI)</a></li>
-</ul>
 
         </div>
       </div>
@@ -68,9 +63,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">conf module</li>
+      <li class="breadcrumb-item active">Code organization</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/docs/conf.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/docs/code_structure.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -78,8 +73,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="conf-module">
-<h1>conf module<a class="headerlink" href="#conf-module" title="Permalink to this heading"></a></h1>
+  <section id="code-organization">
+<h1>Code organization<a class="headerlink" href="#code-organization" title="Permalink to this heading"></a></h1>
+<section id="general-overview">
+<h2>General overview<a class="headerlink" href="#general-overview" title="Permalink to this heading"></a></h2>
+<p>The software follows an MVC design pattern with:</p>
+<ul class="simple">
+<li><p>the controller: multiScale_main.py</p></li>
+<li><p>the model: multiScope.py with all hardware control code in src (camera, filter wheel, slit, stages, ni_board)</p></li>
+<li><p>the viewer: gui folder and auxiliary_code (napari_in_subprocess.py)</p></li>
+</ul>
+<p>The hardware are synchronized in time using an NI DAQ card (ni_board). The voltage arrays for the NI board are generated in the acquisition_array_class.py file.</p>
+</section>
 </section>
 
 
