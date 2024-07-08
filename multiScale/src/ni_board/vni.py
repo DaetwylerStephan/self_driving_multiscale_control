@@ -2,23 +2,15 @@ import ctypes as C
 import numpy as np
 import matplotlib.pyplot as plt
 
-"""
-TODO: One way or another, make it harder to forget the daq.close()
-method, which can cause crazy voltages to persist. _del_? _enter_ and
-_exit_? Try to do it better than we are.
-Requires nicaiu.dll to be in the same directory, or located in the
-os.environ['PATH'] search path.
-If you get an error, google for NIDAQmx.h to decypher it.
-"""
 api = C.cdll.LoadLibrary("nicaiu")
 
-
-#todo- rewrite this so that you can specify in constants
-#digital/analog, channel number, minVol, maxVol, name of channel, constant voltage or play
-
-#todo - include a tool to make a single voltage output and not only the play voltage functionality
-
 class Analog_Out:
+    """
+    Class to control the analog output of voltages on an NI board, such as NI PCIe 6733.
+
+    Class adapted from Andrew G York. Please check out:
+    https://github.com/AndrewGYork/tools/blob/master/ni.py
+    """
     def __init__(
         self,
         num_channels='all',
@@ -30,7 +22,17 @@ class Analog_Out:
         minVol=0,
         maxVol=10,
         ):
-        """Play analog voltages via a National Instruments analog-out DAQ board.
+        """
+        Set up analog, digital or constant voltage output channel via a National Instruments DAQ board.
+
+        :param num_channels: Number of channels.
+        :param rate: Rate of NI device.
+        :param verbose: True/False for verbose statements.
+        :param daq_type: Determines NI channel type: '6738' (analog), '6738_digital' (digital), '6738_constant' (constant)
+        :param line: Output line, e.g.  "Dev1/ao30"
+        :param clock_name: Name of clock.
+        :param minVol: Minimal voltage allowed for constant voltage analog output.
+        :param maxVol: Maximal voltage allowed for constant voltage analog output.
         """
 
         self.daq_type = daq_type
@@ -45,7 +47,7 @@ class Analog_Out:
             # are 8 digital lines on `port1`, but these are not "buffered". We
             # have not yet included any functionality for these lines.
             self.max_channels = 2
-            self.max_rate = 10e6 #TODO is this the correct max rate?
+            self.max_rate = 10e6
             self.channel_type = 'digital'
             self.has_clock = False
         elif self.daq_type == '6738_constant':
@@ -56,23 +58,22 @@ class Analog_Out:
 
         if num_channels == 'all':
             num_channels = self.max_channels
+
         assert 1 <= num_channels <= self.max_channels
+
         self.num_channels = num_channels
+
         if clock_name is not None:
             assert isinstance(clock_name, str)
             clock_name = bytes(clock_name, 'ascii')
+
         self.verbose = verbose
 
-        if self.verbose: print("Opening %s-out board..."%self.channel_type)
+        if self.verbose:
+            print("Opening %s-out board..."%self.channel_type)
+
         self.task_handle = C.c_void_p(0)
         api.create_task(bytes(), self.task_handle)
-        # If I were a real man, I would automatically detect the proper
-        # board name somehow
-    # (http://digital.ni.com/public.nsf/allkb/86256F0E001DA9FF492572A5006FD7D3)
-    # instead of demanding user input via the 'init' argument. If
-        # this next api call crashes for you, check the name of your
-        # analog-out card using NI Measurement and Automation Explorer
-        # (NI MAX):
 
         if self.channel_type == 'analog':
             device_name2 = bytes(line, 'ascii')
@@ -101,18 +102,23 @@ class Analog_Out:
                 maxVol,  # Maximum voltage
                 10348,  # DAQmx_Val_Volts; don't question it!
                 None)  # NULL
-            return None
+            return None #important: don't continue to set up parameters below now.
+
+
+        #for digital and analog channel types, continue to set the following parameters (constant returned none above).
 
         if self.verbose: print(" Board open.")
         dtype = {'digital': np.uint8, 'analog': np.float64}[self.channel_type]
         self.voltages = np.zeros((2, self.num_channels), dtype=dtype)
+
         # Play initial voltages with the internal clock
         if self.has_clock:
             self.clock_name = None
         else:
             self.clock_name = clock_name
+
         self.set_rate(rate)
-        self._write_voltages(self.voltages)
+        self.write_voltages(self.voltages)
         if self.has_clock:
             self.play_voltages(force_final_zeros=False, block=True)
         else:
@@ -123,6 +129,12 @@ class Analog_Out:
         return None
 
     def set_rate(self, rate):
+        """
+        Set up output rate of DAQ card.
+
+        :param rate: Rate for output.
+        :return: None
+        """
         self._ensure_task_is_stopped()
         assert 0 < rate <= self.max_rate
         self.rate = float(rate)
@@ -136,6 +148,12 @@ class Analog_Out:
         return None
 
     def set_verbose(self,verbosevalue=False):
+        """
+        Update verbose settings for debugging/trouble shooting.
+
+        :param verbosevalue: True/False for verbose output.
+        """
+
         self.verbose=verbosevalue
 
     def play_voltages(
@@ -145,24 +163,16 @@ class Analog_Out:
         block=True,
         ):
         """
-        If voltage is None, play the previously set voltage.
-        If 'force_final_zeros', the last entry of each channel of
-        'voltages' is set to zero.
-        If 'block', this function will not return until the voltages are
-        finished playing. Not performant, but easier to reason about.
-        NB: by default, play_voltages() blocks until the voltages finish
-        playing. This makes it harder to accidentally code yourself into
-        ugly race conditions, but it obviously makes it hard to do
-        anything else while the board is playing voltages. Since
-        we're just issuing a DLL call, it's easy for play_voltages() to
-        return as soon as the voltage task has started playing. This is
-        probably what you want! But easier to write bugs with.
-        Regardless, if a previous voltage task is still playing, we have
-        to wait for it to finish before we can start the next one.
+        Play voltages on the NI board. By default, play_voltages() blocks until the voltages finish
+        playing. If a previous voltage task is still playing, wait for it to finish before the next one is started.
+
+        :param voltages: Array of voltages. If None, play the previously set voltages.
+        :param force_final_zeros: Boolean True/False. If 'force_final_zeros', the last entry of each channel of 'voltages' is set to zero.
+        :param block: Boolean True/False. If 'block', this function will not return until the voltages are finished playing.
         """
         self._ensure_task_is_stopped()
         if voltages is not None:
-            self._write_voltages(voltages, force_final_zeros)
+            self.write_voltages(voltages, force_final_zeros)
         if self.verbose: print("Playing voltages...")
         api.start_task(self.task_handle)
         self._task_running = True
@@ -171,6 +181,12 @@ class Analog_Out:
         return None
 
     def close(self):
+        """
+        Set voltages to zero and close NI board.
+
+        :return: None
+        """
+
         if self.daq_type == '6738_constant':
             if self.verbose: print("Setting voltages to zero")
             api.write_scalarvoltages(self.task_handle, 1, 10, 0, None)
@@ -184,42 +200,57 @@ class Analog_Out:
             return None
 
     def setconstantvoltage(self, voltage):
+        """
+        Set constant voltage to '6738_constant' (constant) channel.
+
+        :param voltage: voltage to set.
+        """
+
         # Writes a floating-point sample to a task that contains a single analog output channel.
         api.write_scalarvoltages(self.task_handle, 1, 10, voltage, None)
 
     def s2p(self, seconds):
-        '''Convert a duration in seconds to a number of AO "pixels."
-        Frequently I know how many seconds I want to play a voltage for,
-        and I do simple math to convert this to how many "pixels" of
-        voltage I should use on the analog out card to get this many
-        seconds. Frequently I get this math wrong. That's why I wrote
-        this function.
-        '''
+        """
+        Convert a duration in seconds to a number of AO "pixels."
+
+        :param seconds:  Time duration in seconds.
+        :return: num_pixels. Number of pixels for NI board.
+        """
+
         num_pixels = int(round(self.rate * seconds))
         return num_pixels
 
     def p2s(self, num_pixels):
-        '''Convert a  number of AO "pixels to a duration in seconds."
-        Frequently I know how many "pixels" of voltage I'm playing on
-        the analog out card, and I do simple math to convert this to how
-        many seconds I'm playing that voltage for. Frequently I get this
-        math wrong. That's why I wrote this function.
-        '''
+        """
+        Convert a duration in number of AO "pixels" to seconds.
+
+        :param num_pixels:  Number of pixels for NI board.
+        :return: seconds. Time duration in seconds.
+        """
+
         seconds = num_pixels / self.rate
         return seconds
 
     def s2s(self, seconds):
-        '''Calculate nearest duration the AO card can exactly deliver.
+        """
+        Calculate nearest duration the AO card can exactly deliver.
         This function rounds a time (in seconds) to the nearest time
         that the AO card can exactly deliver via an integer number of
-        "pixels". For example, maybe you'd like to play a 10 millisecond
-        pulse of voltage, but the AO rate is set to 300; how many
-        "pixels" should we expect the AO card play for?
-        '''
+        "pixels".
+
+        :param seconds: Time to determine nearest duration of AO card can deliver.
+        :return: seconds. Precise time that AO can deliver.
+        """
+
         seconds = self.p2s(self.s2p(seconds))
         return seconds
 
     def _ensure_task_is_stopped(self):
+        """
+        Make sure there is no AO task running.
+
+        :return: None
+        """
         if not hasattr(self, '_task_running'):
             self._task_running = False
         if self._task_running:
@@ -230,7 +261,15 @@ class Analog_Out:
             self._task_running = False
         return None
 
-    def _write_voltages(self, voltages, force_final_zeros=True):
+    def write_voltages(self, voltages, force_final_zeros=True):
+        """
+        Write a voltage array to the NI board.
+
+        :param voltages: 2-d array with shape=(n, self.num_channels)
+        :param force_final_zeros: Boolean, if yes, voltages at the end are set to zero.
+        :return: None
+        """
+
         assert len(voltages.shape) == 2
         assert voltages.dtype == self.voltages.dtype
         assert voltages.shape[0] >= 2
@@ -262,56 +301,9 @@ class Analog_Out:
                   "points written to each %s channel."%self.daq_type)
         return None
 
-    def plot_voltages(self, volts, names):
-        # Reverse lookup table; channel numbers to names:
-        for c in range(volts.shape[1]):
-            plt.plot(volts[:, c], label=names[c])
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        xlocs, xlabels = plt.xticks()
-        plt.xticks(xlocs, [self.p2s(l) for l in xlocs])
-        plt.ylabel('Volts')
-        plt.xlabel('Seconds')
-        plt.tight_layout()
-        plt.show()
 
-    def get_voltage_array(self,
-                          exposure_time=0.05,
-                          remote_low_vol = -2,
-                          remote_high_vol = 2,
-                          stage_triggertime=0.002,
-                          delay_camera_trigger=0.002,  # how long does stage needs to move
-                          camera_triggertime=0.002,
-                          laser_line=3 #3 or higher
-                          ):
-        '''
-        channels: stage trigger, remote mirror, TTL laser (4), camera trigger
-        :returns Array with voltages for 0: stage, 1: camera trigger, 2: remote mirror
-        '''
 
-        assert laser_line>2, print("Choose parameter 3-7 for laser line")
 
-        returnpoint = self.s2p(stage_triggertime + delay_camera_trigger)
-        endpoint = self.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
-
-        # np.linspace(remote_low_vol, remote_low_vol, num = ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
-        basic_unit = np.zeros((endpoint, 7), np.dtype(np.float64))
-
-        # stage trigger
-        basic_unit[0:self.s2p(stage_triggertime), 0] = 4
-
-        # camera trigger
-        basic_unit[self.s2p(stage_triggertime + delay_camera_trigger): self.s2p(
-            stage_triggertime + delay_camera_trigger + camera_triggertime), 1] = 4
-
-        #remote mirror
-        basic_unit[0: returnpoint, 2] = np.linspace(remote_high_vol, remote_low_vol, num=returnpoint - self.s2p(0.000))
-        basic_unit[returnpoint: endpoint, 2] = np.linspace(remote_low_vol, remote_high_vol, num=endpoint - returnpoint)
-
-        basic_unit[self.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): self.s2p(
-            stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time), laser_line] = 4  # laser trigger
-        print(self.s2p(exposure_time + 0.004) - self.s2p(0.000))
-
-        return basic_unit
 
 
 # DLL api management----------------------------------------------------------------------------------------------------
@@ -323,6 +315,12 @@ api.get_error_info = api.DAQmxGetExtendedErrorInfo
 api.get_error_info.argtypes = [C.c_char_p, C.c_uint32]
 
 def check_error(error_code):
+    """
+    Print error code from NI DAQ board.
+
+    :param error_code: Error code.
+    :return:  error_code.
+    """
     if error_code != 0:
         num_bytes = api.get_error_info(None, 0) #if passed in 0 in buffersize, the value returned is the number of bytes
         print("Error message from NI DAQ: (", num_bytes, "bytes )")
@@ -484,12 +482,63 @@ if __name__ == '__main__':
     volts[ao.s2p(8):ao.s2p(10), :] = 5
 
 
-    basic_unit = ao.get_voltage_array()
+    def get_voltage_array(exposure_time=0.05,
+                          remote_low_vol=-2,
+                          remote_high_vol=2,
+                          stage_triggertime=0.002,
+                          delay_camera_trigger=0.002,  # how long does stage needs to move
+                          camera_triggertime=0.002,
+                          laser_line=3  # 3 or higher
+                          ):
+        '''
+        channels: stage trigger, remote mirror, TTL laser (4), camera trigger
+        :returns Array with voltages for 0: stage, 1: camera trigger, 2: remote mirror
+        '''
+
+        assert laser_line > 2, print("Choose parameter 3-7 for laser line")
+
+        returnpoint = ao.s2p(stage_triggertime + delay_camera_trigger)
+        endpoint = ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time)
+
+        # np.linspace(remote_low_vol, remote_low_vol, num = ao.s2p(exposure_time + 0.004)-ao.s2p(0.000))
+        basic_unit = np.zeros((endpoint, 7), np.dtype(np.float64))
+
+        # stage trigger
+        basic_unit[0:ao.s2p(stage_triggertime), 0] = 4
+
+        # camera trigger
+        basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger): ao.s2p(
+            stage_triggertime + delay_camera_trigger + camera_triggertime), 1] = 4
+
+        # remote mirror
+        basic_unit[0: returnpoint, 2] = np.linspace(remote_high_vol, remote_low_vol, num=returnpoint - ao.s2p(0.000))
+        basic_unit[returnpoint: endpoint, 2] = np.linspace(remote_low_vol, remote_high_vol, num=endpoint - returnpoint)
+
+        basic_unit[ao.s2p(stage_triggertime + delay_camera_trigger + camera_triggertime): ao.s2p(
+            stage_triggertime + delay_camera_trigger + camera_triggertime + exposure_time), laser_line] = 4  # laser trigger
+        print(ao.s2p(exposure_time + 0.004) - ao.s2p(0.000))
+
+        return basic_unit
+
+    basic_unit = get_voltage_array()
 
     nb_frames = 5
     control_array = np.tile(basic_unit, (nb_frames, 1))
     print(control_array)
-    ao.plot_voltages(control_array, ("ao0/stage", "ao5/camera", "ao6/remote mirror", "ao8/laser", "ao11", "ao14", "ao18"))
+
+
+    def plot_voltages(volts, names):
+        # Reverse lookup table; channel numbers to names:
+        for c in range(volts.shape[1]):
+            plt.plot(volts[:, c], label=names[c])
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        xlocs, xlabels = plt.xticks()
+        plt.xticks(xlocs, [ao.p2s(l) for l in xlocs])
+        plt.ylabel('Volts')
+        plt.xlabel('Seconds')
+        plt.tight_layout()
+        plt.show()
+    plot_voltages(control_array, ("ao0/stage", "ao5/camera", "ao6/remote mirror", "ao8/laser", "ao11", "ao14", "ao18"))
 
     #volts[ao.s2p(0.001):ao.s2p]
     #do.play_voltages(digits, force_final_zeros=True, block=False)

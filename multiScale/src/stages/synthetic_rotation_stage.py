@@ -9,41 +9,50 @@ import time
 
 
 class Synthetic_rotationstage:
+    """
+    Class to make and operate a synthetic rotation stage.
+    """
 
     def __init__(self, locator):
-        '''
-        Initialize rotation stage parameters, and print out some parameters for debugging
-        Input: locator address of the rotation stage, e.g. usb:id:3948963323
-        Output: an initialized and connected stage.
-        '''
+        """
+        Initialize a synthetic rotation stage.
+
+        :param locator: Stage ID/address of the synthetic rotation stage.
+        """
+
         # initialize rotation stage
         self.angle = 0
-
-    def ExitIfError(self, status):
-        '''
-        MCS controller error message parser.
-        Input: status report of the stage
-        Output: print an error message if applicable
-        '''
-        #init error_msg variable
-        return
+        self.stageid = locator
 
     def moveToAngle(self, angle):
+        """
+        Move to specific angle with synthetic rotation stage.
+
+        :param angle: Angle to move to.
+        """
+
         self.angle = angle
         print("move to angle: " + str(angle))
 
     def getAngle(self):
-       print("angle: " + str(self.angle))
+        """
+        Print current angle of rotation stage.
+        """
+
+        print("angle: " + str(self.angle))
 
     def close(self):
+        """
+        Close synthetic rotation stage.
+        """
+
         # /* At the end of the program you should release all opened systems. */
         print('stage closed')
 
 if __name__ == '__main__':
     ##test here code of this class
 
-    stage_id = 'usb:id:3948963323'
-
+    stage_id = 'syntheticstagename'
     rotationstage = Synthetic_rotationstage(stage_id)
     rotationstage.moveToAngle(50)
     rotationstage.close()

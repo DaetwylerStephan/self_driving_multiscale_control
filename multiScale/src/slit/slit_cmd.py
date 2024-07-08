@@ -8,12 +8,14 @@ import re
 
 
 class slit_ximc_control:
+    """
+    Class to control the Xilinc slit.
+    """
 
     def __init__(self):
         '''
-        Initialize xilinc slit, and print out some parameters for debugging
-        Input:
-        Output: an initialized and connected slit.
+        Initialize and connect to xilinc slit, and print out some parameters for debugging
+
         '''
 
         print("a")
@@ -146,6 +148,9 @@ class slit_ximc_control:
 
 
     def slit_info(self):
+        """
+        Obtain information about the Xilinc slit. Print out information such as device info, manufacturer, manufacturerID, ProductDescription.
+        """
         print("\nGet device info")
         result = self.lib.get_device_information(self.device_id, byref(self.x_device_information))
         print("Result: " + repr(result))
@@ -163,6 +168,9 @@ class slit_ximc_control:
 
 
     def slit_status(self):
+        """
+        Obtain and print status information of the Xilinc slit device.
+        """
         print("\nGet status")
         result = self.lib.get_status(self.device_id, byref(self.x_status))
         print("Result: " + repr(result))
@@ -174,6 +182,11 @@ class slit_ximc_control:
 
 
     def slit_get_position(self):
+        """
+        Get the position of the slit.
+
+        :return: Steps (self.x_pos.Position) and microsteps (self.x_pos.uPosition).
+        """
         print("\nRead position")
         result = self.lib.get_position(self.device_id, byref(self.x_pos))
         print("Result: " + repr(result))
@@ -182,24 +195,33 @@ class slit_ximc_control:
         return self.x_pos.Position, self.x_pos.uPosition
 
 
-    def slit_left(self):
-        print("\nMoving left")
-        result = self.lib.command_left(self.device_id)
-        print("Result: " + repr(result))
-
-
     def slit_move(self, distance, udistance):
+        """
+        Move the slit by a defined number of steps and microsteps.
+
+        :param distance: Steps to move
+        :param udistance: Microsteps to move.
+        """
         print("\nGoing to {0} steps, {1} microsteps".format(distance, udistance))
         result = self.lib.command_move(self.device_id, distance, udistance)
         print("Result: " + repr(result))
 
     def slit_wait_for_stop(self, interval):
+        """
+        Check whether the slit has stopped moving.
+
+        :param interval: Status refresh interval. The function waits this number of milliseconds between requests to the controller.
+        """
         print("\nWaiting for stop")
         result = self.lib.command_wait_for_stop(self.device_id, interval)
         print("Result: " + repr(result))
 
 
     def slit_serial(self):
+        """
+        Get and print serial number of slit.
+        """
+
         print("\nReading serial")
         x_serial = c_uint()
         result = self.lib.get_serial_number(self.device_id, byref(x_serial))
@@ -208,6 +230,11 @@ class slit_ximc_control:
 
 
     def slit_get_speed(self):
+        """
+        Get, print and return slit movement speed.
+
+        :return: Slit movement speed
+        """
         print("\nGet speed")
         # Create move settings structure
         # Get current move settings from controller
@@ -219,6 +246,12 @@ class slit_ximc_control:
 
 
     def slit_set_speed(self, speed):
+        """
+        Set slit movement speed.
+
+        :param speed: Set movement speed. Target speed (for stepper motor: steps/s). Range: 0..100000.
+        """
+
         print("\nSet speed")
         # Create move settings structure
         # Get current move settings from controller
@@ -235,6 +268,11 @@ class slit_ximc_control:
 
 
     def slit_set_microstep_mode_256(self):
+        """
+        Set the slit into 1/256-step mode (most precise mode).
+        Check: https://libximc.xisupport.com/doc-en/ximc_8h.html#flagset_microstepmode
+
+        """
         print("\nSet microstep mode to 1/256 steps")
         # Create engine settings structure
         # Get current engine settings from controller
@@ -249,26 +287,19 @@ class slit_ximc_control:
         # Print command return status. It will be 0 if all is OK
         print("Write command result: " + repr(result))
 
-    def slit_set_microstep_mode_2(self):
-        print("\nSet microstep mode to 1/2 steps")
-        # Create engine settings structure
-        # Get current engine settings from controller
-        result = self.lib.get_engine_settings(self.device_id, byref(self.eng))
-        # Print command return status. It will be 0 if all is OK
-        print("Read command result: " + repr(result))
-        # Change MicrostepMode parameter to MICROSTEP_MODE_FRAC_256
-        # (use MICROSTEP_MODE_FRAC_128, MICROSTEP_MODE_FRAC_64 ... for other microstep modes)
-        self.eng.MicrostepMode = self.MicrostepMode.MICROSTEP_MODE_FRAC_2
-        # Write new engine settings to controller
-        result = self.lib.set_engine_settings(self.device_id, byref(self.eng))
-        # Print command return status. It will be 0 if all is OK
-        print("Write command result: " + repr(result))
 
     def home_stage(self):
+        """
+        Move to home and calibrate zero position.
+        """
+
         print("\nSet Position to Zero")
         self.lib.command_homezero(self.device_id)
 
     def slit_closing(self):
+        """
+        Close the slit.
+        """
         print("\nSlit Closing")
         self.lib.close_device(byref(cast(self.device_id, POINTER(c_int))))
 
@@ -290,7 +321,6 @@ if __name__ == '__main__':
 
     # first move
     test_slit.slit_set_speed(500)
-    #test_slit.slit_left()
     time.sleep(4)
     test_slit.slit_get_position()
     # second move

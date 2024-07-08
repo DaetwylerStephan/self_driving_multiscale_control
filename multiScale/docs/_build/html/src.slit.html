@@ -55,10 +55,8 @@
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_get_position"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_get_position()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_get_speed"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_get_speed()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_info"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_info()</span></code></a></li>
-<li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_left"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_left()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_move"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_move()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_serial"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_serial()</span></code></a></li>
-<li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_2"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_set_microstep_mode_2()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_256"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_set_microstep_mode_256()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_set_speed"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_set_speed()</span></code></a></li>
 <li><a class="reference internal" href="#src.slit.slit_cmd.slit_ximc_control.slit_status"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_status()</span></code></a></li>
@@ -107,78 +105,107 @@
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.slit.slit_cmd.</span></span><span class="sig-name descname"><span class="pre">slit_ximc_control</span></span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to control the Xilinc slit.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Initialize xilinc slit, and print out some parameters for debugging
-Input:
-Output: an initialized and connected slit.</p>
+<dd><p>Initialize and connect to xilinc slit, and print out some parameters for debugging</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.home_stage">
 <span class="sig-name descname"><span class="pre">home_stage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.home_stage" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Move to home and calibrate zero position.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_closing">
 <span class="sig-name descname"><span class="pre">slit_closing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_closing" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Close the slit.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_get_position">
 <span class="sig-name descname"><span class="pre">slit_get_position</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_get_position" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get the position of the slit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Steps (self.x_pos.Position) and microsteps (self.x_pos.uPosition).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_get_speed">
 <span class="sig-name descname"><span class="pre">slit_get_speed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_get_speed" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get, print and return slit movement speed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Slit movement speed</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_info">
 <span class="sig-name descname"><span class="pre">slit_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_info" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_left">
-<span class="sig-name descname"><span class="pre">slit_left</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_left" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Obtain information about the Xilinc slit. Print out information such as device info, manufacturer, manufacturerID, ProductDescription.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_move">
 <span class="sig-name descname"><span class="pre">slit_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">udistance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_move" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Move the slit by a defined number of steps and microsteps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance</strong> – Steps to move</p></li>
+<li><p><strong>udistance</strong> – Microsteps to move.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_serial">
 <span class="sig-name descname"><span class="pre">slit_serial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_serial" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_2">
-<span class="sig-name descname"><span class="pre">slit_set_microstep_mode_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_2" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get and print serial number of slit.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_256">
 <span class="sig-name descname"><span class="pre">slit_set_microstep_mode_256</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_256" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Set the slit into 1/256-step mode (most precise mode).
+Check: <a class="reference external" href="https://libximc.xisupport.com/doc-en/ximc_8h.html#flagset_microstepmode">https://libximc.xisupport.com/doc-en/ximc_8h.html#flagset_microstepmode</a></p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_set_speed">
 <span class="sig-name descname"><span class="pre">slit_set_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_set_speed" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Set slit movement speed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>speed</strong> – Set movement speed. Target speed (for stepper motor: steps/s). Range: 0..100000.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_status">
 <span class="sig-name descname"><span class="pre">slit_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_status" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Obtain and print status information of the Xilinc slit device.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.slit.slit_cmd.slit_ximc_control.slit_wait_for_stop">
 <span class="sig-name descname"><span class="pre">slit_wait_for_stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.slit.slit_cmd.slit_ximc_control.slit_wait_for_stop" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Check whether the slit has stopped moving.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>interval</strong> – Status refresh interval. The function waits this number of milliseconds between requests to the controller.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

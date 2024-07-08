@@ -52,7 +52,6 @@
 <li><a class="reference internal" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.close()</span></code></a></li>
 <li><a class="reference internal" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.set_filter"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.set_filter()</span></code></a></li>
-<li><a class="reference internal" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.filterdict"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.filterdict</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -62,8 +61,6 @@
 <li><a class="reference internal" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.__init__"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.close"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.close()</span></code></a></li>
 <li><a class="reference internal" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.set_filter()</span></code></a></li>
-<li><a class="reference internal" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.double_wheel"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.double_wheel</span></code></a></li>
-<li><a class="reference internal" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.wait_until_done_delay"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.wait_until_done_delay</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -108,28 +105,40 @@
 <dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.filter_wheel.Synthetic_Filterwheel.</span></span><span class="sig-name descname"><span class="pre">Synthetic_Filterwheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Synthetic FilterWheel</p>
+<p>Synthetic filter wheel class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize synthetic filter wheel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>COMport</strong> – Synthetic COMport to connect to filter wheel.</p></li>
+<li><p><strong>filterdict</strong> – Synthetic filter dictionary of mounted filters and their position.</p></li>
+<li><p><strong>baudrate</strong> – Synthetic baudrate for connection.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.close" title="Permalink to this definition"></a></dt>
-<dd><p>Close the filter wheel</p>
+<dd><p>Close the synthetic filter wheel</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.set_filter">
 <span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_until_done</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.set_filter" title="Permalink to this definition"></a></dt>
-<dd><p>Moves and sets correct filter</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.filterdict">
-<span class="sig-name descname"><span class="pre">filterdict</span></span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.filterdict" title="Permalink to this definition"></a></dt>
-<dd><p>Delay in s for the wait until done function</p>
+<dd><p>Moves and sets synthetic filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> – String, name of filter, e.g. ‘515-30-25’</p></li>
+<li><p><strong>wait_until_done</strong> – flag whether to wait a defined amount of time before returning</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -142,63 +151,44 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.filter_wheel.ludlcontrol.</span></span><span class="sig-name descname"><span class="pre">LudlFilterwheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to control a 6-position Ludl filterwheel</p>
-<p>Needs a dictionary which combines filter designations and position IDs
-in the form:</p>
-<dl class="simple">
-<dt>filters = {‘405-488-647-Tripleblock’<span class="classifier">0,</span></dt><dd><p>‘405-488-561-640-Quadrupleblock’: 1,
-‘464 482-35’: 2,
-‘508 520-35’: 3,
-‘515LP’:4,
-‘529 542-27’:5,
-‘561LP’:6,
-‘594LP’:7,
-‘Empty-Alignment’:8,}</p>
-</dd>
-</dl>
-<p>If there are tuples instead of integers as values, the
-filterwheel is assumed to be a double wheel.</p>
-<p>I.e.: ‘508 520-35’: (2,3)</p>
-<p>adapted from ludl filter wheel control by Fabian Voigt</p>
+<p>Needs a dictionary which combines filter designations and position IDs in the form:</p>
+<p>filters = {‘405-488-647-Tripleblock’ : 0, ‘405-488-561-640-Quadrupleblock’: 1, ‘464 482-35’: 2, ‘508 520-35’: 3, ‘515LP’:4,}</p>
+<p>Adapted from Ludl filter wheel control by Fabian Voigt. Check out:
+<a class="reference external" href="https://github.com/mesoSPIM/mesoSPIM-control/blob/master/mesoSPIM/src/devices/filter_wheels/mesoSPIM_FilterWheel.py">https://github.com/mesoSPIM/mesoSPIM-control/blob/master/mesoSPIM/src/devices/filter_wheels/mesoSPIM_FilterWheel.py</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.close" title="Permalink to this definition"></a></dt>
-<dd><p>Close the filter wheel.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter">
-<span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_until_done</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter" title="Permalink to this definition"></a></dt>
-<dd><p>Moves filter using the pyserial command set.</p>
-<p>No checks are done whether the movement is completed or
-finished in time.</p>
+<dd><p>Initialize Ludl filter wheel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filter</strong> – String, name of filter, e.g. ‘515-30-25’</p></li>
-<li><p><strong>wait_until_done</strong> – flag</p></li>
+<li><p><strong>COMport</strong> – COMport to connect to filter wheel.</p></li>
+<li><p><strong>filterdict</strong> – Filter dictionary of mounted filters and their position.</p></li>
+<li><p><strong>baudrate</strong> – Baudrate for connection.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.double_wheel">
-<span class="sig-name descname"><span class="pre">double_wheel</span></span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.double_wheel" title="Permalink to this definition"></a></dt>
-<dd><p>Delay in s for the wait until done function</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close the Ludl filter wheel.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.wait_until_done_delay">
-<span class="sig-name descname"><span class="pre">wait_until_done_delay</span></span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.wait_until_done_delay" title="Permalink to this definition"></a></dt>
-<dd><p>If the first entry of the filterdict has a tuple
-as value, it is assumed that it is a double-filterwheel
-to change the serial commands accordingly.</p>
-<p>TODO: This doesn’t check that the tuple has length 2.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter">
+<span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_until_done</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter" title="Permalink to this definition"></a></dt>
+<dd><p>Moves filter wheel using the pyserial command set. No checks are done whether the movement is completed or
+finished in time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> – String, name of filter, e.g. ‘515-30-25’</p></li>
+<li><p><strong>wait_until_done</strong> – flag whether to wait a defined amount of time before returning</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

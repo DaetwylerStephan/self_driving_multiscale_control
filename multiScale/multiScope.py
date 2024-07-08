@@ -725,7 +725,7 @@ class multiScopeModel:
                 custody.switch_from(None, to=self.highres_camera)
 
                 # write voltages, indicate "False" so that the voltages are not set back to zero at the end (for the remote mirror)
-                write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(basic_unit, False),
+                write_voltages_thread = ct.ResultThread(target=self.ao.write_voltages, args=(basic_unit, False),
                                                         ).start()
 
                 # start camera thread to poll for new images
@@ -942,7 +942,7 @@ class multiScopeModel:
             self.stack_nbplanes_lowres + 1, 1))  # add +1 as you want to return to origin position
 
             # write voltages
-            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
+            write_voltages_thread = ct.ResultThread(target=self.ao.write_voltages, args=(control_array,),
                                                     ).start()
 
             # set up stage
@@ -1135,7 +1135,7 @@ class multiScopeModel:
                 print("camera initialized")
 
             # write voltages
-            write_voltages_thread = ct.ResultThread(target=self.ao._write_voltages, args=(control_array,),
+            write_voltages_thread = ct.ResultThread(target=self.ao.write_voltages, args=(control_array,),
                                                     ).start()
 
             # set up stage

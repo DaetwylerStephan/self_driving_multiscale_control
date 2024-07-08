@@ -3,27 +3,32 @@ import time
 
 
 class Synthetic_Filterwheel:
-
     """
-    Synthetic FilterWheel
+    Synthetic filter wheel class.
     """
 
     def __init__(self, COMport, filterdict, baudrate=9600):
+        """
+        Initialize synthetic filter wheel.
+
+        :param COMport: Synthetic COMport to connect to filter wheel.
+        :param filterdict: Synthetic filter dictionary of mounted filters and their position.
+        :param baudrate: Synthetic baudrate for connection.
+        """
+
         print('Initializing Synthetic Filter Wheel')
         self.COMport = COMport
         self.baudrate = baudrate
         self.filterdict = filterdict
 
-        ''' Delay in s for the wait until done function '''
-        self.wait_until_done_delay = 0.5
+        self.wait_until_done_delay = 0.5 #Delay in s for the wait until done function
+
 
         self.first_item_in_filterdict = list(self.filterdict.keys())[0]
 
-
-
     def close(self):
         '''
-        Close the filter wheel
+        Close the synthetic filter wheel
         '''
         pass
 
@@ -39,9 +44,12 @@ class Synthetic_Filterwheel:
 
     def set_filter(self, filter, wait_until_done=False):
         '''
-        Moves and sets correct filter
+        Moves and sets synthetic filter.
 
+        :param filter: String, name of filter, e.g. '515-30-25'
+        :param wait_until_done: flag whether to wait a defined amount of time before returning
         '''
+
         if self._check_if_filter_in_filterdict(filter) is True:
             print("set and move to filter position")
             if wait_until_done:

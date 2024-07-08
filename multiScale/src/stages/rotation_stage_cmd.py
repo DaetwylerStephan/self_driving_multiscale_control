@@ -21,13 +21,17 @@ class _GetchWindows:
 getch = _GetchWindows()
 
 class SR2812_rotationstage:
+    """
+    Class to operate the SR2812 rotation stage from Smaract.
+    """
 
     def __init__(self, locator):
-        '''
-        Initialize rotation stage parameters, and print out some parameters for debugging
-        Input: locator address of the rotation stage, e.g. usb:id:3948963323
-        Output: an initialized and connected stage.
-        '''
+        """
+        Initialize and connect rotation stage, and print out some parameters for debugging
+
+        :param locator: Stage ID/address of the rotation stage, e.g. 'usb:id:3948963354'
+        """
+
         # initialize some variables
         self.sensorEnabled = ct.c_ulong(0)  # initialize sensorEnbaled variable
         self.mcsHandle = ct.c_ulong()  # initialize MCS control handle
@@ -36,8 +40,6 @@ class SR2812_rotationstage:
         self.sensorType = ct.c_ulong()
         self.position = ct.c_int()
         self.status = ct.c_ulong()
-
-
 
         # check dll version (not really necessary)
         version = ct.c_ulong()
@@ -68,11 +70,13 @@ class SR2812_rotationstage:
 
 
     def ExitIfError(self, status):
-        '''
-        MCS controller error message parser.
-        Input: status report of the stage
-        Output: print an error message if applicable
-        '''
+        """
+        MCS controller error message parser. Print an error message if applicable.
+
+        :param status: Status report of the stage.
+        :return: None
+        """
+
         #init error_msg variable
         error_msg = ct.c_char_p()
         if(status != SA_OK):
@@ -81,19 +85,29 @@ class SR2812_rotationstage:
         return
 
     def moveToAngle(self, angle):
+        """
+        Move rotation stage to a specific angle.
+
+        :param angle: Angle to move to.
+        """
         angleposition = ct.c_int(int(angle))
         self.ExitIfError(SA_GotoAngleAbsolute_S(self.mcsHandle, self.channel, angleposition, 0, 1000))
 
     def getAngle(self):
+        """
+        Print current angle of rotation stage.
+        """
+
         revolution = ct.c_ulong()
         position = ct.c_int()
         self.ExitIfError(SA_GetAngle_S(self.mcsHandle, self.channel, position, revolution))
         print("Position: {} ugrad (Press \'s\' to change step size. Press \'q\' to exit.)".format(position.value))
 
     def ManualMove(self):
-        '''
+        """
         Use the _GetchWindows class to manually operate the initialized stage from the command line.
-        '''
+        """
+
         step_angle = 1000000
         print("\nENTER COMMAND AND RETURN\n" \
               "+  Move positioner up by {}mgrad\n" \
@@ -141,6 +155,10 @@ class SR2812_rotationstage:
                 # // - - - - - - - - - - -
 
     def close(self):
+        """
+        Close the rotation stage.
+        """
+
         # /* At the end of the program you should release all opened systems. */
         self.ExitIfError(SA_CloseSystem(self.mcsHandle))
         print('stage closed')
