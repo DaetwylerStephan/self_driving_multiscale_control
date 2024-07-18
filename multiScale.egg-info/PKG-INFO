@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: multiScale
+Version: 0.1.0
+Summary: Analysis and Visualization of multi-scale light-sheet data
+Author: Stephan Daetwyler, Reto Fiolka
+License-File: LICENSE
+Requires-Dist: psutil
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: tifffile
+Requires-Dist: opencv-python-headless
+Requires-Dist: imutils
+Requires-Dist: pystackreg
+Requires-Dist: scikit-image
+Requires-Dist: scipy
+Requires-Dist: multiprocess
+Requires-Dist: pandas
+Requires-Dist: imagecodecs
+Requires-Dist: napari[all]
+Requires-Dist: openpyxl

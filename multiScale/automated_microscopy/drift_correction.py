@@ -12,9 +12,9 @@ except:
     print("check append path in drift_correction.py module")
     sys.path.append(os.path.abspath("./multiScale"))
 
-from auxiliary_code.constants import Image_parameters
-from automated_microscopy.template_matching import automated_templateMatching
-from automated_microscopy.image_deposit import images_InMemory_class
+from multiScale.auxiliary_code.constants import Image_parameters
+from multiScale.automated_microscopy.template_matching import automated_templateMatching
+from multiScale.automated_microscopy.image_deposit import images_InMemory_class
 
 from pystackreg import StackReg
 import pystackreg

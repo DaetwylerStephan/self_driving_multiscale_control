@@ -53,7 +53,8 @@ elif is_windows:
     print('Uninstall package: pip uninstall pyvcam  \n')
     print('************************************************************\n')
 
-pvcam_sdk_path = os.environ['PVCAM_SDK_PATH']
+pvcam_sdk_path = r"C:/Program Files/Photometrics/PVCamSDK/"
+#pvcam_sdk_path = os.environ['PVCAM_SDK_PATH']
 import numpy
 include_dirs = [numpy.get_include()]
 
