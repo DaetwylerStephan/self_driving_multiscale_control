@@ -2,22 +2,22 @@ class microscope_configuration:
     """
     Microscope configuration class. Define which hardware to use here and where to save images.
     """
-    lowres_camera = 'Photometrics_lowres'
-    highres_camera = 'Photometrics_highres'
-    filterwheel = 'Ludl_filterwheel'
-    ni_board = 'NI_Board'
-    rotationstage = 'Smaract_RotationStage'
-    translationstage = 'Smaract_TranslationStage'
+    # lowres_camera = 'Photometrics_lowres'
+    # highres_camera = 'Photometrics_highres'
+    # filterwheel = 'Ludl_filterwheel'
+    # ni_board = 'NI_Board'
+    # rotationstage = 'Smaract_RotationStage'
+    # translationstage = 'Smaract_TranslationStage'
 
     parentdir = "D:/multiScope_Data/"
 
     # Synthetic microscope.
-    # lowres_camera = 'Synthetic_camera'
-    # highres_camera = 'Synthetic_camera'
-    # filterwheel = 'Synthetic_Filterwheel'
-    # rotationstage = 'Synthetic_RotationStage'
-    # translationstage = 'Synthetic_TranslationStage'
-    # ni_board = 'Synthetic_niBoard'
+    lowres_camera = 'Synthetic_camera'
+    highres_camera = 'Synthetic_camera'
+    filterwheel = 'Synthetic_Filterwheel'
+    rotationstage = 'Synthetic_RotationStage'
+    translationstage = 'Synthetic_TranslationStage'
+    ni_board = 'Synthetic_niBoard'
 
 class FilterWheel_parameters:
     """

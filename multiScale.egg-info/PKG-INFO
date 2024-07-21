@@ -18,3 +18,7 @@ Requires-Dist: pandas
 Requires-Dist: imagecodecs
 Requires-Dist: napari[all]
 Requires-Dist: openpyxl
+Requires-Dist: nidaqmx
+Requires-Dist: cffi
+Requires-Dist: serial
+Requires-Dist: vispy

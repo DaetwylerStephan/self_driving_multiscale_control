@@ -179,14 +179,15 @@ class Synthetic_Photo_Camera:
         :param out: buffer to update with acquired image
         :param flipimage: do you want to change the orientation of the image to display.
         """
+
         framesReceived = 0
         while framesReceived < 1:
             try:
                 frame, fps, frame_count = self.cam.poll_frame()
                 if flipimage == False:
-                    out[:] = np.copy(frame['pixel_data'][:])
+                    out[:] = np.copy(np.copy(frame))
                 else:
-                    out[:] = np.flipud(np.copy(frame['pixel_data'][:]))
+                    out[:] = np.flipud(np.copy(frame))
                 framesReceived += 1
             except Exception as e:
                 print(str(e))

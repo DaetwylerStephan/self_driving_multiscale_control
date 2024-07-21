@@ -23,7 +23,6 @@ multiScale/src/slit/__init__.py
 multiScale/src/slit/slit_cmd.py
 multiScale/src/stages/__init__.py
 multiScale/src/stages/rotation_stage_cmd.py
-multiScale/src/stages/setup.py
 multiScale/src/stages/synthetic_rotation_stage.py
 multiScale/src/stages/synthetic_translation_stage.py
 multiScale/src/stages/translation_stage_cmd.py

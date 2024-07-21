@@ -21,6 +21,7 @@
 
 # Import ctypes from standard python to import c.dll(s)
 import ctypes as ct
+import os
 
 #define standard SA_types // not really necessary in Python
 SA_STATUS = ct.c_ulong()
@@ -28,6 +29,8 @@ SA_INDEX  = ct.c_ulong()
 SA_PACKET_TYPE  = ct.c_ulong()
 
 #import MCSControl.dll via ctypes
+
+librarypath = os.path.abspath(os.path.join(os.path.dirname(__file__), "MCSControl"))
 MCS_lib = ct.cdll.LoadLibrary("MCSControl")
 
 # // defines a data packet for the asynchronous mode

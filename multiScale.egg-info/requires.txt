@@ -12,3 +12,7 @@ pandas
 imagecodecs
 napari[all]
 openpyxl
+nidaqmx
+cffi
+serial
+vispy

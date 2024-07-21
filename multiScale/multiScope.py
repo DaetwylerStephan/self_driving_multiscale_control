@@ -240,43 +240,43 @@ class multiScopeModel:
                 rate=NI_board_parameters.rate,
                 daq_type=NI_board_parameters.ao_type,
                 line=NI_board_parameters.line_selection,
-                verbose=True)
+                verbose=False)
             self.ao_laser488_power = ni.Analog_Out(
                 daq_type=NI_board_parameters.ao_type_constant,
                 line=NI_board_parameters.power_488_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.ao_laser552_power = ni.Analog_Out(
                 daq_type=NI_board_parameters.ao_type_constant,
                 line=NI_board_parameters.power_552_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.ao_laser594_power = ni.Analog_Out(
                 daq_type=NI_board_parameters.ao_type_constant,
                 line=NI_board_parameters.power_594_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.ao_laser640_power = ni.Analog_Out(
                 daq_type=NI_board_parameters.ao_type_constant,
                 line=NI_board_parameters.power_640_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.flipMirrorPosition_power = ni.Analog_Out(
                 daq_type=NI_board_parameters.ao_type_constant,
                 line=NI_board_parameters.flip_mirror_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.LED_voltage = ni.Analog_Out(
                 daq_type=NI_board_parameters.ao_type_constant,
                 line=NI_board_parameters.LED_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             print("done with ao.")
             atexit.register(self.ao.close)
         else:
@@ -285,43 +285,43 @@ class multiScopeModel:
                 rate=NI_board_parameters.rate,
                 daq_type= 'synthetic',
                 line=NI_board_parameters.line_selection,
-                verbose=True)
+                verbose=False)
             self.ao_laser488_power = synthetic_ni.Analog_Out(
                 daq_type='synthetic_constant',
                 line=NI_board_parameters.power_488_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.ao_laser552_power = synthetic_ni.Analog_Out(
                 daq_type='synthetic_constant',
                 line=NI_board_parameters.power_552_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.ao_laser594_power = synthetic_ni.Analog_Out(
                 daq_type='synthetic_constant',
                 line=NI_board_parameters.power_594_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.ao_laser640_power = synthetic_ni.Analog_Out(
                 daq_type='synthetic_constant',
                 line=NI_board_parameters.power_640_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.flipMirrorPosition_power = synthetic_ni.Analog_Out(
                 daq_type='synthetic_constant',
                 line=NI_board_parameters.flip_mirror_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
             self.LED_voltage = synthetic_ni.Analog_Out(
                 daq_type='synthetic_constant',
                 line=NI_board_parameters.LED_line,
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
-                verbose=True)
+                verbose=False)
 
     def _init_filterwheel(self):
         """
@@ -669,6 +669,7 @@ class multiScopeModel:
                     self.initial_time = time.perf_counter()
 
             self.highres_camera.end_preview()
+
 
         self.high_res_buffer = ct.SharedNDArray(shape=(self.current_highresROI_height, self.current_highresROI_width),
                                                 dtype='uint16')

@@ -19,7 +19,7 @@ Next navigate to the PyVCAM
 
 .. code-block:: console
 
-    (microscopecontrol) ~\PyVCAM-master> cd PyVCAM-master
+    (microscopecontrol) ~\MicroscopeControl> cd PyVCAM-master
     (microscopecontrol) ~\PyVCAM-master> python setup.py install
 
 Errors we encountered:
@@ -40,6 +40,17 @@ NI card drivers
 To install the drivers for the NI board, please go to:
 https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx--main-page.html
 
+and install it with suggested additional installs.
+
+Smaract
+-------
+
+.. code-block:: console
+
+    (microscopecontrol) ~\MicroscopeControl> cd Smaract
+    (microscopecontrol) ~\Smaract> pip install .
+
+Run the two executables in the Smaract Folder.
 
 
 Operating System Compatibility
