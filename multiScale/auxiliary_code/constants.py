@@ -2,14 +2,15 @@ class microscope_configuration:
     """
     Microscope configuration class. Define which hardware to use here and where to save images.
     """
+
+    parentdir = "D:/multiScope_Data/"
+
     # lowres_camera = 'Photometrics_lowres'
     # highres_camera = 'Photometrics_highres'
     # filterwheel = 'Ludl_filterwheel'
     # ni_board = 'NI_Board'
     # rotationstage = 'Smaract_RotationStage'
     # translationstage = 'Smaract_TranslationStage'
-
-    parentdir = "D:/multiScope_Data/"
 
     # Synthetic microscope.
     lowres_camera = 'Synthetic_camera'

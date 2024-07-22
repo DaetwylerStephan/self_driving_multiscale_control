@@ -9,9 +9,9 @@ from threading import Event, Thread
 import numpy as np
 
 try:
-    from .smaract import ctl as ctl
+    from Smaract.smaract import ctl as ctl
 except ImportError:
-    import smaract.ctl as ctl
+    import Smaract.smaract.ctl as ctl
 
 
 
@@ -149,7 +149,7 @@ class SLC_translationstage:
                 else:
                     # The movement failed for some reason. E.g. an endstop was detected.
                     print("MCS2 reference found, channel: {}, error: 0x{:04X} ({}) ".format(event.idx, event.i32,
-                                                                                              ctl.GetResultInfo(
+                                                                                            ctl.GetResultInfo(
                                                                                                   event.i32)))
             else:
                 # The code should be prepared to handle unexpected events beside the expected ones.
@@ -243,7 +243,8 @@ class SLC_translationstage:
                     else:
                         # Stream was canceled by device.
                         # Note: The event parameter now holds the error code as well as the channel index responsible for the failure
-                        print("MCS2 stream aborted by device: {}".format(ctl.ErrorCode(ctl.EventParameter.PARAM_RESULT(event.i32)).name))
+                        print("MCS2 stream aborted by device: {}".format(
+                            ctl.ErrorCode(ctl.EventParameter.PARAM_RESULT(event.i32)).name))
                         self.stream_done.set()
                         self.stream_abort.set()
                 elif event.type == ctl.EventType.STREAM_READY or event.type == ctl.EventType.STREAM_TRIGGERED:
@@ -527,7 +528,7 @@ class SLC_translationstage:
         velocityvalue = np.ulonglong(slow_velocity * 10000000000)
         accelerationvalue = np.ulonglong(slow_acceleration * 100000000000)
         ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.MOVE_VELOCITY, velocityvalue)
-        ctl.SetProperty_i64(self.d_handle,0, ctl.Property.MOVE_ACCELERATION, accelerationvalue)
+        ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.MOVE_ACCELERATION, accelerationvalue)
 
         try:
             # Spawn a thread to receive events from the controller.
@@ -556,7 +557,7 @@ class SLC_translationstage:
             if (result):
                 print("get result 1")
             result = ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_INCREMENT, increment)
-            result = ctl.SetProperty_i32(self.d_handle,0, ctl.Property.CH_POS_COMP_DIRECTION, ctl.EITHER_DIRECTION)
+            result = ctl.SetProperty_i32(self.d_handle, 0, ctl.Property.CH_POS_COMP_DIRECTION, ctl.EITHER_DIRECTION)
             # disable limits
             ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_LIMIT_MIN, 0)
             ctl.SetProperty_i64(self.d_handle, 0, ctl.Property.CH_POS_COMP_LIMIT_MAX, 0)

@@ -220,7 +220,7 @@ class Analog_Out:
         if self.voltages.shape[0] != old_voltages_shape[0]:
             self.set_rate(self.rate)
 
-        print("writing voltages")
+        #print("writing voltages")
         return None
 
 

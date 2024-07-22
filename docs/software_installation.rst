@@ -2,31 +2,91 @@
 Software Installation
 =====================
 
-Computer Specifications and requirements
-========================================
+Operating System Compatibility
+------------------------------
 
-Below are the recommended specifications for installing the self-driving, multi-scale software.
+This software has been tested on a Windows 10 computer.
+
+Get ready
+=========
+
+**Install Python, Git and Anaconda/Miniconda**
+
+Make sure you have `Python <https://www.python.org/downloads/>`_ and `Anaconda <https://docs.anaconda.com/anaconda/install/>`_ or `Miniconda <https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links>`_
+installed on your system. Next, please make sure you also have `Git already installed <https://git-scm.com/downloads>`_ installed on your system.
+For a user-friendly experience, `GitHub Desktop <https://desktop.github.com/>`_ is a nice software tool to clone and handle
+repositories. As an IDE, we recommend `PyCharm <https://www.jetbrains.com/pycharm/download/?section=windows>`_.
+
+**Create a directory where the repository will be cloned**
+
+Open an ``Anaconda Prompt`` or PyCharm and go to the Terminal (Command Prompt)
+and enter the following to create a folder and change the working directory to this path.
+
+.. code-block:: console
+
+  (base) C:\Users\Username> cd Documents
+  (base) C:\Users\Username\Documents> mkdir MicroscopeControlCode
+  (base) C:\users\Username\Documents> cd MicroscopeControlCode
+
+**Download the code from Github**
+
+Now, clone this repository to your local path.
+
+.. code-block:: console
+
+    (base) C:\Users\Username\Documents\MicroscopeControlCode> $ git clone https://github.com/DaetwylerStephan/ContextDriven_MicroscopeControl.git
+
+Now you have the code ready in the folder MicroscopeControlCode.
+
+**Initialize a conda environment for your control code**
+
+Now, as a next step, generate a dedicated `Conda environment <https://conda.io/projects/conda/en/latest/user-guide/getting-started.html>`_
+for the control code.
+
+
+.. code-block:: console
+
+   (base) ~\MicroscopeControlCode> $ conda create -n microscopecontrol python=3.9
+   (base) ~\MicroscopeControlCode> $ conda activate microscopecontrol python=3.9
+   (microscopecontrol) ~\MicroscopeControlCode> $
+
+Note: This environment uses Python version 3.9.
+
+Hardware driver installation
+============================
+
+Before continuing now with the control code installation, we need several hardware
+drivers for camera, stages and analog output board.
 
 Camera drivers
 --------------
 
-First install the Pvcam drivers for the camera software
+To run the Photometrics camera (and control software code), please download the
+camera drivers from the manufacturer's homepage.
+
+First install the Pvcam drivers for the camera software:
 https://www.photometrics.com/support/download/pvcam
+
 and the SDK:
 https://www.photometrics.com/support/download/pvcam-sdk
 
-Next navigate to the PyVCAM
+Next, navigate to the PyVCAM folder and run the setup install command:
 
 .. code-block:: console
 
-    (microscopecontrol) ~\MicroscopeControl> cd PyVCAM-master
+    (microscopecontrol) ~\MicroscopeControlCode> cd PyVCAM-master
     (microscopecontrol) ~\PyVCAM-master> python setup.py install
 
 Errors we encountered:
 
-The script did not recognize (find) the right path to the environmenal
-variable in the system. To obtain it, check the environmental variables
-and modify the path accordingly:
+The script did not recognize (find) the right path to the environmental
+variable of the system. To obtain it, check the environmental variables:
+
+.. image:: images/environmental_variables.png
+
+.. image:: images/environmental_pvcampath.png
+
+and modify the path in the PyVCAM-master/setup.py file accordingly:
 
 .. code-block:: python
 
@@ -45,22 +105,71 @@ and install it with suggested additional installs.
 Smaract
 -------
 
+To install the driver for the Smaract stages, first install the two drivers
+executables in the Smaract Folder
+
+Next, navigate to the Smaract folder and run the setup install command:
+
 .. code-block:: console
 
     (microscopecontrol) ~\MicroscopeControl> cd Smaract
     (microscopecontrol) ~\Smaract> pip install .
 
-Run the two executables in the Smaract Folder.
 
+Installation of the software
+============================
 
-Operating System Compatibility
-------------------------------
-
-TODO
+Now navigate to the folder "multiScale", where the setup.py and requirements.txt file are located,
+and install the software:
 
 .. code-block:: console
 
-    conda create -n microscopecontrol python=3.9
+   (microscopecontrol) ~\MicroscopeControl\multiScale> pip install .
+
+
+Configuration file
+------------------
+
+Now, depending on your available hardware, define the configuration file in
+multiScale\auxiliary_code\constants.py:
+
+For a synthetic microscope without any hardware available, define it as:
+
+.. code-block:: python
+
+    parentdir = "D:/multiScope_Data/"
+
+    # Synthetic microscope.
+    lowres_camera = 'Synthetic_camera'
+    highres_camera = 'Synthetic_camera'
+    filterwheel = 'Synthetic_Filterwheel'
+    rotationstage = 'Synthetic_RotationStage'
+    translationstage = 'Synthetic_TranslationStage'
+    ni_board = 'Synthetic_niBoard'
+
+For the full self-driving microscope as described in the paper
+with all hardware available, set:
+
+.. code-block:: python
+
+    parentdir = "D:/multiScope_Data/"
+
+    lowres_camera = 'Photometrics_lowres'
+    highres_camera = 'Photometrics_highres'
+    filterwheel = 'Ludl_filterwheel'
+    ni_board = 'NI_Board'
+    rotationstage = 'Smaract_RotationStage'
+    translationstage = 'Smaract_TranslationStage'
+
+Now it is time to start the code:
+
+.. code-block:: console
+
+   (microscopecontrol) ~\MicroscopeControl\multiScale> python multiScale_main.py
+
+
+
+
 
 
 

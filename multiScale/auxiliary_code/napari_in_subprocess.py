@@ -8,9 +8,15 @@ import traceback
 import napari
 from qtpy.QtCore import QTimer
 # Our stuff
-from .concurrency_tools import ObjectInSubprocess, SharedNDArray, _dummy_function
+try:
+    from .concurrency_tools import ObjectInSubprocess, SharedNDArray, _dummy_function
+except:
+    from concurrency_tools import ObjectInSubprocess, SharedNDArray, _dummy_function
 import numpy as np
-from multiScale.auxiliary_code.constants import Camera_parameters
+try:
+    from multiScale.auxiliary_code.constants import Camera_parameters
+except:
+    from constants import Camera_parameters
 
 
 def display(display_type=None):
@@ -99,6 +105,7 @@ class _NapariDisplay:
         Close Napari viewer.
         """
         self.viewer.close()
+
 
 # Below are Napari viewer classes for running it in a subprocess.
 

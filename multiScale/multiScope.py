@@ -226,7 +226,6 @@ class multiScopeModel:
         print("Initializing display...")
         self.display = ct.ObjectInSubprocess(napari._NapariDisplay, custom_loop=napari._napari_child_loop,
                                              close_method_name='close')
-
         print("done with display.")
 
     def _init_ao(self):
@@ -322,6 +321,8 @@ class multiScopeModel:
                 minVol=NI_board_parameters.minVol_constant,
                 maxVol=NI_board_parameters.maxVol_constant,
                 verbose=False)
+            atexit.register(self.ao.close)
+
 
     def _init_filterwheel(self):
         """
@@ -402,7 +403,12 @@ class multiScopeModel:
         self.rotationstage.close()
         self.XYZ_stage.close()
         #self.adjustableslit.slit_closing()
-        self.display.close()  # more work needed here
+        del self.highres_camera
+        del self.lowres_camera
+        self.display.close()
+        con = getattr(self.display, '_')
+        del self.display
+        # self.display.close()  # more work needed here
         print('Closed multiScope')
 
 
