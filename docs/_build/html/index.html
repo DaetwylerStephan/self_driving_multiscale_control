@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,13 +15,13 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Software Installation" href="software_installation.html" /> 
+    <link rel="next" title="Software Installation and Configuration" href="software_installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,13 +46,17 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">multiScale</a></li>
 </ul>
 
         </div>
@@ -80,13 +84,17 @@
            <div itemprop="articleBody">
              
   <section id="welcome-to-self-driving-multi-scale-imaging-s-documentation">
-<h1>Welcome to self-driving multi-scale imaging’s documentation!<a class="headerlink" href="#welcome-to-self-driving-multi-scale-imaging-s-documentation" title="Permalink to this heading"></a></h1>
+<h1>Welcome to self-driving multi-scale imaging’s documentation!<a class="headerlink" href="#welcome-to-self-driving-multi-scale-imaging-s-documentation" title="Link to this heading"></a></h1>
 <p><strong>Self-driving, multi-scale software</strong> is an open-source Python software for custom multi-scale
 light-sheet microscope control where the low-resolution guides high-resolution acquisition over hours of imaging.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This project is under active development. See our <a class="reference external" href="https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging">GitHub repository for updates</a>.</p>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
 </div>
@@ -97,17 +105,18 @@ light-sheet microscope control where the low-resolution guides high-resolution a
 <li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
 </ul>
 </div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">multiScale</a></li>
+</ul>
+</div>
 </section>
 <section id="references-and-api">
-<h1>References and API<a class="headerlink" href="#references-and-api" title="Permalink to this heading"></a></h1>
+<h1>References and API<a class="headerlink" href="#references-and-api" title="Link to this heading"></a></h1>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This project is under active development. See our <a class="reference external" href="https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging">GitHub repository for updates</a>.</p>
-</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Please be advised that there are inherent risks associated with the use of this software.
@@ -119,7 +128,7 @@ Users should be aware of these risks and agree to utilize this software at their
 </div>
 </section>
 <section id="funding">
-<h1><strong>Funding</strong><a class="headerlink" href="#funding" title="Permalink to this heading"></a></h1>
+<h1><strong>Funding</strong><a class="headerlink" href="#funding" title="Link to this heading"></a></h1>
 <p>This software is supported by the</p>
 <ul class="simple">
 <li><p>NIH National Cancer Institute (1U54CA268072).</p></li>
@@ -132,7 +141,7 @@ Users should be aware of these risks and agree to utilize this software at their
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="software_installation.html" class="btn btn-neutral float-right" title="Software Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="software_installation.html" class="btn btn-neutral float-right" title="Software Installation and Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,9 +15,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -43,52 +43,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">automated_microscopy package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-automated_microscopy.drift_correction">automated_microscopy.drift_correction module</a><ul>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction"><code class="docutils literal notranslate"><span class="pre">drift_correction</span></code></a><ul>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.__init__"><code class="docutils literal notranslate"><span class="pre">drift_correction.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_Lateral_drift()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_axialdrift()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates"><code class="docutils literal notranslate"><span class="pre">drift_correction.calculate_pixelcoord_from_physicalcoordinates()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.find_closestLowResTile"><code class="docutils literal notranslate"><span class="pre">drift_correction.find_closestLowResTile()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles"><code class="docutils literal notranslate"><span class="pre">drift_correction.find_corresponsingHighResTiles()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted"><code class="docutils literal notranslate"><span class="pre">drift_correction.indicate_driftcorrectionCompleted()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.drift_correction.drift_correction.register_image"><code class="docutils literal notranslate"><span class="pre">drift_correction.register_image()</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
 </ul>
-</li>
-<li><a class="reference internal" href="#module-automated_microscopy.image_deposit">automated_microscopy.image_deposit module</a><ul>
-<li><a class="reference internal" href="#automated_microscopy.image_deposit.images_InMemory_class"><code class="docutils literal notranslate"><span class="pre">images_InMemory_class</span></code></a><ul>
-<li><a class="reference internal" href="#automated_microscopy.image_deposit.images_InMemory_class.__init__"><code class="docutils literal notranslate"><span class="pre">images_InMemory_class.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.image_deposit.images_InMemory_class.addNewImage"><code class="docutils literal notranslate"><span class="pre">images_InMemory_class.addNewImage()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.image_deposit.images_InMemory_class.image_retrieval"><code class="docutils literal notranslate"><span class="pre">images_InMemory_class.image_retrieval()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.image_deposit.images_InMemory_class.replaceImage"><code class="docutils literal notranslate"><span class="pre">images_InMemory_class.replaceImage()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.image_deposit.images_InMemory_class.reset"><code class="docutils literal notranslate"><span class="pre">images_InMemory_class.reset()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-automated_microscopy.template_matching">automated_microscopy.template_matching module</a><ul>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.automated_templateMatching"><code class="docutils literal notranslate"><span class="pre">automated_templateMatching</span></code></a><ul>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.automated_templateMatching.__init__"><code class="docutils literal notranslate"><span class="pre">automated_templateMatching.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching"><code class="docutils literal notranslate"><span class="pre">automated_templateMatching.scaling_templateMatching()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching_multiprocessing"><code class="docutils literal notranslate"><span class="pre">automated_templateMatching.scaling_templateMatching_multiprocessing()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.automated_templateMatching.simple_templateMatching"><code class="docutils literal notranslate"><span class="pre">automated_templateMatching.simple_templateMatching()</span></code></a></li>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess"><code class="docutils literal notranslate"><span class="pre">automated_templateMatching.template_processing_subprocess()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#automated_microscopy.template_matching.random"><code class="docutils literal notranslate"><span class="pre">random()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-automated_microscopy">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -114,21 +79,21 @@
            <div itemprop="articleBody">
              
   <section id="automated-microscopy-package">
-<h1>automated_microscopy package<a class="headerlink" href="#automated-microscopy-package" title="Permalink to this heading"></a></h1>
+<h1>automated_microscopy package<a class="headerlink" href="#automated-microscopy-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-automated_microscopy.drift_correction">
-<span id="automated-microscopy-drift-correction-module"></span><h2>automated_microscopy.drift_correction module<a class="headerlink" href="#module-automated_microscopy.drift_correction" title="Permalink to this heading"></a></h2>
+<span id="automated-microscopy-drift-correction-module"></span><h2>automated_microscopy.drift_correction module<a class="headerlink" href="#module-automated_microscopy.drift_correction" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.drift_correction.</span></span><span class="sig-name descname"><span class="pre">drift_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.drift_correction.</span></span><span class="sig-name descname"><span class="pre">drift_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides the tools to guide high-resolution acquisition using low-resolution images (multi-scale microscopy) for self-driving
 microscopy over long time periods.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_PosList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highres_zspacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highresShape_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timepoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imageRepoLists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugfilepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initiate self-driving module</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -149,7 +114,7 @@ microscopy over long time periods.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift">
-<span class="sig-name descname"><span class="pre">calculate_Lateral_drift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumberID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">calculate_Lateral_drift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumberID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_Lateral_drift" title="Link to this definition"></a></dt>
 <dd><p>Finds the new (current) lateral position of the region of interest (PosNumberID) in the corresponding low-resolution view
 by calling the template matching function.</p>
 <dl class="field-list simple">
@@ -164,7 +129,7 @@ by calling the template matching function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_axialdrift">
-<span class="sig-name descname"><span class="pre">calculate_axialdrift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">calculate_axialdrift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_axialdrift" title="Link to this definition"></a></dt>
 <dd><p>Calculates axial drift correction based on low-resolution view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -182,7 +147,7 @@ by calling the template matching function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates">
-<span class="sig-name descname"><span class="pre">calculate_pixelcoord_from_physicalcoordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates_lowres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates_highres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowresshape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">calculate_pixelcoord_from_physicalcoordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates_lowres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates_highres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowresshape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.calculate_pixelcoord_from_physicalcoordinates" title="Link to this definition"></a></dt>
 <dd><p>Calulate pixel coordinates from physical stage coordinates (important at first timepoint to match region of interest to low-resolution data).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -200,7 +165,7 @@ by calling the template matching function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.find_closestLowResTile">
-<span class="sig-name descname"><span class="pre">find_closestLowResTile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.find_closestLowResTile" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">find_closestLowResTile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.find_closestLowResTile" title="Link to this definition"></a></dt>
 <dd><p>Find corresponding low resolution stack to selected (high-resolution) region of interest (PosNumber) (at the same angle).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -217,7 +182,7 @@ by calling the template matching function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles">
-<span class="sig-name descname"><span class="pre">find_corresponsingHighResTiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LowResPosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">find_corresponsingHighResTiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LowResPosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.find_corresponsingHighResTiles" title="Link to this definition"></a></dt>
 <dd><p>Find all high resolution stacks that are closest to a given low res view (at the same angle)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -231,7 +196,7 @@ by calling the template matching function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted">
-<span class="sig-name descname"><span class="pre">indicate_driftcorrectionCompleted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">indicate_driftcorrectionCompleted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.indicate_driftcorrectionCompleted" title="Link to this definition"></a></dt>
 <dd><p>Indicate that correction for PosNumber has been finished by setting array value to 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -245,7 +210,7 @@ by calling the template matching function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.drift_correction.drift_correction.register_image">
-<span class="sig-name descname"><span class="pre">register_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.register_image" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">register_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.drift_correction.drift_correction.register_image" title="Link to this definition"></a></dt>
 <dd><p>Register two images (ref, mov) to each other using StackReg.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -265,23 +230,23 @@ by calling the template matching function.</p>
 
 </section>
 <section id="module-automated_microscopy.image_deposit">
-<span id="automated-microscopy-image-deposit-module"></span><h2>automated_microscopy.image_deposit module<a class="headerlink" href="#module-automated_microscopy.image_deposit" title="Permalink to this heading"></a></h2>
+<span id="automated-microscopy-image-deposit-module"></span><h2>automated_microscopy.image_deposit module<a class="headerlink" href="#module-automated_microscopy.image_deposit" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.image_deposit.</span></span><span class="sig-name descname"><span class="pre">images_InMemory_class</span></span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.image_deposit.</span></span><span class="sig-name descname"><span class="pre">images_InMemory_class</span></span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Image repository class.</p>
 <p>This class is generating an image repository with the (maximum intensity projection) images for calculations of
 drift correction, template matching and other smart microscopy applications.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize images_InMemory_class with empty placeholders.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.addNewImage">
-<span class="sig-name descname"><span class="pre">addNewImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.addNewImage" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">addNewImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.addNewImage" title="Link to this definition"></a></dt>
 <dd><p>Add an image newly to a selected list (whichlist) at position number PosNumber</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -300,7 +265,7 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.image_retrieval">
-<span class="sig-name descname"><span class="pre">image_retrieval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.image_retrieval" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">image_retrieval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.image_retrieval" title="Link to this definition"></a></dt>
 <dd><p>Get an image from a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -321,7 +286,7 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.replaceImage">
-<span class="sig-name descname"><span class="pre">replaceImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.replaceImage" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">replaceImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">whichlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PosNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.replaceImage" title="Link to this definition"></a></dt>
 <dd><p>Replace an image at index PosNumber in the list “whichlist” with new image (image).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -343,7 +308,7 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.image_deposit.images_InMemory_class.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.reset" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.image_deposit.images_InMemory_class.reset" title="Link to this definition"></a></dt>
 <dd><p>Resets class to default value (without any images saved).</p>
 </dd></dl>
 
@@ -351,21 +316,21 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 </section>
 <section id="module-automated_microscopy.template_matching">
-<span id="automated-microscopy-template-matching-module"></span><h2>automated_microscopy.template_matching module<a class="headerlink" href="#module-automated_microscopy.template_matching" title="Permalink to this heading"></a></h2>
+<span id="automated-microscopy-template-matching-module"></span><h2>automated_microscopy.template_matching module<a class="headerlink" href="#module-automated_microscopy.template_matching" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.template_matching.</span></span><span class="sig-name descname"><span class="pre">automated_templateMatching</span></span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automated_microscopy.template_matching.</span></span><span class="sig-name descname"><span class="pre">automated_templateMatching</span></span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides the methods for template matching.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initiate the class with template matching methods</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching">
-<span class="sig-name descname"><span class="pre">scaling_templateMatching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">scaling_templateMatching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching" title="Link to this definition"></a></dt>
 <dd><p>Performs template matching across different scales.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -384,7 +349,7 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching_multiprocessing">
-<span class="sig-name descname"><span class="pre">scaling_templateMatching_multiprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching_multiprocessing" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">scaling_templateMatching_multiprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.scaling_templateMatching_multiprocessing" title="Link to this definition"></a></dt>
 <dd><p>Performs template matching across different scales, accelerated by multiple processors (for each scale one process).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -403,7 +368,7 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.simple_templateMatching">
-<span class="sig-name descname"><span class="pre">simple_templateMatching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.simple_templateMatching" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">simple_templateMatching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">searchimage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.simple_templateMatching" title="Link to this definition"></a></dt>
 <dd><p>Performs simple template matching</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -422,7 +387,7 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess">
-<span class="sig-name descname"><span class="pre">template_processing_subprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_resized</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">template_processing_subprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_resized</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">searchimage_sc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#automated_microscopy.template_matching.automated_templateMatching.template_processing_subprocess" title="Link to this definition"></a></dt>
 <dd><p>Function called by scaling_templateMatching_multiprocessing for multi-processed template matching. Updates queue with values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -441,12 +406,12 @@ drift correction, template matching and other smart microscopy applications.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automated_microscopy.template_matching.random">
-<span class="sig-prename descclassname"><span class="pre">automated_microscopy.template_matching.</span></span><span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">interval</span> <span class="pre">[0,</span> <span class="pre">1).</span></span></span><a class="headerlink" href="#automated_microscopy.template_matching.random" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automated_microscopy.template_matching.</span></span><span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">interval</span> <span class="pre">[0,</span> <span class="pre">1).</span></span></span><a class="headerlink" href="#automated_microscopy.template_matching.random" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-automated_microscopy">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-automated_microscopy" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-automated_microscopy" title="Link to this heading"></a></h2>
 </section>
 </section>
 

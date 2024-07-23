@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,9 +15,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -43,23 +43,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">acquisition_array_class module</a><ul>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays</span></code></a><ul>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.__init__"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highResASLM_StackAq_array()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highResSPIM_StackAq_array()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highresASLM_preview_array()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highresSPIM_preview_array()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_lowRes_StackAq_array()</span></code></a></li>
-<li><a class="reference internal" href="#acquisition_array_class.acquisition_arrays.get_lowres_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_lowres_preview_array()</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
 </ul>
-</li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -85,10 +79,10 @@
            <div itemprop="articleBody">
              
   <section id="module-acquisition_array_class">
-<span id="acquisition-array-class-module"></span><h1>acquisition_array_class module<a class="headerlink" href="#module-acquisition_array_class" title="Permalink to this heading"></a></h1>
+<span id="acquisition-array-class-module"></span><h1>acquisition_array_class module<a class="headerlink" href="#module-acquisition_array_class" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">acquisition_array_class.</span></span><span class="sig-name descname"><span class="pre">acquisition_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">acquisition_array_class.</span></span><span class="sig-name descname"><span class="pre">acquisition_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Acquisition array class.</p>
 <p>Its methods generate the voltage arrays that are sent to the NI board for fast synchronization of the different hardware
@@ -103,7 +97,7 @@ components for:</p>
 </ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize the acquisition_arrays class. This class has the model as parameter to have access to all parameters that are
 set in the model (multiScope.py).</p>
 <dl class="field-list simple">
@@ -115,7 +109,7 @@ set in the model (multiScope.py).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array">
-<span class="sig-name descname"><span class="pre">get_highResASLM_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_highResASLM_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array" title="Link to this definition"></a></dt>
 <dd><p>This function generates the voltage array for the high-resolution axially-swept light-sheet (ASLM) stack acquisition.
 Triggers for the camera, stage and lasers are needed, and a smooth/windowed “sawtooth” pattern needs to be applied at the
 remote mirror.</p>
@@ -131,7 +125,7 @@ remote mirror.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array">
-<span class="sig-name descname"><span class="pre">get_highResSPIM_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_highResSPIM_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array" title="Link to this definition"></a></dt>
 <dd><p>This function generates the voltage array for the high-resolution static light-sheet (SPIM) stack acquisition.
 Triggers for the camera, stage and lasers are needed, and a static voltage needs to be applied to the remote mirror.</p>
 <dl class="field-list simple">
@@ -146,7 +140,7 @@ Triggers for the camera, stage and lasers are needed, and a static voltage needs
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array">
-<span class="sig-name descname"><span class="pre">get_highresASLM_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_highresASLM_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array" title="Link to this definition"></a></dt>
 <dd><p>This function generates the voltage array for the high-resolution axially-swept light-sheet (ASLM) preview.
 For ASLM, the laser on/off signal needs to be sent and the voltage of the remote mirror needs to be adjusted during an exposure.</p>
 <dl class="field-list simple">
@@ -158,7 +152,7 @@ For ASLM, the laser on/off signal needs to be sent and the voltage of the remote
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array">
-<span class="sig-name descname"><span class="pre">get_highresSPIM_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_highresSPIM_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array" title="Link to this definition"></a></dt>
 <dd><p>This function generates the voltage array for the high-resolution SPIM (static light-sheet) preview.
 As no stage or camera functions are triggered in the preview, only the laser on/off trigger signal needs
 to be sent. If the microscope is in alignment mode, also the remote mirror voltage can be adjusted.</p>
@@ -171,7 +165,7 @@ to be sent. If the microscope is in alignment mode, also the remote mirror volta
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array">
-<span class="sig-name descname"><span class="pre">get_lowRes_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_lowRes_StackAq_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_laserline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array" title="Link to this definition"></a></dt>
 <dd><p>This function generates the voltage array for the low-resolution stack acquisition.
 Triggers for the camera, stage and lasers are needed, and a static voltage needs to be applied to the remote mirror.</p>
 <dl class="field-list simple">
@@ -186,7 +180,7 @@ Triggers for the camera, stage and lasers are needed, and a static voltage needs
 
 <dl class="py method">
 <dt class="sig sig-object py" id="acquisition_array_class.acquisition_arrays.get_lowres_preview_array">
-<span class="sig-name descname"><span class="pre">get_lowres_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_lowres_preview_array" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_lowres_preview_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#acquisition_array_class.acquisition_arrays.get_lowres_preview_array" title="Link to this definition"></a></dt>
 <dd><p>This function generates the voltage array for the low-resolution preview. As no stage or camera functions are triggered
 in the preview, only the laser on/off trigger signal needs to be sent. If the microscope is in alignment mode, also the
 remote mirror voltage can be adjusted.</p>

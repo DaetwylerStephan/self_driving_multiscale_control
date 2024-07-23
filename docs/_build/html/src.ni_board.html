@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,9 +15,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -43,48 +43,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">src.ni_board package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-src.ni_board.ni_synthetic">src.ni_board.ni_synthetic module</a><ul>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out"><code class="docutils literal notranslate"><span class="pre">Analog_Out</span></code></a><ul>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.__init__"><code class="docutils literal notranslate"><span class="pre">Analog_Out.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.close"><code class="docutils literal notranslate"><span class="pre">Analog_Out.close()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.p2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.p2s()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.play_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.play_voltages()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.s2p"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2p()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.s2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2s()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.set_rate"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_rate()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.set_verbose"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_verbose()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.setconstantvoltage"><code class="docutils literal notranslate"><span class="pre">Analog_Out.setconstantvoltage()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.ni_synthetic.Analog_Out.write_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.write_voltages()</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
 </ul>
-</li>
-<li><a class="reference internal" href="#module-src.ni_board.vni">src.ni_board.vni module</a><ul>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out"><code class="docutils literal notranslate"><span class="pre">Analog_Out</span></code></a><ul>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.__init__"><code class="docutils literal notranslate"><span class="pre">Analog_Out.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.close"><code class="docutils literal notranslate"><span class="pre">Analog_Out.close()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.p2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.p2s()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.play_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.play_voltages()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.s2p"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2p()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.s2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2s()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.set_rate"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_rate()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.set_verbose"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_verbose()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.setconstantvoltage"><code class="docutils literal notranslate"><span class="pre">Analog_Out.setconstantvoltage()</span></code></a></li>
-<li><a class="reference internal" href="#src.ni_board.vni.Analog_Out.write_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.write_voltages()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#src.ni_board.vni.check_error"><code class="docutils literal notranslate"><span class="pre">check_error()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-src.ni_board">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -110,20 +79,20 @@
            <div itemprop="articleBody">
              
   <section id="src-ni-board-package">
-<h1>src.ni_board package<a class="headerlink" href="#src-ni-board-package" title="Permalink to this heading"></a></h1>
+<h1>src.ni_board package<a class="headerlink" href="#src-ni-board-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.ni_board.ni_synthetic">
-<span id="src-ni-board-ni-synthetic-module"></span><h2>src.ni_board.ni_synthetic module<a class="headerlink" href="#module-src.ni_board.ni_synthetic" title="Permalink to this heading"></a></h2>
+<span id="src-ni-board-ni-synthetic-module"></span><h2>src.ni_board.ni_synthetic module<a class="headerlink" href="#module-src.ni_board.ni_synthetic" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ni_board.ni_synthetic.</span></span><span class="sig-name descname"><span class="pre">Analog_Out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ni_board.ni_synthetic.</span></span><span class="sig-name descname"><span class="pre">Analog_Out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to control a synthetic analog output board.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize synthetic analog output board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -143,7 +112,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.close" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.close" title="Link to this definition"></a></dt>
 <dd><p>Close the synthetic analog output board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -154,7 +123,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.p2s">
-<span class="sig-name descname"><span class="pre">p2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.p2s" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">p2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.p2s" title="Link to this definition"></a></dt>
 <dd><p>Convert a duration in number of synthetic AO “pixels” to seconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -168,7 +137,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.play_voltages">
-<span class="sig-name descname"><span class="pre">play_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.play_voltages" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">play_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.play_voltages" title="Link to this definition"></a></dt>
 <dd><p>Play voltages on the synthetic analog output board. By default, play_voltages() blocks until the voltages finish
 playing. If a previous voltage task is still playing, wait for it to finish before the next one is started.</p>
 <dl class="field-list simple">
@@ -184,7 +153,7 @@ playing. If a previous voltage task is still playing, wait for it to finish befo
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.s2p">
-<span class="sig-name descname"><span class="pre">s2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.s2p" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">s2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.s2p" title="Link to this definition"></a></dt>
 <dd><p>Convert a duration in seconds to a number of synthetic AO “pixels.”</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -198,7 +167,7 @@ playing. If a previous voltage task is still playing, wait for it to finish befo
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.s2s">
-<span class="sig-name descname"><span class="pre">s2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.s2s" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">s2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.s2s" title="Link to this definition"></a></dt>
 <dd><p>Calculate nearest duration the synthetic AO card can exactly deliver.
 This function rounds a time (in seconds) to the nearest time
 that the AO card can exactly deliver via an integer number of
@@ -215,7 +184,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.set_rate">
-<span class="sig-name descname"><span class="pre">set_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.set_rate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.set_rate" title="Link to this definition"></a></dt>
 <dd><p>Set up output rate of the synthetic analog output board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -229,7 +198,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.set_verbose">
-<span class="sig-name descname"><span class="pre">set_verbose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosevalue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.set_verbose" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_verbose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosevalue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.set_verbose" title="Link to this definition"></a></dt>
 <dd><p>Update verbose settings for debugging/trouble shooting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -240,7 +209,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.setconstantvoltage">
-<span class="sig-name descname"><span class="pre">setconstantvoltage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.setconstantvoltage" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">setconstantvoltage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.setconstantvoltage" title="Link to this definition"></a></dt>
 <dd><p>Synthetic function to set constant voltage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -251,7 +220,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.ni_synthetic.Analog_Out.write_voltages">
-<span class="sig-name descname"><span class="pre">write_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.write_voltages" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">write_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.ni_synthetic.Analog_Out.write_voltages" title="Link to this definition"></a></dt>
 <dd><p>Write a voltage array to the synthetic analog card.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -270,17 +239,17 @@ that the AO card can exactly deliver via an integer number of
 
 </section>
 <section id="module-src.ni_board.vni">
-<span id="src-ni-board-vni-module"></span><h2>src.ni_board.vni module<a class="headerlink" href="#module-src.ni_board.vni" title="Permalink to this heading"></a></h2>
+<span id="src-ni-board-vni-module"></span><h2>src.ni_board.vni module<a class="headerlink" href="#module-src.ni_board.vni" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ni_board.vni.</span></span><span class="sig-name descname"><span class="pre">Analog_Out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ni_board.vni.</span></span><span class="sig-name descname"><span class="pre">Analog_Out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to control the analog output of voltages on an NI board, such as NI PCIe 6733.</p>
 <p>Class adapted from Andrew G York. Please check out:
 <a class="reference external" href="https://github.com/AndrewGYork/tools/blob/master/ni.py">https://github.com/AndrewGYork/tools/blob/master/ni.py</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6733'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dev1/ao0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.__init__" title="Link to this definition"></a></dt>
 <dd><p>Set up analog, digital or constant voltage output channel via a National Instruments DAQ board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -300,7 +269,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.close" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.close" title="Link to this definition"></a></dt>
 <dd><p>Set voltages to zero and close NI board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -311,7 +280,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.p2s">
-<span class="sig-name descname"><span class="pre">p2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.p2s" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">p2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.p2s" title="Link to this definition"></a></dt>
 <dd><p>Convert a duration in number of AO “pixels” to seconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -325,7 +294,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.play_voltages">
-<span class="sig-name descname"><span class="pre">play_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.play_voltages" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">play_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.play_voltages" title="Link to this definition"></a></dt>
 <dd><p>Play voltages on the NI board. By default, play_voltages() blocks until the voltages finish
 playing. If a previous voltage task is still playing, wait for it to finish before the next one is started.</p>
 <dl class="field-list simple">
@@ -341,7 +310,7 @@ playing. If a previous voltage task is still playing, wait for it to finish befo
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.s2p">
-<span class="sig-name descname"><span class="pre">s2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.s2p" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">s2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.s2p" title="Link to this definition"></a></dt>
 <dd><p>Convert a duration in seconds to a number of AO “pixels.”</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -355,7 +324,7 @@ playing. If a previous voltage task is still playing, wait for it to finish befo
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.s2s">
-<span class="sig-name descname"><span class="pre">s2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.s2s" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">s2s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.s2s" title="Link to this definition"></a></dt>
 <dd><p>Calculate nearest duration the AO card can exactly deliver.
 This function rounds a time (in seconds) to the nearest time
 that the AO card can exactly deliver via an integer number of
@@ -372,7 +341,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.set_rate">
-<span class="sig-name descname"><span class="pre">set_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.set_rate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.set_rate" title="Link to this definition"></a></dt>
 <dd><p>Set up output rate of DAQ card.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -386,7 +355,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.set_verbose">
-<span class="sig-name descname"><span class="pre">set_verbose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosevalue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.set_verbose" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_verbose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosevalue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.set_verbose" title="Link to this definition"></a></dt>
 <dd><p>Update verbose settings for debugging/trouble shooting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -397,7 +366,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.setconstantvoltage">
-<span class="sig-name descname"><span class="pre">setconstantvoltage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.setconstantvoltage" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">setconstantvoltage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.setconstantvoltage" title="Link to this definition"></a></dt>
 <dd><p>Set constant voltage to ‘6738_constant’ (constant) channel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -408,7 +377,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.ni_board.vni.Analog_Out.write_voltages">
-<span class="sig-name descname"><span class="pre">write_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.write_voltages" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">write_voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_final_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.Analog_Out.write_voltages" title="Link to this definition"></a></dt>
 <dd><p>Write a voltage array to the NI board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -427,7 +396,7 @@ that the AO card can exactly deliver via an integer number of
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.ni_board.vni.check_error">
-<span class="sig-prename descclassname"><span class="pre">src.ni_board.vni.</span></span><span class="sig-name descname"><span class="pre">check_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.check_error" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.ni_board.vni.</span></span><span class="sig-name descname"><span class="pre">check_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.ni_board.vni.check_error" title="Link to this definition"></a></dt>
 <dd><p>Print error code from NI DAQ board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -441,7 +410,7 @@ that the AO card can exactly deliver via an integer number of
 
 </section>
 <section id="module-src.ni_board">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.ni_board" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.ni_board" title="Link to this heading"></a></h2>
 </section>
 </section>
 

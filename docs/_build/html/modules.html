@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,12 +15,14 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="acquisition_array_class module" href="acquisition_array_class.html" />
+    <link rel="prev" title="User interface (GUI)" href="user_interface.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,11 +45,30 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">multiScale</a></li>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
-</div>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">multiScale</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html">multiScope module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html">auxiliary_code package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -73,77 +94,52 @@
            <div itemprop="articleBody">
              
   <section id="multiscale">
-<h1>multiScale<a class="headerlink" href="#multiscale" title="Permalink to this heading"></a></h1>
+<h1>multiScale<a class="headerlink" href="#multiscale" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.__init__"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.get_highResASLM_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highResASLM_StackAq_array()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.get_highResSPIM_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highResSPIM_StackAq_array()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.get_highresASLM_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highresASLM_preview_array()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.get_highresSPIM_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_highresSPIM_preview_array()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.get_lowRes_StackAq_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_lowRes_StackAq_array()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays.get_lowres_preview_array"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays.get_lowres_preview_array()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html#acquisition_array_class.acquisition_arrays"><code class="docutils literal notranslate"><span class="pre">acquisition_arrays</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.__init__"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.abort_stack"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.abort_stack()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.abort_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.abort_timelapse()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.acquire_stack"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_stack()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.acquire_stack_task"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_stack_task()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_timelapse()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.acquire_timelapse_task"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.acquire_timelapse_task()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.changeROI"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.changeROI()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.changefilter"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.changefilter()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.close"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.close()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.disable_keyboard_movement"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.disable_keyboard_movement()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.enable_keyboard_movement"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.enable_keyboard_movement()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.key_pressed"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.key_pressed()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.movestage"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.movestage()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.movestageToPosition"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.movestageToPosition()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.run"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.run_highrespreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_highrespreview()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.run_lowrespreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_lowrespreview()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.run_stop_preview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.run_stop_preview()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.updateDriftCorrectionSettings"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateDriftCorrectionSettings()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.updateExposureParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateExposureParameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.updateHighResLaserParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateHighResLaserParameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.updateLowResLaserParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updateLowResLaserParameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.update_ASLMParameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.update_ASLMParameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.update_stack_aq_parameters"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.update_stack_aq_parameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.updatefilename"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updatefilename()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller.updatepreview"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller.updatepreview()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html#multiScale_main.MultiScale_Microscope_Controller"><code class="docutils literal notranslate"><span class="pre">MultiScale_Microscope_Controller</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="multiScope.html">multiScope module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel"><code class="docutils literal notranslate"><span class="pre">multiScopeModel</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.__init__"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.__init__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.acquire_stack_highres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.acquire_stack_highres()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.acquire_stack_lowres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.acquire_stack_lowres()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.calculate_ASLMparameters"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.calculate_ASLMparameters()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.changeHRtoLR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeHRtoLR()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.changeLRtoHR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeLRtoHR()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.check_movementboundaries"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.check_movementboundaries()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.close"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.close()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.move_to_position"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.move_to_position()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.prepare_acquisition"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.prepare_acquisition()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.preview_highres_ASLM"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_ASLM()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.preview_highres_static"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_static()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.preview_lowres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_lowres()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.save_currentpositionToFile"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.save_currentpositionToFile()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.set_laserpower"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.set_laserpower()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.smooth_sawtooth"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.smooth_sawtooth()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.stack_acquisition_master"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.stack_acquisition_master()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel.update_bufferSize"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.update_bufferSize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html#multiScope.multiScopeModel"><code class="docutils literal notranslate"><span class="pre">multiScopeModel</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html#module-automated_microscopy.drift_correction">automated_microscopy.drift_correction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html#module-automated_microscopy.image_deposit">automated_microscopy.image_deposit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html#module-automated_microscopy.template_matching">automated_microscopy.template_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html#module-automated_microscopy">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="auxiliary_code.html">auxiliary_code package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html#module-auxiliary_code.concurrency_tools">auxiliary_code.concurrency_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html#module-auxiliary_code.constants">auxiliary_code.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html#module-auxiliary_code.napari_in_subprocess">auxiliary_code.napari_in_subprocess module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html#module-auxiliary_code.write_parameters">auxiliary_code.write_parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html#module-auxiliary_code">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">gui package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui.Welcome_window">gui.Welcome_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui.advancedsettings_window">gui.advancedsettings_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui.main_window">gui.main_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui.run_window">gui.run_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui.smart_window">gui.smart_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui.stages_window">gui.stages_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#module-gui">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.html">src package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -153,7 +149,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_interface.html" class="btn btn-neutral float-left" title="User interface (GUI)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acquisition_array_class.html" class="btn btn-neutral float-right" title="acquisition_array_class module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

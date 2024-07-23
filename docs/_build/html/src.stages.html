@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,9 +15,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=359c27e9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -43,66 +43,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">src.stages package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-src.stages.rotation_stage_cmd">src.stages.rotation_stage_cmd module</a><ul>
-<li><a class="reference internal" href="#rotation-stage-cmd-py">rotation_stage_cmd.py</a></li>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage</span></code></a><ul>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.ExitIfError"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.ExitIfError()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.ManualMove"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.ManualMove()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.__init__"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.close"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.close()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.getAngle"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.getAngle()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.moveToAngle"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.moveToAngle()</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
 </ul>
-</li>
-<li><a class="reference internal" href="#module-src.stages.synthetic_rotation_stage">src.stages.synthetic_rotation_stage module</a><ul>
-<li><a class="reference internal" href="#synthetic-rotation-stage-py">Synthetic rotation_stage.py</a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage</span></code></a><ul>
-<li><a class="reference internal" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.close()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.getAngle"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.getAngle()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.moveToAngle"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.moveToAngle()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-src.stages.synthetic_translation_stage">src.stages.synthetic_translation_stage module</a><ul>
-<li><a class="reference internal" href="#synthetic-translation-stage-py">synthetic_translation_stage.py</a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage</span></code></a><ul>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.close()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.findReference"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.findReference()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.moveToPosition"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.moveToPosition()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-src.stages.translation_stage_cmd">src.stages.translation_stage_cmd module</a><ul>
-<li><a class="reference internal" href="#translation-stage-cmd-py">translation_stage_cmd.py</a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage</span></code></a><ul>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.__init__"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.assert_lib_compatibility"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.assert_lib_compatibility()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.close"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.close()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.findReference"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.findReference()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.moveToPosition"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.moveToPosition()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_setup"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.streamStackAcquisition_externalTrigger_setup()</span></code></a></li>
-<li><a class="reference internal" href="#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-src.stages">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -128,24 +79,24 @@
            <div itemprop="articleBody">
              
   <section id="src-stages-package">
-<h1>src.stages package<a class="headerlink" href="#src-stages-package" title="Permalink to this heading"></a></h1>
+<h1>src.stages package<a class="headerlink" href="#src-stages-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.stages.rotation_stage_cmd">
-<span id="src-stages-rotation-stage-cmd-module"></span><h2>src.stages.rotation_stage_cmd module<a class="headerlink" href="#module-src.stages.rotation_stage_cmd" title="Permalink to this heading"></a></h2>
+<span id="src-stages-rotation-stage-cmd-module"></span><h2>src.stages.rotation_stage_cmd module<a class="headerlink" href="#module-src.stages.rotation_stage_cmd" title="Link to this heading"></a></h2>
 <section id="rotation-stage-cmd-py">
-<h3>rotation_stage_cmd.py<a class="headerlink" href="#rotation-stage-cmd-py" title="Permalink to this heading"></a></h3>
+<h3>rotation_stage_cmd.py<a class="headerlink" href="#rotation-stage-cmd-py" title="Link to this heading"></a></h3>
 <p>Script containing all functions to initialize and operate the rotation stage SR2812 from Smaract</p>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.rotation_stage_cmd.</span></span><span class="sig-name descname"><span class="pre">SR2812_rotationstage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.rotation_stage_cmd.</span></span><span class="sig-name descname"><span class="pre">SR2812_rotationstage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to operate the SR2812 rotation stage from Smaract.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage.ExitIfError">
-<span class="sig-name descname"><span class="pre">ExitIfError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.ExitIfError" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ExitIfError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.ExitIfError" title="Link to this definition"></a></dt>
 <dd><p>MCS controller error message parser. Print an error message if applicable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -159,13 +110,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage.ManualMove">
-<span class="sig-name descname"><span class="pre">ManualMove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.ManualMove" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ManualMove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.ManualMove" title="Link to this definition"></a></dt>
 <dd><p>Use the _GetchWindows class to manually operate the initialized stage from the command line.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize and connect rotation stage, and print out some parameters for debugging</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -176,19 +127,19 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.close" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.close" title="Link to this definition"></a></dt>
 <dd><p>Close the rotation stage.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage.getAngle">
-<span class="sig-name descname"><span class="pre">getAngle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.getAngle" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">getAngle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.getAngle" title="Link to this definition"></a></dt>
 <dd><p>Print current angle of rotation stage.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.rotation_stage_cmd.SR2812_rotationstage.moveToAngle">
-<span class="sig-name descname"><span class="pre">moveToAngle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.moveToAngle" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">moveToAngle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.rotation_stage_cmd.SR2812_rotationstage.moveToAngle" title="Link to this definition"></a></dt>
 <dd><p>Move rotation stage to a specific angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -201,19 +152,19 @@
 
 </section>
 <section id="module-src.stages.synthetic_rotation_stage">
-<span id="src-stages-synthetic-rotation-stage-module"></span><h2>src.stages.synthetic_rotation_stage module<a class="headerlink" href="#module-src.stages.synthetic_rotation_stage" title="Permalink to this heading"></a></h2>
+<span id="src-stages-synthetic-rotation-stage-module"></span><h2>src.stages.synthetic_rotation_stage module<a class="headerlink" href="#module-src.stages.synthetic_rotation_stage" title="Link to this heading"></a></h2>
 <section id="synthetic-rotation-stage-py">
-<h3>Synthetic rotation_stage.py<a class="headerlink" href="#synthetic-rotation-stage-py" title="Permalink to this heading"></a></h3>
+<h3>Synthetic rotation_stage.py<a class="headerlink" href="#synthetic-rotation-stage-py" title="Link to this heading"></a></h3>
 <p>Script containing all functions to initialize and operate a synthetic rotation stage</p>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.stages.synthetic_rotation_stage.Synthetic_rotationstage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.synthetic_rotation_stage.</span></span><span class="sig-name descname"><span class="pre">Synthetic_rotationstage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.synthetic_rotation_stage.</span></span><span class="sig-name descname"><span class="pre">Synthetic_rotationstage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to make and operate a synthetic rotation stage.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_rotation_stage.Synthetic_rotationstage.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize a synthetic rotation stage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -224,19 +175,19 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_rotation_stage.Synthetic_rotationstage.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.close" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.close" title="Link to this definition"></a></dt>
 <dd><p>Close synthetic rotation stage.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_rotation_stage.Synthetic_rotationstage.getAngle">
-<span class="sig-name descname"><span class="pre">getAngle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.getAngle" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">getAngle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.getAngle" title="Link to this definition"></a></dt>
 <dd><p>Print current angle of rotation stage.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_rotation_stage.Synthetic_rotationstage.moveToAngle">
-<span class="sig-name descname"><span class="pre">moveToAngle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.moveToAngle" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">moveToAngle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.moveToAngle" title="Link to this definition"></a></dt>
 <dd><p>Move to specific angle with synthetic rotation stage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -249,37 +200,37 @@
 
 </section>
 <section id="module-src.stages.synthetic_translation_stage">
-<span id="src-stages-synthetic-translation-stage-module"></span><h2>src.stages.synthetic_translation_stage module<a class="headerlink" href="#module-src.stages.synthetic_translation_stage" title="Permalink to this heading"></a></h2>
+<span id="src-stages-synthetic-translation-stage-module"></span><h2>src.stages.synthetic_translation_stage module<a class="headerlink" href="#module-src.stages.synthetic_translation_stage" title="Link to this heading"></a></h2>
 <section id="synthetic-translation-stage-py">
-<h3>synthetic_translation_stage.py<a class="headerlink" href="#synthetic-translation-stage-py" title="Permalink to this heading"></a></h3>
+<h3>synthetic_translation_stage.py<a class="headerlink" href="#synthetic-translation-stage-py" title="Link to this heading"></a></h3>
 <p>Script containing all functions to initialize and operate a synthetic translation stage</p>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.synthetic_translation_stage.</span></span><span class="sig-name descname"><span class="pre">Synthetic_translationstage</span></span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.synthetic_translation_stage.</span></span><span class="sig-name descname"><span class="pre">Synthetic_translationstage</span></span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to operate a synthetic translation stage system with 3 axes (XYZ).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize the synthetic translation stage system (x,y,z positions) and stream events.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.close" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.close" title="Link to this definition"></a></dt>
 <dd><p>Close synthetic translation stage.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage.findReference">
-<span class="sig-name descname"><span class="pre">findReference</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.findReference" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">findReference</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.findReference" title="Link to this definition"></a></dt>
 <dd><p>Reference synthetic translation stage and set values to zero.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage.moveToPosition">
-<span class="sig-name descname"><span class="pre">moveToPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.moveToPosition" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">moveToPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.moveToPosition" title="Link to this definition"></a></dt>
 <dd><p>Move synthetic translation stage to new position.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -290,7 +241,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup">
-<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_of_frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_acceleration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_of_frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_acceleration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup" title="Link to this definition"></a></dt>
 <dd><p>Set up synthetic translation stage into a waiting mode where it can be triggered to move stage by increment upon
 receiving triggers. Total number of triggers expected is no_of_frames.</p>
 <dl class="field-list simple">
@@ -307,7 +258,7 @@ receiving triggers. Total number of triggers expected is no_of_frames.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd">
-<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_waitEnd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_waitEnd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd" title="Link to this definition"></a></dt>
 <dd><p>Wait for stream to finish.</p>
 </dd></dl>
 
@@ -315,19 +266,19 @@ receiving triggers. Total number of triggers expected is no_of_frames.</p>
 
 </section>
 <section id="module-src.stages.translation_stage_cmd">
-<span id="src-stages-translation-stage-cmd-module"></span><h2>src.stages.translation_stage_cmd module<a class="headerlink" href="#module-src.stages.translation_stage_cmd" title="Permalink to this heading"></a></h2>
+<span id="src-stages-translation-stage-cmd-module"></span><h2>src.stages.translation_stage_cmd module<a class="headerlink" href="#module-src.stages.translation_stage_cmd" title="Link to this heading"></a></h2>
 <section id="translation-stage-cmd-py">
-<h3>translation_stage_cmd.py<a class="headerlink" href="#translation-stage-cmd-py" title="Permalink to this heading"></a></h3>
+<h3>translation_stage_cmd.py<a class="headerlink" href="#translation-stage-cmd-py" title="Link to this heading"></a></h3>
 <p>Script containing all functions to initialize and operate the translation stages from Smaract</p>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.translation_stage_cmd.</span></span><span class="sig-name descname"><span class="pre">SLC_translationstage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.stages.translation_stage_cmd.</span></span><span class="sig-name descname"><span class="pre">SLC_translationstage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to operate the translation stage system with 3 axes (XYZ) from Smaract.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize and connect translation stage from Smaract, and print out some parameters for debugging</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -338,7 +289,7 @@ receiving triggers. Total number of triggers expected is no_of_frames.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.assert_lib_compatibility">
-<span class="sig-name descname"><span class="pre">assert_lib_compatibility</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.assert_lib_compatibility" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">assert_lib_compatibility</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.assert_lib_compatibility" title="Link to this definition"></a></dt>
 <dd><p>Checks that the major version numbers of the Python API and the
 loaded shared SmarAct library are the same to avoid errors due to
 incompatibilities. Raises a RuntimeError if the major version numbers are different.</p>
@@ -346,20 +297,20 @@ incompatibilities. Raises a RuntimeError if the major version numbers are differ
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.close" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.close" title="Link to this definition"></a></dt>
 <dd><p>Close all translational stages from Smaract.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.findReference">
-<span class="sig-name descname"><span class="pre">findReference</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.findReference" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">findReference</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.findReference" title="Link to this definition"></a></dt>
 <dd><p>Find the reference position for all three channels (stage axes). Move the up-down stage (channel 2) first to avoid collisions
 with the illumination and detection objectives. Set the positions to zero after referencing.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.moveToPosition">
-<span class="sig-name descname"><span class="pre">moveToPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.moveToPosition" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">moveToPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.moveToPosition" title="Link to this definition"></a></dt>
 <dd><p>Move to a specific position (xyz) defined by the position_list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -370,7 +321,7 @@ with the illumination and detection objectives. Set the positions to zero after 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_setup">
-<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_of_frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_acceleration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_setup" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_of_frames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_velocity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_acceleration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_setup" title="Link to this definition"></a></dt>
 <dd><p>Set up a stack acquisition by preparing the stages to receive an external trigger signal that will move the stage by increment.
 no_of_frames trigger signals are expected. A waiting stream (thread) to receive voltage inputs is started.</p>
 <dl class="field-list simple">
@@ -387,7 +338,7 @@ no_of_frames trigger signals are expected. A waiting stream (thread) to receive 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd">
-<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_waitEnd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">streamStackAcquisition_externalTrigger_waitEnd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd" title="Link to this definition"></a></dt>
 <dd><p>Wait for the stream started in streamStackAcquisition_externalTrigger_setup to end (i.e. when stack acquisition is complete).</p>
 </dd></dl>
 
@@ -395,7 +346,7 @@ no_of_frames trigger signals are expected. A waiting stream (thread) to receive 
 
 </section>
 <section id="module-src.stages">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.stages" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.stages" title="Link to this heading"></a></h2>
 </section>
 </section>
 

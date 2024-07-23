@@ -9,6 +9,11 @@ Welcome to self-driving multi-scale imaging's documentation!
 **Self-driving, multi-scale software** is an open-source Python software for custom multi-scale
 light-sheet microscope control where the low-resolution guides high-resolution acquisition over hours of imaging.
 
+.. note::
+
+   This project is under active development. See our `GitHub repository for updates
+   <https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging>`_.
+
 
 .. toctree::
    :caption: Getting Started
@@ -25,16 +30,16 @@ light-sheet microscope control where the low-resolution guides high-resolution a
    user_interface
 
 
+.. toctree::
+   :caption: Python API references
+   :maxdepth: 1
+
+   modules
+
 References and API
 ==================
 
-* :ref:`genindex`
 * :ref:`modindex`
-
-.. note::
-
-   This project is under active development. See our `GitHub repository for updates
-   <https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging>`_.
 
 
 .. warning::
