@@ -1,7 +1,9 @@
-
-.idea/workspace.xml
+.idea
 *.iml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/modules.xml
-.idea/vcs.xml
 *.log
+*.egg-info
+*.egg
+*build/
+*.DS_Store
+*.pyc
+

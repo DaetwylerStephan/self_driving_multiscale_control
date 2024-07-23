@@ -24,6 +24,9 @@ setup(name='multiScale',
 	  description='Analysis and Visualization of multi-scale light-sheet data',
 	  author='Stephan Daetwyler, Reto Fiolka',
 	  packages=['multiScale'] + ['multiScale.'+ pkg for pkg in subpkgs] +
+			   ['multiScale.gui'] +
+			   ['multiScale.auxiliary_code'] +
+			   ['multiScale.automated_microscopy'] +
 			   ['multiScale.src.camera'] +
 			   ['multiScale.src.filter_wheel'] +
 			   ['multiScale.src.ni_board'] +
