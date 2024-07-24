@@ -14,34 +14,6 @@ light-sheet microscope control where the low-resolution guides high-resolution a
    This project is under active development. See our `GitHub repository for updates
    <https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging>`_.
 
-
-.. toctree::
-   :caption: Getting Started
-   :maxdepth: 1
-
-   software_installation
-   microscope_configuration
-
-.. toctree::
-   :caption: Code organization
-   :maxdepth: 1
-
-   code_structure
-   user_interface
-
-
-.. toctree::
-   :caption: Python API references
-   :maxdepth: 1
-
-   modules
-
-References and API
-==================
-
-* :ref:`modindex`
-
-
 .. warning::
 
     Please be advised that there are inherent risks associated with the use of this software.
@@ -52,6 +24,26 @@ References and API
     Users should be aware of these risks and agree to utilize this software at their own risk.
 
 
+.. toctree::
+   :caption: Getting Started
+   :maxdepth: 1
+
+   software_installation
+
+.. toctree::
+   :caption: Code organization
+   :maxdepth: 1
+
+   user_interface
+   code_structure
+
+.. toctree::
+   :caption: Python API references
+   :maxdepth: 1
+
+   modules
+
+
 **Funding**
 ============
 This software is supported by the
@@ -60,3 +52,7 @@ This software is supported by the
 - Swiss National Science Foundation (191347 to S.D)
 - NIGMS National Institute of General Medical Sciences (R35 GM133522 to R.F.)
 
+References and API
+==================
+
+* :ref:`modindex`

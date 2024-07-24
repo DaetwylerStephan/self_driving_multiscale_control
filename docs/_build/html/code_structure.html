@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="User interface (GUI)" href="user_interface.html" />
-    <link rel="prev" title="Microscope Configuration" href="microscope_configuration.html" /> 
+    <link rel="next" title="multiScale" href="modules.html" />
+    <link rel="prev" title="User interface (GUI) Walkthrough" href="user_interface.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,15 +48,18 @@
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Code organization</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#general-overview">General overview</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">multiScale</a></li>
 </ul>
 
         </div>
@@ -88,12 +91,20 @@
 <section id="general-overview">
 <h2>General overview<a class="headerlink" href="#general-overview" title="Link to this heading"></a></h2>
 <p>The software follows an MVC design pattern with:</p>
-<ul class="simple">
-<li><p>the controller: multiScale_main.py</p></li>
-<li><p>the model: multiScope.py with all hardware control code in src (camera, filter wheel, slit, stages, ni_board)</p></li>
-<li><p>the viewer: gui folder and auxiliary_code (napari_in_subprocess.py)</p></li>
-</ul>
-<p>The hardware are synchronized in time using an NI DAQ card (ni_board). The voltage arrays for the NI board are generated in the acquisition_array_class.py file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">the controller<span class="colon">:</span></dt>
+<dd class="field-odd"><p>multiScale_main.py</p>
+</dd>
+<dt class="field-even">the model<span class="colon">:</span></dt>
+<dd class="field-even"><p>multiScope.py with all hardware control code in src
+(camera, filter wheel, slit, stages, ni_board)</p>
+</dd>
+<dt class="field-odd">the viewer<span class="colon">:</span></dt>
+<dd class="field-odd"><p>gui folder and image viewer (auxiliary_code.napari_in_subprocess.py)</p>
+</dd>
+</dl>
+<p>The hardware are synchronized in time using an NI DAQ card (ni_board).
+The voltage arrays for the NI board are generated in the acquisition_array_class.py file.</p>
 </section>
 </section>
 
@@ -101,8 +112,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="microscope_configuration.html" class="btn btn-neutral float-left" title="Microscope Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="user_interface.html" class="btn btn-neutral float-right" title="User interface (GUI)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="user_interface.html" class="btn btn-neutral float-left" title="User interface (GUI) Walkthrough" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="multiScale" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

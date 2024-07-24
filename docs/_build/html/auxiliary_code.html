@@ -20,7 +20,9 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gui package" href="gui.html" />
+    <link rel="prev" title="automated_microscopy package" href="automated_microscopy.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,12 +48,53 @@
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">multiScale</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html">multiScope module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">auxiliary_code package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.concurrency_tools">auxiliary_code.concurrency_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.CustodyThread"><code class="docutils literal notranslate"><span class="pre">CustodyThread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess"><code class="docutils literal notranslate"><span class="pre">ObjectInSubprocess</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread"><code class="docutils literal notranslate"><span class="pre">ResultThread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.SharedNDArray"><code class="docutils literal notranslate"><span class="pre">SharedNDArray</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.constants">auxiliary_code.constants module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.ASLM_parameters"><code class="docutils literal notranslate"><span class="pre">ASLM_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters"><code class="docutils literal notranslate"><span class="pre">Camera_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.FilterWheel_parameters"><code class="docutils literal notranslate"><span class="pre">FilterWheel_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.Image_parameters"><code class="docutils literal notranslate"><span class="pre">Image_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.Stage_parameters"><code class="docutils literal notranslate"><span class="pre">Stage_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration"><code class="docutils literal notranslate"><span class="pre">microscope_configuration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.napari_in_subprocess">auxiliary_code.napari_in_subprocess module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.napari_in_subprocess.display"><code class="docutils literal notranslate"><span class="pre">display()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.write_parameters">auxiliary_code.write_parameters module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.write_parameters.write_Params"><code class="docutils literal notranslate"><span class="pre">write_Params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -68,6 +111,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">multiScale</a></li>
       <li class="breadcrumb-item active">auxiliary_code package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/auxiliary_code.rst.txt" rel="nofollow"> View page source</a>
@@ -524,6 +568,11 @@ large numpy arrays between the processes is still really fast!</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Microscope configuration class. Define which hardware to use here and where to save images.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.disktosave">
+<span class="sig-name descname"><span class="pre">disktosave</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:\\'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.disktosave" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.filterwheel">
 <span class="sig-name descname"><span class="pre">filterwheel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_Filterwheel'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.filterwheel" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -616,7 +665,10 @@ Class from Andrew York et al. Check out: <a class="reference external" href="htt
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="automated_microscopy.html" class="btn btn-neutral float-left" title="automated_microscopy package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gui.html" class="btn btn-neutral float-right" title="gui package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

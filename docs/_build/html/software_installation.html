@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Microscope Configuration" href="microscope_configuration.html" />
+    <link rel="next" title="User interface (GUI) Walkthrough" href="user_interface.html" />
     <link rel="prev" title="Welcome to self-driving multi-scale imaging’s documentation!" href="index.html" /> 
 </head>
 
@@ -63,12 +63,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
 <ul>
@@ -129,7 +128,7 @@ and enter the following to create a folder and change the working directory to t
 <p>Now, as a next step, generate a dedicated <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/getting-started.html">Conda environment</a>
 for the control code.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda create -n microscopecontrol python=3.9</span>
-<span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda activate microscopecontrol python=3.9</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda activate microscopecontrol</span>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; $</span>
 </pre></div>
 </div>
@@ -194,6 +193,7 @@ and install the software:</p>
 multiScaleauxiliary_codeconstants.py:</p>
 <p>For a synthetic microscope without any hardware available, define it as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parentdir</span> <span class="o">=</span> <span class="s2">&quot;D:/multiScope_Data/&quot;</span>
+<span class="n">disktosave</span> <span class="o">=</span> <span class="s2">&quot;D:</span><span class="se">\\</span><span class="s2">&quot;</span>
 
 <span class="c1"># Synthetic microscope.</span>
 <span class="n">lowres_camera</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_camera&#39;</span>
@@ -207,6 +207,7 @@ multiScaleauxiliary_codeconstants.py:</p>
 <p>For the full self-driving microscope as described in the paper
 with all hardware available, set:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parentdir</span> <span class="o">=</span> <span class="s2">&quot;D:/multiScope_Data/&quot;</span>
+<span class="n">disktosave</span> <span class="o">=</span> <span class="s2">&quot;D:</span><span class="se">\\</span><span class="s2">&quot;</span>
 
 <span class="n">lowres_camera</span> <span class="o">=</span> <span class="s1">&#39;Photometrics_lowres&#39;</span>
 <span class="n">highres_camera</span> <span class="o">=</span> <span class="s1">&#39;Photometrics_highres&#39;</span>
@@ -261,7 +262,7 @@ and <a class="reference external" href="https://stackoverflow.com/questions/4347
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to self-driving multi-scale imaging’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="microscope_configuration.html" class="btn btn-neutral float-right" title="Microscope Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="user_interface.html" class="btn btn-neutral float-right" title="User interface (GUI) Walkthrough" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

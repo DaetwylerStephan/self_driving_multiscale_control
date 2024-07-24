@@ -20,7 +20,9 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="automated_microscopy package" href="automated_microscopy.html" />
+    <link rel="prev" title="multiScale_main module" href="multiScale_main.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,12 +48,47 @@
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="microscope_configuration.html">Microscope Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">multiScale</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">multiScope module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#multiScope.multiScopeModel"><code class="docutils literal notranslate"><span class="pre">multiScopeModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.__init__"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.acquire_stack_highres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.acquire_stack_highres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.acquire_stack_lowres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.acquire_stack_lowres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.calculate_ASLMparameters"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.calculate_ASLMparameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.changeHRtoLR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeHRtoLR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.changeLRtoHR"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.changeLRtoHR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.check_movementboundaries"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.check_movementboundaries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.close"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.move_to_position"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.move_to_position()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.prepare_acquisition"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.prepare_acquisition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.preview_highres_ASLM"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_ASLM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.preview_highres_static"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_highres_static()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.preview_lowres"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.preview_lowres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.save_currentpositionToFile"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.save_currentpositionToFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.set_laserpower"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.set_laserpower()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.smooth_sawtooth"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.smooth_sawtooth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.stack_acquisition_master"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.stack_acquisition_master()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multiScope.multiScopeModel.update_bufferSize"><code class="docutils literal notranslate"><span class="pre">multiScopeModel.update_bufferSize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html">auxiliary_code package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -68,6 +105,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">multiScale</a></li>
       <li class="breadcrumb-item active">multiScope module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/multiScope.rst.txt" rel="nofollow"> View page source</a>
@@ -281,7 +319,10 @@ updates the buffers accordingly.</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="multiScale_main.html" class="btn btn-neutral float-left" title="multiScale_main module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="automated_microscopy.html" class="btn btn-neutral float-right" title="automated_microscopy package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

@@ -1,6 +1,6 @@
-====================
-User interface (GUI)
-====================
+================================
+User interface (GUI) Walkthrough
+================================
 
 Our user interface is organized into different notebooks corresponding to
 different tasks: a Welcome tab, a Stage settings tab,
@@ -28,7 +28,7 @@ harddrive.
 Stage tab
 =========
 
-.. image:: images/welcome_tab.png
+.. image:: images/stages_tab.png
 
 In the stage tab, the acquisition positions are set and defined (Low Resolution Positions
 and High Resolution Positions table). To move the stage, new stage positions can be entered
@@ -61,6 +61,24 @@ Advanced Settings tab
 
 .. image:: images/advanced_settings_tab.png
 
-In the advanced settings tab, settings for the ASLM acquisition are set. Moreover, an alignment mode is
-available for the high-resolution SPIM acquisition to move the voltage of the remote voice coil.
+In the advanced settings tab, set the ASLM acquisition settings. Moreover, an alignment mode is
+available for the high-resolution SPIM acquisition to move the voltage of the remote voice coil and see
+how the ASLM focus changes over the field of view. Additionally, advanced settings for stack acquisition
+can be set such as stage acceleration and velocity.
+
+Self-driving microscopy features
+================================
+
+.. image:: images/self_driving_tab.png
+
+In the last tab, set settings for the self-driving microscopy module (which channels to use).
+
+Image display with Napari
+=========================
+
+.. image:: images/Napari.png
+
+The previews and all acquired images are displayed in the Napari image viewer. It provides
+a state-of-the art image display that enables, amongst others,
+contrast adjustments, zooming to regions of interest, or change in color display
 
