@@ -55,8 +55,8 @@ class multiScopeModel:
         self.exposure_time_LR = 200
         self.continue_preview_lowres = False
         self.continue_preview_highres = False
-        self.stack_nbplanes_lowres = 200
-        self.stack_nbplanes_highres = 200
+        self.stack_nbplanes_lowres = 21
+        self.stack_nbplanes_highres = 21
         self.lowres_planespacing = 10000000
         self.highres_planespacing = 10000000
         self.displayImStack = 1

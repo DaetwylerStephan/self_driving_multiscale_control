@@ -4,6 +4,7 @@ class microscope_configuration:
     """
 
     parentdir = "D:/multiScope_Data/"
+    disktosave = "D:\\"
 
     # lowres_camera = 'Photometrics_lowres'
     # highres_camera = 'Photometrics_highres'

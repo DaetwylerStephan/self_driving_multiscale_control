@@ -102,7 +102,7 @@ class Synthetic_translationstage:
         Wait for stream to finish.
         """
         # Wait for the "stream done" event.
-        print("Stream finished.")
+        #print("Stream finished.")
         pass
 
 if __name__ == '__main__':

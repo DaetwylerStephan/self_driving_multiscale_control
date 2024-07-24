@@ -271,9 +271,9 @@ class Run_Tab(tk.Frame):
 
         #number of planes
         self.stack_aq_entry_numberOfPlanes_lowres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes_lowres)
-        self.stack_aq_numberOfPlanes_lowres.set(200)
+        self.stack_aq_numberOfPlanes_lowres.set(10)
         self.stack_aq_entry_numberOfPlanes_highres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_numberOfPlanes_highres)
-        self.stack_aq_numberOfPlanes_highres.set(200)
+        self.stack_aq_numberOfPlanes_highres.set(10)
 
         #plane spacing
         self.stack_aq_entry_plane_spacing_lowres = tk.Entry(stack_aquisition_settings, textvariable=self.stack_aq_plane_spacing_lowres)

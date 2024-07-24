@@ -50,9 +50,9 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_alignmentmodeOn = tk.IntVar() #switch ASLM alignment mode on/off
         self.ASLM_SawToothOn = tk.IntVar() #choose SawTooth in ASLM alignment mode
         self.ASLM_constantVoltageOn = tk.IntVar() #choose constant voltage in ASLM alignment mode
-        self.ASLM_volt_lowRes_static = tk.DoubleVar() #parameter for low resolution static light sheet
-        self.ASLM_volt_highRes_static = tk.DoubleVar() #parameter for high resolution static light sheet
-        self.ASLM_SawtoothORconstant = tk.StringVar()
+        # self.ASLM_volt_lowRes_static = tk.DoubleVar() #parameter for low resolution static light sheet
+        # self.ASLM_volt_highRes_static = tk.DoubleVar() #parameter for high resolution static light sheet
+        # self.ASLM_SawtoothORconstant = tk.StringVar()
         self.ASLM_voltageDirection = tk.StringVar()
 
         #mSPIM settings
@@ -143,8 +143,8 @@ class AdvancedSettings_Tab(tk.Frame):
         voltagemaximal_label = ttk.Label(ASLM_settings, text="Max Vol@mirror:").grid(row=22, column=0)
 
         voltagecurrent_label = ttk.Label(ASLM_settings, text="Current ASLM remote mirror voltage (mV):").grid(row=31, column=0, columnspan=2)
-        voltagelowRes_label = ttk.Label(ASLM_settings, text="Low Resolution ASLM remote mirror voltage (static, mV):").grid(row=32, column=0, columnspan=2)
-        voltagehighRes_label = ttk.Label(ASLM_settings, text="High Resolution ASLM remote mirror voltage (static, mV):").grid(row=40, column=0, columnspan=2)
+        # voltagelowRes_label = ttk.Label(ASLM_settings, text="Low Resolution ASLM remote mirror voltage (static, mV):").grid(row=32, column=0, columnspan=2)
+        # voltagehighRes_label = ttk.Label(ASLM_settings, text="High Resolution ASLM remote mirror voltage (static, mV):").grid(row=40, column=0, columnspan=2)
 
         self.scanWidth_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_scanWidth, width=6)
         self.voltageinterval_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_interval, width=6)
@@ -163,8 +163,8 @@ class AdvancedSettings_Tab(tk.Frame):
         self.voltagemiddle_entry640minus = tk.Button(ASLM_settings, text="-",command=lambda: self.change_voltage(self.ASLM_volt_middle640, -1))
 
         self.voltagecurrent_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_current, width=6)
-        self.voltageLowRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_lowRes_static, width=6)
-        self.voltageHighRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_highRes_static, width=6)
+        # self.voltageLowRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_lowRes_static, width=6)
+        # self.voltageHighRes_entry = tk.Entry(ASLM_settings, textvariable=self.ASLM_volt_highRes_static, width=6)
 
         interval_scale = tk.Scale(ASLM_settings, variable=self.ASLM_volt_interval, from_=0, to=100,
                                   resolution=0.1, orient="horizontal", showvalue=False)
@@ -199,8 +199,8 @@ class AdvancedSettings_Tab(tk.Frame):
         self.ASLM_volt_middle640.set(0)
 
         self.ASLM_volt_current.set(0)
-        self.ASLM_volt_lowRes_static.set(0)
-        self.ASLM_volt_highRes_static.set(0)
+        # self.ASLM_volt_lowRes_static.set(0)
+        # self.ASLM_volt_highRes_static.set(0)
 
 
         #ASLM settings layout
@@ -235,8 +235,8 @@ class AdvancedSettings_Tab(tk.Frame):
 
         self.ASLM_alignmentmodeOn_chkbt.grid(row=30, column=0, sticky=tk.W + tk.S)
         self.voltagecurrent_entry.grid(row=31, column=2, sticky=tk.W + tk.E + tk.S)
-        self.voltageLowRes_entry.grid(row=32, column=2, sticky=tk.W + tk.S)
-        self.voltageHighRes_entry.grid(row=40, column=2, sticky=tk.W + tk.S)
+        # self.voltageLowRes_entry.grid(row=32, column=2, sticky=tk.W + tk.S)
+        # self.voltageHighRes_entry.grid(row=40, column=2, sticky=tk.W + tk.S)
 
     def change_voltage(self, voltage, factor):
         """

@@ -35,7 +35,7 @@ class SmartMicroscopySettings_Tab(tk.Frame):
         self.driftcorrection_LED = tk.IntVar()
 
         # set the different label frames
-        drift_correction_settings = tk.LabelFrame(self, text="Drift Correction Option")
+        drift_correction_settings = tk.LabelFrame(self, text="Self-driving options")
         drift_correction_settings.grid(row=1, column=3, rowspan=2, sticky=tk.W + tk.E + tk.S + tk.N)
 
         #self.drift_highres_button = tk.Checkbutton(drift_correction_settings, text ='On High Resolution', variable=self.drift_correction_highres, onvalue=1, offvalue=0)

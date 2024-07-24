@@ -5,6 +5,9 @@ from tkinter import messagebox
 from tkinter import filedialog
 import psutil
 
+from multiScale.auxiliary_code.constants import microscope_configuration
+
+
 class Welcome_Tab(tk.Frame):
     """Welcome tab
 
@@ -77,7 +80,7 @@ class Welcome_Tab(tk.Frame):
         ### ----------------------------filepath settings -----------------------------------------------------------------
         # calculations
         # calculate free disk space
-        obj_Disk = psutil.disk_usage('D:\\')
+        obj_Disk = psutil.disk_usage(microscope_configuration.disktosave)
         totaldisksize = obj_Disk.total / (1024.0 ** 3)
         useddisksize = obj_Disk.used / (1024.0 ** 3)
         freedisksize = round(obj_Disk.free / (1024.0 ** 3))

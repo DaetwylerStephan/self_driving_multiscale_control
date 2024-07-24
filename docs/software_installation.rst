@@ -47,7 +47,7 @@ for the control code.
 .. code-block:: console
 
    (base) ~\MicroscopeControlCode> $ conda create -n microscopecontrol python=3.9
-   (base) ~\MicroscopeControlCode> $ conda activate microscopecontrol python=3.9
+   (base) ~\MicroscopeControlCode> $ conda activate microscopecontrol
    (microscopecontrol) ~\MicroscopeControlCode> $
 
 Note: This environment uses Python version 3.9.
@@ -138,6 +138,7 @@ For a synthetic microscope without any hardware available, define it as:
 .. code-block:: python
 
     parentdir = "D:/multiScope_Data/"
+    disktosave = "D:\\"
 
     # Synthetic microscope.
     lowres_camera = 'Synthetic_camera'
@@ -153,6 +154,7 @@ with all hardware available, set:
 .. code-block:: python
 
     parentdir = "D:/multiScope_Data/"
+    disktosave = "D:\\"
 
     lowres_camera = 'Photometrics_lowres'
     highres_camera = 'Photometrics_highres'
