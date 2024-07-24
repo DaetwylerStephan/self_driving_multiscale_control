@@ -189,8 +189,10 @@ files for conda and pip to include the proxy settings. For Windows, the paths ar
     * The ``conda`` configuration file can be found at C:\\Users\\UserProfile\\.condarc
     * The ``pip`` configuration file can be found at C:\\Users\\UserProfile\\pip\\pip.ini
 
-See also this `Stackoverflow <https://stackoverflow.com/questions/36729023/how-to-make-anaconda-work-behind-http-proxy-not-https>`_
-discussion.
+See also these Stackoverflow discussions on :
+`Anaconda condarc files <https://stackoverflow.com/questions/36729023/how-to-make-anaconda-work-behind-http-proxy-not-https>`_
+and `Pip.ini files <https://stackoverflow.com/questions/9698557/how-to-use-pip-on-windows-behind-an-authenticating-proxy>`_
+and `Pip ini configuration <https://stackoverflow.com/questions/43473041/how-to-configure-pip-per-config-file-to-use-a-proxy-with-authentification>`_.
 
 
 Alternatively, set the proxy from Anaconda Prompt as follows:

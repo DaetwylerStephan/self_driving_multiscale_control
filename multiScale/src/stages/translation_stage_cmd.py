@@ -9,9 +9,9 @@ from threading import Event, Thread
 import numpy as np
 
 try:
-    from Smaract.smaract import ctl as ctl
+    from smaract.smaract import ctl as ctl
 except ImportError:
-    import Smaract.smaract.ctl as ctl
+    import smaract.ctl as ctl
 
 
 

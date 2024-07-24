@@ -31,7 +31,8 @@ setup(name='multiScale',
 			   ['multiScale.src.filter_wheel'] +
 			   ['multiScale.src.ni_board'] +
 			   ['multiScale.src.slit'] +
-			   ['multiScale.src.stages'],
+	  		   ['multiScale.src.stages']
+			   ['multiScale.src.stages.MCSControl'],
 	  include_package_data=True,
 	  install_requires=install_requires,
 )
