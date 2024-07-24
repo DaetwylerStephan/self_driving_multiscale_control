@@ -7,5 +7,5 @@
 *.DS_Store
 *.pyc
 __pychache__
-.examples
+*examples/
 
