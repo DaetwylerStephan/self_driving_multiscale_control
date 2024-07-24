@@ -2,6 +2,7 @@
 *.iml
 *.log
 *.egg-info
+*.egg
 *build/
 *.DS_Store
 *.pyc
