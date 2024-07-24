@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src package &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.camera package" href="src.camera.html" />
+    <link rel="prev" title="gui package" href="gui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">multiScale</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html">multiScope module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html">auxiliary_code package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">src package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html">src.camera package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html">src.filter_wheel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html">src.ni_board package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html">src.slit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html">src.stages package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">multiScale</a></li>
+      <li class="breadcrumb-item active">src package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-package">
+<h1>src package<a class="headerlink" href="#src-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.camera.html">src.camera package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.camera.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.camera.html#module-src.camera.Photometrics_camera">src.camera.Photometrics_camera module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera"><code class="docutils literal notranslate"><span class="pre">Photo_Camera</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.__init__"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.close"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.end_preview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.end_preview()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.get_imageroi"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.get_imageroi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.init_previewbuffer"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.init_previewbuffer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_ASLM_acquisition"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_ASLM_acquisition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_highres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_stack_acquisition_highres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.prepare_stack_acquisition_lowres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.prepare_stack_acquisition_lowres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_preview_highres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_preview_highres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_preview_lowres"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_preview_lowres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.run_stack_acquisition_buffer_fast"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.run_stack_acquisition_buffer_fast()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.set_imageroi"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.set_imageroi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.set_up_highrespreview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.set_up_highrespreview()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Photometrics_camera.Photo_Camera.set_up_lowres_preview"><code class="docutils literal notranslate"><span class="pre">Photo_Camera.set_up_lowres_preview()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.camera.html#module-src.camera.Synthetic_camera">src.camera.Synthetic_camera module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.__init__"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.close"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.finish"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.finish()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.open"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.open()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.poll_frame"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.poll_frame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.reset_rois"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.reset_rois()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.set_roi"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.set_roi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.shape"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.shape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthentic_cam_object.start_live"><code class="docutils literal notranslate"><span class="pre">Synthentic_cam_object.start_live()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.end_preview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.end_preview()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.get_imageroi"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.get_imageroi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.init_previewbuffer"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.init_previewbuffer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_ASLM_acquisition"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_ASLM_acquisition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_highres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_stack_acquisition_highres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.prepare_stack_acquisition_lowres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.prepare_stack_acquisition_lowres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_highres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_preview_highres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_preview_lowres"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_preview_lowres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.run_stack_acquisition_buffer_fast"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.run_stack_acquisition_buffer_fast()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_imageroi"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.set_imageroi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_highrespreview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.set_up_highrespreview()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html#src.camera.Synthetic_camera.Synthetic_Photo_Camera.set_up_lowres_preview"><code class="docutils literal notranslate"><span class="pre">Synthetic_Photo_Camera.set_up_lowres_preview()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.camera.html#module-src.camera">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.filter_wheel.html">src.filter_wheel package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.filter_wheel.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.filter_wheel.html#module-src.filter_wheel.Synthetic_Filterwheel">src.filter_wheel.Synthetic_Filterwheel module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.set_filter"><code class="docutils literal notranslate"><span class="pre">Synthetic_Filterwheel.set_filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.filter_wheel.html#module-src.filter_wheel.ludlcontrol">src.filter_wheel.ludlcontrol module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel.__init__"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel.close"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.filter_wheel.html#src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter"><code class="docutils literal notranslate"><span class="pre">LudlFilterwheel.set_filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.filter_wheel.html#module-src.filter_wheel">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.ni_board.html">src.ni_board package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.ni_board.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.ni_board.html#module-src.ni_board.ni_synthetic">src.ni_board.ni_synthetic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out"><code class="docutils literal notranslate"><span class="pre">Analog_Out</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.__init__"><code class="docutils literal notranslate"><span class="pre">Analog_Out.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.close"><code class="docutils literal notranslate"><span class="pre">Analog_Out.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.p2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.p2s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.play_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.play_voltages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.s2p"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2p()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.s2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.set_rate"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_rate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.set_verbose"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_verbose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.setconstantvoltage"><code class="docutils literal notranslate"><span class="pre">Analog_Out.setconstantvoltage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.ni_synthetic.Analog_Out.write_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.write_voltages()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.ni_board.html#module-src.ni_board.vni">src.ni_board.vni module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out"><code class="docutils literal notranslate"><span class="pre">Analog_Out</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.__init__"><code class="docutils literal notranslate"><span class="pre">Analog_Out.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.close"><code class="docutils literal notranslate"><span class="pre">Analog_Out.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.p2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.p2s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.play_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.play_voltages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.s2p"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2p()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.s2s"><code class="docutils literal notranslate"><span class="pre">Analog_Out.s2s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.set_rate"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_rate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.set_verbose"><code class="docutils literal notranslate"><span class="pre">Analog_Out.set_verbose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.setconstantvoltage"><code class="docutils literal notranslate"><span class="pre">Analog_Out.setconstantvoltage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.Analog_Out.write_voltages"><code class="docutils literal notranslate"><span class="pre">Analog_Out.write_voltages()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.ni_board.html#src.ni_board.vni.check_error"><code class="docutils literal notranslate"><span class="pre">check_error()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.ni_board.html#module-src.ni_board">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.slit.html">src.slit package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.slit.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.slit.html#module-src.slit.slit_cmd">src.slit.slit_cmd module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.__init__"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.home_stage"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.home_stage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_closing"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_closing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_get_position"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_get_position()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_get_speed"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_get_speed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_info"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_move"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_move()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_serial"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_serial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_set_microstep_mode_256"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_set_microstep_mode_256()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_set_speed"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_set_speed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_status"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html#src.slit.slit_cmd.slit_ximc_control.slit_wait_for_stop"><code class="docutils literal notranslate"><span class="pre">slit_ximc_control.slit_wait_for_stop()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.slit.html#module-src.slit">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.stages.html">src.stages package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.stages.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.stages.html#module-src.stages.rotation_stage_cmd">src.stages.rotation_stage_cmd module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#rotation-stage-cmd-py">rotation_stage_cmd.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.ExitIfError"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.ExitIfError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.ManualMove"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.ManualMove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.__init__"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.close"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.getAngle"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.getAngle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.rotation_stage_cmd.SR2812_rotationstage.moveToAngle"><code class="docutils literal notranslate"><span class="pre">SR2812_rotationstage.moveToAngle()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.stages.html#module-src.stages.synthetic_rotation_stage">src.stages.synthetic_rotation_stage module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#synthetic-rotation-stage-py">Synthetic rotation_stage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#src.stages.synthetic_rotation_stage.Synthetic_rotationstage"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.getAngle"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.getAngle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_rotation_stage.Synthetic_rotationstage.moveToAngle"><code class="docutils literal notranslate"><span class="pre">Synthetic_rotationstage.moveToAngle()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.stages.html#module-src.stages.synthetic_translation_stage">src.stages.synthetic_translation_stage module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#synthetic-translation-stage-py">synthetic_translation_stage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.__init__"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.close"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.findReference"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.findReference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.moveToPosition"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.moveToPosition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.streamStackAcquisition_externalTrigger_setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.synthetic_translation_stage.Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd"><code class="docutils literal notranslate"><span class="pre">Synthetic_translationstage.streamStackAcquisition_externalTrigger_waitEnd()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.stages.html#module-src.stages.translation_stage_cmd">src.stages.translation_stage_cmd module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#translation-stage-cmd-py">translation_stage_cmd.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.__init__"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.assert_lib_compatibility"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.assert_lib_compatibility()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.close"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.findReference"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.findReference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.moveToPosition"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.moveToPosition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_setup"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.streamStackAcquisition_externalTrigger_setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html#src.stages.translation_stage_cmd.SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd"><code class="docutils literal notranslate"><span class="pre">SLC_translationstage.streamStackAcquisition_externalTrigger_waitEnd()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.stages.html#module-src.stages">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gui.html" class="btn btn-neutral float-left" title="gui package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.camera.html" class="btn btn-neutral float-right" title="src.camera package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

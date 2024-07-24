@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.filter_wheel package &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.ni_board package" href="src.ni_board.html" />
+    <link rel="prev" title="src.camera package" href="src.camera.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">multiScale</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html">multiScope module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html">auxiliary_code package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.camera.html">src.camera package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">src.filter_wheel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ni_board.html">src.ni_board package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.slit.html">src.slit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.stages.html">src.stages package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">multiScale</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+      <li class="breadcrumb-item active">src.filter_wheel package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.filter_wheel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-filter-wheel-package">
+<h1>src.filter_wheel package<a class="headerlink" href="#src-filter-wheel-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.filter_wheel.Synthetic_Filterwheel">
+<span id="src-filter-wheel-synthetic-filterwheel-module"></span><h2>src.filter_wheel.Synthetic_Filterwheel module<a class="headerlink" href="#module-src.filter_wheel.Synthetic_Filterwheel" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.filter_wheel.Synthetic_Filterwheel.</span></span><span class="sig-name descname"><span class="pre">Synthetic_Filterwheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Synthetic filter wheel class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize synthetic filter wheel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>COMport</strong> – Synthetic COMport to connect to filter wheel.</p></li>
+<li><p><strong>filterdict</strong> – Synthetic filter dictionary of mounted filters and their position.</p></li>
+<li><p><strong>baudrate</strong> – Synthetic baudrate for connection.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.close" title="Link to this definition"></a></dt>
+<dd><p>Close the synthetic filter wheel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.set_filter">
+<span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_until_done</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.Synthetic_Filterwheel.Synthetic_Filterwheel.set_filter" title="Link to this definition"></a></dt>
+<dd><p>Moves and sets synthetic filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> – String, name of filter, e.g. ‘515-30-25’</p></li>
+<li><p><strong>wait_until_done</strong> – flag whether to wait a defined amount of time before returning</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.filter_wheel.ludlcontrol">
+<span id="src-filter-wheel-ludlcontrol-module"></span><h2>src.filter_wheel.ludlcontrol module<a class="headerlink" href="#module-src.filter_wheel.ludlcontrol" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.filter_wheel.ludlcontrol.</span></span><span class="sig-name descname"><span class="pre">LudlFilterwheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to control a 6-position Ludl filterwheel</p>
+<p>Needs a dictionary which combines filter designations and position IDs in the form:</p>
+<p>filters = {‘405-488-647-Tripleblock’ : 0, ‘405-488-561-640-Quadrupleblock’: 1, ‘464 482-35’: 2, ‘508 520-35’: 3, ‘515LP’:4,}</p>
+<p>Adapted from Ludl filter wheel control by Fabian Voigt. Check out:
+<a class="reference external" href="https://github.com/mesoSPIM/mesoSPIM-control/blob/master/mesoSPIM/src/devices/filter_wheels/mesoSPIM_FilterWheel.py">https://github.com/mesoSPIM/mesoSPIM-control/blob/master/mesoSPIM/src/devices/filter_wheels/mesoSPIM_FilterWheel.py</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">COMport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize Ludl filter wheel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>COMport</strong> – COMport to connect to filter wheel.</p></li>
+<li><p><strong>filterdict</strong> – Filter dictionary of mounted filters and their position.</p></li>
+<li><p><strong>baudrate</strong> – Baudrate for connection.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.close" title="Link to this definition"></a></dt>
+<dd><p>Close the Ludl filter wheel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter">
+<span class="sig-name descname"><span class="pre">set_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_until_done</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.filter_wheel.ludlcontrol.LudlFilterwheel.set_filter" title="Link to this definition"></a></dt>
+<dd><p>Moves filter wheel using the pyserial command set. No checks are done whether the movement is completed or
+finished in time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter</strong> – String, name of filter, e.g. ‘515-30-25’</p></li>
+<li><p><strong>wait_until_done</strong> – flag whether to wait a defined amount of time before returning</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.filter_wheel">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.filter_wheel" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.camera.html" class="btn btn-neutral float-left" title="src.camera package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.ni_board.html" class="btn btn-neutral float-right" title="src.ni_board package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gui package &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src package" href="src.html" />
+    <link rel="prev" title="auxiliary_code package" href="auxiliary_code.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">multiScale</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html">multiScope module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auxiliary_code.html">auxiliary_code package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">gui package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui.Welcome_window">gui.Welcome_window module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gui.Welcome_window.Welcome_Tab"><code class="docutils literal notranslate"><span class="pre">Welcome_Tab</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui.advancedsettings_window">gui.advancedsettings_window module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gui.advancedsettings_window.AdvancedSettings_Tab"><code class="docutils literal notranslate"><span class="pre">AdvancedSettings_Tab</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui.main_window">gui.main_window module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gui.main_window.MultiScope_MainGui"><code class="docutils literal notranslate"><span class="pre">MultiScope_MainGui</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui.run_window">gui.run_window module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gui.run_window.Run_Tab"><code class="docutils literal notranslate"><span class="pre">Run_Tab</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui.smart_window">gui.smart_window module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gui.smart_window.SmartMicroscopySettings_Tab"><code class="docutils literal notranslate"><span class="pre">SmartMicroscopySettings_Tab</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui.stages_window">gui.stages_window module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gui.stages_window.Stages_Tab"><code class="docutils literal notranslate"><span class="pre">Stages_Tab</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-gui">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">multiScale</a></li>
+      <li class="breadcrumb-item active">gui package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/gui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gui-package">
+<h1>gui package<a class="headerlink" href="#gui-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-gui.Welcome_window">
+<span id="gui-welcome-window-module"></span><h2>gui.Welcome_window module<a class="headerlink" href="#module-gui.Welcome_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gui.Welcome_window.Welcome_Tab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gui.Welcome_window.</span></span><span class="sig-name descname"><span class="pre">Welcome_Tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.Welcome_window.Welcome_Tab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<p>Welcome tab</p>
+<p>A welcome tab to display free disk space and select experiment parameters such as:</p>
+<ul class="simple">
+<li><p>Model organism</p></li>
+<li><p>User</p></li>
+<li><p>Fluorescent marker</p></li>
+<li><p>Quit application</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.Welcome_window.Welcome_Tab.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.Welcome_window.Welcome_Tab.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize welcome tab</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> – the ttk.Notebook class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.Welcome_window.Welcome_Tab.deleteme">
+<span class="sig-name descname"><span class="pre">deleteme</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.Welcome_window.Welcome_Tab.deleteme" title="Link to this definition"></a></dt>
+<dd><p>Upon call of this function from the quit button, a message window is shown before quitting. If “yes” is selected, quit the program.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.Welcome_window.Welcome_Tab.getwelcome_parameters">
+<span class="sig-name descname"><span class="pre">getwelcome_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.Welcome_window.Welcome_Tab.getwelcome_parameters" title="Link to this definition"></a></dt>
+<dd><p>Get parameters of welcome window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of parameters {username, modelOrganism, fluorescent maker}</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-gui.advancedsettings_window">
+<span id="gui-advancedsettings-window-module"></span><h2>gui.advancedsettings_window module<a class="headerlink" href="#module-gui.advancedsettings_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gui.advancedsettings_window.AdvancedSettings_Tab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gui.advancedsettings_window.</span></span><span class="sig-name descname"><span class="pre">AdvancedSettings_Tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.advancedsettings_window.AdvancedSettings_Tab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<p>Advanced Settings Tab</p>
+<p>A tab for advanced settings such as setting of :</p>
+<ul class="simple">
+<li><p>Axially-swept light sheet parameters</p></li>
+<li><p>Alignment mode to control the voltage at the remote mirror</p></li>
+<li><p>Advanced stack acquisition settings such as camera delay and stage velocity/acceleration</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.advancedsettings_window.AdvancedSettings_Tab.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.advancedsettings_window.AdvancedSettings_Tab.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize advanced settings tab</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> – the ttk.Notebook class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.advancedsettings_window.AdvancedSettings_Tab.change_voltage">
+<span class="sig-name descname"><span class="pre">change_voltage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voltage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.advancedsettings_window.AdvancedSettings_Tab.change_voltage" title="Link to this definition"></a></dt>
+<dd><p>Convert input from the +/- buttons to a change of 0.1 in voltage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>voltage</strong> – tkinter voltage variable,  voltage value to modify</p></li>
+<li><p><strong>factor</strong> – +1 or -1, determines whether to increase or decrease voltage</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-gui.main_window">
+<span id="gui-main-window-module"></span><h2>gui.main_window module<a class="headerlink" href="#module-gui.main_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gui.main_window.MultiScope_MainGui">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gui.main_window.</span></span><span class="sig-name descname"><span class="pre">MultiScope_MainGui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.main_window.MultiScope_MainGui" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Notebook</span></code></p>
+<p>This is the main GUI class for the multi-scale microscope. It organizes and arranges the microscope GUI into different tabs:</p>
+<ul class="simple">
+<li><p>A welcome tab</p></li>
+<li><p>A stage tab</p></li>
+<li><p>A run tab</p></li>
+<li><p>An advanced settings tab</p></li>
+<li><p>A tab to control the self-driving acquisition.</p></li>
+</ul>
+<p>This is also the class to call when only starting the GUI without the model by calling: python main_window.py</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.main_window.MultiScope_MainGui.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.main_window.MultiScope_MainGui.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize GUI</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-gui.run_window">
+<span id="gui-run-window-module"></span><h2>gui.run_window module<a class="headerlink" href="#module-gui.run_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gui.run_window.Run_Tab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gui.run_window.</span></span><span class="sig-name descname"><span class="pre">Run_Tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.run_window.Run_Tab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<p>Run Tab</p>
+<p>A run tab to select parameters such as:</p>
+<ul class="simple">
+<li><p>Preview or stack acquisition</p></li>
+<li><p>Stack acquisition parameters such as number of planes, which lasers to image, which cameras, plane distance</p></li>
+<li><p>Time-lapse acquisition settings such as time interval and duration</p></li>
+<li><p>Laser settings such as laser power of low- and highres illumination</p></li>
+<li><p>Camera settings such as exposure time</p></li>
+<li><p>Region of interest to image</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.run_window.Run_Tab.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.run_window.Run_Tab.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize run tab</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> – the ttk.Notebook class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.run_window.Run_Tab.preview_change">
+<span class="sig-name descname"><span class="pre">preview_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.run_window.Run_Tab.preview_change" title="Link to this definition"></a></dt>
+<dd><p>Set from the controller to sink or raise button (change appearance), e.g. when running a preview or a stack acquisition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>button</strong> – tkinter button to sink or raise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.run_window.Run_Tab.preview_filter_select">
+<span class="sig-name descname"><span class="pre">preview_filter_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.run_window.Run_Tab.preview_filter_select" title="Link to this definition"></a></dt>
+<dd><p>Change appearance of buttons for excitation wavelength. As a result, only the button of the selected wavelength (laser),
+that is running in the preview, is sunk. All other buttons are raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>button</strong> – tkinter button to sink</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.run_window.Run_Tab.updateTimesTimelapse">
+<span class="sig-name descname"><span class="pre">updateTimesTimelapse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.run_window.Run_Tab.updateTimesTimelapse" title="Link to this definition"></a></dt>
+<dd><p>Updates the displayed time-lapse parameters, such as starting time or the expected end time of the time-lapse.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-gui.smart_window">
+<span id="gui-smart-window-module"></span><h2>gui.smart_window module<a class="headerlink" href="#module-gui.smart_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gui.smart_window.SmartMicroscopySettings_Tab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gui.smart_window.</span></span><span class="sig-name descname"><span class="pre">SmartMicroscopySettings_Tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.smart_window.SmartMicroscopySettings_Tab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<p>Smart, self-driving microscope tab</p>
+<p>A tab to select whether to run the self-driving microscope module or not and which channel to use for low-resolution guidance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.smart_window.SmartMicroscopySettings_Tab.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.smart_window.SmartMicroscopySettings_Tab.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize self-driving, smart microscopy tab</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> – the ttk.Notebook class</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-gui.stages_window">
+<span id="gui-stages-window-module"></span><h2>gui.stages_window module<a class="headerlink" href="#module-gui.stages_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gui.stages_window.</span></span><span class="sig-name descname"><span class="pre">Stages_Tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<p>Stage tab</p>
+<p>A stages tab to select which positions will be imaged in a timelapse</p>
+<ul class="simple">
+<li><p>Change step size of stage movements</p></li>
+<li><p>Move to position (value entry and buttons)</p></li>
+<li><p>Activate keyboard for movement and add positions (a,s,w,d and r,t)</p></li>
+<li><p>Move to a defined position in the table (right)</p></li>
+<li><p>Automatically generate mosaic of positions</p></li>
+<li><p>Two tables to display selected low-res and high-res positions</p></li>
+</ul>
+<p>Note: Positions are displayed using a ttk.Treeview construct.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize stages Tab</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> – the ttk.Notebook class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.addhighresPos">
+<span class="sig-name descname"><span class="pre">addhighresPos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.addhighresPos" title="Link to this definition"></a></dt>
+<dd><p>Add the current stage positions (translational stage, rotational stage) at the current stage position
+index (self.stage_currentPosindex) in the high-resolution position list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.addlowresPos">
+<span class="sig-name descname"><span class="pre">addlowresPos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.addlowresPos" title="Link to this definition"></a></dt>
+<dd><p>Add the current stage positions (translational stage, rotational stage) at the current stage position
+index (self.stage_currentPosindex) in the low-resolution position list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.change_angle">
+<span class="sig-name descname"><span class="pre">change_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.change_angle" title="Link to this definition"></a></dt>
+<dd><p>This function changes the value of the rotational stage position (direction) in the direction of the factor (+1 or -1)
+by the value of the rotational stage step size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>direction</strong> – Defines the rotational stage position to update (self.stage_moveto_angle)</p></li>
+<li><p><strong>factor</strong> – Defines direction of update (+1/-1)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.change_currentposition">
+<span class="sig-name descname"><span class="pre">change_currentposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.change_currentposition" title="Link to this definition"></a></dt>
+<dd><p>This function changes the value of the stage position (direction) in the direction of the factor (+1 or -1)
+by the value of the translation stage step size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>direction</strong> – Defines which stage position to update (e.g. self.stage_moveto_lateral)</p></li>
+<li><p><strong>factor</strong> – Defines direction of update (+1/-1)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.deletehighresPos">
+<span class="sig-name descname"><span class="pre">deletehighresPos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.deletehighresPos" title="Link to this definition"></a></dt>
+<dd><p>Delete position in high-resolution position list that corresponds to the current selected position (self.stage_currenthighresPosindex)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.deletelowresPos">
+<span class="sig-name descname"><span class="pre">deletelowresPos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.deletelowresPos" title="Link to this definition"></a></dt>
+<dd><p>Delete position in low-resolution position list that corresponds to the current selected position (self.stage_currentPosIndex)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.display_tree">
+<span class="sig-name descname"><span class="pre">display_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positionlist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.display_tree" title="Link to this definition"></a></dt>
+<dd><p>Update the display of the positions in the GUI position table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> – Which tree to update low-resolution data tree (self.stage_savedPos_tree) or high-resolution (self.stage_highres_savedPos_tree)</p></li>
+<li><p><strong>positionlist</strong> – Current updated positions to display</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.loadhighresPosList">
+<span class="sig-name descname"><span class="pre">loadhighresPosList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.loadhighresPosList" title="Link to this definition"></a></dt>
+<dd><p>Load saved high-resolution position list from memory</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.loadlowresPosList">
+<span class="sig-name descname"><span class="pre">loadlowresPosList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.loadlowresPosList" title="Link to this definition"></a></dt>
+<dd><p>Load saved low-resolution position list from memory</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.makeMosaic">
+<span class="sig-name descname"><span class="pre">makeMosaic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.makeMosaic" title="Link to this definition"></a></dt>
+<dd><p>Generate a mosaic based on the selected parameters for either high- or low-resolution data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>camera</strong> – defines whether mosaic is generated for high-resolution (“highres”) or low-resolution (“lowres”) data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.reverthighresList">
+<span class="sig-name descname"><span class="pre">reverthighresList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.reverthighresList" title="Link to this definition"></a></dt>
+<dd><p>Go back to previous high-resolution position list (e.g. to list before loading a saved list, or adding a position).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.revertlowresList">
+<span class="sig-name descname"><span class="pre">revertlowresList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.revertlowresList" title="Link to this definition"></a></dt>
+<dd><p>Go back to previous low-resolution position list (e.g. to list before loading a saved list, or adding a position).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.savehighresPosList">
+<span class="sig-name descname"><span class="pre">savehighresPosList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.savehighresPosList" title="Link to this definition"></a></dt>
+<dd><p>Save the current high resolution stage position list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.savelowresPosList">
+<span class="sig-name descname"><span class="pre">savelowresPosList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.savelowresPosList" title="Link to this definition"></a></dt>
+<dd><p>Save the current low resolution stage position list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gui.stages_window.Stages_Tab.update_stage_trans_stepsize">
+<span class="sig-name descname"><span class="pre">update_stage_trans_stepsize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gui.stages_window.Stages_Tab.update_stage_trans_stepsize" title="Link to this definition"></a></dt>
+<dd><p>When the Tkinter slider (apply a logarithmic scaling to the slider) for the translation stage step size is changed,
+update the value of the stage_trans_stepsize parameter (displayed in the entry field).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – update event</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-gui">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-gui" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="auxiliary_code.html" class="btn btn-neutral float-left" title="auxiliary_code package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.html" class="btn btn-neutral float-right" title="src package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

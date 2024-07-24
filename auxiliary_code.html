@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>auxiliary_code package &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gui package" href="gui.html" />
+    <link rel="prev" title="automated_microscopy package" href="automated_microscopy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="software_installation.html">Software Installation and Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">multiScale</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="acquisition_array_class.html">acquisition_array_class module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScale_main.html">multiScale_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiScope.html">multiScope module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="automated_microscopy.html">automated_microscopy package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">auxiliary_code package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.concurrency_tools">auxiliary_code.concurrency_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.CustodyThread"><code class="docutils literal notranslate"><span class="pre">CustodyThread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess"><code class="docutils literal notranslate"><span class="pre">ObjectInSubprocess</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread"><code class="docutils literal notranslate"><span class="pre">ResultThread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.concurrency_tools.SharedNDArray"><code class="docutils literal notranslate"><span class="pre">SharedNDArray</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.constants">auxiliary_code.constants module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.ASLM_parameters"><code class="docutils literal notranslate"><span class="pre">ASLM_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.Camera_parameters"><code class="docutils literal notranslate"><span class="pre">Camera_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.FilterWheel_parameters"><code class="docutils literal notranslate"><span class="pre">FilterWheel_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.Image_parameters"><code class="docutils literal notranslate"><span class="pre">Image_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.NI_board_parameters"><code class="docutils literal notranslate"><span class="pre">NI_board_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.Stage_parameters"><code class="docutils literal notranslate"><span class="pre">Stage_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.constants.microscope_configuration"><code class="docutils literal notranslate"><span class="pre">microscope_configuration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.napari_in_subprocess">auxiliary_code.napari_in_subprocess module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.napari_in_subprocess.display"><code class="docutils literal notranslate"><span class="pre">display()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code.write_parameters">auxiliary_code.write_parameters module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auxiliary_code.write_parameters.write_Params"><code class="docutils literal notranslate"><span class="pre">write_Params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-auxiliary_code">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html">gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">multiScale</a></li>
+      <li class="breadcrumb-item active">auxiliary_code package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/auxiliary_code.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="auxiliary-code-package">
+<h1>auxiliary_code package<a class="headerlink" href="#auxiliary-code-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-auxiliary_code.concurrency_tools">
+<span id="auxiliary-code-concurrency-tools-module"></span><h2>auxiliary_code.concurrency_tools module<a class="headerlink" href="#module-auxiliary_code.concurrency_tools" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.CustodyThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">CustodyThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_resource</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.CustodyThread" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#auxiliary_code.concurrency_tools.ResultThread" title="auxiliary_code.concurrency_tools.ResultThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultThread</span></code></a></p>
+<p>Threads that can access shared resources in the order they were launched.
+Class from Andrew York et al. Check out: <a class="reference external" href="https://github.com/AndrewGYork/tools">https://github.com/AndrewGYork/tools</a></p>
+<p>See the docstring at the top of this module for examples.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.CustodyThread.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_resource</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.CustodyThread.__init__" title="Link to this definition"></a></dt>
+<dd><p>This constructor should always be called with keyword arguments. Arguments are:</p>
+<p><em>group</em> should be None; reserved for future extension when a ThreadGroup
+class is implemented.</p>
+<p><em>target</em> is the callable object to be invoked by the run()
+method. Defaults to None, meaning nothing is called.</p>
+<p><em>name</em> is the thread name. By default, a unique name is constructed of
+the form “Thread-N” where N is a small decimal number.</p>
+<p><em>args</em> is the argument tuple for the target invocation. Defaults to ().</p>
+<p><em>kwargs</em> is a dictionary of keyword arguments for the target
+invocation. Defaults to {}.</p>
+<p>If a subclass overrides the constructor, it must make sure to invoke
+the base class constructor (Thread.__init__()) before doing anything
+else to the thread.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ObjectInSubprocess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">ObjectInSubprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initializer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">initargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_method_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closeargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closekwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ObjectInSubprocess.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initializer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">initargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_method_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closeargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closekwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ObjectInSubprocess.__init__" title="Link to this definition"></a></dt>
+<dd><p>Make an object in a child process, that acts like it isn’t.
+Class from Andrew York et al. Check out: <a class="reference external" href="https://github.com/AndrewGYork/tools">https://github.com/AndrewGYork/tools</a></p>
+<p>As much as possible, we try to make instances of ObjectInSubprocess
+behave as if they’re an instance of the object living in the parent
+process. They’re not, of course: they live in a child process. If you
+have spare cores on your machine, this turns CPU-bound operations
+(which  threading can’t parallelize) into IO-bound operations (which
+threading CAN parallelize),  without too much mental overhead for the
+coder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initializer</strong> – Callable that returns an instance of a Python object</p></li>
+<li><p><strong>initargs</strong> – Arguments to ‘initializer’</p></li>
+<li><p><strong>initkwargs</strong> – Arguments to ‘initializer’</p></li>
+<li><p><strong>close_method_name</strong> – String, optional, name of our object’s method to be called automatically when the child process exits</p></li>
+<li><p><strong>closeargs</strong> – Arguments to ‘close_method’</p></li>
+<li><p><strong>closekwargs</strong> – Arguments to ‘close_method’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">ResultThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></p>
+<p>threading.Thread with all the simple features we wish it had.</p>
+<p>Class from Andrew York et al. Check out: <a class="reference external" href="https://github.com/AndrewGYork/tools">https://github.com/AndrewGYork/tools</a></p>
+<p>We added a ‘get_result’ method that returns values/raises exceptions.</p>
+<p>We changed the return value of ‘start’ from ‘None’ to ‘self’ – just to
+trivially save us a line of code when launching threads.</p>
+<p class="rubric">Example</p>
+<dl class="simple">
+<dt>def f(a):</dt><dd><p>‘’’ A function that does something… ‘’’
+return a.sum()</p>
+</dd>
+</dl>
+<p>## Getting Results:
+a = np.ones((2,), dtype=’uint8’)</p>
+<p>res_th = ResultThread(target=f, args=(a,)).start()</p>
+<p>res = res_th.get_result() # returns f(a)</p>
+<p>assert res == 2</p>
+<p>## Error handling
+a = 1</p>
+<p>res_th = ResultThread(target=f, args=(a,)).start()
+# try:</p>
+<p>#     res = res_th.get_result()</p>
+<p># except AttributeError:</p>
+<p>#     print(“AttributeError was raised in thread!”)</p>
+<p># else:</p>
+<p>#     raise AssertionError(‘We expected an AttributeError to be raised on join!’)</p>
+<p>This module modifies threading.excepthook. You can’t just copy/paste
+this class definition and expect it to work.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.__init__" title="Link to this definition"></a></dt>
+<dd><p>This constructor should always be called with keyword arguments. Arguments are:</p>
+<p><em>group</em> should be None; reserved for future extension when a ThreadGroup
+class is implemented.</p>
+<p><em>target</em> is the callable object to be invoked by the run()
+method. Defaults to None, meaning nothing is called.</p>
+<p><em>name</em> is the thread name. By default, a unique name is constructed of
+the form “Thread-N” where N is a small decimal number.</p>
+<p><em>args</em> is the argument tuple for the target invocation. Defaults to ().</p>
+<p><em>kwargs</em> is a dictionary of keyword arguments for the target
+invocation. Defaults to {}.</p>
+<p>If a subclass overrides the constructor, it must make sure to invoke
+the base class constructor (Thread.__init__()) before doing anything
+else to the thread.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.get_result">
+<span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.get_result" title="Link to this definition"></a></dt>
+<dd><p>Either returns a value or raises an exception.</p>
+<p>Optionally accepts a timeout in seconds. If thread has not returned
+after timeout seconds, raises a TimeoutError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeout</strong> – Set timeout value to wait for join of threads. Default is None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.run" title="Link to this definition"></a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.ResultThread.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.ResultThread.start" title="Link to this definition"></a></dt>
+<dd><p>Start the thread’s activity.</p>
+<p>It must be called at most once per thread object. It arranges for the
+object’s run() method to be invoked in a separate thread of control.</p>
+<p>This method will raise a RuntimeError if called more than once on the
+same thread object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.concurrency_tools.SharedNDArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.concurrency_tools.</span></span><span class="sig-name descname"><span class="pre">SharedNDArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_memory_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.concurrency_tools.SharedNDArray" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+<p>A numpy array that lives in shared memory. Class from Andrew York et al.
+Check out: <a class="reference external" href="https://github.com/AndrewGYork/tools">https://github.com/AndrewGYork/tools</a></p>
+<p>Inputs and outputs to/from ObjectInSubprocess are ‘serialized’, which
+is pretty fast - except for large in-memory objects. The only large
+in-memory objects we regularly deal with are numpy arrays, so it
+makes sense to provide a way to pass large numpy arrays via shared memory
+(which avoids slow serialization).</p>
+<p class="rubric">Example</p>
+<p>data_buf = SharedNDArray(shape=(400, 2000, 2000), dtype=’uint16’)
+display_buf = SharedNDArray(shape=(2000, 2000), dtype=’uint8’)</p>
+<p>camera = ObjectInSubprocess(Camera)
+preprocessor = ObjectInSubprocess(Preprocessor)
+display = ObjectInSubprocess(Display)</p>
+<p>camera.record(num_images=400, out=data_buf)
+preprocessor.process(in=data_buf, out=display_buf)
+display.show(display_buf)</p>
+<p>Here, each object gets its own CPU core, AND passing
+large numpy arrays between the processes is still really fast!</p>
+<p>To implement this we used memmap from numpy.core as a template.</p>
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code.constants">
+<span id="auxiliary-code-constants-module"></span><h2>auxiliary_code.constants module<a class="headerlink" href="#module-auxiliary_code.constants" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">ASLM_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ASLM parameters. Define here the parameters for the ASLM voltage.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters.remote_mirror_maxVol">
+<span class="sig-name descname"><span class="pre">remote_mirror_maxVol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5</span></em><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters.remote_mirror_maxVol" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters.remote_mirror_minVol">
+<span class="sig-name descname"><span class="pre">remote_mirror_minVol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-2.5</span></em><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters.remote_mirror_minVol" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.ASLM_parameters.simultaneous_lines">
+<span class="sig-name descname"><span class="pre">simultaneous_lines</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">17</span></em><a class="headerlink" href="#auxiliary_code.constants.ASLM_parameters.simultaneous_lines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">Camera_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Camera configuration values. Define here settings for the Photometrics cameras.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.HR_height_pixel">
+<span class="sig-name descname"><span class="pre">HR_height_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2048</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.HR_height_pixel" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.HR_width_pixel">
+<span class="sig-name descname"><span class="pre">HR_width_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2048</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.HR_width_pixel" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.LR_height_pixel">
+<span class="sig-name descname"><span class="pre">LR_height_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2960</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.LR_height_pixel" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.LR_width_pixel">
+<span class="sig-name descname"><span class="pre">LR_width_pixel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5056</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.LR_width_pixel" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.highres_line_digitization_time">
+<span class="sig-name descname"><span class="pre">highres_line_digitization_time</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0112</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.highres_line_digitization_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_height">
+<span class="sig-name descname"><span class="pre">low_to_highres_calibration_height</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">130</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_height" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_width">
+<span class="sig-name descname"><span class="pre">low_to_highres_calibration_width</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">159</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.low_to_highres_calibration_width" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Camera_parameters.lowres_line_digitization_time">
+<span class="sig-name descname"><span class="pre">lowres_line_digitization_time</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01026</span></em><a class="headerlink" href="#auxiliary_code.constants.Camera_parameters.lowres_line_digitization_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FilterWheel_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">FilterWheel_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.FilterWheel_parameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Filter wheel configuration class. Define which filters are available and which comport to use for connection.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FilterWheel_parameters.avail_filters">
+<span class="sig-name descname"><span class="pre">avail_filters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'515-30-25':</span> <span class="pre">1,</span> <span class="pre">'572/20-25':</span> <span class="pre">2,</span> <span class="pre">'615/20-25':</span> <span class="pre">3,</span> <span class="pre">'676/37-25':</span> <span class="pre">4,</span> <span class="pre">'block':</span> <span class="pre">0,</span> <span class="pre">'transmission':</span> <span class="pre">5}</span></em><a class="headerlink" href="#auxiliary_code.constants.FilterWheel_parameters.avail_filters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.FilterWheel_parameters.comport">
+<span class="sig-name descname"><span class="pre">comport</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'COM6'</span></em><a class="headerlink" href="#auxiliary_code.constants.FilterWheel_parameters.comport" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Image_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">Image_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.Image_parameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Image parameters. Define here values for the xy lateral pixel sizes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Image_parameters.xy_pixelsize_highres_um">
+<span class="sig-name descname"><span class="pre">xy_pixelsize_highres_um</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.117</span></em><a class="headerlink" href="#auxiliary_code.constants.Image_parameters.xy_pixelsize_highres_um" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Image_parameters.xy_pixelsize_lowres_um">
+<span class="sig-name descname"><span class="pre">xy_pixelsize_lowres_um</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3825</span></em><a class="headerlink" href="#auxiliary_code.constants.Image_parameters.xy_pixelsize_lowres_um" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">NI_board_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>NI board parameters. Define here the on which channels the hardware components are connected to.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.LED_line">
+<span class="sig-name descname"><span class="pre">LED_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao30'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.LED_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.adjustmentfactor">
+<span class="sig-name descname"><span class="pre">adjustmentfactor</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.adjustmentfactor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.ao_nchannels">
+<span class="sig-name descname"><span class="pre">ao_nchannels</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.ao_nchannels" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.ao_type">
+<span class="sig-name descname"><span class="pre">ao_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'6738'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.ao_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.ao_type_constant">
+<span class="sig-name descname"><span class="pre">ao_type_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'6738_constant'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.ao_type_constant" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.flip_mirror_line">
+<span class="sig-name descname"><span class="pre">flip_mirror_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao26'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.flip_mirror_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.highres_camera">
+<span class="sig-name descname"><span class="pre">highres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.highres_camera" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser488">
+<span class="sig-name descname"><span class="pre">laser488</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser488" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser552">
+<span class="sig-name descname"><span class="pre">laser552</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser552" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser594">
+<span class="sig-name descname"><span class="pre">laser594</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser594" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.laser640">
+<span class="sig-name descname"><span class="pre">laser640</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.laser640" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.led">
+<span class="sig-name descname"><span class="pre">led</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.led" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.line_selection">
+<span class="sig-name descname"><span class="pre">line_selection</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao0,</span> <span class="pre">Dev1/ao1,</span> <span class="pre">Dev1/ao3,</span> <span class="pre">Dev1/ao5,</span> <span class="pre">Dev1/ao6,</span> <span class="pre">Dev1/ao8,</span> <span class="pre">Dev1/ao11,</span> <span class="pre">Dev1/ao12'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.line_selection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.lowres_camera">
+<span class="sig-name descname"><span class="pre">lowres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.lowres_camera" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_line">
+<span class="sig-name descname"><span class="pre">mSPIM_mirror_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao29'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_voltage">
+<span class="sig-name descname"><span class="pre">mSPIM_mirror_voltage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.mSPIM_mirror_voltage" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.maxVol_constant">
+<span class="sig-name descname"><span class="pre">maxVol_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.maxVol_constant" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.max_mSPIM_constant">
+<span class="sig-name descname"><span class="pre">max_mSPIM_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.max_mSPIM_constant" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.minVol_constant">
+<span class="sig-name descname"><span class="pre">minVol_constant</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.minVol_constant" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_488_line">
+<span class="sig-name descname"><span class="pre">power_488_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao17'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_488_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_552_line">
+<span class="sig-name descname"><span class="pre">power_552_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao18'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_552_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_594_line">
+<span class="sig-name descname"><span class="pre">power_594_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao22'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_594_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.power_640_line">
+<span class="sig-name descname"><span class="pre">power_640_line</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Dev1/ao25'</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.power_640_line" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.rate">
+<span class="sig-name descname"><span class="pre">rate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20000.0</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.stage">
+<span class="sig-name descname"><span class="pre">stage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.stage" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.NI_board_parameters.voicecoil">
+<span class="sig-name descname"><span class="pre">voicecoil</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#auxiliary_code.constants.NI_board_parameters.voicecoil" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">Stage_parameters</span></span><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stage configuration. Define the connection values for the Smaract stages.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters.adjustableslit_max">
+<span class="sig-name descname"><span class="pre">adjustableslit_max</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4024</span></em><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters.adjustableslit_max" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters.stage_id_XYZ">
+<span class="sig-name descname"><span class="pre">stage_id_XYZ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'network:sn:MCS2-00000382'</span></em><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters.stage_id_XYZ" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.Stage_parameters.stage_id_rot">
+<span class="sig-name descname"><span class="pre">stage_id_rot</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'usb:id:3948963323'</span></em><a class="headerlink" href="#auxiliary_code.constants.Stage_parameters.stage_id_rot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.constants.</span></span><span class="sig-name descname"><span class="pre">microscope_configuration</span></span><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Microscope configuration class. Define which hardware to use here and where to save images.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.disktosave">
+<span class="sig-name descname"><span class="pre">disktosave</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:\\'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.disktosave" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.filterwheel">
+<span class="sig-name descname"><span class="pre">filterwheel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_Filterwheel'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.filterwheel" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.highres_camera">
+<span class="sig-name descname"><span class="pre">highres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_camera'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.highres_camera" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.lowres_camera">
+<span class="sig-name descname"><span class="pre">lowres_camera</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_camera'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.lowres_camera" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.ni_board">
+<span class="sig-name descname"><span class="pre">ni_board</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_niBoard'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.ni_board" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.parentdir">
+<span class="sig-name descname"><span class="pre">parentdir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:/multiScope_Data/'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.parentdir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.rotationstage">
+<span class="sig-name descname"><span class="pre">rotationstage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_RotationStage'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.rotationstage" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="auxiliary_code.constants.microscope_configuration.translationstage">
+<span class="sig-name descname"><span class="pre">translationstage</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Synthetic_TranslationStage'</span></em><a class="headerlink" href="#auxiliary_code.constants.microscope_configuration.translationstage" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code.napari_in_subprocess">
+<span id="auxiliary-code-napari-in-subprocess-module"></span><h2>auxiliary_code.napari_in_subprocess module<a class="headerlink" href="#module-auxiliary_code.napari_in_subprocess" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="auxiliary_code.napari_in_subprocess.display">
+<span class="sig-prename descclassname"><span class="pre">auxiliary_code.napari_in_subprocess.</span></span><span class="sig-name descname"><span class="pre">display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">display_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.napari_in_subprocess.display" title="Link to this definition"></a></dt>
+<dd><p>Creates a simplified non-blocking napari viewer in a subprocess.
+Class from Andrew York et al. Check out: <a class="reference external" href="https://github.com/AndrewGYork/tools">https://github.com/AndrewGYork/tools</a></p>
+<p>If you’re using a custom _NapariDisplay, pass it as <cite>display_type</cite>.</p>
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code.write_parameters">
+<span id="auxiliary-code-write-parameters-module"></span><h2>auxiliary_code.write_parameters module<a class="headerlink" href="#module-auxiliary_code.write_parameters" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="auxiliary_code.write_parameters.write_Params">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">auxiliary_code.write_parameters.</span></span><span class="sig-name descname"><span class="pre">write_Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.write_parameters.write_Params" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Writes the experiment_settings.txt file with the current microscope model parameters.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.write_parameters.write_Params.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.write_parameters.write_Params.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initiate the writer class by importing the view object where all user parameters are set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>view</strong> – view object of the MVC design pattern.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="auxiliary_code.write_parameters.write_Params.write_to_textfile">
+<span class="sig-name descname"><span class="pre">write_to_textfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roilowres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roihighres</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#auxiliary_code.write_parameters.write_Params.write_to_textfile" title="Link to this definition"></a></dt>
+<dd><p>Writes the Experiment_settings.txt file to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filePath</strong> – File path to save the Experiment_settings.txt file.</p></li>
+<li><p><strong>roilowres</strong> – The current ROI of the low-resolution camera .</p></li>
+<li><p><strong>roihighres</strong> – The current ROI of the high-resolution camera.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-auxiliary_code">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-auxiliary_code" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="automated_microscopy.html" class="btn btn-neutral float-left" title="automated_microscopy package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gui.html" class="btn btn-neutral float-right" title="gui package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

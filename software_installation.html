@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software Installation and Configuration &mdash; self-driving multi-scale imaging 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User interface (GUI) Walkthrough" href="user_interface.html" />
+    <link rel="prev" title="Welcome to self-driving multi-scale imaging’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            self-driving multi-scale imaging
+              <img src="_static/multiscale_logo.jpeg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Software Installation and Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#operating-system-compatibility">Operating System Compatibility</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-ready">Get ready</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-driver-installation">Hardware driver installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#camera-drivers">Camera drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ni-card-drivers">NI card drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#smaract">Smaract</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code organization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code organization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API references</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">multiScale</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">self-driving multi-scale imaging</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Software Installation and Configuration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/software_installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="software-installation-and-configuration">
+<h1>Software Installation and Configuration<a class="headerlink" href="#software-installation-and-configuration" title="Link to this heading"></a></h1>
+<section id="operating-system-compatibility">
+<h2>Operating System Compatibility<a class="headerlink" href="#operating-system-compatibility" title="Link to this heading"></a></h2>
+<p>This software has been tested on a Windows 10 computer.</p>
+<section id="get-ready">
+<h3>Get ready<a class="headerlink" href="#get-ready" title="Link to this heading"></a></h3>
+<p><strong>Install Python, Git and Anaconda/Miniconda</strong></p>
+<p>Make sure you have <a class="reference external" href="https://www.python.org/downloads/">Python</a> and <a class="reference external" href="https://docs.anaconda.com/anaconda/install/">Anaconda</a> or <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links">Miniconda</a>
+installed on your system. Next, please make sure you also have <a class="reference external" href="https://git-scm.com/downloads">Git already installed</a> installed on your system.
+For a user-friendly experience, <a class="reference external" href="https://desktop.github.com/">GitHub Desktop</a> is a nice software tool to clone and handle
+repositories. As an IDE, we recommend <a class="reference external" href="https://www.jetbrains.com/pycharm/download/?section=windows">PyCharm</a>.</p>
+<p><strong>Create a directory where the repository will be cloned</strong></p>
+<p>Open an <code class="docutils literal notranslate"><span class="pre">Anaconda</span> <span class="pre">Prompt</span></code> or PyCharm and go to the Terminal (Command Prompt)
+and enter the following to create a folder and change the working directory to this path.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\Username&gt; cd Documents</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\Username\Documents&gt; mkdir MicroscopeControlCode</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\users\Username\Documents&gt; cd MicroscopeControlCode</span>
+</pre></div>
+</div>
+<p><strong>Download the code from Github</strong></p>
+<p>Now, clone this repository to your local path.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\Username\Documents\MicroscopeControlCode&gt; $ git clone https://github.com/DaetwylerStephan/ContextDriven_MicroscopeControl.git</span>
+</pre></div>
+</div>
+<p>Now you have the code ready in the folder MicroscopeControlCode.</p>
+<p><strong>Initialize a conda environment for your control code</strong></p>
+<p>Now, as a next step, generate a dedicated <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/getting-started.html">Conda environment</a>
+for the control code.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda create -n microscopecontrol python=3.9</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda activate microscopecontrol</span>
+<span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; $</span>
+</pre></div>
+</div>
+<p>Note: This environment uses Python version 3.9.</p>
+</section>
+<section id="hardware-driver-installation">
+<h3>Hardware driver installation<a class="headerlink" href="#hardware-driver-installation" title="Link to this heading"></a></h3>
+<p>Before continuing now with the control code installation, we need several hardware
+drivers for camera, stages and analog output board.</p>
+</section>
+</section>
+<section id="camera-drivers">
+<h2>Camera drivers<a class="headerlink" href="#camera-drivers" title="Link to this heading"></a></h2>
+<p>To run the Photometrics camera (and control software code), please download the
+camera drivers from the manufacturer’s homepage.</p>
+<p>First install the Pvcam drivers for the camera software:
+<a class="reference external" href="https://www.photometrics.com/support/download/pvcam">https://www.photometrics.com/support/download/pvcam</a></p>
+<p>and the SDK:
+<a class="reference external" href="https://www.photometrics.com/support/download/pvcam-sdk">https://www.photometrics.com/support/download/pvcam-sdk</a></p>
+<p>Next, navigate to the PyVCAM folder and run the setup install command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; cd PyVCAM-master</span>
+<span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\PyVCAM-master&gt; python setup.py install</span>
+</pre></div>
+</div>
+<p>Errors we encountered:</p>
+<p>The script did not recognize (find) the right path to the environmental
+variable of the system. To obtain it, check the environmental variables:</p>
+<img alt="_images/environmental_variables.png" src="_images/environmental_variables.png" />
+<img alt="_images/environmental_pvcampath.png" src="_images/environmental_pvcampath.png" />
+<p>and modify the path in the PyVCAM-master/setup.py file accordingly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pvcam_sdk_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;C:/Program Files/Photometrics/PVCamSDK/&quot;</span>
+<span class="c1">#pvcam_sdk_path = os.environ[&#39;PVCAM_SDK_PATH&#39;]</span>
+</pre></div>
+</div>
+</section>
+<section id="ni-card-drivers">
+<h2>NI card drivers<a class="headerlink" href="#ni-card-drivers" title="Link to this heading"></a></h2>
+<p>To install the drivers for the NI board, please go to:
+<a class="reference external" href="https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx--main-page.html">https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx–main-page.html</a></p>
+<p>and install it with suggested additional installs.</p>
+</section>
+<section id="smaract">
+<h2>Smaract<a class="headerlink" href="#smaract" title="Link to this heading"></a></h2>
+<p>To install the driver for the Smaract stages, first install the two drivers
+executables in the Smaract Folder</p>
+<p>Next, navigate to the Smaract folder and run the setup install command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl&gt; cd Smaract</span>
+<span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\Smaract&gt; pip install .</span>
+</pre></div>
+</div>
+<section id="installation-of-the-software">
+<h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
+<p>Now navigate to the folder “multiScale”, where the setup.py and requirements.txt file are located,
+and install the software:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; pip install .</span>
+</pre></div>
+</div>
+</section>
+<section id="configuration-file">
+<h3>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h3>
+<p>Now, depending on your available hardware, define the configuration file in
+multiScaleauxiliary_codeconstants.py:</p>
+<p>For a synthetic microscope without any hardware available, define it as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parentdir</span> <span class="o">=</span> <span class="s2">&quot;D:/multiScope_Data/&quot;</span>
+<span class="n">disktosave</span> <span class="o">=</span> <span class="s2">&quot;D:</span><span class="se">\\</span><span class="s2">&quot;</span>
+
+<span class="c1"># Synthetic microscope.</span>
+<span class="n">lowres_camera</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_camera&#39;</span>
+<span class="n">highres_camera</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_camera&#39;</span>
+<span class="n">filterwheel</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_Filterwheel&#39;</span>
+<span class="n">rotationstage</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_RotationStage&#39;</span>
+<span class="n">translationstage</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_TranslationStage&#39;</span>
+<span class="n">ni_board</span> <span class="o">=</span> <span class="s1">&#39;Synthetic_niBoard&#39;</span>
+</pre></div>
+</div>
+<p>For the full self-driving microscope as described in the paper
+with all hardware available, set:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parentdir</span> <span class="o">=</span> <span class="s2">&quot;D:/multiScope_Data/&quot;</span>
+<span class="n">disktosave</span> <span class="o">=</span> <span class="s2">&quot;D:</span><span class="se">\\</span><span class="s2">&quot;</span>
+
+<span class="n">lowres_camera</span> <span class="o">=</span> <span class="s1">&#39;Photometrics_lowres&#39;</span>
+<span class="n">highres_camera</span> <span class="o">=</span> <span class="s1">&#39;Photometrics_highres&#39;</span>
+<span class="n">filterwheel</span> <span class="o">=</span> <span class="s1">&#39;Ludl_filterwheel&#39;</span>
+<span class="n">ni_board</span> <span class="o">=</span> <span class="s1">&#39;NI_Board&#39;</span>
+<span class="n">rotationstage</span> <span class="o">=</span> <span class="s1">&#39;Smaract_RotationStage&#39;</span>
+<span class="n">translationstage</span> <span class="o">=</span> <span class="s1">&#39;Smaract_TranslationStage&#39;</span>
+</pre></div>
+</div>
+<p>Now it is time to start the code:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; python multiScale_main.py</span>
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h3>
+<p>If you run the code at an institution with a firewall, you may need to change the proxy
+settings to enable <code class="docutils literal notranslate"><span class="pre">pip</span></code> and <code class="docutils literal notranslate"><span class="pre">conda</span></code> to download files.</p>
+<p>To do so, change your system environment variables (Windows). You obtain the port number (1234)
+and proxy address (<a class="reference external" href="http://proxy.your_university.edu">http://proxy.your_university.edu</a>) from your system administrators.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Variable = HTTP_PROXY; Value = <a class="reference external" href="http://proxy.your_university.edu:1234">http://proxy.your_university.edu:1234</a></p></li>
+<li><p>Variable = HTTPS_PROXY; Value = <a class="reference external" href="https://proxy.your_university.edu:1234">https://proxy.your_university.edu:1234</a></p></li>
+</ul>
+</div></blockquote>
+<p>If you continue to have issues then change the value of Variable HTTPS_PROXY to
+<a class="reference external" href="http://proxy.your_university.edu:1234">http://proxy.your_university.edu:1234</a></p>
+<p>If this does not resolve your download/proxy issues, also update the configuration
+files for conda and pip to include the proxy settings. For Windows, the paths are saved at:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">conda</span></code> configuration file can be found at C:\Users\UserProfile\.condarc</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">pip</span></code> configuration file can be found at C:\Users\UserProfile\pip\pip.ini</p></li>
+</ul>
+</div></blockquote>
+<p>See also these Stackoverflow discussions on :
+<a class="reference external" href="https://stackoverflow.com/questions/36729023/how-to-make-anaconda-work-behind-http-proxy-not-https">Anaconda condarc files</a>
+and <a class="reference external" href="https://stackoverflow.com/questions/9698557/how-to-use-pip-on-windows-behind-an-authenticating-proxy">Pip.ini files</a>
+and <a class="reference external" href="https://stackoverflow.com/questions/43473041/how-to-configure-pip-per-config-file-to-use-a-proxy-with-authentification">Pip ini configuration</a>.</p>
+<p>Alternatively, set the proxy from Anaconda Prompt as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">https_proxy=http://username:password&#64;proxy.your_university.edu:1234</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">http_proxy=http://username:password&#64;proxy.your_university.edu:1234</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to self-driving multi-scale imaging’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="user_interface.html" class="btn btn-neutral float-right" title="User interface (GUI) Walkthrough" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Stephan Daetwyler, Reto Fiolka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
