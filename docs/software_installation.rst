@@ -34,7 +34,7 @@ Now, clone this repository to your local path.
 
 .. code-block:: console
 
-    (base) C:\Users\Username\Documents\MicroscopeControlCode> $ git clone https://github.com/DaetwylerStephan/ContextDriven_MicroscopeControl.git
+    (base) C:\Users\Username\Documents\MicroscopeControlCode> $ git clone https://github.com/DaetwylerStephan/self_driving_multiscale_control.git
 
 Now you have the code ready in the folder MicroscopeControlCode.
 
@@ -168,6 +168,11 @@ Now it is time to start the code:
 .. code-block:: console
 
    (microscopecontrol) ~\MicroscopeControl\multiScale> python multiScale_main.py
+
+
+.. note::
+
+    Please note that you run "pip install ." after you change settings in the code in the top folder.
 
 
 Troubleshooting

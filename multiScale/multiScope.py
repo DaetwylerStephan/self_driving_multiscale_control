@@ -1055,18 +1055,14 @@ class multiScopeModel:
                         highreslistID = self.driftcorrectionmodule.find_corresponsingHighResTiles(posnumber_lowres)
                         print("highreslist to do drift correction on: " + str(highreslistID) + " of " + str(posnumber_lowres))
                         # add max projection to ImageRepo
-                        if self.drift_transmission == 0:
-                            currentmode = 'fluorescene'
-                        else:
-                            currentmode = 'transmission'
 
                         for iter in highreslistID:
                             print("---------------------------------------------------------------------------")
                             print("drift correction on " + str(iter) + " and posnumber lowres" + str(posnumber_lowres) + " and " + filepathforprojection_three)
-                            (row_number, column_number, crop_height, crop_width) = self.driftcorrectionmodule.calculate_Lateral_drift(copy.deepcopy(iter), mode=currentmode)
+                            (row_number, column_number, crop_height, crop_width) = self.driftcorrectionmodule.calculate_Lateral_drift(copy.deepcopy(iter))
                             image1 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width], axis=1)
                             image2 = np.max(self.low_res_buffers[bufferindex][:, row_number:row_number+crop_height, column_number:column_number+crop_width], axis=2)
-                            self.driftcorrectionmodule.calculate_axialdrift(copy.deepcopy(iter), image1, image2, mode=currentmode)
+                            self.driftcorrectionmodule.calculate_axialdrift(copy.deepcopy(iter), image1, image2)
                             self.driftcorrectionmodule.indicate_driftcorrectionCompleted(iter)
 
 

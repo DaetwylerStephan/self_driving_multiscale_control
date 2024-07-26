@@ -505,7 +505,7 @@ if __name__ == '__main__':
 
     c.ImageRepo.replaceImage("current_transmissionAxial1Image",1, img_first_axial1)
     c.ImageRepo.replaceImage("current_transmissionAxial2Image",1, img_first_axial2)
-    c.calculate_axialdrift(1, img_new_axial1, img_new_axial2, mode='transmission')
+    c.calculate_axialdrift(1, img_new_axial1, img_new_axial2)
 
 
 
@@ -514,7 +514,7 @@ if __name__ == '__main__':
 
     #first acquisition
     c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
-    lat_drift1 = c.calculate_Lateral_drift(2, mode='transmission')
+    lat_drift1 = c.calculate_Lateral_drift(2)
     print(lat_drift1)
     tmpimag1 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
 
@@ -522,14 +522,14 @@ if __name__ == '__main__':
     c.currenttimepoint = "t00001"
     c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0001)
     #c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0000)
-    lat_drift2 = c.calculate_Lateral_drift(2, mode='transmission')
+    lat_drift2 = c.calculate_Lateral_drift(2)
     print(lat_drift2)
     tmpimag2 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
 
     # # #third acquisition
     # c.currenttimepoint = "t00002"
     # c.ImageRepo.replaceImage("current_lowRes_Proj", 0, img_lowres_t_t0002)
-    # lat_drift3 = c.calculate_Lateral_drift(2, mode='transmission')
+    # lat_drift3 = c.calculate_Lateral_drift(2)
     # print(lat_drift3)
     # tmpimag3 = copy.deepcopy(c.ImageRepo.image_retrieval("current_transmissionImage", 2))
     #
