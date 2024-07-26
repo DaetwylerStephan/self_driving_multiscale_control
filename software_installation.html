@@ -56,8 +56,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#camera-drivers">Camera drivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ni-card-drivers">NI card drivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#smaract">Smaract</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-the-code">Run the code</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
@@ -100,6 +101,11 @@
              
   <section id="software-installation-and-configuration">
 <h1>Software Installation and Configuration<a class="headerlink" href="#software-installation-and-configuration" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please check out our <a class="reference external" href="https://www.youtube.com/watch?v=4oEhywawhts">tutorial video on Youtube</a> for a detailed
+step-by-step guide through the installation.</p>
+</div>
 <section id="operating-system-compatibility">
 <h2>Operating System Compatibility<a class="headerlink" href="#operating-system-compatibility" title="Link to this heading"></a></h2>
 <p>This software has been tested on a Windows 10 computer.</p>
@@ -120,7 +126,7 @@ and enter the following to create a folder and change the working directory to t
 </div>
 <p><strong>Download the code from Github</strong></p>
 <p>Now, clone this repository to your local path.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\Username\Documents\MicroscopeControlCode&gt; $ git clone https://github.com/DaetwylerStephan/ContextDriven_MicroscopeControl.git</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\Username\Documents\MicroscopeControlCode&gt; $ git clone https://github.com/DaetwylerStephan/self_driving_multiscale_control.git</span>
 </pre></div>
 </div>
 <p>Now you have the code ready in the folder MicroscopeControlCode.</p>
@@ -179,18 +185,10 @@ executables in the Smaract Folder</p>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\Smaract&gt; pip install .</span>
 </pre></div>
 </div>
-<section id="installation-of-the-software">
-<h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
-<p>Now navigate to the folder “multiScale”, where the setup.py and requirements.txt file are located,
-and install the software:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; pip install .</span>
-</pre></div>
-</div>
-</section>
 <section id="configuration-file">
 <h3>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h3>
 <p>Now, depending on your available hardware, define the configuration file in
-multiScaleauxiliary_codeconstants.py:</p>
+<code class="docutils literal notranslate"><span class="pre">multiScale/auxiliary_code/constants.py</span></code>:</p>
 <p>For a synthetic microscope without any hardware available, define it as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parentdir</span> <span class="o">=</span> <span class="s2">&quot;D:/multiScope_Data/&quot;</span>
 <span class="n">disktosave</span> <span class="o">=</span> <span class="s2">&quot;D:</span><span class="se">\\</span><span class="s2">&quot;</span>
@@ -217,6 +215,23 @@ with all hardware available, set:</p>
 <span class="n">translationstage</span> <span class="o">=</span> <span class="s1">&#39;Smaract_TranslationStage&#39;</span>
 </pre></div>
 </div>
+<p>Note that you also set the folder where you save the data here (parentdir) and indicate the disk
+where the data is saved here (disktosave).</p>
+</section>
+<section id="installation-of-the-software">
+<h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
+<p>Now navigate to the folder “multiScale”, where the setup.py and requirements.txt file are located,
+and install the software:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; pip install .</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please note that you run “pip install .” every time after you change any part of the code.</p>
+</div>
+</section>
+<section id="run-the-code">
+<h3>Run the code<a class="headerlink" href="#run-the-code" title="Link to this heading"></a></h3>
 <p>Now it is time to start the code:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; python multiScale_main.py</span>
 </pre></div>
