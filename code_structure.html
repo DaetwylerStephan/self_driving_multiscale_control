@@ -54,6 +54,12 @@
 <li class="toctree-l1"><a class="reference internal" href="user_interface.html">User interface (GUI) Walkthrough</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Code organization</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#general-overview">General overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concurrent-image-acquisition-and-analysis-with-buffer-queue">Concurrent image acquisition and analysis with buffer queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#self-driving-features">Self-driving features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#first-timepoint">First timepoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#later-timepoint">Later timepoint</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -105,6 +111,70 @@
 </dl>
 <p>The hardware are synchronized in time using an NI DAQ card (ni_board).
 The voltage arrays for the NI board are generated in the acquisition_array_class.py file.</p>
+<img alt="_images/MVC.png" src="_images/MVC.png" />
+</section>
+<section id="concurrent-image-acquisition-and-analysis-with-buffer-queue">
+<h2>Concurrent image acquisition and analysis with buffer queue<a class="headerlink" href="#concurrent-image-acquisition-and-analysis-with-buffer-queue" title="Link to this heading"></a></h2>
+<p>To optimize imaging time, the microscope relies on a buffer queue and an array of shared memory buffers</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">low_res_buffers</span> <span class="o">=</span> <span class="p">[</span>
+               <span class="n">ct</span><span class="o">.</span><span class="n">SharedNDArray</span><span class="p">(</span>
+                   <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack_nbplanes_lowres</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_lowresROI_height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_lowresROI_width</span><span class="p">),</span>
+                   <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowresbuffernumber</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>This allows to acquire data to one buffer and perform computation / image analysis on another buffer. At
+a next time point the roles of the buffers are reversed. The data in the buffer to which data was acquired
+to is now ready to be processed and analyzed</p>
+<img alt="_images/buffer_change.png" src="_images/buffer_change.png" />
+<p>As a result, overall imaging time is improved as the microscope does not need
+to wait for data to be analyzed/processed before acquiring the next volume.
+Currently, the microscope generates maximum intensity projections and (optionally) self-driving
+microscope control to keep high-resolution regions in focus over hours of imaging.</p>
+<p>All these image processing and analysis tasks are performed from
+a results thread that calls the function “calculate_projection_and_drift”.
+In future, this also the place to integrate event-based detections.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">projection_thread</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">ResultThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">calculate_projection_and_drift</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="self-driving-features">
+<h2>Self-driving features<a class="headerlink" href="#self-driving-features" title="Link to this heading"></a></h2>
+<p>To enable self-driving microscopy, the microscope relies on concurrent imaging and analysis (see above).</p>
+<section id="first-timepoint">
+<h3>First timepoint<a class="headerlink" href="#first-timepoint" title="Link to this heading"></a></h3>
+<p>In a typical routine, the microscope starts acquiring a stack to a buffer (LR acquisition buffer 1):</p>
+<img alt="_images/acquisition_routine1.png" src="_images/acquisition_routine1.png" />
+<p>After acquisition of this first region, the acquisition of the second region (volume) starts to a second
+buffer (LR acquisition buffer 2).</p>
+<p>As the microscope acquires data, LR acquisition buffer 1 is processed. If this is the first timepoint,
+correspondence between low-and high-resolution regions for the self-driving
+modules are not yet established. Therefore, the microscope checks if this is the channel (signal) on
+which correspondence should be established and if there is a high-resolution region within this low-resolution
+volume. If yes, populate the image library for this high-resolution regions with the data of the current
+channel (signal). The data saved are the maximum intensity projections in X-Y, Y-Z, X-Z views.</p>
+<img alt="_images/acquisition_routine2.png" src="_images/acquisition_routine2.png" />
+<p>After the low-resolution regions have been acquired, high-resolution data is acquired and saved to disk.</p>
+</section>
+<section id="later-timepoint">
+<h3>Later timepoint<a class="headerlink" href="#later-timepoint" title="Link to this heading"></a></h3>
+<p>At a later timepoint, similarly to the first timepoint, the microscope starts
+acquiring a stack to a buffer (LR acquisition buffer 1):</p>
+<img alt="_images/acquisition_routine3.png" src="_images/acquisition_routine3.png" />
+<p>After acquisition of this first region, the acquisition of the second region (volume) starts to a second
+buffer (LR acquisition buffer 2).</p>
+<p>In contrast to the first timepoint, image correspondence is already established.  If this is the
+channel (signal) on which correspondence should be established and if there is a
+high-resolution region within this low-resolution, its maximum intensity projections
+in X-Y, X-Z, Y-Z views of the previous timepoint are loaded into
+memory from the image repository. Then, using multi-scale template matching, the current
+position of the region of interest is found in the newly acquired data using the maximum intensity
+projection view in X-Y direction. The X-Z and Y-Z projections are then formed of the cropped low-resolution
+data around the newly found region and the axial shift is calculated. Lastly, the image repository is
+updated with the new maximum intensity projections.</p>
+<img alt="_images/acquisition_routine4.png" src="_images/acquisition_routine4.png" />
+<p>.</p>
+</section>
 </section>
 </section>
 
