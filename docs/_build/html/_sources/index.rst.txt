@@ -12,7 +12,7 @@ light-sheet microscope control where the low-resolution guides high-resolution a
 .. note::
 
    This project is under active development. See our `GitHub repository for updates
-   <https://github.com/DaetwylerStephan/selfdriving-multiscale-imaging>`_.
+   <https://github.com/DaetwylerStephan/self_driving_multiscale_control>`_.
 
 .. warning::
 

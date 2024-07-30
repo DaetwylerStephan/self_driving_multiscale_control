@@ -14,5 +14,5 @@ napari[all]
 openpyxl
 nidaqmx
 cffi
-serial
+pyserial
 vispy

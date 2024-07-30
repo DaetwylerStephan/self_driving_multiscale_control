@@ -2,6 +2,13 @@
 Software Installation and Configuration
 =======================================
 
+.. note::
+
+   Please check out our `tutorial video on Youtube
+   <https://www.youtube.com/watch?v=4oEhywawhts>`_ for a detailed
+   step-by-step guide through the installation.
+
+
 Operating System Compatibility
 ------------------------------
 
@@ -116,22 +123,11 @@ Next, navigate to the Smaract folder and run the setup install command:
     (microscopecontrol) ~\Smaract> pip install .
 
 
-Installation of the software
-============================
-
-Now navigate to the folder "multiScale", where the setup.py and requirements.txt file are located,
-and install the software:
-
-.. code-block:: console
-
-   (microscopecontrol) ~\MicroscopeControl\multiScale> pip install .
-
-
 Configuration file
 ==================
 
 Now, depending on your available hardware, define the configuration file in
-multiScale\auxiliary_code\constants.py:
+``multiScale/auxiliary_code/constants.py``:
 
 For a synthetic microscope without any hardware available, define it as:
 
@@ -163,16 +159,31 @@ with all hardware available, set:
     rotationstage = 'Smaract_RotationStage'
     translationstage = 'Smaract_TranslationStage'
 
+Note that you also set the folder where you save the data here (parentdir) and indicate the disk
+where the data is saved here (disktosave).
+
+Installation of the software
+============================
+
+Now navigate to the folder "multiScale", where the setup.py and requirements.txt file are located,
+and install the software:
+
+.. code-block:: console
+
+   (microscopecontrol) ~\MicroscopeControl\multiScale> pip install .
+
+.. note::
+
+    Please note that you run "pip install ." every time after you change any part of the code.
+
+Run the code
+============
+
 Now it is time to start the code:
 
 .. code-block:: console
 
    (microscopecontrol) ~\MicroscopeControl\multiScale> python multiScale_main.py
-
-
-.. note::
-
-    Please note that you run "pip install ." after you change settings in the code in the top folder.
 
 
 Troubleshooting
