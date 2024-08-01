@@ -50,14 +50,15 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Software Installation and Configuration</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#operating-system-compatibility">Operating System Compatibility</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#get-ready">Get ready</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#hardware-driver-installation">Hardware driver installation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#camera-drivers">Camera drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#errors-we-encountered">Errors we encountered:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ni-card-drivers">NI card drivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#smaract">Smaract</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#run-the-code">Run the code</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 </ul>
@@ -133,12 +134,21 @@ and enter the following to create a folder and change the working directory to t
 <p><strong>Initialize a conda environment for your control code</strong></p>
 <p>Now, as a next step, generate a dedicated <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/getting-started.html">Conda environment</a>
 for the control code.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda create -n microscopecontrol python=3.9</span>
-<span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; $ conda activate microscopecontrol</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; conda create -n microscopecontrol python=3.9</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">~\MicroscopeControlCode&gt; conda activate microscopecontrol</span>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; $</span>
 </pre></div>
 </div>
 <p>Note: This environment uses Python version 3.9.</p>
+</section>
+<section id="installation-of-the-software">
+<h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
+<p>Now navigate to the folder “multiScale”, where the setup.py and requirements.txt file are located,
+and install the software:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; cd self_driving_multiscale_control</span>
+<span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode\self_driving_multiscale_control&gt; pip install .</span>
+</pre></div>
+</div>
 </section>
 <section id="hardware-driver-installation">
 <h3>Hardware driver installation<a class="headerlink" href="#hardware-driver-installation" title="Link to this heading"></a></h3>
@@ -159,7 +169,9 @@ camera drivers from the manufacturer’s homepage.</p>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\PyVCAM-master&gt; python setup.py install</span>
 </pre></div>
 </div>
-<p>Errors we encountered:</p>
+</section>
+<section id="errors-we-encountered">
+<h2>Errors we encountered:<a class="headerlink" href="#errors-we-encountered" title="Link to this heading"></a></h2>
 <p>The script did not recognize (find) the right path to the environmental
 variable of the system. To obtain it, check the environmental variables:</p>
 <img alt="_images/environmental_variables.png" src="_images/environmental_variables.png" />
@@ -169,6 +181,8 @@ variable of the system. To obtain it, check the environmental variables:</p>
 <span class="c1">#pvcam_sdk_path = os.environ[&#39;PVCAM_SDK_PATH&#39;]</span>
 </pre></div>
 </div>
+<p>When installing the software, also the Microsoft compiler of the c-libraries might not work.</p>
+<p>Go to: <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">https://visualstudio.microsoft.com/downloads/</a> and install a Visual Studio with</p>
 </section>
 <section id="ni-card-drivers">
 <h2>NI card drivers<a class="headerlink" href="#ni-card-drivers" title="Link to this heading"></a></h2>
@@ -217,14 +231,6 @@ with all hardware available, set:</p>
 </div>
 <p>Note that you also set the folder where you save the data here (parentdir) and indicate the disk
 where the data is saved here (disktosave).</p>
-</section>
-<section id="installation-of-the-software">
-<h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
-<p>Now navigate to the folder “multiScale”, where the setup.py and requirements.txt file are located,
-and install the software:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; pip install .</span>
-</pre></div>
-</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Please note that you run “pip install .” every time after you change any part of the code.</p>
