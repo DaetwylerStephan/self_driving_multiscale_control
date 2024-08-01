@@ -53,11 +53,22 @@ for the control code.
 
 .. code-block:: console
 
-   (base) ~\MicroscopeControlCode> $ conda create -n microscopecontrol python=3.9
-   (base) ~\MicroscopeControlCode> $ conda activate microscopecontrol
+   (base) ~\MicroscopeControlCode> conda create -n microscopecontrol python=3.9
+   (base) ~\MicroscopeControlCode> conda activate microscopecontrol
    (microscopecontrol) ~\MicroscopeControlCode> $
 
 Note: This environment uses Python version 3.9.
+
+Installation of the software
+============================
+
+Now navigate to the folder "multiScale", where the setup.py and requirements.txt file are located,
+and install the software:
+
+.. code-block:: console
+
+   (microscopecontrol) ~\MicroscopeControlCode> cd self_driving_multiscale_control
+   (microscopecontrol) ~\MicroscopeControlCode\self_driving_multiscale_control> pip install .
 
 Hardware driver installation
 ============================
@@ -85,6 +96,7 @@ Next, navigate to the PyVCAM folder and run the setup install command:
     (microscopecontrol) ~\PyVCAM-master> python setup.py install
 
 Errors we encountered:
+----------------------
 
 The script did not recognize (find) the right path to the environmental
 variable of the system. To obtain it, check the environmental variables:
@@ -100,6 +112,10 @@ and modify the path in the PyVCAM-master/setup.py file accordingly:
     pvcam_sdk_path = r"C:/Program Files/Photometrics/PVCamSDK/"
     #pvcam_sdk_path = os.environ['PVCAM_SDK_PATH']
 
+
+When installing the software, also the Microsoft compiler of the c-libraries might not work.
+
+Go to: https://visualstudio.microsoft.com/downloads/ and install a Visual Studio with
 
 NI card drivers
 ---------------
@@ -162,15 +178,7 @@ with all hardware available, set:
 Note that you also set the folder where you save the data here (parentdir) and indicate the disk
 where the data is saved here (disktosave).
 
-Installation of the software
-============================
 
-Now navigate to the folder "multiScale", where the setup.py and requirements.txt file are located,
-and install the software:
-
-.. code-block:: console
-
-   (microscopecontrol) ~\MicroscopeControl\multiScale> pip install .
 
 .. note::
 
