@@ -125,6 +125,14 @@ https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with
 
 and install it with suggested additional installs.
 
+
+Graphics card
+---------------
+
+If you encounter an OpenGL error, please make sure you have a Graphics card
+that allows to run Napari (https://napari.org/stable/tutorials/fundamentals/installation.html).
+
+
 Smaract
 -------
 
@@ -135,14 +143,14 @@ Next, navigate to the Smaract folder and run the setup install command:
 
 .. code-block:: console
 
-    (microscopecontrol) ~\MicroscopeControl> cd Smaract
+    (microscopecontrol) ~\self_driving_multiscale_control> cd Smaract
     (microscopecontrol) ~\Smaract> pip install .
 
 
 Configuration file
 ==================
 
-Now, depending on your available hardware, define the configuration file in
+Now, depending on your available hardware and disks, define the configuration file in
 ``multiScale/auxiliary_code/constants.py``:
 
 For a synthetic microscope without any hardware available, define it as:
@@ -179,7 +187,6 @@ Note that you also set the folder where you save the data here (parentdir) and i
 where the data is saved here (disktosave).
 
 
-
 .. note::
 
     Please note that you run "pip install ." every time after you change any part of the code.
@@ -191,7 +198,7 @@ Now it is time to start the code:
 
 .. code-block:: console
 
-   (microscopecontrol) ~\MicroscopeControl\multiScale> python multiScale_main.py
+   (microscopecontrol) ~\self_driving_multiscale_control\multiScale> python multiScale_main.py
 
 
 Troubleshooting
