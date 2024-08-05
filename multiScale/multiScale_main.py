@@ -536,9 +536,9 @@ class MultiScale_Microscope_Controller():
 
         #check not to exceed limits
         moveToPosition = self.model.check_movementboundaries(moveToPosition)
-        self.view.stagessettingstab.stage_moveto_axial.set(moveToPosition[0])
-        self.view.stagessettingstab.stage_moveto_lateral.set(moveToPosition[1])
-        self.view.stagessettingstab.stage_moveto_updown.set(moveToPosition[2])
+        # self.view.stagessettingstab.stage_moveto_axial.set(moveToPosition[0])
+        # self.view.stagessettingstab.stage_moveto_lateral.set(moveToPosition[1])
+        # self.view.stagessettingstab.stage_moveto_updown.set(moveToPosition[2])
 
         #move
         self.model.move_to_position(moveToPosition)
