@@ -57,6 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#camera-drivers">Camera drivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#errors-we-encountered">Errors we encountered:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ni-card-drivers">NI card drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#graphics-card">Graphics card</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#smaract">Smaract</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#run-the-code">Run the code</a></li>
@@ -190,18 +191,23 @@ variable of the system. To obtain it, check the environmental variables:</p>
 <a class="reference external" href="https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx--main-page.html">https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx–main-page.html</a></p>
 <p>and install it with suggested additional installs.</p>
 </section>
+<section id="graphics-card">
+<h2>Graphics card<a class="headerlink" href="#graphics-card" title="Link to this heading"></a></h2>
+<p>If you encounter an OpenGL error, please make sure you have a Graphics card
+that allows to run Napari (<a class="reference external" href="https://napari.org/stable/tutorials/fundamentals/installation.html">https://napari.org/stable/tutorials/fundamentals/installation.html</a>).</p>
+</section>
 <section id="smaract">
 <h2>Smaract<a class="headerlink" href="#smaract" title="Link to this heading"></a></h2>
 <p>To install the driver for the Smaract stages, first install the two drivers
 executables in the Smaract Folder</p>
 <p>Next, navigate to the Smaract folder and run the setup install command:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl&gt; cd Smaract</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control&gt; cd Smaract</span>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\Smaract&gt; pip install .</span>
 </pre></div>
 </div>
 <section id="configuration-file">
 <h3>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h3>
-<p>Now, depending on your available hardware, define the configuration file in
+<p>Now, depending on your available hardware and disks, define the configuration file in
 <code class="docutils literal notranslate"><span class="pre">multiScale/auxiliary_code/constants.py</span></code>:</p>
 <p>For a synthetic microscope without any hardware available, define it as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parentdir</span> <span class="o">=</span> <span class="s2">&quot;D:/multiScope_Data/&quot;</span>
@@ -239,7 +245,7 @@ where the data is saved here (disktosave).</p>
 <section id="run-the-code">
 <h3>Run the code<a class="headerlink" href="#run-the-code" title="Link to this heading"></a></h3>
 <p>Now it is time to start the code:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControl\multiScale&gt; python multiScale_main.py</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control\multiScale&gt; python multiScale_main.py</span>
 </pre></div>
 </div>
 </section>
