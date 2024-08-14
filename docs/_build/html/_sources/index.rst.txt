@@ -9,6 +9,13 @@ Welcome to self-driving multi-scale imaging's documentation!
 **Self-driving, multi-scale software** is an open-source Python software for custom multi-scale
 light-sheet microscope control where the low-resolution guides high-resolution acquisition over hours of imaging.
 
+If you use this code, please cite our preprint:
+“Imaging of cellular dynamics in vitro and in situ: from a whole organism to
+sub-cellular imaging with self-driving, multi-scale microscopy” by
+Stephan Daetwyler, Hanieh Mazloom-Farsibaf, Felix Y. Zhou, Dagan Segal,
+Etai Sapoznik, Jill M. Westcott, Rolf A. Brekken, Gaudenz Danuser and
+Reto Fiolka: https://www.biorxiv.org/content/10.1101/2024.02.28.582579v1
+
 .. note::
 
    This project is under active development. See our `GitHub repository for updates
