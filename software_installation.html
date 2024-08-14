@@ -48,22 +48,20 @@
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Software Installation and Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#operating-system-compatibility">Operating System Compatibility</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#get-ready">Get ready</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hardware-driver-installation">Hardware driver installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#operating-system-compatibility">Operating System Compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-ready">Get ready</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-of-the-software">Installation of the software</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-driver-installation">Hardware driver installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#camera-drivers">Camera drivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#errors-we-encountered">Errors we encountered:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ni-card-drivers">NI card drivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#graphics-card">Graphics card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#smaract">Smaract</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#camera-drivers">Camera drivers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#errors-we-encountered">Errors we encountered:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ni-card-drivers">NI card drivers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#graphics-card">Graphics card</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#smaract">Smaract</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#run-the-code">Run the code</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-code">Run the code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -110,9 +108,12 @@ step-by-step guide through the installation.</p>
 </div>
 <section id="operating-system-compatibility">
 <h2>Operating System Compatibility<a class="headerlink" href="#operating-system-compatibility" title="Link to this heading"></a></h2>
-<p>This software has been tested on a Windows 10 computer.</p>
+<p>In synthetic mode, this code was tested on
+a Dell Precision 5820 Tower operating Window 10 (64 bit) with 64 GB RAM,
+an Intel Xeon(R) W-2155 CPU &#64; 3.30 GHz processor, and an NVIDIA Quadro P4000 graphics card.</p>
+</section>
 <section id="get-ready">
-<h3>Get ready<a class="headerlink" href="#get-ready" title="Link to this heading"></a></h3>
+<h2>Get ready<a class="headerlink" href="#get-ready" title="Link to this heading"></a></h2>
 <p><strong>Install Python, Git and Anaconda/Miniconda</strong></p>
 <p>Make sure you have <a class="reference external" href="https://www.python.org/downloads/">Python</a> and <a class="reference external" href="https://docs.anaconda.com/anaconda/install/">Anaconda</a> or <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links">Miniconda</a>
 installed on your system. Next, please make sure you also have <a class="reference external" href="https://git-scm.com/downloads">Git already installed</a> installed on your system.
@@ -143,7 +144,7 @@ for the control code.</p>
 <p>Note: This environment uses Python version 3.9.</p>
 </section>
 <section id="installation-of-the-software">
-<h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
+<h2>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h2>
 <p>Now navigate to the folder “self_driving_multiscale_control”, where the setup.py and requirements.txt file are located,
 and install the software:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; cd self_driving_multiscale_control</span>
@@ -152,13 +153,11 @@ and install the software:</p>
 </div>
 </section>
 <section id="hardware-driver-installation">
-<h3>Hardware driver installation<a class="headerlink" href="#hardware-driver-installation" title="Link to this heading"></a></h3>
+<h2>Hardware driver installation<a class="headerlink" href="#hardware-driver-installation" title="Link to this heading"></a></h2>
 <p>Before continuing now with running the software, we need several hardware
 drivers for camera, stages and analog output board.</p>
-</section>
-</section>
 <section id="camera-drivers">
-<h2>Camera drivers<a class="headerlink" href="#camera-drivers" title="Link to this heading"></a></h2>
+<h3>Camera drivers<a class="headerlink" href="#camera-drivers" title="Link to this heading"></a></h3>
 <p>To run the Photometrics camera (and control software code), please download both
 camera drivers from the manufacturer’s homepage.</p>
 <p>First download and install the Pvcam drivers for the camera software:
@@ -172,7 +171,7 @@ camera drivers from the manufacturer’s homepage.</p>
 </div>
 </section>
 <section id="errors-we-encountered">
-<h2>Errors we encountered:<a class="headerlink" href="#errors-we-encountered" title="Link to this heading"></a></h2>
+<h3>Errors we encountered:<a class="headerlink" href="#errors-we-encountered" title="Link to this heading"></a></h3>
 <p>The script did not recognize (find) the right path to the environmental
 variable of the system. To obtain it, check the environmental variables:</p>
 <img alt="_images/environmental_variables.png" src="_images/environmental_variables.png" />
@@ -188,19 +187,19 @@ and install a <a class="reference external" href="https://learn.microsoft.com/en
 <img alt="_images/VisualStudioCcode.jpg" src="_images/VisualStudioCcode.jpg" />
 </section>
 <section id="ni-card-drivers">
-<h2>NI card drivers<a class="headerlink" href="#ni-card-drivers" title="Link to this heading"></a></h2>
+<h3>NI card drivers<a class="headerlink" href="#ni-card-drivers" title="Link to this heading"></a></h3>
 <p>To install the drivers for the NI board, please go to:
 <a class="reference external" href="https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx--main-page.html">https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with-ni-daqmx–main-page.html</a></p>
 <p>and install it with suggested additional installs.</p>
 </section>
 <section id="graphics-card">
-<h2>Graphics card<a class="headerlink" href="#graphics-card" title="Link to this heading"></a></h2>
+<h3>Graphics card<a class="headerlink" href="#graphics-card" title="Link to this heading"></a></h3>
 <p>If you encounter an OpenGL error, please make sure you have a Graphics card
 that allows to run Napari independently of this software:</p>
 <p><a class="reference external" href="https://napari.org/stable/tutorials/fundamentals/installation.html">https://napari.org/stable/tutorials/fundamentals/installation.html</a></p>
 </section>
 <section id="smaract">
-<h2>Smaract<a class="headerlink" href="#smaract" title="Link to this heading"></a></h2>
+<h3>Smaract<a class="headerlink" href="#smaract" title="Link to this heading"></a></h3>
 <p>To install the driver for the Smaract stages, first install the two drivers
 executables in the Smaract Folder Smaract/executables:
 StageDriver1.exe and StageDriver2.exe.</p>
@@ -209,8 +208,10 @@ StageDriver1.exe and StageDriver2.exe.</p>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\Smaract&gt; pip install .</span>
 </pre></div>
 </div>
+</section>
+</section>
 <section id="configuration-file">
-<h3>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h3>
+<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h2>
 <p>Now, depending on your available hardware and disks, define the configuration file in
 <code class="docutils literal notranslate"><span class="pre">multiScale/auxiliary_code/constants.py</span></code>:</p>
 <p>For a synthetic microscope without any hardware available, define it as:</p>
@@ -250,14 +251,15 @@ where the data is saved here (disktosave).</p>
 </div>
 </section>
 <section id="run-the-code">
-<h3>Run the code<a class="headerlink" href="#run-the-code" title="Link to this heading"></a></h3>
+<h2>Run the code<a class="headerlink" href="#run-the-code" title="Link to this heading"></a></h2>
 <p>Now it is time to start the code:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control\multiScale&gt; python multiScale_main.py</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control&gt; cd multiScale</span>
+<span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control\multiScale&gt; python multiScale_main.py</span>
 </pre></div>
 </div>
 </section>
 <section id="troubleshooting">
-<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h3>
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
 <p>If you run the code at an institution with a firewall, you may need to change the proxy
 settings to enable <code class="docutils literal notranslate"><span class="pre">pip</span></code> and <code class="docutils literal notranslate"><span class="pre">conda</span></code> to download files.</p>
 <p>To do so, change your system environment variables (Windows). You obtain the port number (1234)
@@ -287,7 +289,6 @@ and <a class="reference external" href="https://stackoverflow.com/questions/4347
 <li><p><code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">https_proxy=http://username:password&#64;proxy.your_university.edu:1234</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">http_proxy=http://username:password&#64;proxy.your_university.edu:1234</span></code></p></li>
 </ul>
-</section>
 </section>
 </section>
 
