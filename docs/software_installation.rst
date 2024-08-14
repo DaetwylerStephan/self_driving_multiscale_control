@@ -62,7 +62,7 @@ Note: This environment uses Python version 3.9.
 Installation of the software
 ============================
 
-Now navigate to the folder "multiScale", where the setup.py and requirements.txt file are located,
+Now navigate to the folder "self_driving_multiscale_control", where the setup.py and requirements.txt file are located,
 and install the software:
 
 .. code-block:: console
@@ -73,26 +73,26 @@ and install the software:
 Hardware driver installation
 ============================
 
-Before continuing now with the control code installation, we need several hardware
+Before continuing now with running the software, we need several hardware
 drivers for camera, stages and analog output board.
 
 Camera drivers
 --------------
 
-To run the Photometrics camera (and control software code), please download the
+To run the Photometrics camera (and control software code), please download both
 camera drivers from the manufacturer's homepage.
 
-First install the Pvcam drivers for the camera software:
+First download and install the Pvcam drivers for the camera software:
 https://www.photometrics.com/support/download/pvcam
 
-and the SDK:
+and download and install the SDK (with Python support):
 https://www.photometrics.com/support/download/pvcam-sdk
 
 Next, navigate to the PyVCAM folder and run the setup install command:
 
 .. code-block:: console
 
-    (microscopecontrol) ~\MicroscopeControlCode> cd PyVCAM-master
+    (microscopecontrol) ~\self_driving_multiscale_control> cd PyVCAM-master
     (microscopecontrol) ~\PyVCAM-master> python setup.py install
 
 Errors we encountered:
@@ -113,9 +113,12 @@ and modify the path in the PyVCAM-master/setup.py file accordingly:
     #pvcam_sdk_path = os.environ['PVCAM_SDK_PATH']
 
 
-When installing the software, also the Microsoft compiler of the c-libraries might not work.
+When running "python setup.py install", the code requires a C language compiler for the camera code.
+If you encounter this error, please go to https://visualstudio.microsoft.com/downloads/
+and install a `Visual Studio with C and C++ support <https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170>`_:
 
-Go to: https://visualstudio.microsoft.com/downloads/ and install a Visual Studio with
+.. image:: images/VisualStudioCcode.jpg
+
 
 NI card drivers
 ---------------
@@ -130,14 +133,17 @@ Graphics card
 ---------------
 
 If you encounter an OpenGL error, please make sure you have a Graphics card
-that allows to run Napari (https://napari.org/stable/tutorials/fundamentals/installation.html).
+that allows to run Napari independently of this software:
+
+https://napari.org/stable/tutorials/fundamentals/installation.html
 
 
 Smaract
 -------
 
 To install the driver for the Smaract stages, first install the two drivers
-executables in the Smaract Folder
+executables in the Smaract Folder Smaract/executables:
+StageDriver1.exe and StageDriver2.exe.
 
 Next, navigate to the Smaract folder and run the setup install command:
 
@@ -186,10 +192,13 @@ with all hardware available, set:
 Note that you also set the folder where you save the data here (parentdir) and indicate the disk
 where the data is saved here (disktosave).
 
-
 .. note::
 
-    Please note that you run "pip install ." every time after you change any part of the code.
+    Please note that you run "pip install ." every time after you change any part of this code.
+
+.. code-block:: console
+
+    (microscopecontrol) ~\self_driving_multiscale_control> pip install .
 
 Run the code
 ============

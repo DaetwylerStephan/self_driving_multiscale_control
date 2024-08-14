@@ -144,7 +144,7 @@ for the control code.</p>
 </section>
 <section id="installation-of-the-software">
 <h3>Installation of the software<a class="headerlink" href="#installation-of-the-software" title="Link to this heading"></a></h3>
-<p>Now navigate to the folder “multiScale”, where the setup.py and requirements.txt file are located,
+<p>Now navigate to the folder “self_driving_multiscale_control”, where the setup.py and requirements.txt file are located,
 and install the software:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; cd self_driving_multiscale_control</span>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode\self_driving_multiscale_control&gt; pip install .</span>
@@ -153,20 +153,20 @@ and install the software:</p>
 </section>
 <section id="hardware-driver-installation">
 <h3>Hardware driver installation<a class="headerlink" href="#hardware-driver-installation" title="Link to this heading"></a></h3>
-<p>Before continuing now with the control code installation, we need several hardware
+<p>Before continuing now with running the software, we need several hardware
 drivers for camera, stages and analog output board.</p>
 </section>
 </section>
 <section id="camera-drivers">
 <h2>Camera drivers<a class="headerlink" href="#camera-drivers" title="Link to this heading"></a></h2>
-<p>To run the Photometrics camera (and control software code), please download the
+<p>To run the Photometrics camera (and control software code), please download both
 camera drivers from the manufacturer’s homepage.</p>
-<p>First install the Pvcam drivers for the camera software:
+<p>First download and install the Pvcam drivers for the camera software:
 <a class="reference external" href="https://www.photometrics.com/support/download/pvcam">https://www.photometrics.com/support/download/pvcam</a></p>
-<p>and the SDK:
+<p>and download and install the SDK (with Python support):
 <a class="reference external" href="https://www.photometrics.com/support/download/pvcam-sdk">https://www.photometrics.com/support/download/pvcam-sdk</a></p>
 <p>Next, navigate to the PyVCAM folder and run the setup install command:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\MicroscopeControlCode&gt; cd PyVCAM-master</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control&gt; cd PyVCAM-master</span>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\PyVCAM-master&gt; python setup.py install</span>
 </pre></div>
 </div>
@@ -182,8 +182,10 @@ variable of the system. To obtain it, check the environmental variables:</p>
 <span class="c1">#pvcam_sdk_path = os.environ[&#39;PVCAM_SDK_PATH&#39;]</span>
 </pre></div>
 </div>
-<p>When installing the software, also the Microsoft compiler of the c-libraries might not work.</p>
-<p>Go to: <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">https://visualstudio.microsoft.com/downloads/</a> and install a Visual Studio with</p>
+<p>When running “python setup.py install”, the code requires a C language compiler for the camera code.
+If you encounter this error, please go to <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">https://visualstudio.microsoft.com/downloads/</a>
+and install a <a class="reference external" href="https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170">Visual Studio with C and C++ support</a>:</p>
+<img alt="_images/VisualStudioCcode.jpg" src="_images/VisualStudioCcode.jpg" />
 </section>
 <section id="ni-card-drivers">
 <h2>NI card drivers<a class="headerlink" href="#ni-card-drivers" title="Link to this heading"></a></h2>
@@ -194,12 +196,14 @@ variable of the system. To obtain it, check the environmental variables:</p>
 <section id="graphics-card">
 <h2>Graphics card<a class="headerlink" href="#graphics-card" title="Link to this heading"></a></h2>
 <p>If you encounter an OpenGL error, please make sure you have a Graphics card
-that allows to run Napari (<a class="reference external" href="https://napari.org/stable/tutorials/fundamentals/installation.html">https://napari.org/stable/tutorials/fundamentals/installation.html</a>).</p>
+that allows to run Napari independently of this software:</p>
+<p><a class="reference external" href="https://napari.org/stable/tutorials/fundamentals/installation.html">https://napari.org/stable/tutorials/fundamentals/installation.html</a></p>
 </section>
 <section id="smaract">
 <h2>Smaract<a class="headerlink" href="#smaract" title="Link to this heading"></a></h2>
 <p>To install the driver for the Smaract stages, first install the two drivers
-executables in the Smaract Folder</p>
+executables in the Smaract Folder Smaract/executables:
+StageDriver1.exe and StageDriver2.exe.</p>
 <p>Next, navigate to the Smaract folder and run the setup install command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control&gt; cd Smaract</span>
 <span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\Smaract&gt; pip install .</span>
@@ -239,7 +243,10 @@ with all hardware available, set:</p>
 where the data is saved here (disktosave).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Please note that you run “pip install .” every time after you change any part of the code.</p>
+<p>Please note that you run “pip install .” every time after you change any part of this code.</p>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(microscopecontrol)</span> <span class="go">~\self_driving_multiscale_control&gt; pip install .</span>
+</pre></div>
 </div>
 </section>
 <section id="run-the-code">
