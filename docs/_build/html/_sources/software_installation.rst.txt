@@ -84,6 +84,10 @@ all hardware components:
    (microscopecontrol) ~\self_driving_multiscale_control> cd multiScale
    (microscopecontrol) ~\self_driving_multiscale_control\multiScale> python multiScale_main.py
 
+Note: The miroscope automatically sets the path to save images. If you do not have a "D:" drive,
+change the "parentdir" and "disktosave" parameters in the configuration file (see below) to successfully
+run the synthetic microscope. In case this is needed, rerun "pip install ." after making the changes.
+
 Next, to run the microscope as described in our paper, we need to install all hardware components.
 
 Hardware driver installation
