@@ -9,21 +9,6 @@ import copy
 
 from multiScale import acquisition_array_class as acq_arrays
 
-import src.camera.Photometrics_camera as Photometricscamera
-import src.camera.Synthetic_camera as Synthetic_camera
-
-import src.ni_board.vni as ni
-import src.ni_board.ni_synthetic as synthetic_ni
-
-import src.stages.rotation_stage_cmd as RotStage
-import src.stages.synthetic_rotation_stage as Synthetic_RotStage
-
-import src.stages.translation_stage_cmd as TransStage
-import src.stages.synthetic_translation_stage as Synthetic_TransStage
-
-import src.filter_wheel.ludlcontrol as FilterWheel
-import src.filter_wheel.Synthetic_Filterwheel as Synthetic_FilterWheel
-
 import auxiliary_code.concurrency_tools as ct
 import auxiliary_code.napari_in_subprocess as napari
 from auxiliary_code.constants import FilterWheel_parameters
@@ -186,6 +171,7 @@ class multiScopeModel:
         print("Initializing low resolution camera ..")
 
         if microscope_configuration.lowres_camera == 'Photometrics_lowres':
+            import src.camera.Photometrics_camera as Photometricscamera
             # place the Photometrics class as object into an Object in Subprocess
             self.lowres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMPCIECam00')
             self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
@@ -194,6 +180,7 @@ class multiScopeModel:
             print("done with camera.")
 
         else:
+            import src.camera.Synthetic_camera as Synthetic_camera
             # place the Photometrics class as object into an Object in Subprocess
             self.lowres_camera = ct.ObjectInSubprocess(Synthetic_camera.Synthetic_Photo_Camera, 'lowres_synthetic')
             self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
@@ -206,6 +193,7 @@ class multiScopeModel:
         """
         if microscope_configuration.highres_camera == 'Photometrics_highres':
             print("Initializing high resolution camera..")
+            import src.camera.Photometrics_camera as Photometricscamera
             # place the Photometrics class as object into an Object in Subprocess
             self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
             self.highres_camera_ROI = self.highres_camera.get_imageroi()
@@ -214,6 +202,7 @@ class multiScopeModel:
             print("done with camera.")
         else:
             # place the Photometrics class as object into an Object in Subprocess
+            import src.camera.Synthetic_camera as Synthetic_camera
             self.highres_camera = ct.ObjectInSubprocess(Synthetic_camera.Synthetic_Photo_Camera, 'highres_synthetic')
             self.highres_camera_ROI = self.highres_camera.get_imageroi()
             print(self.highres_camera_ROI)
@@ -234,6 +223,7 @@ class multiScopeModel:
         """
         print("Initializing ao card...", end=' ')
         if microscope_configuration.ni_board == 'NI_Board':
+            import src.ni_board.vni as ni
             self.ao = ni.Analog_Out(
                 num_channels=NI_board_parameters.ao_nchannels,
                 rate=NI_board_parameters.rate,
@@ -279,6 +269,7 @@ class multiScopeModel:
             print("done with ao.")
             atexit.register(self.ao.close)
         else:
+            import src.ni_board.ni_synthetic as synthetic_ni
             self.ao = synthetic_ni.Analog_Out(
                 num_channels=NI_board_parameters.ao_nchannels,
                 rate=NI_board_parameters.rate,
@@ -329,6 +320,8 @@ class multiScopeModel:
         Initialize Ludl filterwheel or synthetic filterwheel
         """
         if microscope_configuration.filterwheel == 'Ludl_filterwheel':
+
+            import src.filter_wheel.ludlcontrol as FilterWheel
             ComPort = FilterWheel_parameters.comport
             self.filters = FilterWheel_parameters.avail_filters
 
@@ -340,6 +333,7 @@ class multiScopeModel:
             self.filterwheel.set_filter('676/37-25', wait_until_done=False)
             print("done with Ludl filterwheel.")
         else:
+            import src.filter_wheel.Synthetic_Filterwheel as Synthetic_FilterWheel
             #synthetic filter wheel
             ComPort = FilterWheel_parameters.comport
             self.filters = FilterWheel_parameters.avail_filters
@@ -353,12 +347,15 @@ class multiScopeModel:
         Initialize Smaract translation stage or synthetic stage
         """
         if microscope_configuration.translationstage == 'Smaract_TranslationStage':
+
+            import src.stages.translation_stage_cmd as TransStage
             print("Initializing XYZ stage usb:sn:MCS2-00001795...")
             stage_id = Stage_parameters.stage_id_XYZ
             self.XYZ_stage = TransStage.SLC_translationstage(stage_id)
             self.XYZ_stage.findReference()
         else:
             print("Initializing synthetic stage ")
+            import src.stages.synthetic_translation_stage as Synthetic_TransStage
             self.XYZ_stage = Synthetic_TransStage.Synthetic_translationstage()
             self.XYZ_stage.findReference()
         print("done with XYZ stage.")
@@ -370,9 +367,11 @@ class multiScopeModel:
         """
         print("Initializing rotation stage...")
         if microscope_configuration.rotationstage == 'Smaract_RotationStage':
+            import src.stages.rotation_stage_cmd as RotStage
             stage_id = Stage_parameters.stage_id_rot
             self.rotationstage = RotStage.SR2812_rotationstage(stage_id)
         else:
+            import src.stages.synthetic_rotation_stage as Synthetic_RotStage
             stage_id = Stage_parameters.stage_id_rot
             self.rotationstage = Synthetic_RotStage.Synthetic_rotationstage(stage_id)
         print("done with rot stage.")
