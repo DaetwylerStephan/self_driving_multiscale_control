@@ -89,7 +89,7 @@ After acquisition of this first region, the acquisition of the second region (vo
 buffer (LR acquisition buffer 2).
 
 In contrast to the first timepoint, image correspondence is already established.  If this is the
-channel (signal) on which correspondence should be established and if there is a
+channel (signal) which is used for self-driving microscope correction, and if there is a
 high-resolution region within this low-resolution, its maximum intensity projections
 in X-Y, X-Z, Y-Z views of the previous timepoint are loaded into
 memory from the image repository. Then, using multi-scale template matching, the current

@@ -72,6 +72,20 @@ and install the software:
    (microscopecontrol) ~\MicroscopeControlCode> cd self_driving_multiscale_control
    (microscopecontrol) ~\MicroscopeControlCode\self_driving_multiscale_control> pip install .
 
+
+Run the microscope in synthetic mode
+====================================
+
+Now, as we have no hardware installed, we can run the microscope in synthetic mode, which simulates
+all hardware components:
+
+.. code-block:: console
+
+   (microscopecontrol) ~\self_driving_multiscale_control> cd multiScale
+   (microscopecontrol) ~\self_driving_multiscale_control\multiScale> python multiScale_main.py
+
+Next, to run the microscope as described in our paper, we need to install all hardware components.
+
 Hardware driver installation
 ============================
 
@@ -131,21 +145,11 @@ https://www.ni.com/en/support/documentation/supplemental/06/getting-started-with
 and install it with suggested additional installs.
 
 
-Graphics card
----------------
-
-If you encounter an OpenGL error, please make sure you have a Graphics card
-that allows to run Napari independently of this software:
-
-https://napari.org/stable/tutorials/fundamentals/installation.html
-
-
 Smaract
 -------
 
-To install the driver for the Smaract stages, first install the two drivers
-executables in the Smaract Folder Smaract/executables:
-StageDriver1.exe and StageDriver2.exe.
+To install the driver for the Smaract stages, first install the drivers
+provided by Smaract when receiving the Smaract device.
 
 Next, navigate to the Smaract folder and run the setup install command:
 
@@ -205,7 +209,7 @@ where the data is saved here (disktosave).
 Run the code
 ============
 
-Now it is time to start the code:
+Now it is time to start the full code:
 
 .. code-block:: console
 
@@ -215,6 +219,17 @@ Now it is time to start the code:
 
 Troubleshooting
 ===============
+
+Graphics card (Napari issues)
+-----------------------------
+
+If you encounter an OpenGL error, please make sure you have a Graphics card
+that allows to run Napari independently of this software:
+
+https://napari.org/stable/tutorials/fundamentals/installation.html
+
+Proxy issues (Download errors)
+------------------------------
 
 If you run the code at an institution with a firewall, you may need to change the proxy
 settings to enable ``pip`` and ``conda`` to download files.
