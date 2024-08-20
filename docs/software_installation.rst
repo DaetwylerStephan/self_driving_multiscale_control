@@ -10,9 +10,11 @@ Software Installation and Configuration
 
 
 Operating System Compatibility
-------------------------------
+==============================
 
-This software has been tested on a Windows 10 computer.
+In synthetic mode, this code was tested on
+a Dell Precision 5820 Tower operating Window 10 (64 bit) with 64 GB RAM,
+an Intel Xeon(R) W-2155 CPU @ 3.30 GHz processor, and an NVIDIA Quadro P4000 graphics card.
 
 Get ready
 =========
@@ -207,6 +209,7 @@ Now it is time to start the code:
 
 .. code-block:: console
 
+   (microscopecontrol) ~\self_driving_multiscale_control> cd multiScale
    (microscopecontrol) ~\self_driving_multiscale_control\multiScale> python multiScale_main.py
 
 

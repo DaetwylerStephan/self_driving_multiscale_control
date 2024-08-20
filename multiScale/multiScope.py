@@ -182,6 +182,7 @@ class multiScopeModel:
         else:
             import src.camera.Synthetic_camera as Synthetic_camera
             # place the Photometrics class as object into an Object in Subprocess
+            import src.camera.Synthetic_camera as Synthetic_camera
             self.lowres_camera = ct.ObjectInSubprocess(Synthetic_camera.Synthetic_Photo_Camera, 'lowres_synthetic')
             self.lowres_camera_ROI = self.lowres_camera.get_imageroi()
             print(self.lowres_camera_ROI)
@@ -195,6 +196,7 @@ class multiScopeModel:
             print("Initializing high resolution camera..")
             import src.camera.Photometrics_camera as Photometricscamera
             # place the Photometrics class as object into an Object in Subprocess
+            import src.camera.Photometrics_camera as Photometricscamera
             self.highres_camera = ct.ObjectInSubprocess(Photometricscamera.Photo_Camera, 'PMUSBCam00')
             self.highres_camera_ROI = self.highres_camera.get_imageroi()
             print(self.highres_camera_ROI)
@@ -335,6 +337,7 @@ class multiScopeModel:
         else:
             import src.filter_wheel.Synthetic_Filterwheel as Synthetic_FilterWheel
             #synthetic filter wheel
+            import src.filter_wheel.Synthetic_Filterwheel as Synthetic_FilterWheel
             ComPort = FilterWheel_parameters.comport
             self.filters = FilterWheel_parameters.avail_filters
             print("Initializing filter wheel...", end=' ')
