@@ -20,9 +20,7 @@ https://daetwylerstephan.github.io/self_driving_multiscale_control/
 A tutorial video for installing and running this code in its synthetic mode,
 is available here:
 
-https://www.youtube.com/watch?v=4oEhywawhts
-
-
+https://www.youtube.com/watch?v=alAD5PIA9Ps
 
 
 
