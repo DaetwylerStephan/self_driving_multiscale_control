@@ -6,13 +6,10 @@
 This repository contains the software to run and control a self-driving,
 multi-scale microscope. 
 
-If you use this code, please cite our preprint:
-“Imaging of cellular dynamics in vitro and in situ: from a whole organism to 
-sub-cellular imaging with self-driving, multi-scale microscopy” by Stephan Daetwyler, 
-Hanieh Mazloom-Farsibaf, Felix Y. Zhou, Dagan Segal, Etai Sapoznik, Jill M. Westcott,
-Rolf A. Brekken, Gaudenz Danuser and Reto Fiolka:
+If you use this code, please cite our paper:
+Daetwyler, S., Mazloom-Farsibaf, H., Zhou, F.Y. et al. Imaging of cellular dynamics from a whole organism to subcellular scale with self-driving, multiscale microscopy. Nat Methods 22, 569–578 (2025). 
 
-https://www.biorxiv.org/content/10.1101/2024.02.28.582579v1
+https://doi.org/10.1038/s41592-025-02598-2
 
 A detailed documentation with instructions how to run the code is available here:
 https://daetwylerstephan.github.io/self_driving_multiscale_control/
